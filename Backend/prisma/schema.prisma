@@ -1,0 +1,181 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Status {
+  ACTIVE
+  INACTIVE
+}
+
+enum Role {
+  STUDENT
+  COMPANY
+  ADMIN
+}
+
+enum JobStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ApplicationStatus {
+  APPLIED
+  SHORTLISTED
+  REJECTED
+  SELECTED
+  WITHDRAWN
+  NOT_ELIGIBLE
+}
+
+enum NotificationType {
+  APPLICATION_UPDATE
+  JOB_ALERT
+  SYSTEM
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  firstname  String
+  lastname   String?
+  email      String   @unique
+  password   String
+  socketId   String?
+
+  role       Role
+  status     Status   @default(ACTIVE)
+
+  student    Student?
+  company    Company?
+  admin      Admin?
+
+  tokens     Token[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Student {
+  id           Int     @id @default(autoincrement())
+  userId       Int     @unique
+  user         User    @relation(fields: [userId], references: [id])
+
+  departmentId Int
+  department   Department @relation(fields: [departmentId], references: [id])
+
+  cgpa         Float
+
+  applications Application[]
+
+  createdAt    DateTime @default(now())
+
+  @@index([departmentId])
+}
+
+model Company {
+  id        Int     @id @default(autoincrement())
+  userId    Int     @unique
+  user      User    @relation(fields: [userId], references: [id])
+
+  name      String
+  description String?
+
+  jobs      Job[]
+
+  createdAt DateTime @default(now())
+}
+
+model Admin {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
+}
+
+model Department {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+
+  students  Student[]
+  jobs      Job[]
+
+  createdAt DateTime @default(now())
+}
+
+model Job {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  salary      Float
+  location    String
+
+  status      JobStatus @default(PENDING)
+
+  companyId   Int
+  company     Company @relation(fields: [companyId], references: [id])
+
+  approvedBy  Int?
+  approver    Admin? @relation(fields: [approvedBy], references: [id])
+
+  applications Application[]
+
+  eligibleDepartments Department[]
+
+  createdAt   DateTime @default(now())
+
+  @@index([status])
+  @@index([companyId])
+}
+
+model Application {
+  id        Int      @id @default(autoincrement())
+
+  studentId Int
+  jobId     Int
+
+  status    ApplicationStatus @default(APPLIED)
+  reason    String?
+
+  student   Student @relation(fields: [studentId], references: [id])
+  job       Job     @relation(fields: [jobId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, jobId])
+}
+
+model Token {
+  id            Int      @id @default(autoincrement())
+  refreshToken  String
+
+  status        Status   @default(ACTIVE)
+
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt     DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+
+  title     String
+  message   String
+
+  type      NotificationType
+  read      Boolean  @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
