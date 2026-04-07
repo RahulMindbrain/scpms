@@ -2,7 +2,9 @@ import Homepage from "@/pages/public/homepage/homepage";
 import type { RouteOptions } from "./type";
 import NotFound from "@/pages/public/notFound/notFound";
 import SignUp from "@/pages/public/signup/signup";
-
+import SignIn from "@/pages/public/signin/signIn";
+import ForgotPassword from "@/pages/public/forgotpassword/forget";
+import HomePage from "@/pages/public/homepage/homepage";
 export const PublicRoutes: RouteOptions<any>[] = [
     {
         path: "/",
@@ -12,8 +14,22 @@ export const PublicRoutes: RouteOptions<any>[] = [
         path: "/signup",
         component: SignUp,
     },
+     {
+        path: "/login",
+        component: SignIn,
+    },
+    {
+        path: "/Forgot",
+        component: ForgotPassword,
+    },
+    {
+        path: "/Home",
+        component: Homepage,
+    },
+
     {
         path: "*",
         component: NotFound,
     },
+    
 ];
