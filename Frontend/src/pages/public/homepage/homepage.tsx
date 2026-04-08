@@ -16,7 +16,7 @@ import {
   Building2
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 
 const HomePage: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -362,26 +362,48 @@ const CheckListItem = ({ text }: { text: string }) => (
   </li>
 );
 
-const PortalCard = ({ icon: Icon, iconColor, title, desc, buttonText }: {
+const PortalCard = ({
+  icon: Icon,
+  iconColor,
+  title,
+  desc,
+  buttonText,
+  navigateTo
+}: {
   icon: LucideIcon,
   iconColor: string,
   title: string,
   desc: string,
-  buttonText: string
+  buttonText: string,
   navigateTo: string
-}) => (
-  <div className="bg-white p-10 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 text-center flex flex-col items-center">
-    <div className={`w-16 h-16 ${iconColor} rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-black/5`}>
-      <Icon size={32} className="text-white" />
+}) => {
+
+  const navigate = useNavigate();
+
+  return (
+    <div className="bg-white p-10 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 text-center flex flex-col items-center">
+      
+      <div className={`w-16 h-16 ${iconColor} rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-black/5`}>
+        <Icon size={32} className="text-white" />
+      </div>
+
+      <h3 className="text-2xl font-bold text-slate-900 mb-4">{title}</h3>
+
+      <p className="text-slate-500 leading-relaxed mb-8 text-sm">
+        {desc}
+      </p>
+
+      <button
+        onClick={() => navigate(navigateTo)}
+        className="mt-auto px-6 py-2.5 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-2 group"
+      >
+        {buttonText}
+        <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+      </button>
+
     </div>
-    <h3 className="text-2xl font-bold text-slate-900 mb-4">{title}</h3>
-    <p className="text-slate-500 leading-relaxed mb-8 text-sm">
-      {desc}
-    </p>
-    <button className="mt-auto px-6 py-2.5 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-2 group">
-      {buttonText} <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-    </button>
-  </div>
-);
+  );
+};
+
 
 export default HomePage;
