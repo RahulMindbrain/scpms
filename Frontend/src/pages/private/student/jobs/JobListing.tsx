@@ -7,6 +7,7 @@ import {
   BriefcaseBusiness
 } from 'lucide-react';
 import { useState } from 'react';
+import ApplicationStatus from '../application/Application';
 
 const JobListing = () => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -195,6 +196,12 @@ const JobListing = () => {
     </div>
   );
 };
+<ApplicationStatus 
+  companyName="Google"
+  role="SDE Intern"
+  appliedDate="Apr 5"
+  currentStatus="HR Round" 
+/>
 
 export default JobListing;
 

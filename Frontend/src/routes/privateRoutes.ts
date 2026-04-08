@@ -2,6 +2,7 @@ import Eligibility from "@/pages/private/student/eligibility/Eligibility";
 import StudentDashboard from "@/pages/private/student/dashboard/StudentDashboard";
 import StudentProfile from "@/pages/private/student/profile/StudentProfile";
 import JobListing from "@/pages/private/student/jobs/JobListing";
+import ApplicationStatus from "@/pages/private/student/application/Application";
 import type { RouteOptions } from "./type";
 
 export const PrivateRoutes: RouteOptions<any>[] = [
@@ -21,4 +22,9 @@ export const PrivateRoutes: RouteOptions<any>[] = [
         path: "/student/jobs",
         component: JobListing,
     },
+    {
+        path: "/student/application",
+        component:ApplicationStatus
+    }
+
 ];

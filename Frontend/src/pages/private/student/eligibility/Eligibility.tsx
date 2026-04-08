@@ -53,7 +53,7 @@ const Eligibility = () => {
             </button>
             <div className="h-10 w-px bg-slate-200 mx-1"></div>
             <div className="flex items-center gap-3 bg-white p-1 pr-4 border border-slate-200 rounded-full shadow-sm">
-              <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">PS</div>
+              <div className="w-8 h-8 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xs font-bold">AS</div>
               <span className="text-sm font-semibold text-slate-700">Anjali Sharma</span>
             </div>
           </div>
