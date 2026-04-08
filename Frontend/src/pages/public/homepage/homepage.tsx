@@ -222,7 +222,7 @@ const HomePage: React.FC = () => {
               iconColor="bg-blue-600"
               title="TPO / Admin"
               desc="Manage drives, approve profiles, monitor analytics, and orchestrate the entire placement lifecycle."
-              buttonText="Access TPO Panel"
+              buttonText="Access TPO Portal"
             />
             <PortalCard
               icon={GraduationCap}
