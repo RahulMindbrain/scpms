@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Users, 
-  GraduationCap, 
-  BarChart3, 
-  ShieldCheck, 
+import {
+  Users,
+  GraduationCap,
+  BarChart3,
+  ShieldCheck,
   Zap,
   Menu,
   X,
@@ -16,11 +16,12 @@ import {
   Building2
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 const HomePage: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-
+const navigate = useNavigate();
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll);
@@ -30,9 +31,8 @@ const HomePage: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-teal-500/30">
       {/* Navigation */}
-      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled ? 'bg-white/80 backdrop-blur-md border-b border-slate-200 py-3 shadow-sm' : 'bg-transparent py-5'
-      }`}>
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-md border-b border-slate-200 py-3 shadow-sm' : 'bg-transparent py-5'
+        }`}>
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3 group cursor-pointer">
@@ -43,11 +43,11 @@ const HomePage: React.FC = () => {
                 Smart CPMS
               </span>
             </div>
-            
+
             <div className="hidden md:flex items-center gap-10">
               <div className="flex items-center gap-8">
                 {['Features', 'Portals', 'Stats'].map((item) => (
-                  <a key={item} href={`#${item.toLowerCase()}`} 
+                  <a key={item} href={`#${item.toLowerCase()}`}
                     className={`text-sm font-semibold transition-colors ${scrolled ? 'text-slate-500 hover:text-blue-600' : 'text-slate-300 hover:text-white'}`}>
                     {item}
                   </a>
@@ -57,36 +57,38 @@ const HomePage: React.FC = () => {
                 <a href="/login" className={`text-sm font-bold ${scrolled ? 'text-slate-900' : 'text-white'} hover:text-blue-500 transition-colors`}>
                   Sign In
                 </a>
-                <button className="bg-gradient-to-r from-blue-600 to-teal-500 text-white px-6 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:shadow-lg hover:shadow-blue-500/25 transition-all active:scale-95">
+                <Link
+                  to="/signup"
+                  className="bg-gradient-to-r from-blue-600 to-teal-500 text-white px-6 py-2 rounded-lg text-sm font-bold flex items-center gap-2"
+                >
                   Get Started <ArrowRight size={16} />
-                </button>
+                </Link>
               </div>
             </div>
 
-            <button className={`md:hidden p-2 ${scrolled || isMenuOpen ? 'text-slate-900' : 'text-white'}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button className= {`md:hidden p-2 ${scrolled || isMenuOpen ? 'text-slate-900' : 'text-white'}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X /> : <Menu />}
             </button>
           </div>
         </div>
 
         {/* Mobile Navigation Menu */}
-        <div className={`md:hidden fixed inset-0 z-40 bg-white transition-all duration-300 ease-in-out ${
-          isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
-        }`}>
+        <div className={`md:hidden fixed inset-0 z-40 bg-white transition-all duration-300 ease-in-out ${isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
+          }`}>
           <div className="flex flex-col h-full pt-24 px-8 pb-10">
             <div className="flex flex-col gap-6 mb-auto">
               {['Features', 'Portals', 'Stats'].map((item) => (
-                <a key={item} href={`#${item.toLowerCase()}`} 
-                   onClick={() => setIsMenuOpen(false)}
-                   className="text-2xl font-bold text-slate-800 hover:text-blue-600 transition-colors">
+                <a key={item} href={`#${item.toLowerCase()}`}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="text-2xl font-bold text-slate-800 hover:text-blue-600 transition-colors">
                   {item}
                 </a>
               ))}
             </div>
             <div className="flex flex-col gap-4">
-              <a href="/login" 
-                 onClick={() => setIsMenuOpen(false)}
-                 className="flex items-center justify-center py-4 text-lg font-bold text-slate-900 border border-slate-200 rounded-2xl">
+              <a href="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className="flex items-center justify-center py-4 text-lg font-bold text-slate-900 border border-slate-200 rounded-2xl">
                 Sign In
               </a>
               <button className="py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-2xl text-lg font-bold shadow-xl shadow-blue-500/20">
@@ -100,31 +102,31 @@ const HomePage: React.FC = () => {
       {/* Hero Section */}
       <header className="relative min-h-[90vh] flex items-center pt-28 pb-20 md:pt-20">
         <div className="absolute inset-0 z-0">
-          <img 
-            src="/hero-bg.png" 
-            alt="Campus Architecture" 
+          <img
+            src="/hero-bg.png"
+            alt="Campus Architecture"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-transparent"></div>
         </div>
-        
+
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 mb-8">
               <Zap size={14} className="text-teal-400" />
               <span className="text-xs font-bold text-teal-400 uppercase tracking-wider">Next-Gen Placement Platform</span>
             </div>
-            
+
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-[1.1]">
               Placements, <span className="text-teal-400">Simplified</span>
             </h1>
-            
+
             <p className="text-lg md:text-xl text-slate-300 mb-10 leading-relaxed max-w-2xl">
-              A unified digital hub for TPOs, students, and recruiters. 
-              Automate drives, track applications, and boost placement rates 
+              A unified digital hub for TPOs, students, and recruiters.
+              Automate drives, track applications, and boost placement rates
               — all from one platform.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
               <button className="px-8 py-3.5 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-xl font-bold flex items-center gap-2 shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:translate-y-[-2px]">
                 Launch Dashboard <ChevronRight size={18} />
@@ -158,44 +160,44 @@ const HomePage: React.FC = () => {
               A complete suite of tools to digitize and automate your campus placement process.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <FeatureCard 
+            <FeatureCard
               icon={BarChart3}
               iconBg="bg-blue-50"
               iconColor="text-blue-600"
               title="Real-Time Analytics"
               desc="Track placement stats, department performance, and salary trends with interactive dashboards."
             />
-            <FeatureCard 
+            <FeatureCard
               icon={ShieldCheck}
               iconBg="bg-indigo-50"
               iconColor="text-indigo-600"
               title="Role-Based Access"
               desc="Secure JWT-based authentication with separate portals for TPOs, students, and companies."
             />
-            <FeatureCard 
+            <FeatureCard
               icon={Zap}
               iconBg="bg-cyan-50"
               iconColor="text-cyan-500"
               title="Auto Eligibility"
               desc="Automatically filter students by CGPA, branch, and backlogs — only eligible candidates can apply."
             />
-            <FeatureCard 
+            <FeatureCard
               icon={Calendar}
               iconBg="bg-blue-50"
               iconColor="text-blue-700"
               title="Interview Scheduling"
               desc="Centralized calendar for placement drives, preventing scheduling conflicts across companies."
             />
-            <FeatureCard 
+            <FeatureCard
               icon={FileText}
               iconBg="bg-violet-50"
               iconColor="text-violet-600"
               title="Digital Portfolios"
               desc="Standardized student profiles and automated resume validation for easier evaluation."
             />
-            <FeatureCard 
+            <FeatureCard
               icon={Mail}
               iconBg="bg-teal-50"
               iconColor="text-teal-600"
@@ -223,6 +225,7 @@ const HomePage: React.FC = () => {
               title="TPO / Admin"
               desc="Manage drives, approve profiles, monitor analytics, and orchestrate the entire placement lifecycle."
               buttonText="Access TPO Portal"
+              navigateTo="/login"
             />
             <PortalCard
               icon={GraduationCap}
@@ -230,6 +233,7 @@ const HomePage: React.FC = () => {
               title="Students"
               desc="Build your portfolio, track eligibility, apply to drives, and follow your application status in real time."
               buttonText="Student Portal"
+               navigateTo="/login"
             />
             <PortalCard
               icon={Building2}
@@ -237,6 +241,7 @@ const HomePage: React.FC = () => {
               title="Companies"
               desc="Post job descriptions, filter candidates by criteria, schedule interviews, and update selection results."
               buttonText="Company Portal"
+               navigateTo="/login"
             />
           </div>
         </div>
@@ -256,7 +261,7 @@ const HomePage: React.FC = () => {
                 <CheckListItem text="Automated eligibility filtering saves hours of manual work" />
               </ul>
             </div>
-            
+
             <div className="flex-1 w-full">
               <div className="bg-[#1e293b] rounded-3xl p-10 md:p-16 text-center text-white shadow-2xl">
                 <div className="space-y-12">
@@ -287,7 +292,7 @@ const HomePage: React.FC = () => {
           <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-600 blur-[120px] rounded-full"></div>
           <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-teal-500 blur-[120px] rounded-full"></div>
         </div>
-        
+
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
             Ready to Transform Your Placements?
@@ -295,9 +300,12 @@ const HomePage: React.FC = () => {
           <p className="text-slate-400 text-lg mb-10">
             Join the smart campus revolution. Get started in minutes — no setup complexity.
           </p>
-          <button className="bg-teal-500 hover:bg-teal-400 text-white px-10 py-4 rounded-xl font-bold text-lg flex items-center gap-2 mx-auto transition-all hover:scale-105 active:scale-95 shadow-xl shadow-teal-500/20">
+          <Link
+            to="/signup"
+            className="bg-teal-500 hover:bg-teal-400 text-white px-10 py-4 rounded-xl font-bold text-lg flex items-center gap-2 mx-auto transition-all hover:scale-105 active:scale-95 shadow-xl shadow-teal-500/20"
+          >
             Get Started Now <ArrowRight size={20} />
-          </button>
+          </Link>
         </div>
       </section>
 
@@ -327,12 +335,12 @@ const StatItem = ({ value, label, border }: { value: string, label: string, bord
   </div>
 );
 
-const FeatureCard = ({ icon: Icon, iconBg, iconColor, title, desc }: { 
-  icon: LucideIcon, 
-  iconBg: string, 
-  iconColor: string, 
-  title: string, 
-  desc: string 
+const FeatureCard = ({ icon: Icon, iconBg, iconColor, title, desc }: {
+  icon: LucideIcon,
+  iconBg: string,
+  iconColor: string,
+  title: string,
+  desc: string
 }) => (
   <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 group">
     <div className={`w-12 h-12 ${iconBg} ${iconColor} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
@@ -360,6 +368,7 @@ const PortalCard = ({ icon: Icon, iconColor, title, desc, buttonText }: {
   title: string,
   desc: string,
   buttonText: string
+  navigateTo: string
 }) => (
   <div className="bg-white p-10 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 text-center flex flex-col items-center">
     <div className={`w-16 h-16 ${iconColor} rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-black/5`}>

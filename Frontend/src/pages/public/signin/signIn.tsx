@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Mail, Lock, ArrowRight, Eye, EyeOff, GraduationCap, Briefcase, ShieldCheck } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link,  useNavigate } from "react-router-dom";
 import illustration from "../../../assets/img.jpg";
 import camp from "../../../assets/camp.jpg"
 import campp from "../../../assets/campp.jpg"
@@ -23,13 +23,20 @@ const SignIn: React.FC = () => {
     { id: "tpo", label: "TPO", icon: <ShieldCheck size={16} /> },
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle login logic based on activeRole
-  };
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (activeRole === "student") {
+    navigate("/student/dashboard");
+  } else if (activeRole === "company") {
+    navigate("/company-dashboard");
+  } else if (activeRole === "tpo") {
+    navigate("/tpo-dashboard");
+  }
+};
   const images = [illustration, camp, campp];
   const [currentIndex, setCurrentIndex] = useState(0);
-
+const navigate = useNavigate();
 useEffect(() => {
   const interval = setInterval(() => {
     setCurrentIndex((prev) => (prev + 1) % images.length);
@@ -92,7 +99,7 @@ useEffect(() => {
                 type="email"
                 required
                 placeholder="name@example.com"
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all duration-200"
+                 className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all duration-200"
               />
             </div>
           </div>
@@ -111,7 +118,7 @@ useEffect(() => {
                 type={showPassword ? "text" : "password"}
                 required
                 placeholder="••••••••"
-                className="w-full pl-10 pr-12 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all duration-200"
+                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all duration-200"
               />
               <button
                 type="button"

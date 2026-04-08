@@ -8,7 +8,7 @@ import HomePage from "@/pages/public/homepage/homepage";
 export const PublicRoutes: RouteOptions<any>[] = [
     {
         path: "/",
-        component: Homepage,
+        component: HomePage,
     },
     {
         path: "/signup",

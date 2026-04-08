@@ -1,468 +1,440 @@
 import { useState, useRef } from 'react';
-import { 
-  User, 
-  Bell, 
-  FileText, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  GraduationCap, 
-  Code2, 
-  Package, 
-  Edit3,
-  ExternalLink,
-  Plus,
-  Trash2,
-  Save,
-  X,
-  Upload
+import {
+  User, Bell, FileText, Mail, Phone, MapPin, GraduationCap,
+  Code2, Package, Edit3, ExternalLink, Plus, Trash2, Save,
+  Upload, Camera, Briefcase, Award, Globe
 } from 'lucide-react';
-
+import ProjectModal from './modal/ProjectModal';
 const StudentProfile = () => {
+  const [showProjectModal, setShowProjectModal] = useState(false)
+
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
+  const [newSkill, setNewSkill] = useState("");
   const [profile, setProfile] = useState({
-    name: 'Priya Sharma',
+    name: 'Anjali Sharma',
     batch: '2026 Batch',
     branch: 'B.Tech Computer Science',
-    email: 'priya.sharma@campus.edu',
+    email: 'anjali.sharma@campus.edu',
     phone: '+91 98765 43210',
     location: 'Mumbai, India',
     stats: {
-      cgpa: '8.7 / 10',
+      cgpa: '8.7',
       tenth: '92.4%',
       twelfth: '89.6%',
-      backlogs: 'None',
+      backlogs: '0',
       rollNo: 'CSE2022045',
-      department: 'Computer Science & Engineering'
+      department: 'CSE'
     },
     skills: [
-      { name: 'React', color: 'bg-emerald-500' },
-      { name: 'TypeScript', color: 'bg-cyan-500' },
-      { name: 'Node.js', color: 'bg-teal-500' },
-      { name: 'Python', color: 'bg-emerald-600' },
-      { name: 'MongoDB', color: 'bg-cyan-600' },
-      { name: 'SQL', color: 'bg-teal-600' },
-      { name: 'Git', color: 'bg-emerald-400' },
-      { name: 'Docker', color: 'bg-cyan-400' },
-      { name: 'AWS', color: 'bg-teal-400' }
+      { name: 'React', color: 'bg-blue-500' },
+      { name: 'TypeScript', color: 'bg-blue-600' },
+      { name: 'Node.js', color: 'bg-green-600' },
+      { name: 'Python', color: 'bg-yellow-600' },
+      { name: 'MongoDB', color: 'bg-green-500' },
+      { name: 'Git', color: 'bg-orange-600' },
     ],
     projects: [
       {
         title: 'E-Commerce Platform',
-        description: 'Full-stack e-commerce app with payment integration',
-        tags: ['React', 'Node.js', 'MongoDB']
-      },
-      {
-        title: 'ML Sentiment Analyzer',
-        description: 'NLP-based sentiment analysis on social media data',
-        tags: ['Python', 'Flask', 'TensorFlow']
-      },
-      {
-        title: 'Chat Application',
-        description: 'Real-time messaging app with group chat support',
-        tags: ['Socket.io', 'Express', 'React']
+        description: 'Full-stack e-commerce app with payment integration and admin dashboard.',
+        tags: ['React', 'Node.js', 'MongoDB'],
+        image: null
       }
     ],
     resumes: [
-      {
-        name: 'Priya_Sharma_Resume.pdf',
-        date: 'Apr 1, 2026',
-        size: '245 KB'
-      }
+      { name: 'Anjali_Sharma_Resume.pdf', date: 'Apr 1, 2026', size: '245 KB' }
     ]
   });
-
-  const [newSkill, setNewSkill] = useState('');
-
-  const handleInputChange = (field: string, value: string) => {
-    setProfile(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleStatsChange = (field: string, value: string) => {
-    setProfile(prev => ({
-      ...prev,
-      stats: { ...prev.stats, [field]: value }
-    }));
-  };
-
   const addSkill = () => {
-    if (newSkill.trim()) {
-      const colors = ['bg-emerald-500', 'bg-cyan-500', 'bg-teal-500', 'bg-blue-500', 'bg-indigo-500'];
-      const randomColor = colors[Math.floor(Math.random() * colors.length)];
-      setProfile(prev => ({
-        ...prev,
-        skills: [...prev.skills, { name: newSkill.trim(), color: randomColor }]
-      }));
-      setNewSkill('');
+    if (!newSkill.trim()) return;
+
+    setProfile({
+      ...profile,
+      skills: [...profile.skills, { name: newSkill, color: "bg-indigo-500" }]
+    });
+
+    setNewSkill("");
+  };
+  const deleteSkill = (index: number) => {
+    const updated = profile.skills.filter((_, i) => i !== index)
+    setProfile({ ...profile, skills: updated })
+  }
+  const handleAddProject = (project: any) => {
+    setProfile({
+      ...profile,
+      projects: [...profile.projects, project]
+    });
+  };
+  const updateStat = (field: string, value: string) => {
+    setProfile({
+      ...profile,
+      stats: {
+        ...profile.stats,
+        [field]: value
+      }
+    });
+  };
+
+  const updateProfileField = (field: string, value: string) => {
+    setProfile({
+      ...profile,
+      [field]: value
+    });
+  };
+
+  const [resumeFile, setResumeFile] = useState<File | null>(null)
+  const handleResumeUpload = (e: any) => {
+    setResumeFile(e.target.files[0])
+  }
+  const uploadResume = async () => {
+
+    const formData = new FormData()
+    if (resumeFile) {
+      formData.append("resume", resumeFile)
     }
-  };
 
-  const removeSkill = (index: number) => {
-    setProfile(prev => ({
-      ...prev,
-      skills: prev.skills.filter((_, i) => i !== index)
-    }));
-  };
+    await fetch("http://localhost:3000/upload-resume", {
+      method: "POST",
+      body: formData
+    })
 
-  const handleProjectChange = (index: number, field: string, value: string) => {
-    const updatedProjects = [...profile.projects];
-    updatedProjects[index] = { ...updatedProjects[index], [field]: value };
-    setProfile(prev => ({ ...prev, projects: updatedProjects }));
-  };
-
-  const addProject = () => {
-    setProfile(prev => ({
-      ...prev,
-      projects: [...prev.projects, { title: 'New Project', description: 'Description here', tags: [] }]
-    }));
-  };
-
-  const removeProject = (index: number) => {
-    setProfile(prev => ({
-      ...prev,
-      projects: prev.projects.filter((_, i) => i !== index)
-    }));
-  };
-
-  const handleResumeUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const newResume = {
-        name: file.name,
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        size: `${(file.size / 1024).toFixed(0)} KB`
-      };
-      setProfile(prev => ({
-        ...prev,
-        resumes: [newResume, ...prev.resumes]
-      }));
-    }
-  };
-
+  }
   return (
-    <div className="p-8">
-      {/* Header */}
-      <header className="flex items-center justify-between mb-8 sticky top-0 bg-gray-50/80 backdrop-blur-md z-10 py-2">
-        <div className="flex items-center gap-2 text-gray-600">
-          <User className="w-5 h-5" />
-          <h2 className="font-bold text-xl text-gray-800">My Profile</h2>
-        </div>
-        <div className="flex items-center gap-5">
-          <div className="relative cursor-pointer group">
-            <Bell className="w-6 h-6 text-gray-500 group-hover:text-blue-600 transition-colors" />
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full border-2 border-white font-bold">5</span>
-          </div>
-          <div className="flex items-center gap-3 pl-4 border-l border-gray-200">
-            <div className="w-10 h-10 bg-cyan-600 rounded-full flex items-center justify-center text-white font-bold shadow-md shadow-cyan-600/20 border-2 border-white">PS</div>
-          </div>
-        </div>
-      </header>
-
-      {/* Profile Card */}
-      <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 p-8 mb-8">
-        <div className="flex flex-col md:flex-row items-center gap-8">
-          <div className="relative group">
-            <div className="w-32 h-32 bg-gradient-to-br from-blue-600 to-cyan-500 rounded-2xl flex items-center justify-center text-white text-4xl font-bold shadow-xl shadow-blue-500/20 ring-4 ring-white">
-              {profile.name.split(' ').map(n => n[0]).join('')}
+    <div className="min-h-screen bg-[#f8fafc] pb-12">
+      {/* Top Navigation Bar */}
+      <nav className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <div className="bg-indigo-600 p-1.5 rounded-lg text-white">
+              <User size={20} />
             </div>
-            {isEditing && (
-              <button className="absolute -bottom-2 -right-2 bg-white p-2 rounded-lg shadow-lg border border-gray-100 text-blue-600 hover:text-blue-700 transition-colors">
-                <Upload className="w-4 h-4" />
-              </button>
-            )}
+            <h2 className="font-bold text-slate-800 text-lg">Student Profile</h2>
           </div>
-          <div className="flex-1 text-center md:text-left w-full">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-              <div className="w-full max-w-md">
-                {isEditing ? (
-                  <div className="space-y-2">
-                    <input 
-                      type="text" 
-                      value={profile.name} 
-                      onChange={(e) => handleInputChange('name', e.target.value)}
-                      className="text-3xl font-bold text-gray-900 tracking-tight w-full bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 outline-none focus:ring-2 focus:ring-blue-500"
+          <div className="flex items-center gap-4">
+            <button className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+              <Bell size={22} />
+              <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-red-500 border-2 border-white rounded-full"></span>
+            </button>
+            <div className="h-8 w-[1px] bg-slate-200 mx-2" />
+            <button
+              onClick={() => setIsEditing(!isEditing)}
+              className={`flex items-center gap-2 px-5 py-2 rounded-full font-semibold transition-all shadow-sm ${isEditing ? 'bg-indigo-600 text-white hover:bg-indigo-700' : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+                }`}
+            >
+              {isEditing ? <Save size={18} /> : <Edit3 size={18} />}
+              {isEditing ? 'Save Changes' : 'Edit Profile'}
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      <main className="max-w-7xl mx-auto px-8 mt-8">
+        <div className="grid grid-cols-12 gap-8">
+
+          {/* Left Column: Profile Card & Quick Info */}
+          <div className="col-span-12 lg:col-span-4 space-y-8">
+            {/* Main Profile Card */}
+            <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm">
+              <div className="h-32 bg-gradient-to-r from-indigo-500 to-purple-600" />
+              <div className="px-6 pb-6">
+                <div className="relative -mt-16 mb-4 flex justify-center lg:justify-start">
+                  <div className="w-32 h-32 rounded-3xl border-4 border-white overflow-hidden bg-slate-100 shadow-xl group">
+                    <div className="w-full h-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-3xl font-bold">
+                      {profile.name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    {isEditing && (
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                        <Camera className="text-white" size={24} />
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="text-center lg:text-left">
+                  {isEditing ? (
+                    <input
+                      className="text-2xl font-bold text-slate-900 w-full bg-slate-50 border-b border-indigo-500 outline-none"
+                      value={profile.name}
+                      onChange={(e) => setProfile({ ...profile, name: e.target.value })}
                     />
-                    <div className="flex gap-2">
-                       <input 
-                        type="text" 
-                        value={profile.branch} 
-                        onChange={(e) => handleInputChange('branch', e.target.value)}
-                        className="text-gray-500 font-medium bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 flex-1 outline-none"
+                  ) : (
+                    <h1 className="text-2xl font-bold text-slate-900">{profile.name}</h1>
+                  )}
+                  <p className="text-indigo-600 font-medium text-sm mt-1">{profile.branch}</p>
+                  {isEditing ? (
+                    <div className="flex gap-2 mt-1">
+                      <input
+                        value={profile.batch}
+                        onChange={(e) =>
+                          setProfile({ ...profile, batch: e.target.value })
+                        }
+                        className="text-xs uppercase bg-transparent border-b border-indigo-400 outline-none"
                       />
-                      <input 
-                        type="text" 
-                        value={profile.batch} 
-                        onChange={(e) => handleInputChange('batch', e.target.value)}
-                        className="text-gray-500 font-medium bg-gray-50 border border-gray-200 rounded-lg px-2 py-1 w-28 outline-none"
+
+                      <input
+                        value={profile.stats.rollNo}
+                        onChange={(e) =>
+                          setProfile({
+                            ...profile,
+                            stats: {
+                              ...profile.stats,
+                              rollNo: e.target.value
+                            }
+                          })
+                        }
+                        className="text-xs uppercase bg-transparent border-b border-indigo-400 outline-none"
                       />
                     </div>
+                  ) : (
+                    <p className="text-slate-500 text-xs uppercase tracking-wider mt-1">
+                      {profile.batch} • {profile.stats.rollNo}
+                    </p>
+                  )}
+                </div>
+
+                <div className="mt-6 space-y-3">
+                  <div className="flex items-center gap-3 text-slate-600 hover:text-indigo-600 transition-colors p-2 rounded-xl hover:bg-indigo-50/50">
+                    <Mail size={18} className="text-slate-400" />
+                    {isEditing ? (
+                      <input
+                        type="email"
+                        value={profile.email}
+                        onChange={(e) => updateProfileField("email", e.target.value)}
+                        className="text-sm w-full bg-transparent border-b border-indigo-400 outline-none"
+                      />
+                    ) : (
+                      <span className="text-sm truncate">{profile.email}</span>
+                    )}
                   </div>
-                ) : (
-                  <>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">{profile.name}</h1>
-                    <p className="text-gray-500 font-medium">{profile.branch} • {profile.batch}</p>
-                  </>
-                )}
-              </div>
-              <button 
-                onClick={() => setIsEditing(!isEditing)}
-                className={`flex items-center justify-center gap-2 px-6 py-2.5 font-semibold rounded-xl transition-all shadow-sm ${
-                  isEditing 
-                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
-                    : 'bg-gray-50 text-gray-700 border border-gray-200 hover:bg-gray-100 hover:border-gray-300'
-                }`}
-              >
-                {isEditing ? <Save className="w-4 h-4" /> : <Edit3 className="w-4 h-4" />}
-                {isEditing ? 'Save Profile' : 'Edit Profile'}
-              </button>
-            </div>
-            <div className="flex flex-wrap justify-center md:justify-start gap-y-3 gap-x-6">
-              <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100 min-w-[200px]">
-                <Mail className="w-4 h-4 text-blue-500 shrink-0" />
-                {isEditing ? (
-                  <input 
-                    type="email" 
-                    value={profile.email} 
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    className="bg-transparent border-none outline-none w-full"
-                  />
-                ) : profile.email}
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100 min-w-[150px]">
-                <Phone className="w-4 h-4 text-emerald-500 shrink-0" />
-                {isEditing ? (
-                  <input 
-                    type="text" 
-                    value={profile.phone} 
-                    onChange={(e) => handleInputChange('phone', e.target.value)}
-                    className="bg-transparent border-none outline-none w-full"
-                  />
-                ) : profile.phone}
-              </div>
-              <div className="flex items-center gap-2 text-sm text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100 min-w-[150px]">
-                <MapPin className="w-4 h-4 text-indigo-500 shrink-0" />
-                {isEditing ? (
-                  <input 
-                    type="text" 
-                    value={profile.location} 
-                    onChange={(e) => handleInputChange('location', e.target.value)}
-                    className="bg-transparent border-none outline-none w-full"
-                  />
-                ) : profile.location}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-        {/* Academic Details */}
-        <div className="bg-white p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="p-2 bg-blue-50 rounded-lg">
-              <GraduationCap className="w-5 h-5 text-blue-600" />
-            </div>
-            <h3 className="text-lg font-bold text-gray-800 tracking-tight">Academic Details</h3>
-          </div>
-          <div className="space-y-4">
-            {[
-              { label: 'Department', key: 'department' },
-              { label: 'CGPA', key: 'cgpa' },
-              { label: '10th %', key: 'tenth' },
-              { label: '12th %', key: 'twelfth' },
-              { label: 'Backlogs', key: 'backlogs' },
-              { label: 'Roll No', key: 'rollNo' },
-            ].map((stat, idx) => (
-              <div key={idx} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 px-2 rounded-lg transition-colors">
-                <span className="text-sm font-medium text-gray-500">{stat.label}</span>
-                {isEditing ? (
-                  <input 
-                    type="text" 
-                    value={profile.stats[stat.key as keyof typeof profile.stats]} 
-                    onChange={(e) => handleStatsChange(stat.key, e.target.value)}
-                    className="text-sm font-bold text-gray-800 text-right bg-transparent border-b border-gray-200 outline-none focus:border-blue-500 w-32"
-                  />
-                ) : (
-                  <span className="text-sm font-bold text-gray-800">{profile.stats[stat.key as keyof typeof profile.stats]}</span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Skills */}
-        <div className="bg-white p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-emerald-50 rounded-lg">
-                <Code2 className="w-5 h-5 text-emerald-600" />
-              </div>
-              <h3 className="text-lg font-bold text-gray-800 tracking-tight">Skills</h3>
-            </div>
-          </div>
-          {isEditing && (
-            <div className="mb-6 flex gap-2">
-              <input 
-                type="text" 
-                placeholder="Add a skill..." 
-                value={newSkill}
-                onChange={(e) => setNewSkill(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && addSkill()}
-                className="flex-1 bg-gray-50 border border-gray-200 rounded-xl px-4 py-2 outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-              />
-              <button 
-                onClick={addSkill}
-                className="p-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 transition-colors"
-              >
-                <Plus className="w-5 h-5" />
-              </button>
-            </div>
-          )}
-          <div className="flex flex-wrap gap-3">
-            {profile.skills.map((skill, idx) => (
-              <span 
-                key={idx} 
-                className={`${skill.color} text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg shadow-current/10 hover:scale-105 transition-transform cursor-default flex items-center gap-2`}
-              >
-                {skill.name}
-                {isEditing && (
-                  <X 
-                    className="w-3 h-3 cursor-pointer hover:text-red-200" 
-                    onClick={() => removeSkill(idx)}
-                  />
-                )}
-              </span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Projects */}
-      <div className="bg-white p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100 mb-8">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-50 rounded-lg">
-              <Package className="w-5 h-5 text-indigo-600" />
-            </div>
-            <h3 className="text-lg font-bold text-gray-800 tracking-tight">Projects</h3>
-          </div>
-          {isEditing && (
-            <button 
-              onClick={addProject}
-              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all text-sm font-bold shadow-lg shadow-indigo-600/20"
-            >
-              <Plus className="w-4 h-4" />
-              Add Project
-            </button>
-          )}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {profile.projects.map((project, idx) => (
-            <div key={idx} className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 hover:border-indigo-100 hover:bg-indigo-50/30 transition-all group relative">
-              {isEditing && (
-                <button 
-                  onClick={() => removeProject(idx)}
-                  className="absolute top-2 right-2 p-1.5 bg-red-50 text-red-500 rounded-lg hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              )}
-              {isEditing ? (
-                <div className="space-y-3">
-                  <input 
-                    type="text" 
-                    value={project.title} 
-                    onChange={(e) => handleProjectChange(idx, 'title', e.target.value)}
-                    className="font-bold text-gray-900 bg-white border border-gray-200 rounded-lg px-2 py-1 w-full outline-none"
-                  />
-                  <textarea 
-                    value={project.description} 
-                    onChange={(e) => handleProjectChange(idx, 'description', e.target.value)}
-                    className="text-xs text-gray-500 font-medium bg-white border border-gray-200 rounded-lg px-2 py-1 w-full outline-none h-20 resize-none"
-                  />
+                  <div className="flex items-center gap-3 text-slate-600 p-2 rounded-xl">
+                    <Phone size={18} className="text-slate-400" />
+                    {isEditing ? (
+                      <input
+                        type="tel"
+                        value={profile.phone}
+                        onChange={(e) => updateProfileField("phone", e.target.value)}
+                        className="text-sm w-full bg-transparent border-b border-indigo-400 outline-none"
+                      />
+                    ) : (
+                      <span className="text-sm">{profile.phone}</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 text-slate-600 p-2 rounded-xl">
+                    <MapPin size={18} className="text-slate-400" />
+                    {isEditing ? (
+                      <input
+                        value={profile.location}
+                        onChange={(e) => updateProfileField("location", e.target.value)}
+                        className="text-sm w-full bg-transparent border-b border-indigo-400 outline-none"
+                      />
+                    ) : (
+                      <span className="text-sm">{profile.location}</span>
+                    )}
+                  </div>
                 </div>
-              ) : (
-                <>
-                  <h4 className="font-bold text-gray-900 mb-2 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{project.title}</h4>
-                  <p className="text-xs text-gray-500 font-medium mb-4 leading-relaxed">{project.description}</p>
-                </>
-              )}
-              <div className="flex flex-wrap gap-2 mt-4">
-                {project.tags.map((tag, tIdx) => (
-                  <span key={tIdx} className="px-2 py-1 bg-white border border-gray-200 text-gray-600 rounded-lg text-[10px] font-bold">
-                    {tag}
-                  </span>
+              </div>
+            </div>
+
+            {/* Academic Stats Bento Box */}
+            <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
+              <div className="flex items-center gap-2 mb-6">
+                <GraduationCap className="text-indigo-600" size={20} />
+                <h3 className="font-bold text-slate-800">Academic Overview</h3>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-slate-50 p-4 rounded-2xl">
+                  <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">CGPA</p>
+                  {isEditing ? (
+                    <input
+                      value={profile.stats.cgpa}
+                      onChange={(e) => updateStat("cgpa", e.target.value)}
+                      className="w-full text-xl font-bold text-indigo-600 bg-transparent border-b border-indigo-400 outline-none"
+                    />
+                  ) : (
+                    <p className="text-xl font-bold text-indigo-600">{profile.stats.cgpa}</p>
+                  )}
+                </div>
+                <div className="bg-slate-50 p-4 rounded-2xl">
+                  <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">Backlogs</p>
+                  {isEditing ? (
+                    <input
+                      value={profile.stats.backlogs}
+                      onChange={(e) => updateStat("backlogs", e.target.value)}
+                      className="w-full text-xl font-bold text-slate-800 bg-transparent border-b border-indigo-400 outline-none"
+                    />
+                  ) : (
+                    <p className="text-xl font-bold text-slate-800">{profile.stats.backlogs}</p>
+                  )}
+                </div>
+                <div className="bg-slate-50 p-4 rounded-2xl">
+                  <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">10th Grade</p>
+                  {isEditing ? (
+                    <input
+                      value={profile.stats.tenth}
+                      onChange={(e) => updateStat("tenth", e.target.value)}
+                      className="w-full text-lg font-bold text-slate-800 bg-transparent border-b border-indigo-400 outline-none"
+                    />
+                  ) : (
+                    <p className="text-lg font-bold text-slate-800">{profile.stats.tenth}</p>
+                  )}
+                </div>
+                <div className="bg-slate-50 p-4 rounded-2xl">
+                  <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest">12th Grade</p>
+                  {isEditing ? (
+                    <input
+                      value={profile.stats.twelfth}
+                      onChange={(e) => updateStat("twelfth", e.target.value)}
+                      className="w-full text-lg font-bold text-slate-800 bg-transparent border-b border-indigo-400 outline-none"
+                    />
+                  ) : (
+                    <p className="text-lg font-bold text-slate-800">{profile.stats.twelfth}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Skills, Projects, Resumes */}
+          <div className="col-span-12 lg:col-span-8 space-y-8">
+
+            {/* Skills Card */}
+            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <Code2 className="text-emerald-500" size={20} />
+                  <h3 className="font-bold text-slate-800">Technical Stack</h3>
+                </div>
+                {isEditing && (
+                  <div className="flex gap-2">
+                    <input
+                      value={newSkill}
+                      onChange={(e) => setNewSkill(e.target.value)}
+                      placeholder="Add skill"
+                      className="border px-3 py-1 rounded-lg text-sm"
+                    />
+                    <button
+                      onClick={addSkill}
+                      className="text-indigo-600 text-sm font-bold flex items-center gap-1"
+                    >
+                      <Plus size={16} /> Add
+                    </button>
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-wrap gap-3">
+                {profile.skills.map((skill, i) => (
+                  <div key={i} className="group flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-100 rounded-2xl hover:border-indigo-200 hover:bg-white transition-all cursor-default">
+                    <div className={`w-2 h-2 rounded-full ${skill.color}`} />
+                    <span className="text-sm font-semibold text-slate-700">{skill.name}</span>
+                    {isEditing && <Trash2
+                      size={14}
+                      className="text-slate-300 hover:text-red-500 cursor-pointer"
+                      onClick={() => deleteSkill(i)}
+                    />}
+                  </div>
                 ))}
-                {isEditing && (
-                   <button className="px-2 py-1 bg-white border border-dashed border-gray-300 text-gray-400 rounded-lg text-[10px] font-bold hover:text-indigo-600 hover:border-indigo-600 transition-all">
-                    + Tag
-                  </button>
-                )}
               </div>
             </div>
-          ))}
-        </div>
-      </div>
 
-      {/* Resume */}
-      <div className="bg-white p-8 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-gray-100">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-cyan-50 rounded-lg">
-              <FileText className="w-5 h-5 text-cyan-600" />
-            </div>
-            <h3 className="text-lg font-bold text-gray-800 tracking-tight">Resume</h3>
-          </div>
-          <input 
-            type="file" 
-            ref={fileInputRef} 
-            onChange={handleResumeUpload} 
-            className="hidden" 
-            accept=".pdf,.doc,.docx"
-          />
-          <button 
-            onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2 px-4 py-2 bg-cyan-600 text-white rounded-xl hover:bg-cyan-700 transition-all text-sm font-bold shadow-lg shadow-cyan-600/20"
-          >
-            <Upload className="w-4 h-4" />
-            Upload Resume
-          </button>
-        </div>
-        <div className="space-y-4">
-          {profile.resumes.map((resume, idx) => (
-            <div key={idx} className="flex items-center justify-between p-5 bg-gray-50/50 rounded-2xl border border-gray-100 hover:bg-gray-50 transition-colors group">
-              <div className="flex items-center gap-4">
-                <div className="p-3 bg-white rounded-xl shadow-sm border border-gray-100 text-red-500 group-hover:scale-110 transition-transform">
-                  <FileText className="w-6 h-6" />
+            {/* Projects Grid */}
+            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <Briefcase className="text-orange-500" size={20} />
+                  <h3 className="font-bold text-slate-800">Featured Projects</h3>
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-gray-900">{resume.name}</h4>
-                  <p className="text-xs text-gray-500 font-medium mt-0.5">Uploaded on {resume.date} • {resume.size}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
                 {isEditing && (
-                  <button 
-                    onClick={() => setProfile(prev => ({ ...prev, resumes: prev.resumes.filter((_, i) => i !== idx) }))}
-                    className="p-2.5 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all shadow-sm"
+                  <button
+                    onClick={() => setShowProjectModal(true)}
+                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700"
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Plus size={16} />
+                    Add Project
                   </button>
                 )}
-                <button className="flex items-center gap-2 px-5 py-2.5 bg-white text-gray-700 font-bold rounded-xl border border-gray-200 hover:bg-gray-100 hover:border-gray-300 transition-all shadow-sm">
-                  <ExternalLink className="w-4 h-4" />
-                  View Resume
-                </button>
+
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {profile.projects.map((proj, i) => (
+                  <div key={i} className="p-6 rounded-2xl border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-indigo-200 hover:shadow-md transition-all group">
+                    <div className="flex justify-between items-start mb-4">
+                      <h4 className="font-bold text-slate-800 group-hover:text-indigo-600">{proj.title}</h4>
+                      <ExternalLink size={16} className="text-slate-400" />
+                    </div>
+                    {proj.image && (
+                      <img
+                        src={URL.createObjectURL(proj.image)}
+                        className="w-full h-32 object-cover rounded-lg mb-3"
+                      />
+                    )}
+
+                    <p className="text-sm text-slate-500 mb-4 line-clamp-2">{proj.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {proj.tags.map(tag => (
+                        <span key={tag} className="text-[10px] font-bold px-2 py-1 bg-white border border-slate-200 text-slate-600 rounded-md">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-          ))}
+
+            {/* Resume Section */}
+            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-2">
+                  <FileText className="text-rose-500" size={20} />
+                  <h3 className="font-bold text-slate-800">Documents</h3>
+                </div>
+                <label className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-xl cursor-pointer">
+                  <Upload size={16} /> Upload Resume
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    hidden
+                    onChange={handleResumeUpload}
+                  />
+                  {resumeFile && (
+                    <button
+                      onClick={uploadResume}
+                      className="ml-4 px-4 py-2 bg-indigo-600 text-white rounded-lg"
+                    >
+                      Upload File
+                    </button>
+                  )}
+                </label>
+              </div>
+              {profile.resumes.map((res, i) => (
+                <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-rose-500 border border-slate-100">
+                      <FileText size={24} />
+                    </div>
+                    <div>
+                      <p className="font-bold text-slate-800 text-sm">{res.name}</p>
+                      <p className="text-xs text-slate-500">{res.date} • {res.size}</p>
+                    </div>
+                  </div>
+                  <button className="px-4 py-2 text-indigo-600 font-bold text-sm hover:bg-indigo-50 rounded-xl transition-colors">
+                    View
+                  </button>
+                </div>
+              ))}
+            </div>
+            <ProjectModal
+              isOpen={showProjectModal}
+              onClose={() => setShowProjectModal(false)}
+              onAddProject={handleAddProject}
+            />
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 };
 
-export default StudentProfile;
 
+export default StudentProfile;
