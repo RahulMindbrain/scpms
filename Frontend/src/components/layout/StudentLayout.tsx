@@ -22,7 +22,7 @@ const StudentLayout: React.FC = () => {
     { icon: CheckCircle, label: 'Eligibility', path: '/student/eligibility', section: 'Main' },
     { icon: Briefcase, label: 'Job Listings', path: '/student/jobs', section: 'Main' },
     { icon: FileSearch, label: 'My Applications', path: '/student/Application', section: 'Main' },
-    { icon: Calendar, label: 'Interview Schedule', path: '/student/interviews', section: 'Tools' },
+    { icon: Calendar, label: 'Interview Schedule', path: '/student/interview', section: 'Tools' },
     { icon: Bell, label: 'Notifications', path: '/student/notifications', section: 'Tools' },
     { icon: FileText, label: 'Documents', path: '/student/documents', section: 'Tools' },
   ];

@@ -4,6 +4,9 @@ import StudentProfile from "@/pages/private/student/profile/StudentProfile";
 import JobListing from "@/pages/private/student/jobs/JobListing";
 import ApplicationStatus from "@/pages/private/student/application/Application";
 import type { RouteOptions } from "./type";
+import Notification from "@/pages/private/notification/Notification";
+import Documents from "@/pages/private/documents/Documents";
+import InterviewScheduler from "@/pages/private/interview/InterviewScheduler";
 
 export const PrivateRoutes: RouteOptions<any>[] = [
     {
@@ -25,6 +28,18 @@ export const PrivateRoutes: RouteOptions<any>[] = [
     {
         path: "/student/application",
         component:ApplicationStatus
+    },
+     {
+        path: "/student/notifications",
+        component: Notification
+    },
+     {
+        path: "/student/documents",
+        component:Documents
+    },
+    {
+        path: "/student/interview",
+        component:InterviewScheduler
     }
 
 ];
