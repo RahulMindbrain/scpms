@@ -48,13 +48,14 @@ model User {
   socketId   String?
 
   role       Role
-  status     Status   @default(ACTIVE)
+  status     Status   @default(INACTIVE)
 
   student    Student?
   company    Company?
   admin      Admin?
 
-  tokens     Token[]
+  tokens         Token[]
+  notifications  Notification[]
 
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
@@ -68,13 +69,17 @@ model Student {
   departmentId Int
   department   Department @relation(fields: [departmentId], references: [id])
 
-  cgpa         Float
+  cgpa         Float?
+
+  year         Int        
+  passingYear  Int       
 
   applications Application[]
 
   createdAt    DateTime @default(now())
 
   @@index([departmentId])
+  @@index([passingYear])
 }
 
 model Company {
@@ -94,6 +99,8 @@ model Admin {
   id     Int  @id @default(autoincrement())
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id])
+
+  approvedJobs Job[] @relation("AdminApprovedJobs")
 }
 
 model Department {
@@ -114,12 +121,14 @@ model Job {
   location    String
 
   status      JobStatus @default(PENDING)
+  minCgpa     Float?
+  maxCgpa     Float?
 
   companyId   Int
   company     Company @relation(fields: [companyId], references: [id])
 
   approvedBy  Int?
-  approver    Admin? @relation(fields: [approvedBy], references: [id])
+  approver    Admin? @relation("AdminApprovedJobs", fields: [approvedBy], references: [id], onDelete: SetNull)
 
   applications Application[]
 
@@ -147,11 +156,13 @@ model Application {
   updatedAt DateTime @updatedAt
 
   @@unique([studentId, jobId])
+  @@index([studentId])
+  @@index([jobId])
 }
 
 model Token {
   id            Int      @id @default(autoincrement())
-  refreshToken  String
+  refreshToken  String   @unique
 
   status        Status   @default(ACTIVE)
 
@@ -167,7 +178,7 @@ model Notification {
   id        Int      @id @default(autoincrement())
 
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   title     String
   message   String
