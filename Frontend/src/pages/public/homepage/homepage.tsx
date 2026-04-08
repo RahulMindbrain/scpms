@@ -36,7 +36,7 @@ const navigate = useNavigate();
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3 group cursor-pointer">
-              <div className="p-2 rounded-xl bg-gradient-to-br from-blue-600 to-teal-500 shadow-lg shadow-blue-500/20">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-blue-700 to-slate-900 shadow-lg shadow-blue-500/20">
                 <GraduationCap className="text-white" size={24} />
               </div>
               <span className={`text-xl font-extrabold tracking-tight ${scrolled ? 'text-slate-900' : 'text-white'}`}>
@@ -59,7 +59,7 @@ const navigate = useNavigate();
                 </a>
                 <Link
                   to="/signup"
-                  className="bg-gradient-to-r from-blue-600 to-teal-500 text-white px-6 py-2 rounded-lg text-sm font-bold flex items-center gap-2"
+                  className="bg-gradient-to-br from-blue-700 to-slate-900 text-white px-6 py-2 rounded-lg text-sm font-bold flex items-center gap-2"
                 >
                   Get Started <ArrowRight size={16} />
                 </Link>
@@ -113,12 +113,12 @@ const navigate = useNavigate();
         <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 mb-8">
-              <Zap size={14} className="text-teal-400" />
-              <span className="text-xs font-bold text-teal-400 uppercase tracking-wider">Next-Gen Placement Platform</span>
+              <Zap size={14} className="text-blue-400" />
+              <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">Next-Gen Placement Platform</span>
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-[1.1]">
-              Placements, <span className="text-teal-400">Simplified</span>
+              Placements, <span className="text-blue-400">Simplified</span>
             </h1>
 
             <p className="text-lg md:text-xl text-slate-300 mb-10 leading-relaxed max-w-2xl">
@@ -128,7 +128,7 @@ const navigate = useNavigate();
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <button className="px-8 py-3.5 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-xl font-bold flex items-center gap-2 shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:translate-y-[-2px]">
+              <button className="px-8 py-3.5 bg-gradient-to-br from-blue-700 to-slate-900 text-white rounded-xl font-bold flex items-center gap-2 shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:translate-y-[-2px]">
                 Launch Dashboard <ChevronRight size={18} />
               </button>
               <button className="px-8 py-3.5 bg-white text-slate-900 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition-all">
@@ -271,7 +271,7 @@ const navigate = useNavigate();
                   </div>
                   <div className="h-px bg-slate-700/50 w-full"></div>
                   <div>
-                    <div className="text-4xl md:text-5xl font-black text-teal-400 mb-2 tracking-tight">₹24 LPA</div>
+                    <div className="text-4xl md:text-5xl font-black text-blue-400 mb-2 tracking-tight">₹24 LPA</div>
                     <div className="text-slate-400 font-medium">Highest Package This Season</div>
                   </div>
                   <div className="h-px bg-slate-700/50 w-full"></div>
@@ -290,7 +290,7 @@ const navigate = useNavigate();
       <section className="py-24 bg-[#0f172a] relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
           <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-600 blur-[120px] rounded-full"></div>
-          <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-teal-500 blur-[120px] rounded-full"></div>
+          <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-500 blur-[120px] rounded-full"></div>
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
@@ -302,7 +302,7 @@ const navigate = useNavigate();
           </p>
           <Link
             to="/signup"
-            className="bg-teal-500 hover:bg-teal-400 text-white px-10 py-4 rounded-xl font-bold text-lg flex items-center gap-2 mx-auto transition-all hover:scale-105 active:scale-95 shadow-xl shadow-teal-500/20"
+            className="bg-gradient-to-br from-blue-700 to-slate-900 text-white px-10 py-4 rounded-xl font-bold text-lg flex items-center gap-2 mx-auto transition-all hover:scale-105 active:scale-95 shadow-xl shadow-teal-500/20"
           >
             Get Started Now <ArrowRight size={20} />
           </Link>
