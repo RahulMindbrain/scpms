@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import type { SidebarItem } from './Sidebar';
-import { 
-  LayoutDashboard, 
-  User, 
-  CheckCircle, 
-  Briefcase, 
-  FileSearch, 
-  Calendar, 
-  Bell, 
+import {
+  LayoutDashboard,
+  User,
+  CheckCircle,
+  Briefcase,
+  FileSearch,
+  Calendar,
+  Bell,
   FileText,
   Menu
 } from 'lucide-react';
@@ -19,16 +19,16 @@ const StudentLayout: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
- const sidebarItems: SidebarItem[] = [
-  { icon: LayoutDashboard, label: 'Dashboard', path: '/student/dashboard', section: 'Main' },
-  { icon: User, label: 'My Profile', path: '/student/profile', section: 'Main' },
-  { icon: CheckCircle, label: 'Eligibility', path: '/student/eligibility', section: 'Main' },
-  { icon: Briefcase, label: 'Job Listings', path: '/student/jobs', section: 'Main' },
-  { icon: FileSearch, label: 'My Applications', path: '/student/application', section: 'Main' },
-  { icon: Calendar, label: 'Interview Schedule', path: '/student/interview', section: 'Tools' },
-  { icon: Bell, label: 'Notifications', path: '/student/notifications', section: 'Tools' },
-  { icon: FileText, label: 'Documents', path: '/student/documents', section: 'Tools' },
-];
+  const sidebarItems: SidebarItem[] = [
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/student/dashboard', section: 'Main' },
+    { icon: User, label: 'My Profile', path: '/student/profile', section: 'Main' },
+    { icon: CheckCircle, label: 'Eligibility', path: '/student/eligibility', section: 'Main' },
+    { icon: Briefcase, label: 'Job Listings', path: '/student/jobs', section: 'Main' },
+    { icon: FileSearch, label: 'My Applications', path: '/student/application', section: 'Main' },
+    { icon: Calendar, label: 'Interview Schedule', path: '/student/interview', section: 'Tools' },
+    { icon: Bell, label: 'Notifications', path: '/student/notifications', section: 'Tools' },
+    { icon: FileText, label: 'Documents', path: '/student/documents', section: 'Tools' },
+  ];
 
   const handleSignOut = () => {
     console.log('Signing out...');
@@ -45,7 +45,7 @@ const StudentLayout: React.FC = () => {
           </div>
           <span className="font-bold text-lg">CPMS</span>
         </div>
-        <button 
+        <button
           onClick={() => setIsMobileMenuOpen(true)}
           className="p-2 hover:bg-white/10 rounded-lg transition-colors"
         >
@@ -53,13 +53,16 @@ const StudentLayout: React.FC = () => {
         </button>
       </header>
 
-      <Sidebar 
-        items={sidebarItems} 
+      <Sidebar
+        items={sidebarItems}
         isCollapsed={isCollapsed}
         onToggle={() => setIsCollapsed(!isCollapsed)}
-        onSignOut={handleSignOut} 
+        onSignOut={handleSignOut}
         isOpenMobile={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
+        title="CPMS"
+        subtitle="Student Portal"
+
       />
 
       <main className="flex-1 min-h-screen overflow-x-hidden">

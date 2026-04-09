@@ -16,9 +16,11 @@ interface SidebarProps {
   onSignOut?: () => void;
   isOpenMobile?: boolean;
   onCloseMobile?: () => void;
+  title?: string;
+  subtitle?: string;
 }
 
-const Sidebar = ({ items, isCollapsed, onToggle, onSignOut, isOpenMobile, onCloseMobile }: SidebarProps) => {
+const Sidebar = ({ items, isCollapsed, onToggle, onSignOut, isOpenMobile, onCloseMobile, subtitle, title }: SidebarProps) => {
   const sidebarClasses = `
     bg-[#111827] text-white flex flex-col shadow-2xl z-50 border-r border-white/5 transition-all duration-300 ease-in-out
     ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}
@@ -29,7 +31,7 @@ const Sidebar = ({ items, isCollapsed, onToggle, onSignOut, isOpenMobile, onClos
     <>
       {/* Mobile Overlay */}
       {isOpenMobile && (
-        <div 
+        <div
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden animate-in fade-in duration-300"
           onClick={onCloseMobile}
         />
@@ -44,13 +46,19 @@ const Sidebar = ({ items, isCollapsed, onToggle, onSignOut, isOpenMobile, onClos
             </div>
             {(!isCollapsed || isOpenMobile) && (
               <div className="animate-in fade-in slide-in-from-left-2 duration-300">
-                <h1 className="font-bold text-lg leading-tight">CPMS</h1>
-                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Placement Portal</p>
+                <h1 className="font-bold text-lg leading-tight">
+                  {title}
+                </h1>
+
+                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">
+                  {subtitle}
+                </p>
+
               </div>
             )}
           </div>
-          
-          <button 
+
+          <button
             onClick={isOpenMobile ? onCloseMobile : onToggle}
             className="p-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all duration-300"
           >
@@ -65,20 +73,18 @@ const Sidebar = ({ items, isCollapsed, onToggle, onSignOut, isOpenMobile, onClos
               key={item.label}
               to={item.path}
               onClick={() => isOpenMobile && onCloseMobile?.()}
-              className={({ isActive }) => 
-                `flex items-center rounded-xl transition-all duration-300 group relative ${
-                  isCollapsed ? 'lg:w-12 lg:h-12 lg:justify-center' : 'px-4 py-3 gap-3 w-full'
-                } ${isOpenMobile ? 'px-4 py-3 gap-3 w-full' : ''} ${
-                  isActive 
-                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' 
-                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+              className={({ isActive }) =>
+                `flex items-center rounded-xl transition-all duration-300 group relative ${isCollapsed ? 'lg:w-12 lg:h-12 lg:justify-center' : 'px-4 py-3 gap-3 w-full'
+                } ${isOpenMobile ? 'px-4 py-3 gap-3 w-full' : ''} ${isActive
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
+                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
                   <item.icon className={`w-5 h-5 shrink-0 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'}`} />
-                  
+
                   {(!isCollapsed || isOpenMobile) && (
                     <span className="text-sm font-medium whitespace-nowrap animate-in fade-in slide-in-from-left-2 duration-300">
                       {item.label}
@@ -99,15 +105,14 @@ const Sidebar = ({ items, isCollapsed, onToggle, onSignOut, isOpenMobile, onClos
 
         {/* Footer / Sign Out */}
         <div className={`p-4 border-t border-white/5 ${isCollapsed && !isOpenMobile ? 'lg:flex lg:justify-center' : ''}`}>
-          <button 
+          <button
             onClick={onSignOut}
-            className={`flex items-center rounded-xl transition-all group relative text-gray-400 hover:bg-red-500/10 hover:text-red-400 ${
-              isCollapsed && !isOpenMobile ? 'lg:w-12 lg:h-12 lg:justify-center' : 'px-4 py-3 gap-3 w-full'
-            }`}
+            className={`flex items-center rounded-xl transition-all group relative text-gray-400 hover:bg-red-500/10 hover:text-red-400 ${isCollapsed && !isOpenMobile ? 'lg:w-12 lg:h-12 lg:justify-center' : 'px-4 py-3 gap-3 w-full'
+              }`}
           >
             <LogOut className="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" />
             {(!isCollapsed || isOpenMobile) && <span className="text-sm font-medium">Sign Out</span>}
-            
+
             {isCollapsed && !isOpenMobile && (
               <div className="hidden lg:block absolute left-16 bg-red-900/90 text-white px-3 py-1.5 rounded-lg text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl border border-red-500/20 translate-x-1 group-hover:translate-x-0 duration-300 z-50">
                 Sign Out

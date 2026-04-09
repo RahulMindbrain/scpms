@@ -53,7 +53,7 @@ const PrivateLoginRedirect = () => {
 
   // Redirect based on user role
   if (userType?.toLowerCase() === "organization") {
-    return <Navigate to="/organization/dashboard" replace />;
+    return <Navigate to="/admin/dashboard" replace />;
   } else if (userType?.toLowerCase() === "student") {
     return <Navigate to="/student/dashboard" replace />;
   } else {

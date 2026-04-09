@@ -60,6 +60,8 @@ const AdminLayout: React.FC = () => {
         onSignOut={handleSignOut} 
         isOpenMobile={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
+        title="CPMS"             
+  subtitle="Admin Portal"
       />
 
       <main className="flex-1 min-h-screen overflow-x-hidden">
