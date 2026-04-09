@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
     isAuthenticated: true, // Set to true for development so we can see private pages
-    userType: "student",
+    userType: "admin",
     user: null,
 };
 
