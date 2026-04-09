@@ -10,10 +10,15 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+// import { useDispatch } from "react-redux";
+// import type { AppDispatch } from "../../../redux/store/store";
+// import { registerUser } from "../../../redux/thunks/registerThunk";
+
 
 type RegisterRole = "student" | "company";
 
 const SignUp: React.FC = () => {
+  // const dispatch = useDispatch<AppDispatch>();
   const [step, setStep] = useState(1);
   const [activeRole, setActiveRole] = useState<RegisterRole | null>(null);
   const [agreed, setAgreed] = useState(false);
@@ -40,16 +45,41 @@ const SignUp: React.FC = () => {
     setTimeout(() => setStep(2), 200);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!agreed) { alert("Please agree to Terms"); return; }
-    if (form.password !== form.confirmPassword) { alert("Passwords do not match"); return; }
-    
-    const payload = activeRole === "student" 
-      ? { role: "STUDENT", ...form } 
-      : { role: "RECRUITER", ...form };
-    console.log(payload);
-  };
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  if (!agreed) {
+    alert("Please agree to Terms");
+    return;
+  }
+
+  if (form.password !== form.confirmPassword) {
+    alert("Passwords do not match");
+    return;
+  }
+
+  const payload =
+    activeRole === "student"
+      ? {
+          firstname: form.fullName,
+          email: form.email,
+          password: form.password,
+          role: "STUDENT",
+          university: form.university,
+          course: form.course,
+          graduationYear: form.graduationYear,
+        }
+      : {
+          firstname: form.fullName,
+          email: form.email,
+          password: form.password,
+          role: "RECRUITER",
+          companyName: form.companyName,
+          designation: form.designation,
+        };
+
+  // dispatch(registerUser(payload));
+};
 
   // Reusable input style
   const inputClasses = "w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all duration-200 outline-none text-slate-700 placeholder:text-slate-400";

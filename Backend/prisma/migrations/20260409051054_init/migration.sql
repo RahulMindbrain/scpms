@@ -34,7 +34,9 @@ CREATE TABLE "Student" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
     "departmentId" INTEGER NOT NULL,
-    "cgpa" DOUBLE PRECISION NOT NULL,
+    "cgpa" DOUBLE PRECISION,
+    "year" INTEGER NOT NULL,
+    "passingYear" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Student_pkey" PRIMARY KEY ("id")
@@ -136,6 +138,9 @@ CREATE UNIQUE INDEX "Student_userId_key" ON "Student"("userId");
 
 -- CreateIndex
 CREATE INDEX "Student_departmentId_idx" ON "Student"("departmentId");
+
+-- CreateIndex
+CREATE INDEX "Student_passingYear_idx" ON "Student"("passingYear");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Company_userId_key" ON "Company"("userId");

@@ -26,7 +26,7 @@ export const loginController = async (req: Request, res: Response) => {
     const refreshMaxAge = parseTTLToMs(process.env.JWT_REFRESH_TTL!);
 
     res.cookie("userAccessToken", accessToken, {
-      httpOnly: true,
+      htAdminnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: accessMaxAge,
@@ -34,7 +34,7 @@ export const loginController = async (req: Request, res: Response) => {
     });
 
     res.cookie("userRefreshToken", refreshToken, {
-      httpOnly: true,
+      htAdminnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: refreshMaxAge,
@@ -63,7 +63,7 @@ export const regenAccessToken = async (req: Request, res: Response) => {
     const refreshMaxAge = parseTTLToMs(process.env.jwtRefreshExpires!);
 
     res.cookie("userAccessToken", accessToken, {
-      httpOnly: true,
+      htAdminnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: accessMaxAge,
@@ -71,7 +71,7 @@ export const regenAccessToken = async (req: Request, res: Response) => {
     });
 
     res.cookie("userRefreshToken", newRefreshToken, {
-      httpOnly: true,
+      htAdminnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: refreshMaxAge,
@@ -101,7 +101,7 @@ export const logoutController = async (req: Request, res: Response) => {
     await logoutService(decoded.id);
 
     const cookieOptions = {
-      httpOnly: true,
+      htAdminnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax" as const,
       path: "/",

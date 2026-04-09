@@ -5,7 +5,7 @@ import illustration from "../../../assets/img.jpg";
 import camp from "../../../assets/camp.jpg"
 import campp from "../../../assets/campp.jpg"
 // Define Roles for type safety
-type UserRole = 'student' | 'company' | 'tpo';
+type UserRole = 'student' | 'company' | 'Admin';
 
 interface RoleConfig {
   id: UserRole;
@@ -20,7 +20,7 @@ const SignIn: React.FC = () => {
   const roles: RoleConfig[] = [
     { id: "student", label: "Student", icon: <GraduationCap size={16} /> },
     { id: "company", label: "Company", icon: <Briefcase size={16} /> },
-    { id: "tpo", label: "TPO", icon: <ShieldCheck size={16} /> },
+    { id: "Admin", label: "Admin", icon: <ShieldCheck size={16} /> },
   ];
 
 const handleSubmit = (e: React.FormEvent) => {
@@ -30,8 +30,8 @@ const handleSubmit = (e: React.FormEvent) => {
     navigate("/student/dashboard");
   } else if (activeRole === "company") {
     navigate("/company-dashboard");
-  } else if (activeRole === "tpo") {
-    navigate("/tpo-dashboard");
+  } else if (activeRole === "Admin") {
+    navigate("/admin/dashboard");
   }
 };
   const images = [illustration, camp, campp];
@@ -174,7 +174,7 @@ className="w-32 sm:w-40 md:w-48 h-auto rounded-lg transition-all duration-700"  
 
           <h3 className="text-2xl font-bold mb-4">Accelerate Your Career</h3>
           <p className="text-indigo-100/90 leading-relaxed text-sm">
-            Automating the end-to-end recruitment lifecycle. Real-time interaction between Students, TPOs, and Recruiting Companies.
+            Automating the end-to-end recruitment lifecycle. Real-time interaction between Students, Admins, and Recruiting Companies.
           </p>
 
           <div className="mt-8 flex gap-1.5 justify-center">
