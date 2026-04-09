@@ -13,22 +13,22 @@ import CompanyManagement from "@/pages/private/admin/companies/CompanyManagement
 import PlacementDriveManagement from "@/pages/private/admin/drives/PlacementDriveManagement";
 
 export const PrivateRoutes: RouteOptions<any>[] = [
-    {
-        path: "/admin/dashboard",
-        component: AdminDashboard,
-    },
-    {
-        path: "/admin/students",
-        component: StudentManagement,
-    },
-    {
-        path: "/admin/companies",
-        component: CompanyManagement,
-    },
-    {
-        path: "/admin/drives",
-        component: PlacementDriveManagement,
-    },
+    // {
+    //     path: "/admin/dashboard",
+    //     component: AdminDashboard,
+    // },
+    // {
+    //     path: "/admin/students",
+    //     component: StudentManagement,
+    // },
+    // {
+    //     path: "/admin/companies",
+    //     component: CompanyManagement,
+    // },
+    // {
+    //     path: "/admin/drives",
+    //     component: PlacementDriveManagement,
+    // },
     {
         path: "/student/dashboard",
         component: StudentDashboard,

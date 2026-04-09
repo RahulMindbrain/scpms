@@ -14,8 +14,8 @@ const RouteOutlet: React.FC = () => {
         return <Navigate to="/login" replace />;
     }
 
-    if (userType === "admin") {
-        return <AdminLayout />;
+    if (userType === "student") {
+        return <StudentLayout />;
     }
 
     return <StudentLayout />;

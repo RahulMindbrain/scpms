@@ -19,16 +19,16 @@ const StudentLayout: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const sidebarItems: SidebarItem[] = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/student/dashboard', section: 'Main' },
-    { icon: User, label: 'My Profile', path: '/student/profile', section: 'Main' },
-    { icon: CheckCircle, label: 'Eligibility', path: '/student/eligibility', section: 'Main' },
-    { icon: Briefcase, label: 'Job Listings', path: '/student/jobs', section: 'Main' },
-    { icon: FileSearch, label: 'My Applications', path: '/student/Application', section: 'Main' },
-    { icon: Calendar, label: 'Interview Schedule', path: '/student/interview', section: 'Tools' },
-    { icon: Bell, label: 'Notifications', path: '/student/notifications', section: 'Tools' },
-    { icon: FileText, label: 'Documents', path: '/student/documents', section: 'Tools' },
-  ];
+ const sidebarItems: SidebarItem[] = [
+  { icon: LayoutDashboard, label: 'Dashboard', path: '/student/dashboard', section: 'Main' },
+  { icon: User, label: 'My Profile', path: '/student/profile', section: 'Main' },
+  { icon: CheckCircle, label: 'Eligibility', path: '/student/eligibility', section: 'Main' },
+  { icon: Briefcase, label: 'Job Listings', path: '/student/jobs', section: 'Main' },
+  { icon: FileSearch, label: 'My Applications', path: '/student/application', section: 'Main' },
+  { icon: Calendar, label: 'Interview Schedule', path: '/student/interview', section: 'Tools' },
+  { icon: Bell, label: 'Notifications', path: '/student/notifications', section: 'Tools' },
+  { icon: FileText, label: 'Documents', path: '/student/documents', section: 'Tools' },
+];
 
   const handleSignOut = () => {
     console.log('Signing out...');
