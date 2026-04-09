@@ -3,17 +3,22 @@ import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/reducers/rootReducer";
 import StudentLayout from "@/components/layout/StudentLayout";
+import AdminLayout from "@/components/layout/AdminLayout";
 
 const RouteOutlet: React.FC = () => {
-    const isAuthenticate = useSelector(
-        (state: RootState) => state.auth.isAuthenticated
+    const { isAuthenticated, userType } = useSelector(
+        (state: RootState) => state.auth
     );
 
-    return isAuthenticate ? (
-        <StudentLayout />
-    ) : (
-        <Navigate to={`/login`} replace />
-    );
+    if (!isAuthenticated) {
+        return <Navigate to="/login" replace />;
+    }
+
+    if (userType === "admin") {
+        return <AdminLayout />;
+    }
+
+    return <StudentLayout />;
 };
 
-export default RouteOutlet;
+export default RouteOutlet;

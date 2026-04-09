@@ -1,7 +1,6 @@
-import { LogOut, CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LogOut, GraduationCap, PanelLeft, X } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { useState } from 'react';
 
 export interface SidebarItem {
   icon: LucideIcon;
@@ -12,104 +11,117 @@ export interface SidebarItem {
 
 interface SidebarProps {
   items: SidebarItem[];
-  portalName?: string;
+  isCollapsed: boolean;
+  onToggle: () => void;
   onSignOut?: () => void;
+  isOpenMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
-const Sidebar = ({ items, portalName = 'Student Portal', onSignOut }: SidebarProps) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const sections = Array.from(new Set(items.map(item => item.section)));
+const Sidebar = ({ items, isCollapsed, onToggle, onSignOut, isOpenMobile, onCloseMobile }: SidebarProps) => {
+  const sidebarClasses = `
+    bg-[#111827] text-white flex flex-col shadow-2xl z-50 border-r border-white/5 transition-all duration-300 ease-in-out
+    ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}
+    ${isOpenMobile ? 'fixed inset-y-0 left-0 w-64' : 'fixed inset-y-0 -left-64 lg:sticky lg:inset-auto lg:h-screen lg:top-0'}
+  `;
 
   return (
-    <aside 
-      className={`bg-[#0f172a] text-white flex flex-col fixed inset-y-0 shadow-xl z-20 transition-all duration-300 ease-in-out ${
-        isCollapsed ? 'w-20' : 'w-64'
-      }`}
-    >
-      {/* Header Section */}
-      <div className="p-6 flex items-center h-20 overflow-hidden">
-        <div className="flex items-center gap-3 min-w-max">
-          <div className="w-10 h-10 bg-cyan-500 rounded-lg flex items-center justify-center shadow-lg shadow-cyan-500/20 shrink-0">
-            <CheckCircle className="text-white w-6 h-6" />
+    <>
+      {/* Mobile Overlay */}
+      {isOpenMobile && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden animate-in fade-in duration-300"
+          onClick={onCloseMobile}
+        />
+      )}
+
+      <aside className={sidebarClasses}>
+        {/* Header Section */}
+        <div className={`flex items-center py-6 px-4 ${isCollapsed ? 'lg:flex-col lg:space-y-4' : 'justify-between'}`}>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 lg:w-12 lg:h-12 bg-gradient-to-br from-blue-600 to-cyan-400 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/20 shrink-0">
+              <GraduationCap className="text-white w-6 h-6 lg:w-7 lg:h-7" />
+            </div>
+            {(!isCollapsed || isOpenMobile) && (
+              <div className="animate-in fade-in slide-in-from-left-2 duration-300">
+                <h1 className="font-bold text-lg leading-tight">CPMS</h1>
+                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">Placement Portal</p>
+              </div>
+            )}
           </div>
-          <div className={`transition-all duration-300 ${isCollapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto'}`}>
-            <h1 className="font-bold text-lg leading-tight whitespace-nowrap">CPMS</h1>
-            <p className="text-xs text-gray-400 whitespace-nowrap">{portalName}</p>
-          </div>
+          
+          <button 
+            onClick={isOpenMobile ? onCloseMobile : onToggle}
+            className="p-2 rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-all duration-300"
+          >
+            {isOpenMobile ? <X className="w-5 h-5" /> : <PanelLeft className={`w-5 h-5 transition-transform ${isCollapsed ? '' : 'rotate-180'}`} />}
+          </button>
         </div>
-      </div>
 
-      {/* CENTERED TOGGLE BUTTON */}
-      <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-1/2 -translate-y-1/2 bg-cyan-500 text-white p-1 rounded-full shadow-lg hover:bg-cyan-400 transition-colors z-30"
-        aria-label="Toggle Sidebar"
-      >
-        {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
-      </button>
+        {/* Navigation */}
+        <nav className={`flex-1 px-3 flex flex-col space-y-1.5 py-4 overflow-y-auto no-scrollbar ${isCollapsed ? 'lg:items-center' : ''}`}>
+          {items.map((item) => (
+            <NavLink
+              key={item.label}
+              to={item.path}
+              onClick={() => isOpenMobile && onCloseMobile?.()}
+              className={({ isActive }) => 
+                `flex items-center rounded-xl transition-all duration-300 group relative ${
+                  isCollapsed ? 'lg:w-12 lg:h-12 lg:justify-center' : 'px-4 py-3 gap-3 w-full'
+                } ${isOpenMobile ? 'px-4 py-3 gap-3 w-full' : ''} ${
+                  isActive 
+                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20' 
+                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                }`
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  <item.icon className={`w-5 h-5 shrink-0 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'}`} />
+                  
+                  {(!isCollapsed || isOpenMobile) && (
+                    <span className="text-sm font-medium whitespace-nowrap animate-in fade-in slide-in-from-left-2 duration-300">
+                      {item.label}
+                    </span>
+                  )}
 
-      {/* Navigation */}
-      <nav className="flex-1 px-4 mt-4 space-y-6 overflow-y-auto custom-scrollbar overflow-x-hidden">
-        {sections.map((section) => (
-          <div key={section}>
-            <h2 className={`text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2 px-2 truncate transition-opacity duration-200 ${
-              isCollapsed ? 'opacity-0' : 'opacity-100'
-            }`}>
-              {section}
-            </h2>
-            <ul className="space-y-1">
-              {items.filter(item => item.section === section).map((item) => (
-                <li key={item.label}>
-                  <NavLink
-                    to={item.path}
-                    title={isCollapsed ? item.label : ''}
-                    className={({ isActive }) => 
-                      `flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-                        isActive 
-                          ? 'bg-blue-600/10 text-blue-400 border border-blue-600/20 shadow-sm' 
-                          : 'text-gray-400 hover:bg-white/5 hover:text-white border border-transparent'
-                      }`
-                    }
-                  >
-                    {({ isActive }) => (
-                      <>
-                        <item.icon className={`w-5 h-5 shrink-0 ${isActive ? 'text-blue-400' : 'text-gray-400 group-hover:text-white'}`} />
-                        <span className={`text-sm font-medium whitespace-nowrap transition-all duration-300 ${
-                          isCollapsed ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100 w-auto'
-                        }`}>
-                          {item.label}
-                        </span>
-                      </>
-                    )}
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </nav>
+                  {/* Tooltip on hover (only when collapsed on desktop) */}
+                  {isCollapsed && !isOpenMobile && (
+                    <div className="hidden lg:block absolute left-16 bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl border border-white/10 translate-x-1 group-hover:translate-x-0 duration-300 z-50">
+                      {item.label}
+                    </div>
+                  )}
+                </>
+              )}
+            </NavLink>
+          ))}
+        </nav>
 
-      {/* Footer / Sign Out */}
-      <div className="p-4 border-t border-gray-800">
-        <button 
-          onClick={onSignOut}
-          className="w-full flex items-center gap-3 px-3 py-2.5 text-gray-400 hover:bg-red-500/10 hover:text-red-400 rounded-lg transition-all group overflow-hidden"
-        >
-          <LogOut className="w-5 h-5 shrink-0 text-gray-400 group-hover:text-red-400" />
-          <span className={`text-sm font-medium whitespace-nowrap transition-all duration-300 ${
-            isCollapsed ? 'opacity-0 w-0' : 'opacity-100 w-auto'
-          }`}>
-            Sign Out
-          </span>
-        </button>
-      </div>
+        {/* Footer / Sign Out */}
+        <div className={`p-4 border-t border-white/5 ${isCollapsed && !isOpenMobile ? 'lg:flex lg:justify-center' : ''}`}>
+          <button 
+            onClick={onSignOut}
+            className={`flex items-center rounded-xl transition-all group relative text-gray-400 hover:bg-red-500/10 hover:text-red-400 ${
+              isCollapsed && !isOpenMobile ? 'lg:w-12 lg:h-12 lg:justify-center' : 'px-4 py-3 gap-3 w-full'
+            }`}
+          >
+            <LogOut className="w-5 h-5 shrink-0 transition-transform group-hover:scale-110" />
+            {(!isCollapsed || isOpenMobile) && <span className="text-sm font-medium">Sign Out</span>}
+            
+            {isCollapsed && !isOpenMobile && (
+              <div className="hidden lg:block absolute left-16 bg-red-900/90 text-white px-3 py-1.5 rounded-lg text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl border border-red-500/20 translate-x-1 group-hover:translate-x-0 duration-300 z-50">
+                Sign Out
+              </div>
+            )}
+          </button>
+        </div>
 
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-      `}</style>
-    </aside>
+        <style>{`
+          .no-scrollbar::-webkit-scrollbar { display: none; }
+          .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        `}</style>
+      </aside>
+    </>
   );
 };
 
