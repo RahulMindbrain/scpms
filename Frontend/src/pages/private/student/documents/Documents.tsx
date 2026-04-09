@@ -1,28 +1,29 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   FileText, Upload, Download, Trash2, 
-  Bell, Plus, Loader2,
-  FileCheck, FileClock, PanelLeftOpen
+  Bell, Plus, Loader2, Search,
+  FileCheck, FileClock, PanelLeftOpen,
+  MoreVertical, ExternalLink, ShieldCheck
 } from 'lucide-react';
-import { uploadToCloudinary } from '../../../../lib/cloudinary';
 import { toast } from 'sonner';
 
 const Documents = () => {
   const [activeTab, setActiveTab] = useState('All');
   const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+ const fileInputRef = useRef<HTMLInputElement>(null);
 
   const categories = ['All', 'Resume', 'Certificate', 'Offer Letter'];
 
   const [documents, setDocuments] = useState([
     {
       id: 1,
-      name: 'Priya_Sharma_Resume.pdf',
+      name: 'anjali_Sharma_Resume.pdf',
       category: 'Resume',
       size: '245 KB',
       date: 'Apr 1, 2026',
-      url: '#',
-      icon: <FileText size={20} className="text-blue-500" />
+      status: 'Verified',
+      icon: <FileText size={18} className="text-blue-600" />
     },
     {
       id: 2,
@@ -30,17 +31,8 @@ const Documents = () => {
       category: 'Certificate',
       size: '1.2 MB',
       date: 'Mar 28, 2026',
-      url: '#',
-      icon: <FileCheck size={20} className="text-emerald-500" />
-    },
-    {
-      id: 3,
-      name: 'Internship_Certificate_Google.pdf',
-      category: 'Certificate',
-      size: '320 KB',
-      date: 'Mar 25, 2026',
-      url: '#',
-      icon: <FileCheck size={20} className="text-emerald-500" />
+      status: 'Verified',
+      icon: <FileCheck size={18} className="text-emerald-600" />
     },
     {
       id: 4,
@@ -48,211 +40,160 @@ const Documents = () => {
       category: 'Offer Letter',
       size: '180 KB',
       date: 'Apr 7, 2026',
-      url: '#',
-      icon: <FileText size={20} className="text-indigo-500" />
-    },
-    {
-      id: 5,
-      name: 'Project_Portfolio.pdf',
-      category: 'Certificate',
-      size: '2.1 MB',
-      date: 'Mar 20, 2026',
-      url: '#',
-      icon: <FileText size={20} className="text-blue-500" />
+      status: 'Pending',
+      icon: <FileText size={18} className="text-indigo-600" />
     }
   ]);
 
-  const filteredDocs = activeTab === 'All' 
-    ? documents 
-    : documents.filter(doc => doc.category === activeTab);
+  const filteredDocs = documents.filter(doc => {
+    const matchesTab = activeTab === 'All' || doc.category === activeTab;
+    const matchesSearch = doc.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesTab && matchesSearch;
+  });
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("File size must be less than 5MB");
-      return;
-    }
-
-    setIsUploading(true);
-    const toastId = toast.loading(`Uploading ${file.name}...`);
-
-    try {
-      const url = await uploadToCloudinary(file);
-      
-      const newDoc = {
-        id: documents.length + 1,
-        name: file.name,
-        category: activeTab === 'All' ? 'Resume' : activeTab,
-        size: `${(file.size / 1024).toFixed(1)} KB`,
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        url: url,
-        icon: <FileText size={20} className="text-blue-500" />
-      };
-
-      setDocuments([newDoc, ...documents]);
-      toast.success("Document uploaded successfully!", { id: toastId });
-    } catch (error) {
-      toast.error("Failed to upload document", { id: toastId });
-    } finally {
-      setIsUploading(false);
-      if (fileInputRef.current) fileInputRef.current.value = '';
-    }
-  };
-
-  const deleteDocument = (id: number) => {
+  const deleteDocument = (id:any) => {
     setDocuments(documents.filter(doc => doc.id !== id));
-    toast.success("Document deleted");
+    toast.success("Document removed from vault");
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50">
-      {/* Top Header */}
-      <nav className="sticky top-0 z-30 w-full bg-white border-b border-slate-100 px-6 py-4 shadow-sm">
+    <div className="min-h-screen bg-[#F9FAFB]">
+      {/* Refined Navbar */}
+      <nav className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-3">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <div className="flex items-center gap-4">
-            <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg transition-colors lg:hidden">
-              <PanelLeftOpen size={22} />
-            </button>
-            <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-indigo-50 text-indigo-600 rounded-lg">
-                <FileText size={20} />
-              </div>
-              <h1 className="text-xl font-bold text-slate-800">Documents</h1>
-            </div>
+            <h1 className="text-lg font-bold text-slate-900 tracking-tight">Document </h1>
           </div>
           
-          <div className="flex items-center gap-4 text-slate-600">
-            <button className="relative p-2 hover:bg-slate-100 rounded-full transition-colors">
-              <Bell size={22} />
-              <span className="absolute top-1.5 right-1.5 w-4 h-4 bg-rose-500 text-[10px] text-white flex items-center justify-center font-bold rounded-full border-2 border-white">
-                5
-              </span>
-            </button>
-            <div className="h-8 w-px bg-slate-200" />
-            <div className="flex items-center gap-2 cursor-pointer hover:bg-slate-100 p-1.5 rounded-full px-3 transition-colors">
-              <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-md">
-                PS
-              </div>
+          <div className="flex items-center gap-6">
+            <div className="hidden md:flex items-center relative">
+              <Search className="absolute left-3 text-slate-400" size={16} />
+              <input 
+                type="text"
+                placeholder="Search files..."
+                className="pl-10 pr-4 py-1.5 bg-slate-100 border-none rounded-full text-sm focus:ring-2 focus:ring-indigo-500 w-64 transition-all"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
+            <button className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
+              <Bell size={20} />
+              <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
+            </button>
+            <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">AS</div>
           </div>
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 py-8">
-        {/* Filters & Actions */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-          <div className="flex p-1 bg-slate-100/80 rounded-xl w-fit border border-slate-200">
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => setActiveTab(cat)}
-                className={`px-5 py-2 text-sm font-bold rounded-lg transition-all ${
-                  activeTab === cat 
-                    ? 'bg-indigo-600 text-white shadow-md' 
-                    : 'text-slate-600 hover:bg-white hover:text-indigo-600'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+      <main className="max-w-6xl mx-auto px-8 py-10">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div>
+            <h2 className="text-3xl font-extrabold text-slate-900">Academic Records</h2>
+            <p className="text-slate-500 mt-1 font-medium">Manage and share your verified professional documents.</p>
           </div>
           
           <div className="flex gap-3">
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileUpload} 
-              className="hidden" 
-              accept=".pdf,image/*"
-            />
+            <input type="file" ref={fileInputRef} className="hidden" />
             <button 
               onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading}
-              className="flex items-center justify-center gap-2 px-6 py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all shadow-md shadow-indigo-200 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg active:scale-95"
             >
-              {isUploading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
-              {isUploading ? 'Uploading...' : 'Upload Document'}
+              <Upload size={16} /> Quick Upload
             </button>
           </div>
         </div>
 
-        {/* Document List Container */}
-        <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="divide-y divide-slate-100">
-            {filteredDocs.length > 0 ? (
-              filteredDocs.map((doc) => (
-                <div key={doc.id} className="p-6 flex items-center justify-between hover:bg-slate-50/80 transition-all group">
-                  <div className="flex items-center gap-6">
-                    <div className="h-12 w-12 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center shadow-sm group-hover:bg-white group-hover:border-indigo-100 transition-colors">
-                      {doc.icon}
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-slate-800 text-lg group-hover:text-indigo-600 transition-colors">
-                        {doc.name}
-                      </h3>
-                      <div className="flex items-center gap-3 text-sm font-semibold text-slate-400 mt-0.5">
-                        <span className="text-slate-500">{doc.category}</span>
-                        <span className="h-1 w-1 bg-slate-300 rounded-full" />
-                        <span>{doc.size}</span>
-                        <span className="h-1 w-1 bg-slate-300 rounded-full" />
-                        <span>{doc.date}</span>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <a 
-                      href={doc.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all" 
-                      title="View/Download"
-                    >
-                      <Download size={20} />
-                    </a>
-                    <button 
-                      onClick={() => deleteDocument(doc.id)}
-                      className="p-2.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all" 
-                      title="Delete"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="py-20 flex flex-col items-center justify-center text-slate-400">
-                <FileClock size={64} strokeWidth={1} className="mb-4 opacity-20" />
-                <p className="text-lg font-semibold">No documents found in this category</p>
-                <button 
-                  onClick={() => setActiveTab('All')}
-                  className="mt-2 text-indigo-600 font-bold hover:underline"
-                >
-                  Clear filters
-                </button>
-              </div>
-            )}
-          </div>
+        {/* Filters */}
+        <div className="flex items-center gap-2 mb-8 overflow-x-auto pb-2 no-scrollbar">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveTab(cat)}
+              className={`px-5 py-2 text-sm font-bold rounded-full border transition-all whitespace-nowrap ${
+                activeTab === cat 
+                  ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm' 
+                  : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
         </div>
 
-        {/* Info Card */}
-        <div className="mt-12 p-6 bg-amber-50 rounded-2xl border border-amber-100 flex gap-4 items-start shadow-sm">
-          <div className="p-2 bg-amber-100 text-amber-600 rounded-xl">
-            <Plus size={20} strokeWidth={3} />
+        {/* Document Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredDocs.length > 0 ? (
+            filteredDocs.map((doc) => (
+              <div key={doc.id} className="group bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-200 transition-all relative overflow-hidden">
+                <div className="flex justify-between items-start mb-4">
+                  <div className={`p-3 rounded-xl border ${
+                    doc.category === 'Resume' ? 'bg-blue-50 border-blue-100' : 'bg-emerald-50 border-emerald-100'
+                  }`}>
+                    {doc.icon}
+                  </div>
+                  <button className="text-slate-400 hover:text-slate-600 p-1">
+                    <MoreVertical size={18} />
+                  </button>
+                </div>
+
+                <h3 className="font-bold text-slate-800 mb-1 truncate pr-4 group-hover:text-indigo-600 transition-colors" title={doc.name}>
+                  {doc.name}
+                </h3>
+                
+                <div className="flex items-center gap-2 text-xs font-bold text-slate-400 mb-6">
+                  <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-600">{doc.category}</span>
+                  <span>•</span>
+                  <span>{doc.size}</span>
+                </div>
+
+                <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                   <div className="flex items-center gap-1.5">
+                     <ShieldCheck size={14} className={doc.status === 'Verified' ? 'text-emerald-500' : 'text-slate-300'} />
+                     <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{doc.status}</span>
+                   </div>
+                   <div className="flex items-center gap-1">
+                     <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                       <Download size={16} />
+                     </button>
+                     <button 
+                       onClick={() => deleteDocument(doc.id)}
+                       className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                     >
+                       <Trash2 size={16} />
+                     </button>
+                   </div>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="col-span-full py-24 bg-white rounded-3xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400">
+               <div className="p-4 bg-slate-50 rounded-full mb-4">
+                  <FileClock size={40} strokeWidth={1.5} />
+               </div>
+               <p className="text-lg font-bold text-slate-600">No records found</p>
+               <p className="text-sm font-medium">Try adjusting your filters or upload a new document.</p>
+            </div>
+          )}
+        </div>
+
+        {/* Security Footer */}
+        <div className="mt-16 p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-indigo-950 text-white flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+          <div className="flex items-center gap-5">
+            <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center backdrop-blur-sm">
+              <ShieldCheck size={28} className="text-indigo-300" />
+            </div>
+            <div>
+              <p className="text-indigo-200/70 text-sm font-medium">All documents are encrypted and accessible only by verified recruiters.</p>
+            </div>
           </div>
-          <div>
-            <h4 className="font-bold text-amber-900 mb-1">Upload Guidelines</h4>
-            <p className="text-sm text-amber-800 leading-relaxed font-medium">
-              Ensure all documents are in PDF format and less than 5MB in size. 
-              Named conventions like 'Name_Category_Year' are recommended for better organization.
-            </p>
-          </div>
+          <button className="px-6 py-2.5 bg-white text-slate-900 text-sm font-bold rounded-xl hover:bg-indigo-50 transition-all flex items-center gap-2">
+            View Security Logs <ExternalLink size={14} />
+          </button>
         </div>
       </main>
     </div>
   );
 };
 
-export default Documents;
+export default Documents;
