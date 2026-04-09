@@ -24,6 +24,7 @@ export const loginController = async (req: Request, res: Response) => {
 
     const accessMaxAge = parseTTLToMs(process.env.JWT_ACCESS_TTL!);
     const refreshMaxAge = parseTTLToMs(process.env.JWT_REFRESH_TTL!);
+    // console.log(accessMaxAge, refreshMaxAge);
 
     res.cookie("userAccessToken", accessToken, {
       httpOnly: true,
@@ -40,6 +41,7 @@ export const loginController = async (req: Request, res: Response) => {
       maxAge: refreshMaxAge,
       path: "/",
     });
+    // console.log("HEADERS:", res.getHeaders());
 
     sendSuccess(res, 200, "Login successful", user);
   } catch (error: any) {
@@ -59,8 +61,8 @@ export const regenAccessToken = async (req: Request, res: Response) => {
     const { accessToken, refreshToken: newRefreshToken } =
       await generateAccessService(refreshToken);
 
-    const accessMaxAge = parseTTLToMs(process.env.jwtAccessExpires!);
-    const refreshMaxAge = parseTTLToMs(process.env.jwtRefreshExpires!);
+    const accessMaxAge = parseTTLToMs(process.env.JWT_ACCESS_TTL!);
+    const refreshMaxAge = parseTTLToMs(process.env.JWT_REFRESH_TTL!);
 
     res.cookie("userAccessToken", accessToken, {
       httpOnly: true,
@@ -80,6 +82,7 @@ export const regenAccessToken = async (req: Request, res: Response) => {
 
     sendSuccess(res, 200, "Token refreshed successfully");
   } catch (error: any) {
+    // console.log(error);
     sendError(res, 403, error.message);
   }
 };
@@ -87,16 +90,16 @@ export const regenAccessToken = async (req: Request, res: Response) => {
 export const logoutController = async (req: Request, res: Response) => {
   try {
     const token = req.cookies.userAccessToken;
+    // console.log(token);
 
     if (!token) {
       sendError(res, 401, "Access token missing");
       return;
     }
 
-    const decoded = jwt.verify(
-      token,
-      process.env.jwtAccessSecret as string,
-    ) as { id: number };
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+      id: number;
+    };
 
     await logoutService(decoded.id);
 

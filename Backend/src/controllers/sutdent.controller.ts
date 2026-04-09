@@ -6,11 +6,41 @@ import {
   updateStudentService,
 } from "../services/student.service";
 
+// export const createStudentController = async (req: Request, res: Response) => {
+//   try {
+//     const user = res.locals.user;
+//     console.log(user);
+
+//     const { departmentId, year, passingYear, cgpa } = req.body;
+
+//     const student = await createStudentService(
+//       user.id,
+//       departmentId,
+//       year,
+//       passingYear,
+//       cgpa,
+//     );
+
+//     return sendSuccess(res, 201, "Student profile created", student);
+//   } catch (error: any) {
+//     // console.log(error);
+//     return sendError(res, 400, error.message);
+//   }
+// };
 export const createStudentController = async (req: Request, res: Response) => {
   try {
     const user = res.locals.user;
 
-    const { departmentId, year, passingYear, cgpa } = req.body;
+    const {
+      departmentId,
+      year,
+      passingYear,
+      cgpa,
+      resumeUrl,
+      skills,
+      experiences,
+      certificates,
+    } = req.body;
 
     const student = await createStudentService(
       user.id,
@@ -18,14 +48,17 @@ export const createStudentController = async (req: Request, res: Response) => {
       year,
       passingYear,
       cgpa,
+      resumeUrl,
+      skills,
+      experiences,
+      certificates,
     );
 
-    return sendSuccess(res, 201, "Student profile created", student);
+    return sendSuccess(res, 201, "Student created", student);
   } catch (error: any) {
     return sendError(res, 400, error.message);
   }
 };
-
 export const getStudentProfileController = async (
   _req: Request,
   res: Response,

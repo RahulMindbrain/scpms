@@ -7,7 +7,10 @@ import {
 import { authorizeRoles } from "../middlewares/verifyRole";
 import authenticateUser from "../middlewares/authenticateUser";
 import { validate } from "../middlewares/validate";
-import { createStudentSchema } from "../validators/sudent.validator";
+import {
+  createStudentSchema,
+  updateStudentSchema,
+} from "../validators/sudent.validator";
 
 const StudentRoutes = Router();
 
@@ -30,6 +33,7 @@ StudentRoutes.put(
   "/profile",
   authenticateUser,
   authorizeRoles("STUDENT"),
+  validate(updateStudentSchema),
   updateStudentController,
 );
 

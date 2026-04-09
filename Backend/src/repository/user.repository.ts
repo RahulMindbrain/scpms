@@ -1,5 +1,6 @@
 import { Role, Status } from "@prisma/client";
 import prisma from "../config/db";
+import { TokenExpiredError } from "jsonwebtoken";
 
 export const createUser = async (data: {
   firstname: string;
@@ -88,5 +89,36 @@ export const updateSocketId = async (
   return prisma.user.update({
     where: { id: userId },
     data: { socketId },
+  });
+};
+
+export const findActiveToken = async (userId: number, refreshToken: string) => {
+  return prisma.token.findFirst({
+    where: {
+      userId,
+      refreshToken: refreshToken,
+      status: "ACTIVE",
+    },
+  });
+};
+
+export const updateUser = async (
+  userId: number,
+  data: Partial<{
+    firstname: string;
+    lastname?: string;
+  }>,
+) => {
+  return prisma.user.update({
+    where: { id: userId },
+    data,
+    select: {
+      id: true,
+      firstname: true,
+      lastname: true,
+      email: true,
+      role: true,
+      status: true,
+    },
   });
 };

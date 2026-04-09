@@ -1,5 +1,10 @@
 import { Role } from "@prisma/client";
-import { createUser, findUserByEmail } from "../repository/user.repository";
+import {
+  createUser,
+  findUserByEmail,
+  getUserById,
+  updateUser,
+} from "../repository/user.repository";
 import { hashPassword } from "../utils/hashPassword";
 
 export const createUserService = async (
@@ -26,4 +31,30 @@ export const createUserService = async (
   });
 
   return user;
+};
+
+export const getUserService = async (userId: number) => {
+  const user = await getUserById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return user;
+};
+
+export const updateUserService = async (
+  userId: number,
+  data: {
+    firstname?: string;
+    lastname?: string;
+  },
+) => {
+  const existing = await getUserById(userId);
+
+  if (!existing) {
+    throw new Error("User not found");
+  }
+
+  return updateUser(userId, data);
 };

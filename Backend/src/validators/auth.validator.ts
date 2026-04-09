@@ -27,3 +27,17 @@ export const loginSchema = z.object({
     .string({ required_error: "Password is required" })
     .min(6, "Password must be at least 6 characters"),
 });
+
+export const updateUserSchema = z
+  .object({
+    firstname: z
+      .string({ required_error: "Firstname is required" })
+      .min(2, "Firstname must be at least 2 characters")
+      .optional(),
+
+    lastname: z
+      .string({ required_error: "Lastname is required" })
+      .min(2, "Lastname must be at least 2 characters")
+      .optional(),
+  })
+  .strict();
