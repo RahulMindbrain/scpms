@@ -1,7 +1,8 @@
 import React from "react";
-import { Outlet, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/reducers/rootReducer";
+import StudentLayout from "@/components/layout/StudentLayout";
 
 const RouteOutlet: React.FC = () => {
     const isAuthenticate = useSelector(
@@ -9,12 +10,10 @@ const RouteOutlet: React.FC = () => {
     );
 
     return isAuthenticate ? (
-        // <Layout>
-        <Outlet />
-        // </Layout>
+        <StudentLayout />
     ) : (
-        <Navigate to={`/`} />
+        <Navigate to={`/login`} replace />
     );
 };
 
-export default RouteOutlet;
+export default RouteOutlet;
