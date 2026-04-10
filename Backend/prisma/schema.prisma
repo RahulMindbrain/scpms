@@ -82,6 +82,52 @@ model Student {
   @@index([passingYear])
 }
 
+model Skill {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+
+  students  Student[]   // many-to-many
+  jobs   Job[]
+
+  createdAt DateTime  @default(now())
+  @@index([name])
+}
+
+model Experience {
+  id          Int      @id @default(autoincrement())
+
+  studentId   Int
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  companyName String
+  role        String
+  description String?
+
+  startDate   DateTime
+  endDate     DateTime?
+
+  createdAt   DateTime @default(now())
+
+  @@index([studentId])
+}
+
+model Certificate {
+  id             Int      @id @default(autoincrement())
+
+  studentId      Int
+  student        Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  title          String
+  issuer         String
+  certificateUrl String?
+
+  issuedDate     DateTime?
+
+  createdAt      DateTime @default(now())
+
+  @@index([studentId])
+}
+
 model Company {
   id        Int     @id @default(autoincrement())
   userId    Int     @unique
@@ -126,6 +172,8 @@ model Job {
 
   companyId   Int
   company     Company @relation(fields: [companyId], references: [id])
+
+  skills Skill[]
 
   approvedBy  Int?
   approver    Admin? @relation("AdminApprovedJobs", fields: [approvedBy], references: [id], onDelete: SetNull)

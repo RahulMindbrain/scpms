@@ -7,15 +7,11 @@ export const createStudent = async (
   year: number,
   passingYear: number,
   cgpa?: number,
+  resumeUrl?: string,
+  skillIds?: number[],
+  experiences?: any[],
+  certificates?: any[],
 ) => {
-  const existing = await prisma.student.findUnique({
-    where: { userId },
-  });
-
-  if (existing) {
-    throw new Error("Student profile already exists");
-  }
-
   return prisma.student.create({
     data: {
       userId,
@@ -23,6 +19,39 @@ export const createStudent = async (
       year,
       passingYear,
       ...(cgpa !== undefined && { cgpa }),
+      ...(resumeUrl && { resumeUrl }),
+
+      ...(skillIds?.length && {
+        skills: {
+          connect: skillIds.map((id: number) => ({ id })),
+        },
+      }),
+
+      ...(experiences?.length && {
+        experiences: {
+          create: experiences.map((exp) => ({
+            ...exp,
+            startDate: new Date(exp.startDate),
+            ...(exp.endDate && { endDate: new Date(exp.endDate) }),
+          })),
+        },
+      }),
+
+      ...(certificates?.length && {
+        certificates: {
+          create: certificates.map((cert) => ({
+            ...cert,
+            ...(cert.issuedDate && {
+              issuedDate: new Date(cert.issuedDate),
+            }),
+          })),
+        },
+      }),
+    },
+    include: {
+      skills: true,
+      experiences: true,
+      certificates: true,
     },
   });
 };
@@ -45,15 +74,9 @@ export const getStudentByUserId = async (userId: number) => {
   });
 };
 
-export const updateStudent = async (
-  userId: number,
-  data: {
-    cgpa?: number;
-    departmentId?: number;
-    year?: number;
-    passingYear?: number;
-  },
-) => {
+export const updateStudent = async (userId: number, data: any) => {
+  const { skillIds, experiences, certificates, ...rest } = data;
+
   const existing = await prisma.student.findUnique({
     where: { userId },
   });
@@ -64,7 +87,47 @@ export const updateStudent = async (
 
   return prisma.student.update({
     where: { userId },
-    data,
+    data: {
+      // ✅ scalar fields
+      ...rest,
+
+      // ✅ skills (replace)
+      ...(skillIds && {
+        skills: {
+          connect: skillIds.map((id: number) => ({ id })),
+        },
+      }),
+
+      // ✅ experiences (replace strategy)
+      ...(experiences && {
+        experiences: {
+          deleteMany: {}, // remove old
+          create: experiences.map((exp: any) => ({
+            ...exp,
+            startDate: new Date(exp.startDate),
+            ...(exp.endDate && { endDate: new Date(exp.endDate) }),
+          })),
+        },
+      }),
+
+      // ✅ certificates (replace strategy)
+      ...(certificates && {
+        certificates: {
+          deleteMany: {},
+          create: certificates.map((cert: any) => ({
+            ...cert,
+            ...(cert.issuedDate && {
+              issuedDate: new Date(cert.issuedDate),
+            }),
+          })),
+        },
+      }),
+    },
+    include: {
+      skills: true,
+      experiences: true,
+      certificates: true,
+    },
   });
 };
 

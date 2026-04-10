@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import { sendError, sendSuccess } from "../utils/response";
-import { Role } from "@prisma/client";
+import { JobStatus, Role } from "@prisma/client";
 import { createAdmin, getAdminCount } from "../repository/admin.repository";
 import {
   createAdminService,
   getStudentsService,
+  updateJobStatusByAdminService,
 } from "../services/admin.service";
 
 export const createAdminController = async (req: Request, res: Response) => {
