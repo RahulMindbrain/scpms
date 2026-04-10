@@ -11,6 +11,9 @@ import AdminDashboard from "@/pages/private/admin/dashboard/AdminDashboard";
 import StudentManagement from "@/pages/private/admin/students/StudentManagement";
 import CompanyManagement from "@/pages/private/admin/companies/CompanyManagement";
 import PlacementDriveManagement from "@/pages/private/admin/drives/PlacementDriveManagement";
+import Report from "@/pages/private/admin/report/report"
+import AdminNotificationPage from "@/pages/private/admin/notifrication/notification";
+import Setting from "@/pages/private/admin/setting/Setting"
 
 export const PrivateRoutes: RouteOptions<any>[] = [
     {
@@ -28,7 +31,26 @@ export const PrivateRoutes: RouteOptions<any>[] = [
     {
         path: "/admin/drives",
         component: PlacementDriveManagement,
+    
     },
+    {
+        path: "/admin/report",
+        component: Report,
+    
+    },
+       {
+        path: "/admin/notification",
+        component: AdminNotificationPage,
+    
+    },
+    {
+        path: "/admin/setting",
+        component: Setting,
+    
+    },
+ 
+
+
     {
         path: "/student/dashboard",
         component: StudentDashboard,
@@ -60,6 +82,7 @@ export const PrivateRoutes: RouteOptions<any>[] = [
     {
         path: "/student/interview",
         component:InterviewScheduler
-    }
+    },
+    
 
 ];

@@ -88,9 +88,7 @@ const AdminDashboard: React.FC = () => {
             <button className="p-2.5 bg-white border border-slate-200 rounded-xl text-slate-600 hover:bg-slate-50">
               <Bell className="w-5 h-5" />
             </button>
-            <button className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all active:scale-95">
-              <Plus className="w-4 h-4" /> <span className="hidden sm:inline">New Drive</span>
-            </button>
+            
           </div>
         </header>
 
