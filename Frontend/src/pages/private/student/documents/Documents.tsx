@@ -184,7 +184,7 @@ const Documents = () => {
               <ShieldCheck size={28} className="text-indigo-300" />
             </div>
             <div>
-              <p className="text-indigo-200/70 text-sm font-medium">All documents are encrypted and accessible only by verified recruiters.</p>
+              <p className="text-indigo-200/70 text-sm font-medium">All documents are encrypted and accessible only by verified COMPANYs.</p>
             </div>
           </div>
           <button className="px-6 py-2.5 bg-white text-slate-900 text-sm font-bold rounded-xl hover:bg-indigo-50 transition-all flex items-center gap-2">

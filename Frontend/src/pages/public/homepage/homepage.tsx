@@ -122,7 +122,7 @@ const navigate = useNavigate();
             </h1>
 
             <p className="text-lg md:text-xl text-slate-300 mb-10 leading-relaxed max-w-2xl">
-              A unified digital hub for Admins, students, and recruiters.
+              A unified digital hub for Admins, students, and COMPANYs.
               Automate drives, track applications, and boost placement rates
               — all from one platform.
             </p>

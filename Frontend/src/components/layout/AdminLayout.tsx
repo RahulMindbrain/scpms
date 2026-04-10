@@ -24,10 +24,10 @@ const AdminLayout: React.FC = () => {
     { icon: Users, label: 'Student Management', path: '/admin/students', section: 'Main' },
     { icon: Building2, label: 'Companies', path: '/admin/companies', section: 'Main' },
     { icon: Briefcase, label: 'Placement Drives', path: '/admin/drives', section: 'Main' },
-    { icon: BarChart3, label: 'Reports & Analytics', path: '/admin/analytics', section: 'Tools' },
-    { icon: Bell, label: 'Notifications', path: '/admin/notifications', section: 'Tools' },
-    { icon: Calendar, label: 'Event Calendar', path: '/admin/calendar', section: 'Tools' },
-    { icon: Settings, label: 'Settings', path: '/admin/settings', section: 'System' },
+    { icon: BarChart3, label: 'Reports & Analytics', path: '/admin/report', section: 'Tools' },
+    { icon: Bell, label: 'Notifications', path: '/admin/notification', section: 'Tools' },
+    { icon: Calendar, label: 'Event Calendar', path: '/admin/EventMangement', section: 'Tools' },
+    { icon: Settings, label: 'Settings', path: '/admin/setting', section: 'System' },
   ];
 
   const handleSignOut = () => {
