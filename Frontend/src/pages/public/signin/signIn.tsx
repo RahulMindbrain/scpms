@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Mail, Lock, ArrowRight, Eye, EyeOff, GraduationCap, Briefcase, ShieldCheck } from "lucide-react";
-import { Link,  useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import illustration from "../../../assets/img.jpg";
 import camp from "../../../assets/camp.jpg"
-import campp from "../../../assets/campp.jpg"
+import campp from "../../../assets/campp.jpg";
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../../redux/store/store";
+import { loginUser } from "../../../redux/thunks/loginThunk";
 // Define Roles for type safety
 type UserRole = 'student' | 'company' | 'Admin';
 
@@ -14,43 +17,55 @@ interface RoleConfig {
 }
 
 const SignIn: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [activeRole, setActiveRole] = useState<UserRole>("student");
-
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const roles: RoleConfig[] = [
     { id: "student", label: "Student", icon: <GraduationCap size={16} /> },
     { id: "company", label: "Company", icon: <Briefcase size={16} /> },
     { id: "Admin", label: "Admin", icon: <ShieldCheck size={16} /> },
   ];
 
-const handleSubmit = (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (activeRole === "student") {
-    navigate("/student/dashboard");
-  } else if (activeRole === "company") {
-    navigate("/company-dashboard");
-  } else if (activeRole === "Admin") {
-    navigate("/admin/dashboard");
-  }
-};
+    try {
+      const user = await dispatch(
+        loginUser({ email, password })
+      ).unwrap();
+
+      if (user.role === "STUDENT") {
+        navigate("/student/dashboard");
+      } else if (user.role === "COMPANY") {
+        navigate("/company-dashboard");
+      } else if (user.role === "ADMIN") {
+        navigate("/admin/dashboard");
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
+  };
   const images = [illustration, camp, campp];
   const [currentIndex, setCurrentIndex] = useState(0);
-const navigate = useNavigate();
-useEffect(() => {
-  const interval = setInterval(() => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
-  }, 4000); // 4 seconds is usually better for reading the text alongside the image
-  return () => clearInterval(interval);
-}, [images.length]);
+  const navigate = useNavigate();
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 4000); // 4 seconds is usually better for reading the text alongside the image
+    return () => clearInterval(interval);
+  }, [images.length]);
 
 
-<img
-  src={images[currentIndex]}
-  alt="Placement Stats"
-  className="w-full h-48 object-cover rounded-lg transition-opacity duration-500 ease-in-out"
-  style={{ opacity: 1 }} // You can wrap this in a transition group for a true cross-fade
-/>
+  <img
+    src={images[currentIndex]}
+    alt="Placement Stats"
+    className="w-full h-48 object-cover rounded-lg transition-opacity duration-500 ease-in-out"
+    style={{ opacity: 1 }} // You can wrap this in a transition group for a true cross-fade
+  />
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 font-sans overflow-hidden">
 
@@ -99,7 +114,9 @@ useEffect(() => {
                 type="email"
                 required
                 placeholder="name@example.com"
-                 className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all duration-200"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-500 placeholder-gray-400"
               />
             </div>
           </div>
@@ -118,7 +135,9 @@ useEffect(() => {
                 type={showPassword ? "text" : "password"}
                 required
                 placeholder="••••••••"
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all duration-200"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-500 placeholder-gray-400"
               />
               <button
                 type="button"
@@ -160,17 +179,17 @@ useEffect(() => {
       </div>
 
       {/* RIGHT SIDE - VISUALS */}
-<div className="hidden md:flex w-full md:w-1/2 bg-gradient-to-br from-blue-700 to-slate-900 to-slate-900items-center justify-center p-6 lg:p-12 relative overflow-hidden">
+      <div className="hidden md:flex w-full md:w-1/2 bg-gradient-to-br from-blue-700 to-slate-900 to-slate-900items-center justify-center p-6 lg:p-12 relative overflow-hidden">
         {/* Abstract Background Shapes */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/20 rounded-full -ml-48 -mb-48 blur-3xl"></div>
 
-<div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2rem] p-6 sm:p-8 md:p-10 text-center text-white w-full max-w-sm md:max-w-md shadow-2xl relative z-10">          <div className="bg-white p-4 rounded-2xl mb-8 shadow-2xl transform -rotate-2 hover:rotate-0 transition-transform duration-500 inline-block">
-            <img
-              src={images[currentIndex]}
-              alt="Placement Stats"
-className="w-32 sm:w-40 md:w-48 h-auto rounded-lg transition-all duration-700"            />
-          </div>
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2rem] p-6 sm:p-8 md:p-10 text-center text-white w-full max-w-sm md:max-w-md shadow-2xl relative z-10">          <div className="bg-white p-4 rounded-2xl mb-8 shadow-2xl transform -rotate-2 hover:rotate-0 transition-transform duration-500 inline-block">
+          <img
+            src={images[currentIndex]}
+            alt="Placement Stats"
+            className="w-32 sm:w-40 md:w-48 h-auto rounded-lg transition-all duration-700" />
+        </div>
 
           <h3 className="text-2xl font-bold mb-4">Accelerate Your Career</h3>
           <p className="text-indigo-100/90 leading-relaxed text-sm">

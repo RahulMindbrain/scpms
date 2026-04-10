@@ -10,15 +10,16 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-// import { useDispatch } from "react-redux";
-// import type { AppDispatch } from "../../../redux/store/store";
-// import { registerUser } from "../../../redux/thunks/registerThunk";
-
+import { useDispatch } from "react-redux";
+import type { AppDispatch } from "../../../redux/store/store";
+import { registerUser } from "../../../redux/thunks/registerThunk";
+import { useNavigate } from "react-router-dom";
 
 type RegisterRole = "student" | "company";
 
 const SignUp: React.FC = () => {
-  // const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const [step, setStep] = useState(1);
   const [activeRole, setActiveRole] = useState<RegisterRole | null>(null);
   const [agreed, setAgreed] = useState(false);
@@ -58,29 +59,30 @@ const handleSubmit = async (e: React.FormEvent) => {
     return;
   }
 
-  const payload =
-    activeRole === "student"
-      ? {
-          firstname: form.fullName,
-          email: form.email,
-          password: form.password,
-          role: "STUDENT",
-          university: form.university,
-          course: form.course,
-          graduationYear: form.graduationYear,
-        }
-      : {
-          firstname: form.fullName,
-          email: form.email,
-          password: form.password,
-          role: "RECRUITER",
-          companyName: form.companyName,
-          designation: form.designation,
-        };
+  const names = form.fullName.trim().split(" ");
+  const firstname = names[0];
+  const lastname = names.length > 1 ? names.slice(1).join(" ") : "NA";
 
-  // dispatch(registerUser(payload));
+  const payload = {
+    firstname,
+    lastname,
+    email: form.email,
+    password: form.password,
+    role: activeRole === "student" ? "STUDENT" : "COMPANY",
+  };
+
+  try {
+    await dispatch(registerUser(payload)).unwrap();
+
+    alert("Registration successful");
+
+    // ✅ redirect to login
+    navigate("/login");
+
+  } catch (err: any) {
+    alert(err);
+  }
 };
-
   // Reusable input style
   const inputClasses = "w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all duration-200 outline-none text-slate-700 placeholder:text-slate-400";
 
@@ -99,7 +101,7 @@ const handleSubmit = async (e: React.FormEvent) => {
             Architect Your <br /> Professional Path
           </h1>
           <p className="text-indigo-100 leading-relaxed mb-8 font-medium">
-            Join the Smart CPMS ecosystem to connect with elite recruiters and automate your career trajectory.
+            Join the Smart CPMS ecosystem to connect with elite COMPANYs and automate your career trajectory.
           </p>
           <ul className="space-y-4">
             {["Algorithmic Profile Matching", "Real-time Interview Tracking", "Institutional Grade Security"].map((f, i) => (
@@ -145,7 +147,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                     ${activeRole === "company" ? "bg-indigo-600 text-white scale-110 shadow-lg shadow-indigo-200" : "bg-slate-100 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-600"}`}>
                     <Briefcase size={28} />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900">Recruiter</h3>
+                  <h3 className="text-xl font-bold text-slate-900">COMPANY</h3>
                   <p className="text-sm text-slate-500 mt-2">I am looking to hire the best talent for my organization.</p>
                 </button>
               </div>
@@ -164,7 +166,7 @@ const handleSubmit = async (e: React.FormEvent) => {
 
               <div className="mb-8">
                 <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-                  {activeRole === "student" ? "Student Registration" : "Recruiter Registration"}
+                  {activeRole === "student" ? "Student Registration" : "COMPANY Registration"}
                 </h2>
                 <p className="text-slate-500 mt-1">Complete the details below to initialize your profile.</p>
               </div>
