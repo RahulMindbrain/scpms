@@ -30,6 +30,13 @@ connectToDb();
 app.get("/health", (_req, res) => {
   res.send("listening");
 });
+// app.use((req, _res, next) => {
+//   console.log("---- INCOMING REQUEST ----");
+//   console.log("URL:", req.method, req.url);
+//   console.log("RAW COOKIE HEADER:", req.headers.cookie);
+//   next();
+// });
+
 app.use("/auth", AuthRoutes);
 app.use("/users", UserRoutes);
 app.use("/admin", adminRoutes);

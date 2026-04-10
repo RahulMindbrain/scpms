@@ -1,8 +1,5 @@
 import prisma from "../config/db";
 
-/**
- * ✅ Create Company (SAFE)
- */
 export const createCompany = async (
   userId: number,
   name: string,
@@ -25,9 +22,6 @@ export const createCompany = async (
   });
 };
 
-/**
- * ✅ Get Company (BASIC)
- */
 export const getCompanyByUserId = async (userId: number) => {
   return prisma.company.findUnique({
     where: { userId },
@@ -49,9 +43,6 @@ export const getCompanyByUserId = async (userId: number) => {
   });
 };
 
-/**
- * ✅ Update Company (SAFE)
- */
 export const updateCompany = async (
   userId: number,
   data: {
@@ -73,9 +64,6 @@ export const updateCompany = async (
   });
 };
 
-/**
- * 🏢 FULL COMPANY DETAILS
- */
 export const getCompanyDetails = async (userId: number) => {
   return prisma.company.findUnique({
     where: { userId },
@@ -129,9 +117,6 @@ export const getCompanyDetails = async (userId: number) => {
   });
 };
 
-/**
- * 🎯 GET COMPANIES (FILTER + PAGINATION)
- */
 export const getCompanies = async (params: {
   page?: number;
   limit?: number;
@@ -185,6 +170,74 @@ export const getCompanies = async (params: {
       page: safePage,
       limit: safeLimit,
       totalPages: Math.ceil(total / safeLimit),
+    },
+  };
+};
+
+export const activateCompanies = async (userIds: number[]) => {
+  return prisma.user.updateMany({
+    where: {
+      id: {
+        in: userIds,
+      },
+      role: "COMPANY",
+      status: "INACTIVE",
+    },
+    data: {
+      status: "ACTIVE",
+    },
+  });
+};
+
+export const getInactiveCompanies = async (params: {
+  page: number;
+  limit: number;
+}) => {
+  const { page, limit } = params;
+
+  const safePage = Math.max(1, page);
+  const safeLimit = Math.max(1, limit);
+  const skip = (safePage - 1) * safeLimit;
+
+  const where: Prisma.UserWhereInput = {
+    role: "COMPANY",
+    status: "INACTIVE",
+  };
+
+  const [data, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      skip,
+      take: safeLimit,
+      orderBy: { createdAt: "desc" },
+
+      select: {
+        id: true,
+        firstname: true,
+        email: true,
+        status: true,
+        createdAt: true,
+
+        // company: {
+        //   select: {
+        //     id: true,
+        //     name: true,
+        //     description: true,
+        //   },
+        // },
+      },
+    }),
+
+    prisma.user.count({ where }),
+  ]);
+
+  return {
+    data,
+    meta: {
+      total,
+      page: safePage,
+      limit: safeLimit,
+      totalPages: safeLimit ? Math.ceil(total / safeLimit) : 0,
     },
   };
 };

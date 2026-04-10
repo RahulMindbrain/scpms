@@ -19,7 +19,9 @@ const authenticateUser = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
+  // console.log("hi");
   const token = req.cookies?.userAccessToken as string | undefined;
+  // console.log("Cookies received:", req.cookies);
 
   if (!token) {
     sendError(res, 401, "Authentication cookie missing");
@@ -27,7 +29,7 @@ const authenticateUser = async (
   }
 
   try {
-    const secret = process.env.jwtAccessSecret as Secret;
+    const secret = process.env.JWT_SECRET as Secret;
 
     const decoded = jwt.verify(token, secret);
 
@@ -60,7 +62,8 @@ const authenticateUser = async (
     res.locals.user = user;
 
     next();
-  } catch {
+  } catch (error: any) {
+    console.log("JWT ERROR:", error);
     sendError(res, 401, "Session expired or invalid token");
     return;
   }

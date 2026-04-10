@@ -3,7 +3,13 @@ import { sendError, sendSuccess } from "../utils/response";
 import { JobStatus, Role } from "@prisma/client";
 import { createAdmin, getAdminCount } from "../repository/admin.repository";
 import {
+  activateCompaniesService,
+  activateUsersService,
   createAdminService,
+  getActiveStudentsService,
+  getCompaniesService,
+  getInactiveCompaniesService,
+  getInactiveStudentsService,
   getStudentsService,
   updateJobStatusByAdminService,
 } from "../services/admin.service";

@@ -69,10 +69,10 @@ export const getUsers = async (params: {
   role?: "STUDENT" | "COMPANY" | "ADMIN";
   status?: "ACTIVE" | "INACTIVE";
 }) => {
-  const { page = 1, limit = 10, role, status } = params;
+  const { page, limit, role, status } = params;
 
-  const safePage = Math.max(1, page);
-  const safeLimit = Math.max(1, limit);
+  const safePage = Math.max(1, page ?? 1);
+  const safeLimit = Math.max(1, limit ?? 1);
   const skip = (safePage - 1) * safeLimit;
 
   const where = {
@@ -105,7 +105,7 @@ export const getUsers = async (params: {
       total,
       page: safePage,
       limit: safeLimit,
-      totalPages: Math.ceil(total / safeLimit),
+      totalPages: safeLimit ? Math.ceil(total / safeLimit) : 0,
     },
   };
 };
@@ -115,10 +115,10 @@ export const getJobs = async (params: {
   limit?: number;
   status?: "PENDING" | "APPROVED" | "REJECTED";
 }) => {
-  const { page = 1, limit = 10, status } = params;
+  const { page, limit, status } = params;
 
-  const safePage = Math.max(1, page);
-  const safeLimit = Math.max(1, limit);
+  const safePage = Math.max(1, page ?? 1);
+  const safeLimit = Math.max(1, limit ?? 1);
   const skip = (safePage - 1) * safeLimit;
 
   const where = {
@@ -138,7 +138,6 @@ export const getJobs = async (params: {
         salary: true,
         location: true,
         createdAt: true,
-
         company: {
           select: {
             id: true,
@@ -156,7 +155,7 @@ export const getJobs = async (params: {
       total,
       page: safePage,
       limit: safeLimit,
-      totalPages: Math.ceil(total / safeLimit),
+      totalPages: safeLimit ? Math.ceil(total / safeLimit) : 0,
     },
   };
 };
@@ -166,10 +165,10 @@ export const getStudents = async (params: {
   limit?: number;
   status?: "ACTIVE" | "INACTIVE";
 }) => {
-  const { page = 1, limit = 10, status } = params;
+  const { page, limit, status } = params;
 
-  const safePage = Math.max(1, page);
-  const safeLimit = Math.max(1, limit);
+  const safePage = Math.max(1, page ?? 1);
+  const safeLimit = Math.max(1, limit ?? 1);
   const skip = (safePage - 1) * safeLimit;
 
   const where = {
@@ -183,13 +182,11 @@ export const getStudents = async (params: {
       skip,
       take: safeLimit,
       orderBy: { createdAt: "desc" },
-
       select: {
         id: true,
         firstname: true,
         email: true,
         status: true,
-
         student: {
           select: {
             id: true,
@@ -209,7 +206,7 @@ export const getStudents = async (params: {
       total,
       page: safePage,
       limit: safeLimit,
-      totalPages: Math.ceil(total / safeLimit),
+      totalPages: safeLimit ? Math.ceil(total / safeLimit) : 0,
     },
   };
 };
@@ -219,10 +216,10 @@ export const getCompanies = async (params: {
   limit?: number;
   status?: "ACTIVE" | "INACTIVE";
 }) => {
-  const { page = 1, limit = 10, status } = params;
+  const { page, limit, status } = params;
 
-  const safePage = Math.max(1, page);
-  const safeLimit = Math.max(1, limit);
+  const safePage = Math.max(1, page ?? 1);
+  const safeLimit = Math.max(1, limit ?? 1);
   const skip = (safePage - 1) * safeLimit;
 
   const where = {
@@ -236,13 +233,11 @@ export const getCompanies = async (params: {
       skip,
       take: safeLimit,
       orderBy: { createdAt: "desc" },
-
       select: {
         id: true,
         firstname: true,
         email: true,
         status: true,
-
         company: {
           select: {
             id: true,
@@ -261,7 +256,107 @@ export const getCompanies = async (params: {
       total,
       page: safePage,
       limit: safeLimit,
-      totalPages: Math.ceil(total / safeLimit),
+      totalPages: safeLimit ? Math.ceil(total / safeLimit) : 0,
     },
   };
+};
+
+export const getActiveStudentsByYear = async (params: {
+  page: number;
+  limit: number;
+  year?: number;
+  passingYear?: number;
+}) => {
+  const { page, limit, year, passingYear } = params;
+
+  const safePage = Math.max(1, page);
+  const safeLimit = Math.max(1, limit);
+  const skip = (safePage - 1) * safeLimit;
+
+  const where: Prisma.StudentWhereInput = {
+    ...(year !== undefined && { year }),
+    ...(passingYear !== undefined && { passingYear }),
+
+    user: {
+      status: "ACTIVE",
+    },
+  };
+
+  const [data, total] = await Promise.all([
+    prisma.student.findMany({
+      where,
+      skip,
+      take: safeLimit,
+      orderBy: { createdAt: "desc" },
+
+      select: {
+        id: true,
+        cgpa: true,
+        year: true,
+        passingYear: true,
+
+        user: {
+          select: {
+            id: true,
+            firstname: true,
+            email: true,
+            status: true,
+          },
+        },
+
+        department: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    }),
+
+    prisma.student.count({ where }),
+  ]);
+
+  return {
+    data,
+    meta: {
+      total,
+      page: safePage,
+      limit: safeLimit,
+      totalPages: safeLimit ? Math.ceil(total / safeLimit) : 0,
+    },
+  };
+};
+
+export const getUsersByRoleAndStatus = async ({
+  role,
+  status,
+  page,
+  limit,
+}: {
+  role: "STUDENT" | "COMPANY";
+  status: "ACTIVE" | "INACTIVE";
+  page: number;
+  limit: number;
+}) => {
+  return prisma.user.findMany({
+    where: {
+      role,
+      status,
+    },
+  });
+};
+
+export const activateUsers = async (userIds: number[]) => {
+  return prisma.user.updateMany({
+    where: {
+      id: {
+        in: userIds,
+      },
+      role: "STUDENT",
+      status: "INACTIVE",
+    },
+    data: {
+      status: "ACTIVE",
+    },
+  });
 };

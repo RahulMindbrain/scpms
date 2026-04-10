@@ -1,6 +1,11 @@
 import { Router } from "express";
 import {
+  activateCompaniesController,
+  activateUsersController,
   createAdminController,
+  getCompaniesController,
+  getInactiveCompaniesController,
+  getInactiveStudentsController,
   getStudentsController,
   updateJobStatusByAdminController,
 } from "../controllers/admin.controller";

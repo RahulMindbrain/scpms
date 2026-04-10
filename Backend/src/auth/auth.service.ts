@@ -4,6 +4,7 @@ import {
   logoutRepo,
   storeRefreshToken,
 } from "../repository/auth.repository";
+import { findActiveToken } from "../repository/user.repository";
 
 import {
   generateAccessToken,
@@ -34,6 +35,8 @@ export const loginService = async (mobile: string, password: string) => {
 
   const accessToken = generateAccessToken(existUser.id, existUser.role);
   const refreshToken = generateRefreshToken(existUser.id, existUser.role);
+  // console.log("Access Token:", accessToken);
+  // console.log("Refresh Token:", refreshToken);
 
   await storeRefreshToken(existUser.id, refreshToken);
 
@@ -48,7 +51,7 @@ export const generateAccessService = async (refreshToken: string) => {
   try {
     const decoded = jwt.verify(
       refreshToken,
-      process.env.jwtRefreshSecret as string,
+      process.env.JWT_SECRET as string,
     ) as { id: number; role: string };
 
     const user = await findById(decoded.id);
@@ -61,20 +64,20 @@ export const generateAccessService = async (refreshToken: string) => {
       throw new Error("Account not approved");
     }
 
-    if (user.refreshToken !== refreshToken) {
+    const tokenRecord = await findActiveToken(user.id, refreshToken);
+
+    if (!tokenRecord) {
       throw new Error("Invalid or expired refresh token");
     }
 
     const newAccessToken = generateAccessToken(user.id, user.role);
-    const newRefreshToken = generateRefreshToken(user.id, user.role);
-
-    await storeRefreshToken(user.id, newRefreshToken);
 
     return {
       accessToken: newAccessToken,
-      refreshToken: newRefreshToken,
+      refreshToken: refreshToken,
     };
-  } catch {
+  } catch (err) {
+    //console.log("REFRESH ERROR:", err);
     throw new Error("Invalid or expired refresh token");
   }
 };

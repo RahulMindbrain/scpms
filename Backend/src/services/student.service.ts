@@ -6,6 +6,28 @@ import {
   updateStudent,
 } from "../repository/student.repository";
 
+// export const createStudentService = async (
+//   userId: number,
+//   departmentId: number,
+//   year: number,
+//   passingYear: number,
+//   cgpa?: number,
+// ) => {
+//   const existing = await getStudentByUserId(userId);
+
+//   if (existing) {
+//     throw new Error("Student profile already exists");
+//   }
+
+//   const departmentExist = await getDepartmentById(departmentId);
+
+//   if (!departmentExist) {
+//     throw new Error("Department doesnot exist, Kindly choose valid id");
+//   }
+
+//   return createStudent(userId, departmentId, year, passingYear, cgpa);
+// };
+
 export const createStudentService = async (
   userId: number,
   departmentId: number,

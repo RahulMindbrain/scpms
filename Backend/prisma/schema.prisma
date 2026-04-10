@@ -70,9 +70,14 @@ model Student {
   department   Department @relation(fields: [departmentId], references: [id])
 
   cgpa         Float?
-
   year         Int        
   passingYear  Int       
+
+  resumeUrl    String?   
+
+  skills       Skill[]
+  experiences  Experience[]
+  certificates Certificate[]
 
   applications Application[]
 

@@ -35,6 +35,7 @@ StudentRoutes.put(
   "/profile",
   authenticateUser,
   authorizeRoles("STUDENT"),
+  validate(updateStudentSchema),
   updateStudentController,
 );
 

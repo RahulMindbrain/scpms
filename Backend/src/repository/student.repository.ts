@@ -1,6 +1,24 @@
 import prisma from "../config/db";
 import { Prisma } from "@prisma/client";
 
+// export const createStudent = async (
+//   userId: number,
+//   departmentId: number,
+//   year: number,
+//   passingYear: number,
+//   cgpa?: number,
+// ) => {
+//   return prisma.student.create({
+//     data: {
+//       userId,
+//       departmentId,
+//       year,
+//       passingYear,
+//       ...(cgpa !== undefined && { cgpa }),
+//     },
+//   });
+// };
+
 export const createStudent = async (
   userId: number,
   departmentId: number,
@@ -18,6 +36,7 @@ export const createStudent = async (
       departmentId,
       year,
       passingYear,
+
       ...(cgpa !== undefined && { cgpa }),
       ...(resumeUrl && { resumeUrl }),
 
@@ -64,10 +83,48 @@ export const getStudentByUserId = async (userId: number) => {
       cgpa: true,
       year: true,
       passingYear: true,
+      resumeUrl: true,
+
       department: {
         select: {
           id: true,
           name: true,
+        },
+      },
+
+      // ✅ ADD THESE
+
+      skills: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+
+      experiences: {
+        select: {
+          id: true,
+          companyName: true,
+          role: true,
+          description: true,
+          startDate: true,
+          endDate: true,
+        },
+        orderBy: {
+          startDate: "desc",
+        },
+      },
+
+      certificates: {
+        select: {
+          id: true,
+          title: true,
+          issuer: true,
+          certificateUrl: true,
+          issuedDate: true,
+        },
+        orderBy: {
+          issuedDate: "desc",
         },
       },
     },
@@ -185,48 +242,23 @@ export const getStudentDetails = async (userId: number) => {
   });
 };
 
-export const getStudents = async (params: {
-  page?: number;
-  limit?: number;
-  passingYear?: number;
-  year?: number;
-  minCgpa?: number;
-  maxCgpa?: number;
-  departmentId?: number;
+export const getInactiveStudentUsers = async (params: {
+  page: number;
+  limit: number;
 }) => {
-  const {
-    page = 1,
-    limit = 10,
-    passingYear,
-    year,
-    minCgpa,
-    maxCgpa,
-    departmentId,
-  } = params;
+  const { page, limit } = params;
 
   const safePage = Math.max(1, page);
   const safeLimit = Math.max(1, limit);
-
   const skip = (safePage - 1) * safeLimit;
 
-  const where: Prisma.StudentWhereInput = {
-    ...(passingYear !== undefined && { passingYear }),
-    ...(year !== undefined && { year }),
-    ...(departmentId !== undefined && { departmentId }),
-
-    ...(minCgpa !== undefined || maxCgpa !== undefined
-      ? {
-          cgpa: {
-            not: null,
-            ...(minCgpa !== undefined && { gte: minCgpa }),
-            ...(maxCgpa !== undefined && { lte: maxCgpa }),
-          },
-        }
-      : {}),
+  const where: Prisma.UserWhereInput = {
+    role: "STUDENT",
+    status: "INACTIVE",
   };
 
-  const [students, total] = await Promise.all([
-    prisma.student.findMany({
+  const [data, total] = await Promise.all([
+    prisma.user.findMany({
       where,
       skip,
       take: safeLimit,
@@ -234,38 +266,34 @@ export const getStudents = async (params: {
 
       select: {
         id: true,
-        cgpa: true,
-        year: true,
-        passingYear: true,
+        firstname: true,
+        lastname: true,
+        email: true,
+        status: true,
+        createdAt: true,
 
-        user: {
+        // ✅ include student if exists
+        student: {
           select: {
             id: true,
-            firstname: true,
-            email: true,
-            status: true,
-          },
-        },
-
-        department: {
-          select: {
-            id: true,
-            name: true,
+            year: true,
+            passingYear: true,
+            cgpa: true,
           },
         },
       },
     }),
 
-    prisma.student.count({ where }),
+    prisma.user.count({ where }),
   ]);
 
   return {
-    data: students,
+    data,
     meta: {
       total,
       page: safePage,
       limit: safeLimit,
-      totalPages: Math.ceil(total / safeLimit),
+      totalPages: safeLimit ? Math.ceil(total / safeLimit) : 0,
     },
   };
 };

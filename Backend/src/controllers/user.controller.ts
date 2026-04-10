@@ -1,7 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 import { sendError, sendSuccess } from "../utils/response";
 import { Role } from "@prisma/client";
-import { createUserService } from "../services/user.service";
+import {
+  createUserService,
+  getUserService,
+  updateUserService,
+} from "../services/user.service";
 
 export const createUserController = async (req: Request, res: Response) => {
   try {
@@ -27,5 +31,29 @@ export const createUserController = async (req: Request, res: Response) => {
     console.error(error);
 
     return sendError(res, 500, error.message || "Something went wrong");
+  }
+};
+
+export const getUserController = async (req: Request, res: Response) => {
+  try {
+    const user = res.locals.user;
+    const data = await getUserService(user.id);
+
+    return sendSuccess(res, 200, "User fetched successfully", data);
+  } catch (error: any) {
+    return sendError(res, 404, error.message);
+  }
+};
+
+export const updateUserController = async (req: Request, res: Response) => {
+  try {
+    const user = res.locals.user;
+    // console.log(user);
+
+    const updated = await updateUserService(user.id, req.body);
+
+    return sendSuccess(res, 200, "User updated successfully", updated);
+  } catch (error: any) {
+    return sendError(res, 400, error.message);
   }
 };

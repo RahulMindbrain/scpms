@@ -10,8 +10,8 @@ export const createStudentSchema = z
     year: z
       .number({ invalid_type_error: "Year is required" })
       .int()
-      .min(1, "Year must be at least 1")
-      .max(4, "Year cannot be more than 4"),
+      .min(1)
+      .max(4),
 
     passingYear: z
       .number({ invalid_type_error: "Passing year is required" })

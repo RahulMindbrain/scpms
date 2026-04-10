@@ -1,5 +1,6 @@
 import { Role, Status } from "@prisma/client";
 import prisma from "../config/db";
+import { TokenExpiredError } from "jsonwebtoken";
 
 export const createUser = async (data: {
   firstname: string;
