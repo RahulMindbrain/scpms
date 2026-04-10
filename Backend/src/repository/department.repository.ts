@@ -47,3 +47,12 @@ export const deleteDepartment = async (id: number) => {
     where: { id },
   });
 };
+
+export const getDepartmentsByIds = async (ids: number[]) => {
+  return prisma.department.findMany({
+    where: {
+      id: { in: ids },
+    },
+    select: { id: true },
+  });
+};

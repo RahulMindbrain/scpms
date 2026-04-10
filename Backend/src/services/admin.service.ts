@@ -1,8 +1,8 @@
 // services/admin.service.ts
 
 import bcrypt from "bcrypt";
-import { Role } from "@prisma/client";
-import { createUser } from "../repository/user.repository";
+import { JobStatus, Role } from "@prisma/client";
+import { createUser, getUsersByIds } from "../repository/user.repository";
 import {
   activateUsers,
   createAdmin,
@@ -21,6 +21,12 @@ import {
   getCompanies,
   getInactiveCompanies,
 } from "../repository/company.repository";
+import {
+  getJobById,
+  getJobsByIds,
+  updateJobStatus,
+  updateJobStatusBulk,
+} from "../repository/job.repository";
 
 export const createAdminService = async (
   firstname: string,
@@ -192,12 +198,36 @@ export const activateUsersService = async (userIds: number[]) => {
     throw new Error("User IDs are required");
   }
 
+  const users = await getUsersByIds(userIds);
+
+  if (!users.length) {
+    throw new Error("No users found");
+  }
+
+  const foundIds = users.map((u) => u.id);
+  const missingIds = userIds.filter((id) => !foundIds.includes(id));
+
+  if (missingIds.length) {
+    throw new Error(`Users not found: ${missingIds.join(", ")}`);
+  }
+
+  const invalidUsers = users.filter(
+    (u) => u.role !== "STUDENT" || u.status !== "INACTIVE",
+  );
+
+  if (invalidUsers.length) {
+    throw new Error(
+      `Invalid users (must be STUDENT & INACTIVE): ${invalidUsers.map((u) => u.id).join(", ")}`,
+    );
+  }
+
   const result = await activateUsers(userIds);
 
   return {
     updatedCount: result.count,
   };
 };
+
 export const getInactiveCompaniesService = async (params: {
   page?: number;
   limit?: number;
@@ -213,4 +243,39 @@ export const getInactiveCompaniesService = async (params: {
   if (limit > MAX_LIMIT) limit = MAX_LIMIT;
 
   return getInactiveCompanies({ page, limit });
+};
+
+export const updateJobStatusByAdminService = async (
+  jobIds: number[],
+  status: JobStatus,
+  adminId: number,
+) => {
+  // ✅ Validate status
+  if (![JobStatus.APPROVED, JobStatus.REJECTED].includes(status)) {
+    throw new Error("Invalid status. Only APPROVED or REJECTED allowed");
+  }
+
+  // ✅ Fetch jobs via repository
+  const jobs = await getJobsByIds(jobIds);
+
+  if (!jobs.length) {
+    throw new Error("No jobs found");
+  }
+
+  // ✅ Validate all are PENDING
+  const invalidJobs = jobs.filter((job) => job.status !== JobStatus.PENDING);
+
+  if (invalidJobs.length) {
+    throw new Error(
+      `Some jobs already processed: ${invalidJobs.map((j) => j.id).join(", ")}`,
+    );
+  }
+
+  // ✅ Single vs Bulk handling
+  if (jobIds.length === 1) {
+    return updateJobStatus(jobIds[0], status, adminId);
+  }
+
+  // ✅ Bulk
+  return updateJobStatusBulk(jobIds, status, adminId);
 };

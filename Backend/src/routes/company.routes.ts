@@ -12,6 +12,11 @@ import {
 } from "../validators/company.validators";
 import authenticateUser from "../middlewares/authenticateUser";
 import { createJobController } from "../controllers/job.controller";
+import { createJobSchema } from "../validators/job.validator";
+import {
+  getApplicationsController,
+  updateApplicationController,
+} from "../controllers/application.controller";
 
 const CompanyRoutes = Router();
 
@@ -42,7 +47,22 @@ CompanyRoutes.post(
   "/post-job",
   authenticateUser,
   authorizeRoles("COMPANY"),
+  validate(createJobSchema),
   createJobController,
+);
+
+CompanyRoutes.get(
+  "/get-job-application",
+  authenticateUser,
+  authorizeRoles("COMPANY"),
+  getApplicationsController,
+);
+
+CompanyRoutes.put(
+  "/update-job-status",
+  authenticateUser,
+  authorizeRoles("COMPANY"),
+  updateApplicationController,
 );
 
 export default CompanyRoutes;

@@ -25,8 +25,9 @@ export const createStudentSchema = z
 
     resumeUrl: z.string().url("Invalid resume URL").optional(),
 
-    skills: z.array(z.string().min(1)).optional(),
-
+    skillIds: z
+      .array(z.number().int().positive("Skill ID must be positive"))
+      .optional(),
     experiences: z
       .array(
         z.object({
@@ -57,7 +58,7 @@ export const createStudentSchema = z
 
 export const updateStudentSchema = z
   .object({
-    year: z.number().int().min(1).max(4),
+    year: z.number().int().min(1).max(4).optional(),
 
     passingYear: z.number().int().min(2000).max(2100).optional(),
 
@@ -67,8 +68,7 @@ export const updateStudentSchema = z
 
     resumeUrl: z.string().url().optional(),
 
-    skills: z.array(z.string().min(1)).optional(),
-
+    skillIds: z.array(z.number().int().positive()).optional(),
     experiences: z
       .array(
         z.object({
@@ -92,6 +92,7 @@ export const updateStudentSchema = z
       )
       .optional(),
   })
+  .strict()
   .superRefine((data, ctx) => {
     if (data.year === 1 && data.cgpa !== undefined) {
       ctx.addIssue({

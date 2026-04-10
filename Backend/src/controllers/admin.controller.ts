@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { sendError, sendSuccess } from "../utils/response";
-import { Role } from "@prisma/client";
+import { JobStatus, Role } from "@prisma/client";
 import { createAdmin, getAdminCount } from "../repository/admin.repository";
 import {
   activateCompaniesService,
@@ -11,6 +11,7 @@ import {
   getInactiveCompaniesService,
   getInactiveStudentsService,
   getStudentsService,
+  updateJobStatusByAdminService,
 } from "../services/admin.service";
 
 export const createAdminController = async (req: Request, res: Response) => {
@@ -118,9 +119,19 @@ export const getInactiveStudentsController = async (
 
 export const activateUsersController = async (req: Request, res: Response) => {
   try {
-    const { userIds } = req.body;
+    const { userIds } = req.body || {};
 
-    const result = await activateUsersService(userIds);
+    if (!userIds || !Array.isArray(userIds)) {
+      return sendError(res, 400, "userIds must be an array");
+    }
+
+    const ids = userIds.map(Number);
+
+    if (ids.some((id) => !Number.isInteger(id) || id <= 0)) {
+      return sendError(res, 400, "Invalid user IDs");
+    }
+
+    const result = await activateUsersService(ids);
 
     return sendSuccess(res, 200, "Users activated successfully", result);
   } catch (error: any) {
@@ -156,6 +167,50 @@ export const getInactiveCompaniesController = async (
     });
 
     return sendSuccess(res, 200, "Inactive companies fetched", result);
+  } catch (error: any) {
+    return sendError(res, 400, error.message);
+  }
+};
+
+export const updateJobStatusByAdminController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { jobId, jobIds, status } = req.body;
+    const user = res.locals.user;
+
+    if (!user?.id) {
+      return sendError(res, 401, "Unauthorized");
+    }
+
+    if (user.role !== "ADMIN") {
+      return sendError(res, 403, "Only admin can perform this action");
+    }
+
+    if (!status) {
+      return sendError(res, 400, "status is required");
+    }
+
+    // ✅ Normalize to array
+    const ids = jobIds ?? (jobId ? [jobId] : []);
+
+    if (!ids.length) {
+      return sendError(res, 400, "jobId or jobIds is required");
+    }
+
+    const updatedJobs = await updateJobStatusByAdminService(
+      ids.map(Number),
+      status as JobStatus,
+      user.id,
+    );
+
+    return sendSuccess(
+      res,
+      200,
+      "Job status updated successfully",
+      updatedJobs,
+    );
   } catch (error: any) {
     return sendError(res, 400, error.message);
   }

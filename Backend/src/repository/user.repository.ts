@@ -122,3 +122,16 @@ export const updateUser = async (
     },
   });
 };
+
+export const getUsersByIds = async (userIds: number[]) => {
+  return prisma.user.findMany({
+    where: {
+      id: { in: userIds },
+    },
+    select: {
+      id: true,
+      role: true,
+      status: true,
+    },
+  });
+};

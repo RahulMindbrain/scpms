@@ -11,6 +11,8 @@ import {
   createStudentSchema,
   updateStudentSchema,
 } from "../validators/sudent.validator";
+import { getJobsController } from "../controllers/job.controller";
+import { createApplicationController } from "../controllers/application.controller";
 
 const StudentRoutes = Router();
 
@@ -35,6 +37,20 @@ StudentRoutes.put(
   authorizeRoles("STUDENT"),
   validate(updateStudentSchema),
   updateStudentController,
+);
+
+StudentRoutes.get(
+  "/show-all-jobs",
+  authenticateUser,
+  authorizeRoles("STUDENT"),
+  getJobsController,
+);
+
+StudentRoutes.post(
+  "/apply-job",
+  authenticateUser,
+  authorizeRoles("STUDENT"),
+  createApplicationController,
 );
 
 export default StudentRoutes;

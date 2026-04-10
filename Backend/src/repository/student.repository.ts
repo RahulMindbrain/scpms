@@ -26,20 +26,9 @@ export const createStudent = async (
   passingYear: number,
   cgpa?: number,
   resumeUrl?: string,
-  skills?: string[],
-  experiences?: {
-    companyName: string;
-    role: string;
-    description?: string;
-    startDate: string;
-    endDate?: string;
-  }[],
-  certificates?: {
-    title: string;
-    issuer: string;
-    certificateUrl?: string;
-    issuedDate?: string;
-  }[],
+  skillIds?: number[],
+  experiences?: any[],
+  certificates?: any[],
 ) => {
   return prisma.student.create({
     data: {
@@ -51,12 +40,9 @@ export const createStudent = async (
       ...(cgpa !== undefined && { cgpa }),
       ...(resumeUrl && { resumeUrl }),
 
-      ...(skills?.length && {
+      ...(skillIds?.length && {
         skills: {
-          connectOrCreate: skills.map((name) => ({
-            where: { name },
-            create: { name },
-          })),
+          connect: skillIds.map((id: number) => ({ id })),
         },
       }),
 
@@ -80,6 +66,11 @@ export const createStudent = async (
           })),
         },
       }),
+    },
+    include: {
+      skills: true,
+      experiences: true,
+      certificates: true,
     },
   });
 };
@@ -140,15 +131,9 @@ export const getStudentByUserId = async (userId: number) => {
   });
 };
 
-export const updateStudent = async (
-  userId: number,
-  data: {
-    cgpa?: number;
-    departmentId?: number;
-    year?: number;
-    passingYear?: number;
-  },
-) => {
+export const updateStudent = async (userId: number, data: any) => {
+  const { skillIds, experiences, certificates, ...rest } = data;
+
   const existing = await prisma.student.findUnique({
     where: { userId },
   });
@@ -159,7 +144,47 @@ export const updateStudent = async (
 
   return prisma.student.update({
     where: { userId },
-    data,
+    data: {
+      // ✅ scalar fields
+      ...rest,
+
+      // ✅ skills (replace)
+      ...(skillIds && {
+        skills: {
+          connect: skillIds.map((id: number) => ({ id })),
+        },
+      }),
+
+      // ✅ experiences (replace strategy)
+      ...(experiences && {
+        experiences: {
+          deleteMany: {}, // remove old
+          create: experiences.map((exp: any) => ({
+            ...exp,
+            startDate: new Date(exp.startDate),
+            ...(exp.endDate && { endDate: new Date(exp.endDate) }),
+          })),
+        },
+      }),
+
+      // ✅ certificates (replace strategy)
+      ...(certificates && {
+        certificates: {
+          deleteMany: {},
+          create: certificates.map((cert: any) => ({
+            ...cert,
+            ...(cert.issuedDate && {
+              issuedDate: new Date(cert.issuedDate),
+            }),
+          })),
+        },
+      }),
+    },
+    include: {
+      skills: true,
+      experiences: true,
+      certificates: true,
+    },
   });
 };
 

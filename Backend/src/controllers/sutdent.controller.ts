@@ -37,7 +37,7 @@ export const createStudentController = async (req: Request, res: Response) => {
       passingYear,
       cgpa,
       resumeUrl,
-      skills,
+      skillIds,
       experiences,
       certificates,
     } = req.body;
@@ -49,13 +49,14 @@ export const createStudentController = async (req: Request, res: Response) => {
       passingYear,
       cgpa,
       resumeUrl,
-      skills,
+      skillIds,
       experiences,
       certificates,
     );
 
     return sendSuccess(res, 201, "Student created", student);
   } catch (error: any) {
+    // console.log(error);
     return sendError(res, 400, error.message);
   }
 };
