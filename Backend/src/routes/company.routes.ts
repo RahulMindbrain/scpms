@@ -11,12 +11,15 @@ import {
   updateCompanySchema,
 } from "../validators/company.validators";
 import authenticateUser from "../middlewares/authenticateUser";
+<<<<<<< HEAD
+=======
 import { createJobController } from "../controllers/job.controller";
 import { createJobSchema } from "../validators/job.validator";
 import {
   getApplicationsController,
   updateApplicationController,
 } from "../controllers/application.controller";
+>>>>>>> da655f8b892af87de11b7caa44408e05e94e4b71
 
 const CompanyRoutes = Router();
 
@@ -43,6 +46,8 @@ CompanyRoutes.put(
   updateCompanyController,
 );
 
+<<<<<<< HEAD
+=======
 CompanyRoutes.post(
   "/post-job",
   authenticateUser,
@@ -65,4 +70,5 @@ CompanyRoutes.put(
   updateApplicationController,
 );
 
+>>>>>>> da655f8b892af87de11b7caa44408e05e94e4b71
 export default CompanyRoutes;
