@@ -1,3 +1,5 @@
+import { getDepartmentById } from "../repository/department.repository";
+import { getSkillsByIds } from "../repository/skill.repostiory";
 import {
   createStudent,
   getStudentByUserId,
@@ -10,6 +12,10 @@ export const createStudentService = async (
   year: number,
   passingYear: number,
   cgpa?: number,
+  resumeUrl?: string,
+  skillIds?: number[],
+  experiences?: any[],
+  certificates?: any[],
 ) => {
   const existing = await getStudentByUserId(userId);
 
@@ -17,7 +23,35 @@ export const createStudentService = async (
     throw new Error("Student profile already exists");
   }
 
-  return createStudent(userId, departmentId, year, passingYear, cgpa);
+  const departmentExist = await getDepartmentById(departmentId);
+
+  if (!departmentExist) {
+    throw new Error("Department does not exist");
+  }
+
+  if (skillIds?.length) {
+    const skills = await getSkillsByIds(skillIds);
+
+    const foundIds = skills.map((s) => s.id);
+
+    const missingIds = skillIds.filter((id) => !foundIds.includes(id));
+
+    if (missingIds.length) {
+      throw new Error(`Invalid skill IDs: ${missingIds.join(", ")}`);
+    }
+  }
+
+  return createStudent(
+    userId,
+    departmentId,
+    year,
+    passingYear,
+    cgpa,
+    resumeUrl,
+    skillIds,
+    experiences,
+    certificates,
+  );
 };
 
 export const getStudentProfileService = async (userId: number) => {
@@ -30,20 +64,29 @@ export const getStudentProfileService = async (userId: number) => {
   return student;
 };
 
-export const updateStudentService = async (
-  userId: number,
-  data: {
-    departmentId?: number;
-    year?: number;
-    passingYear?: number;
-    cgpa?: number;
-  },
-) => {
+export const updateStudentService = async (userId: number, data: any) => {
   const existing = await getStudentByUserId(userId);
 
   if (!existing) {
     throw new Error("Student profile not found");
   }
 
-  return updateStudent(userId, data);
+  const { skillIds, ...rest } = data;
+
+  if (skillIds?.length) {
+    const skills = await getSkillsByIds(skillIds);
+
+    const foundIds = skills.map((s) => s.id);
+
+    const missingIds = skillIds.filter((id) => !foundIds.includes(id));
+
+    if (missingIds.length) {
+      throw new Error(`Invalid skill IDs: ${missingIds.join(", ")}`);
+    }
+  }
+
+  return updateStudent(userId, {
+    ...rest,
+    skillIds,
+  });
 };

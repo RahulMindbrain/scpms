@@ -7,7 +7,12 @@ import {
 import { authorizeRoles } from "../middlewares/verifyRole";
 import authenticateUser from "../middlewares/authenticateUser";
 import { validate } from "../middlewares/validate";
-import { createStudentSchema } from "../validators/sudent.validator";
+import {
+  createStudentSchema,
+  updateStudentSchema,
+} from "../validators/sudent.validator";
+import { getJobsController } from "../controllers/job.controller";
+import { createApplicationController } from "../controllers/application.controller";
 
 const StudentRoutes = Router();
 
@@ -31,6 +36,20 @@ StudentRoutes.put(
   authenticateUser,
   authorizeRoles("STUDENT"),
   updateStudentController,
+);
+
+StudentRoutes.get(
+  "/show-all-jobs",
+  authenticateUser,
+  authorizeRoles("STUDENT"),
+  getJobsController,
+);
+
+StudentRoutes.post(
+  "/apply-job",
+  authenticateUser,
+  authorizeRoles("STUDENT"),
+  createApplicationController,
 );
 
 export default StudentRoutes;
