@@ -8,7 +8,7 @@ import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../../redux/store/store";
 import { loginUser } from "../../../redux/thunks/loginThunk";
 // Define Roles for type safety
-type UserRole = 'student' | 'company' | 'Admin';
+type UserRole = "student" | "company" | "admin";
 
 interface RoleConfig {
   id: UserRole;
@@ -18,7 +18,7 @@ interface RoleConfig {
 
 const SignIn: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [activeRole, setActiveRole] = useState<UserRole>("student");
   const [email, setEmail] = useState("");
@@ -26,32 +26,36 @@ const SignIn: React.FC = () => {
   const roles: RoleConfig[] = [
     { id: "student", label: "Student", icon: <GraduationCap size={16} /> },
     { id: "company", label: "Company", icon: <Briefcase size={16} /> },
-    { id: "Admin", label: "Admin", icon: <ShieldCheck size={16} /> },
+    { id: "admin", label: "Admin", icon: <ShieldCheck size={16} /> },
   ];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    try {
-      const user = await dispatch(
-        loginUser({ email, password })
-      ).unwrap();
+  try {
+    const user = await dispatch(
+      loginUser({ email, password })
+    ).unwrap();
 
-      if (user.role === "STUDENT") {
-        navigate("/student/dashboard");
-      } else if (user.role === "COMPANY") {
-        navigate("/company-dashboard");
-      } else if (user.role === "ADMIN") {
-        navigate("/admin/dashboard");
-      }
+    console.log("Logged user:", user);
 
-    } catch (error) {
-      console.error(error);
+    if (user.role === "STUDENT") {
+      navigate("/student/dashboard");
+    } 
+    else if (user.role === "COMPANY") {
+      navigate("/company-dashboard");
+    } 
+    else if (user.role === "ADMIN") {
+      navigate("/admin/dashboard");
     }
-  };
+
+  } catch (error) {
+    console.error("Login error:", error);
+  }
+};
   const images = [illustration, camp, campp];
   const [currentIndex, setCurrentIndex] = useState(0);
-  const navigate = useNavigate();
+
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
@@ -60,12 +64,7 @@ const SignIn: React.FC = () => {
   }, [images.length]);
 
 
-  <img
-    src={images[currentIndex]}
-    alt="Placement Stats"
-    className="w-full h-48 object-cover rounded-lg transition-opacity duration-500 ease-in-out"
-    style={{ opacity: 1 }} // You can wrap this in a transition group for a true cross-fade
-  />
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 font-sans overflow-hidden">
 

@@ -1,9 +1,12 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { loginUser } from "../thunks/loginThunk";
 
 const initialState = {
   isAuthenticated: false,
   userType: null,
   user: null,
+  loading: false,
+  error: null,
 };
 
 const authSlice = createSlice({
@@ -11,19 +14,37 @@ const authSlice = createSlice({
   initialState,
   reducers: {
 
-    login: (state, action) => {
-      state.isAuthenticated = true;
-      state.user = action.payload;
-      state.userType = action.payload.role; // take role from backend
-    },
-
     logout: (state) => {
       state.isAuthenticated = false;
       state.user = null;
       state.userType = null;
     },
+
+  },
+
+  extraReducers: (builder) => {
+    builder
+
+      // when login starts
+      .addCase(loginUser.pending, (state) => {
+        state.loading = true;
+      })
+
+      // when login succeeds
+      .addCase(loginUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuthenticated = true;
+        state.user = action.payload;
+        state.userType = action.payload.role;
+      })
+
+      // when login fails
+      .addCase(loginUser.rejected, (state) => {
+        state.loading = false;
+        state.isAuthenticated = false;
+      });
   },
 });
 
-export const { login, logout } = authSlice.actions;
+export const { logout } = authSlice.actions;
 export default authSlice.reducer;
