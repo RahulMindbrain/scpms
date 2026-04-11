@@ -4,41 +4,35 @@ import Sidebar from './Sidebar';
 import type { SidebarItem } from './Sidebar';
 import { 
   LayoutDashboard, 
-  Settings, 
+  PlusCircle, 
   Briefcase, 
   Users, 
+  ListChecks, 
   Calendar, 
-  BarChart3,
-  Building2,
+  FileEdit,
   Menu,
-  FileText,
-  ListChecks,
-  Mail,
-  Folder
+  GraduationCap
 } from 'lucide-react';
 
-const AdminLayout: React.FC = () => {
+const CompanyLayout: React.FC = () => {
   const navigate = useNavigate();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const sidebarItems: SidebarItem[] = [
-    { icon: LayoutDashboard, label: 'Dashboard', path: '/admin/dashboard', section: 'Management' },
-    { icon: Users, label: 'Students', path: '/admin/students', section: 'Management' },
-    { icon: Building2, label: 'Companies', path: '/admin/companies', section: 'Management' },
-    { icon: Briefcase, label: 'Placement Drives', path: '/admin/drives', section: 'Management' },
-    { icon: FileText, label: 'Applications', path: '/admin/applications', section: 'Management' },
-    { icon: ListChecks, label: 'Shortlisting', path: '/admin/shortlisting', section: 'Management' },
-    { icon: Calendar, label: 'Interview Scheduler', path: '/admin/event-management', section: 'Management' },
+    { icon: LayoutDashboard, label: 'Dashboard', path: '/company/dashboard', section: 'Recruitment' },
+    { icon: PlusCircle, label: 'Post Job', path: '/company/post-job', section: 'Recruitment' },
+    { icon: Briefcase, label: 'Manage Jobs', path: '/company/jobs', section: 'Recruitment' },
+    { icon: Users, label: 'Applicants', path: '/company/applicants', section: 'Recruitment' },
     
-    { icon: BarChart3, label: 'Analytics', path: '/admin/report', section: 'Tools' },
-    { icon: Mail, label: 'Bulk Email', path: '/admin/bulk-email', section: 'Tools' },
-    { icon: Folder, label: 'Document Management', path: '/admin/documents', section: 'Tools' },
-    { icon: Settings, label: 'Settings', path: '/admin/setting', section: 'Tools' },
+    { icon: ListChecks, label: 'Shortlist', path: '/company/shortlist', section: 'Selection' },
+    { icon: Calendar, label: 'Interview Rounds', path: '/company/interviews', section: 'Selection' },
+    { icon: FileEdit, label: 'Update Results', path: '/company/results', section: 'Selection' },
   ];
 
   const handleSignOut = () => {
-    console.log('Admin signing out...');
+    console.log('Recruiter signing out...');
+    // Add logic to clear auth state if needed
     navigate('/login');
   };
 
@@ -48,9 +42,9 @@ const AdminLayout: React.FC = () => {
       <header className="lg:hidden flex items-center justify-between px-6 py-4 bg-[#111827] text-white border-b border-white/5 sticky top-0 z-30">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-cyan-400 rounded-lg flex items-center justify-center">
-            <LayoutDashboard className="w-5 h-5" />
+            <GraduationCap className="w-5 h-5" />
           </div>
-          <span className="font-bold text-lg">CPMS Admin</span>
+          <span className="font-bold text-lg">CPMS</span>
         </div>
         <button 
           onClick={() => setIsMobileMenuOpen(true)}
@@ -68,7 +62,7 @@ const AdminLayout: React.FC = () => {
         isOpenMobile={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
         title="CPMS"             
-  subtitle="Admin Portal"
+        subtitle="Recruiter Portal"
       />
 
       <main className="flex-1 min-h-screen overflow-x-hidden">
@@ -80,4 +74,4 @@ const AdminLayout: React.FC = () => {
   );
 };
 
-export default AdminLayout;
+export default CompanyLayout;

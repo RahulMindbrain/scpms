@@ -29,30 +29,30 @@ const SignIn: React.FC = () => {
     { id: "admin", label: "Admin", icon: <ShieldCheck size={16} /> },
   ];
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  try {
-    const user = await dispatch(
-      loginUser({ email, password })
-    ).unwrap();
+    try {
+      const user = await dispatch(
+        loginUser({ email, password })
+      ).unwrap();
 
-    console.log("Logged user:", user);
+      console.log("Logged user:", user);
 
-    if (user.role === "STUDENT") {
-      navigate("/student/dashboard");
-    } 
-    else if (user.role === "COMPANY") {
-      navigate("/company-dashboard");
-    } 
-    else if (user.role === "ADMIN") {
-      navigate("/admin/dashboard");
+      if (user.role === "STUDENT") {
+        navigate("/student/dashboard");
+      }
+      else if (user.role === "COMPANY") {
+        navigate("/company/dashboard");
+      }
+      else if (user.role === "ADMIN") {
+        navigate("/admin/dashboard");
+      }
+
+    } catch (error) {
+      console.error("Login error:", error);
     }
-
-  } catch (error) {
-    console.error("Login error:", error);
-  }
-};
+  };
   const images = [illustration, camp, campp];
   const [currentIndex, setCurrentIndex] = useState(0);
 

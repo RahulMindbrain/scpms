@@ -67,39 +67,54 @@ const Sidebar = ({ items, isCollapsed, onToggle, onSignOut, isOpenMobile, onClos
         </div>
 
         {/* Navigation */}
-        <nav className={`flex-1 px-3 flex flex-col space-y-1.5 py-4 overflow-y-auto no-scrollbar ${isCollapsed ? 'lg:items-center' : ''}`}>
-          {items.map((item) => (
-            <NavLink
-              key={item.label}
-              to={item.path}
-              onClick={() => isOpenMobile && onCloseMobile?.()}
-              className={({ isActive }) =>
-                `flex items-center rounded-xl transition-all duration-300 group relative ${isCollapsed ? 'lg:w-12 lg:h-12 lg:justify-center' : 'px-4 py-3 gap-3 w-full'
-                } ${isOpenMobile ? 'px-4 py-3 gap-3 w-full' : ''} ${isActive
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20'
-                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
-                }`
-              }
-            >
-              {({ isActive }) => (
-                <>
-                  <item.icon className={`w-5 h-5 shrink-0 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'}`} />
-
-                  {(!isCollapsed || isOpenMobile) && (
-                    <span className="text-sm font-medium whitespace-nowrap animate-in fade-in slide-in-from-left-2 duration-300">
-                      {item.label}
-                    </span>
-                  )}
-
-                  {/* Tooltip on hover (only when collapsed on desktop) */}
-                  {isCollapsed && !isOpenMobile && (
-                    <div className="hidden lg:block absolute left-16 bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl border border-white/10 translate-x-1 group-hover:translate-x-0 duration-300 z-50">
-                      {item.label}
-                    </div>
-                  )}
-                </>
+        <nav className={`flex-1 px-3 flex flex-col space-y-4 py-4 overflow-y-auto no-scrollbar ${isCollapsed ? 'lg:items-center' : ''}`}>
+          {Object.entries(
+            items.reduce((acc, item) => {
+              if (!acc[item.section]) acc[item.section] = [];
+              acc[item.section].push(item);
+              return acc;
+            }, {} as Record<string, SidebarItem[]>)
+          ).map(([section, sectionItems]) => (
+            <div key={section} className="flex flex-col space-y-1.5">
+              {(!isCollapsed || isOpenMobile) && (
+                <span className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  {section}
+                </span>
               )}
-            </NavLink>
+              {sectionItems.map((item) => (
+                <NavLink
+                  key={item.label}
+                  to={item.path}
+                  onClick={() => isOpenMobile && onCloseMobile?.()}
+                  className={({ isActive }) =>
+                    `flex items-center rounded-xl transition-all duration-300 group relative ${isCollapsed ? 'lg:w-12 lg:h-12 lg:justify-center' : 'px-4 py-2.5 gap-3 w-full'
+                    } ${isOpenMobile ? 'px-4 py-2.5 gap-3 w-full' : ''} ${isActive
+                      ? 'bg-[#1f2937] text-white shadow-sm border border-white/5'
+                      : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <item.icon className={`w-5 h-5 shrink-0 transition-transform duration-300 group-hover:scale-110 ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'}`} />
+
+                      {(!isCollapsed || isOpenMobile) && (
+                        <span className={`text-sm font-medium whitespace-nowrap animate-in fade-in slide-in-from-left-2 duration-300 ${isActive ? 'font-bold' : ''}`}>
+                          {item.label}
+                        </span>
+                      )}
+
+                      {/* Tooltip on hover (only when collapsed on desktop) */}
+                      {isCollapsed && !isOpenMobile && (
+                        <div className="hidden lg:block absolute left-16 bg-slate-900 text-white px-3 py-1.5 rounded-lg text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-xl border border-white/10 translate-x-1 group-hover:translate-x-0 duration-300 z-50">
+                          {item.label}
+                        </div>
+                      )}
+                    </>
+                  )}
+                </NavLink>
+              ))}
+            </div>
           ))}
         </nav>
 
