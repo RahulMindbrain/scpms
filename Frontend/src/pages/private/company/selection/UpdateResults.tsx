@@ -116,7 +116,7 @@ const UpdateResults: React.FC = () => {
                     <td className="px-6 py-6 font-black text-slate-800">{row.total}</td>
                     <td className="px-6 py-6 text-center">
                       <Badge
-                        variant={row.status === 'Selected' ? 'success' : row.status === 'Rejected' ? 'destructive' : 'outline'}
+                        variant={row.status === 'Selected' ? 'success' : row.status === 'Rejected' ? 'danger' : 'outline'}
                         className="px-4 py-1.5 rounded-full font-bold"
                       >
                         {row.status}

@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { toast } from 'sonner';
 
 interface Job {
   id: number;
@@ -171,7 +172,7 @@ const JobListing = () => {
               <div className="flex-1">
                 <div className="flex items-start justify-between mb-2">
                   <h3 className="text-xl font-black text-slate-900 leading-tight uppercase tracking-tight">{job.title}</h3>
-                  <Badge variant={job.eligible ? 'success' : 'destructive'} className="uppercase tracking-widest text-[9px] font-black px-3">
+                  <Badge variant={job.eligible ? 'success' : 'danger'} className="uppercase tracking-widest text-[9px] font-black px-3">
                     {job.eligible ? 'Eligible' : 'Not Eligible'}
                   </Badge>
                 </div>

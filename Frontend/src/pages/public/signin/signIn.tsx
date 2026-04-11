@@ -196,7 +196,7 @@ const SignIn: React.FC = () => {
       </div>
 
       {/* RIGHT SIDE - VISUALS */}
-      <div className="hidden md:flex w-full md:w-1/2 bg-gradient-to-br from-blue-700 to-slate-900 to-slate-900items-center justify-center p-6 lg:p-12 relative overflow-hidden">
+      <div className="hidden md:flex w-full md:w-1/2 bg-gradient-to-br from-blue-700 to-slate-900 items-center justify-center p-6 lg:p-12 relative overflow-hidden">
         {/* Abstract Background Shapes */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/20 rounded-full -ml-48 -mb-48 blur-3xl"></div>

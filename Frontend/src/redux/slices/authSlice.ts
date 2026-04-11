@@ -1,7 +1,15 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { loginUser } from "../thunks/loginThunk";
 
-const initialState = {
+interface AuthState {
+  isAuthenticated: boolean;
+  userType: string | null;
+  user: any;
+  loading: boolean;
+  error: string | null;
+}
+
+const initialState: AuthState = {
   isAuthenticated: false,
   userType: null,
   user: null,

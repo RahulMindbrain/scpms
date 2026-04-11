@@ -1,8 +1,8 @@
 import { useState, useRef } from 'react';
 import {
   User, Mail, Phone, MapPin, GraduationCap,
-  Code2, Package, Edit3, ExternalLink, Plus, Trash2, Save,
-  Upload, Camera, Briefcase, Award, Globe, Loader2, FileText
+  Code2, Edit3, ExternalLink, Plus, Trash2, Save,
+  Upload, Camera, Briefcase, Loader2, FileText
 } from 'lucide-react';
 import ProjectModal from './modal/ProjectModal';
 import { uploadToCloudinary } from '../../../../lib/cloudinary';
