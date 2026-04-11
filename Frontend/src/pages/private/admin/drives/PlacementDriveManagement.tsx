@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { 
   Calendar, 
   MapPin, 
@@ -10,10 +10,13 @@ import {
   ChevronDown,
   Building2,
   AlertCircle,
-  Briefcase
+  Briefcase,
+  Search,
+  Filter
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Drive {
   id: number;
@@ -31,7 +34,19 @@ interface Drive {
 
 const PlacementDriveManagement: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [filter] = useState('All Drives');
+  const [filter, setFilter] = useState('All Drives');
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setIsFilterOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const drives: Drive[] = [
     { 
@@ -75,91 +90,136 @@ const PlacementDriveManagement: React.FC = () => {
     },
   ];
 
+  const filteredDrives = drives.filter(d => 
+    filter === 'All Drives' || d.status.toLowerCase() === filter.toLowerCase()
+  );
+
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-in mt-2">
+    <div className="max-w-7xl mx-auto space-y-8 animate-in mt-2 p-4 md:p-0">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Placement Drives</h1>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Placement Drives</h1>
           <p className="text-slate-500 font-medium tracking-tight">Schedule and monitor ongoing recruitment processes.</p>
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-          <div className="relative">
-            <button className="flex w-full sm:w-auto items-center justify-between gap-3 px-6 py-2.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 hover:border-slate-300 transition-all shadow-sm">
-              {filter} <ChevronDown className="w-4 h-4 text-slate-400" />
+          <div className="relative" ref={filterRef}>
+            <button 
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className="flex w-full sm:w-auto items-center justify-between gap-4 px-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-700 hover:border-blue-500 transition-all shadow-sm active:scale-95"
+            >
+              <Filter className="w-4 h-4 text-blue-600" />
+              {filter} 
+              <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${isFilterOpen ? 'rotate-180' : ''}`} />
             </button>
+
+            <AnimatePresence>
+              {isFilterOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute right-0 mt-3 w-56 bg-white border border-slate-100 rounded-2xl shadow-2xl shadow-blue-500/10 z-[50] overflow-hidden p-2"
+                >
+                  {['All Drives', 'Active', 'Upcoming', 'Completed'].map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => {
+                        setFilter(opt);
+                        setIsFilterOpen(false);
+                      }}
+                      className={`w-full text-left px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === opt ? 'bg-blue-600 text-white' : 'text-slate-500 hover:bg-slate-50 hover:text-blue-600'}`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center justify-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-2xl text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20"
+            className="flex items-center justify-center gap-2 px-8 py-3.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 active:scale-95"
           >
-            <Plus className="w-4 h-4" /> Create Drive
+            <Plus className="w-5 h-5" /> Create Drive
           </button>
         </div>
       </div>
 
       {/* Drives List */}
       <div className="space-y-6">
-        {drives.map((drive) => (
-          <div key={drive.id} className="bg-white p-6 lg:p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 group">
-            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
-              <div className="space-y-5 flex-1">
+        {filteredDrives.length > 0 ? filteredDrives.map((drive) => (
+          <div key={drive.id} className="bg-white p-6 lg:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-500 group relative overflow-hidden">
+            <div className={`absolute top-0 right-0 w-40 h-40 blur-[100px] opacity-10 transition-opacity group-hover:opacity-20 ${drive.status === 'active' ? 'bg-blue-600' : 'bg-emerald-600'}`}></div>
+            
+            <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-10 relative z-10">
+              <div className="space-y-6 flex-1">
                 <div className="flex items-center gap-4">
-                  <h3 className="text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{drive.company}</h3>
-                  <Badge variant={drive.status === 'active' ? 'primary' : 'success'}>
-                    {drive.status}
-                  </Badge>
+                  <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-blue-600 border border-slate-100">
+                    <Building2 className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight leading-none mb-2">{drive.company}</h3>
+                    <Badge variant={drive.status === 'active' ? 'primary' : 'success'} className="uppercase tracking-[0.2em] text-[9px] font-black px-3 py-1">
+                      {drive.status}
+                    </Badge>
+                  </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <h4 className="text-lg font-bold text-slate-700">{drive.role}</h4>
-                  <p className="text-sm text-slate-500 leading-relaxed max-w-2xl font-medium">{drive.description}</p>
+                <div className="space-y-3">
+                  <h4 className="text-xl font-bold text-slate-800">{drive.role}</h4>
+                  <p className="text-sm text-slate-500 leading-relax max-w-2xl font-medium">{drive.description}</p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-x-8 gap-y-4 pt-2">
-                  <div className="flex items-center gap-2.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    <Calendar className="w-4 h-4 text-slate-300" /> {drive.date}
+                <div className="flex flex-wrap items-center gap-x-10 gap-y-6 pt-2">
+                  <div className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    <Calendar className="w-4 h-4 text-blue-500" /> {drive.date}
                   </div>
-                  <div className="flex items-center gap-2.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    <MapPin className="w-4 h-4 text-slate-300" /> {drive.location}
+                  <div className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    <MapPin className="w-4 h-4 text-rose-500" /> {drive.location}
                   </div>
-                  <div className="flex items-center gap-2.5 text-xs font-bold text-slate-500 uppercase tracking-wider">
-                    <GraduationCap className="w-4 h-4 text-slate-300" /> CGPA: {drive.minCgpa}+
+                  <div className="flex items-center gap-3 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    <GraduationCap className="w-4 h-4 text-indigo-500" /> CGPA: {drive.minCgpa}+
                   </div>
-                  <div className="text-sm font-black text-slate-900 bg-slate-50 px-4 py-1 rounded-xl border border-slate-100">
+                  <div className="text-xs font-black text-blue-600 bg-blue-50 px-5 py-2 rounded-xl border border-blue-100 uppercase tracking-widest">
                     {drive.package}
                   </div>
                 </div>
 
                 <div className="flex flex-wrap gap-2 pt-2">
                   {drive.branches.map(branch => (
-                    <Badge key={branch} variant="secondary" size="xs" className="px-3 border-transparent">
+                    <span key={branch} className="px-4 py-1.5 bg-slate-50 border border-slate-100 rounded-full text-[9px] font-black text-slate-500 uppercase tracking-widest group-hover:bg-white transition-colors">
                       {branch}
-                    </Badge>
+                    </span>
                   ))}
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row xl:flex-col items-stretch sm:items-center xl:items-end justify-between self-stretch gap-6 lg:gap-8">
+              <div className="flex flex-col sm:flex-row xl:flex-col items-stretch sm:items-center xl:items-end justify-between self-stretch gap-8 mt-4 xl:mt-0">
                 <div className="text-center sm:text-left xl:text-right px-4">
-                  <span className="text-4xl font-black text-slate-900 block tracking-tighter">{drive.applicants}</span>
+                  <span className="text-5xl font-black text-slate-900 block tracking-tighter leading-none mb-1">{drive.applicants}</span>
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">applicants</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <button className="flex-1 sm:flex-none p-3 border border-slate-100 rounded-2xl text-slate-400 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-sm">
+                  <button className="flex-1 sm:flex-none p-3.5 border border-slate-100 rounded-2xl text-slate-400 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 transition-all shadow-sm active:scale-90">
                     <Edit3 className="w-5 h-5" />
                   </button>
-                  <button className="flex-1 sm:flex-none p-3 border border-slate-100 rounded-2xl text-slate-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-sm">
+                  <button className="flex-1 sm:flex-none p-3.5 border border-slate-100 rounded-2xl text-slate-400 hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-all shadow-sm active:scale-90">
                     <Trash2 className="w-5 h-5" />
                   </button>
-                  <button className="flex-[2] sm:flex-none px-8 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold text-slate-700 hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm group/btn">
+                  <button className="flex-[2] sm:flex-none px-10 py-3.5 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 active:scale-95">
                     View Details
                   </button>
                 </div>
               </div>
             </div>
           </div>
-        ))}
+        )) : (
+          <div className="py-20 text-center bg-white rounded-[2.5rem] border border-slate-100 border-dashed">
+             <Search className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+             <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No drives found matching your criteria</p>
+          </div>
+        )}
       </div>
 
       <Modal 
