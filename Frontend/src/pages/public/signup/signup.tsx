@@ -15,6 +15,8 @@ import type { AppDispatch } from "../../../redux/store/store";
 import { registerUser } from "../../../redux/thunks/registerThunk";
 import { useNavigate } from "react-router-dom";
 
+import { toast } from "sonner";
+
 type RegisterRole = "student" | "company";
 
 const SignUp: React.FC = () => {
@@ -23,6 +25,7 @@ const SignUp: React.FC = () => {
   const [step, setStep] = useState(1);
   const [activeRole, setActiveRole] = useState<RegisterRole | null>(null);
   const [agreed, setAgreed] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [form, setForm] = useState({
     fullName: "",
@@ -50,12 +53,17 @@ const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
   if (!agreed) {
-    alert("Please agree to Terms");
+    toast.error("Please agree to the Terms and Privacy Policy");
     return;
   }
 
   if (form.password !== form.confirmPassword) {
-    alert("Passwords do not match");
+    toast.error("Passwords do not match");
+    return;
+  }
+
+  if (form.password.length < 6) {
+    toast.error("Password must be at least 6 characters long");
     return;
   }
 
@@ -71,16 +79,22 @@ const handleSubmit = async (e: React.FormEvent) => {
     role: activeRole === "student" ? "STUDENT" : "COMPANY",
   };
 
+  setIsSubmitting(true);
   try {
-    await dispatch(registerUser(payload)).unwrap();
+    const response = await dispatch(registerUser(payload)).unwrap();
+    console.log("Registration response:", response);
 
-    alert("Registration successful");
+    toast.success("Registration successful! Please login to continue.");
 
     // ✅ redirect to login
-    navigate("/login");
+    setTimeout(() => {
+      navigate("/login");
+    }, 1500);
 
   } catch (err: any) {
-    alert(err);
+    toast.error(err || "Registration failed. Please try again.");
+  } finally {
+    setIsSubmitting(false);
   }
 };
   // Reusable input style
@@ -224,10 +238,11 @@ const handleSubmit = async (e: React.FormEvent) => {
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-br from-indigo-700 to-slate-900 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all active:scale-[0.98]"
+                disabled={isSubmitting}
+                className={`w-full bg-gradient-to-br from-indigo-700 to-slate-900 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 hover:shadow-indigo-300 transition-all active:scale-[0.98] ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
               >
-                Initialize Profile
-                <ArrowRight size={20} />
+                {isSubmitting ? "Initializing..." : "Initialize Profile"}
+                {!isSubmitting && <ArrowRight size={20} />}
               </button>
               
             </form>

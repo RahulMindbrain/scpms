@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import type { RootState } from "@/redux/reducers/rootReducer";
 import StudentLayout from "@/components/layout/StudentLayout";
 import AdminLayout from "@/components/layout/AdminLayout";
+import CompanyLayout from "@/components/layout/CompanyLayout";
 
 const RouteOutlet: React.FC = () => {
      const location = useLocation();
@@ -22,6 +23,10 @@ const RouteOutlet: React.FC = () => {
 
   if (location.pathname.startsWith("/admin")) {
     return <AdminLayout />;
+  }
+
+  if (location.pathname.startsWith("/company")) {
+    return <CompanyLayout />;
   }
 
   return <Navigate to="/login" replace />;
