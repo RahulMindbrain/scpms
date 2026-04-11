@@ -7,6 +7,8 @@ import campp from "../../../assets/campp.jpg";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../../redux/store/store";
 import { loginUser } from "../../../redux/thunks/loginThunk";
+import { toast } from "sonner";
+
 // Define Roles for type safety
 type UserRole = "student" | "company" | "admin";
 
@@ -23,6 +25,8 @@ const SignIn: React.FC = () => {
   const [activeRole, setActiveRole] = useState<UserRole>("student");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
   const roles: RoleConfig[] = [
     { id: "student", label: "Student", icon: <GraduationCap size={16} /> },
     { id: "company", label: "Company", icon: <Briefcase size={16} /> },
@@ -31,6 +35,7 @@ const SignIn: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
 
     try {
       const user = await dispatch(
@@ -38,19 +43,25 @@ const SignIn: React.FC = () => {
       ).unwrap();
 
       console.log("Logged user:", user);
+      toast.success("Welcome back! Signing you in...");
 
-      if (user.role === "STUDENT") {
-        navigate("/student/dashboard");
-      }
-      else if (user.role === "COMPANY") {
-        navigate("/company/dashboard");
-      }
-      else if (user.role === "ADMIN") {
-        navigate("/admin/dashboard");
-      }
+      setTimeout(() => {
+        if (user.role === "STUDENT") {
+          navigate("/student/dashboard");
+        }
+        else if (user.role === "COMPANY") {
+          navigate("/company/dashboard");
+        }
+        else if (user.role === "ADMIN") {
+          navigate("/admin/dashboard");
+        }
+      }, 1000);
 
-    } catch (error) {
+    } catch (error: any) {
       console.error("Login error:", error);
+      toast.error(error || "Invalid email or password");
+    } finally {
+      setIsLoading(false);
     }
   };
   const images = [illustration, camp, campp];
@@ -160,10 +171,11 @@ const SignIn: React.FC = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-gradient-to-br from-blue-700 to-slate-900 active:scale-[0.99] transition-all duration-200 text-white font-semibold py-3 sm:py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-indigo-100 mt-2"
+            disabled={isLoading}
+            className={`w-full bg-gradient-to-br from-blue-700 to-slate-900 active:scale-[0.99] transition-all duration-200 text-white font-semibold py-3 sm:py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-indigo-100 mt-2 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
-            Sign In to Dashboard
-            <ArrowRight size={18} />
+            {isLoading ? "Signing in..." : "Sign In to Dashboard"}
+            {!isLoading && <ArrowRight size={18} />}
           </button>
 
           {/* Signup Link */}

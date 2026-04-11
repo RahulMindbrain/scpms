@@ -13,6 +13,8 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
+import { toast } from 'sonner';
+
 interface Applicant {
   id: string;
   name: string;
@@ -25,8 +27,9 @@ interface Applicant {
 const Shortlisting: React.FC = () => {
   const [selectedApplicants, setSelectedApplicants] = useState<string[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  const applicants: Applicant[] = [
+  const [applicants, setApplicants] = useState<Applicant[]>([
     { id: '1', name: 'Priya Sharma', dept: 'CSE', cgpa: 9.4, currentRound: 'Applied', selected: false },
     { id: '2', name: 'Rahul Verma', dept: 'IT', cgpa: 9.2, currentRound: 'Applied', selected: false },
     { id: '3', name: 'Ananya Patel', dept: 'ECE', cgpa: 9.1, currentRound: 'Applied', selected: false },
@@ -34,11 +37,11 @@ const Shortlisting: React.FC = () => {
     { id: '5', name: 'Sneha Gupta', dept: 'ME', cgpa: 8.5, currentRound: 'Applied', selected: false },
     { id: '6', name: 'Neha Reddy', dept: 'EE', cgpa: 8.7, currentRound: 'Applied', selected: false },
     { id: '7', name: 'Amit Kumar', dept: 'CE', cgpa: 7.8, currentRound: 'Applied', selected: false },
-  ];
+  ]);
 
   const stats = [
-    { label: 'Total Applicants', value: 7, color: 'text-slate-600' },
-    { label: 'Selected', value: 0, color: 'text-blue-600' },
+    { label: 'Total Applicants', value: applicants.length, color: 'text-slate-600' },
+    { label: 'Selected', value: selectedApplicants.length, color: 'text-blue-600' },
     { label: 'Shortlisted So Far', value: 3, color: 'text-emerald-600' },
     { label: 'Rejected', value: 0, color: 'text-rose-600' },
   ];
@@ -49,13 +52,32 @@ const Shortlisting: React.FC = () => {
     );
   };
 
+  const handleMoveToShortlisted = async () => {
+    if (selectedApplicants.length === 0) {
+      toast.error("Please select at least one applicant");
+      return;
+    }
+
+    setIsProcessing(true);
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    setApplicants(prev => prev.map(a => 
+      selectedApplicants.includes(a.id) ? { ...a, currentRound: 'Shortlisted' } : a
+    ));
+    
+    toast.success(`${selectedApplicants.length} applicants moved to Shortlisted round!`);
+    setSelectedApplicants([]);
+    setIsProcessing(false);
+  };
+
   return (
     <div className="p-1">
       <div className="flex items-center gap-2 mb-6">
         <div className="p-2 bg-slate-100 rounded-lg">
           <Menu className="w-5 h-5 text-slate-600" />
         </div>
-        <h1 className="text-xl font-bold text-slate-800">Shortlisting</h1>
+        <h1 className="text-xl font-bold text-slate-800 tracking-tight">Shortlisting Management</h1>
       </div>
 
       {/* Control Panel */}
@@ -63,20 +85,27 @@ const Shortlisting: React.FC = () => {
         <div className="flex flex-col md:flex-row items-end gap-6">
           <div className="flex-1 space-y-2">
             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Company / Drive</label>
-            <select className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none text-slate-700 font-medium">
+            <select className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none text-slate-700 font-bold">
               <option>Google — SDE Intern</option>
+              <option>Microsoft — Full Stack</option>
             </select>
           </div>
           <div className="flex-1 space-y-2">
             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Promote to Round</label>
-            <select className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none text-slate-700 font-medium">
+            <select className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none text-slate-700 font-bold">
               <option>Shortlisted</option>
+              <option>Technical Round 1</option>
+              <option>HR Interview</option>
             </select>
           </div>
           <div className="flex-1">
-             <button className="w-full md:w-auto px-6 py-2.5 bg-indigo-500 hover:bg-indigo-600 text-white rounded-xl font-semibold shadow-md shadow-indigo-100 transition-all flex items-center justify-center gap-2">
+             <button 
+               onClick={handleMoveToShortlisted}
+               disabled={isProcessing || selectedApplicants.length === 0}
+               className="w-full md:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold border-2 border-indigo-500 shadow-lg shadow-indigo-100 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+             >
                <ArrowRight className="w-4 h-4" />
-               <span>Move {selectedApplicants.length} to Shortlisted</span>
+               <span>{isProcessing ? 'Processing...' : `Move ${selectedApplicants.length} to Shortlisted`}</span>
              </button>
           </div>
         </div>
