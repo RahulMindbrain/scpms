@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   Building2,
   MapPin, Search, Plus, CheckCircle2,
@@ -12,6 +12,10 @@ import { Badge } from '@/components/ui/badge.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { toast } from 'sonner';
 import { Modal } from '@/components/ui/modal.tsx';
+import { useDispatch, useSelector } from 'react-redux'; 
+import { fetchCompanies } from '@/redux/thunks/companyThunk';
+import type { AppDispatch } from '@/redux/store/store';
+import type { RootState } from '@/redux/reducers/rootReducer';
 
 interface Company {
   id: number;
@@ -27,6 +31,9 @@ interface Company {
 }
 
 const CompanyManagement: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { companies: reduxCompanies, loading, error } = useSelector((state: RootState) => state.company);
+
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [filter, setFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
@@ -38,14 +45,24 @@ const CompanyManagement: React.FC = () => {
     description: ''
   });
 
-  const [companies, setCompanies] = useState<Company[]>([
-    { id: 1, name: 'Google', sector: 'Technology', location: 'Bangalore', avgPackage: '₹24 LPA', hiredCount: 12, status: 'active', approval: 'Approved' },
-    { id: 2, name: 'Microsoft', sector: 'Technology', location: 'Hyderabad', avgPackage: '₹20 LPA', hiredCount: 8, status: 'active', approval: 'Approved' },
-    { id: 3, name: 'Amazon', sector: 'E-Commerce', location: 'Bangalore', avgPackage: '₹18 LPA', hiredCount: 15, status: 'completed', approval: 'Approved' },
-    { id: 4, name: 'Infosys', sector: 'IT Services', location: 'Pune', avgPackage: '₹6 LPA', hiredCount: 45, status: 'upcoming', approval: 'Approved' },
-    { id: 5, name: 'TCS', sector: 'IT Services', location: 'Mumbai', avgPackage: '₹5.5 LPA', hiredCount: 60, status: 'upcoming', approval: 'Pending' },
-    { id: 6, name: 'Wipro', sector: 'IT Services', location: 'Bangalore', avgPackage: '₹5 LPA', hiredCount: 38, status: 'completed', approval: 'Pending' },
-  ]);
+  useEffect(() => {
+    dispatch(fetchCompanies({}));
+  }, [dispatch]);
+
+  const companies = useMemo(() => {
+    return reduxCompanies.map((c: any) => ({
+      id: c.id,
+      name: c.name || 'N/A',
+      sector: 'Technology', // Defaulting since it's not in the main company schema yet
+      location: 'Multiple', // Defaulting since it's not in the main company schema yet
+      avgPackage: 'Competitive', 
+      hiredCount: 0, 
+      status: 'active' as const,
+      approval: c.user?.status === 'ACTIVE' ? 'Approved' : 'Pending',
+      logo: undefined,
+      email: c.user?.email || 'N/A'
+    }));
+  }, [reduxCompanies]);
 
   const filteredCompanies = useMemo(() => {
     return companies.filter(c => {
@@ -57,39 +74,35 @@ const CompanyManagement: React.FC = () => {
 
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCompany.name || !newCompany.email) {
-      toast.error("Please fill in basic company details.");
-      return;
-    }
-
-    const company: Company = {
-      id: Date.now(),
-      name: newCompany.name,
-      sector: newCompany.sector || 'General',
-      location: newCompany.location || 'TBD',
-      avgPackage: 'N/A',
-      hiredCount: 0,
-      status: 'upcoming',
-      approval: 'Pending'
-    };
-
-    setCompanies([company, ...companies]);
+    toast.info("Integration for adding companies is coming soon.");
     setIsAddModalOpen(false);
     setNewCompany({ name: '', sector: '', location: '', email: '', description: '' });
-    toast.success(`${newCompany.name} has been added for review.`);
   };
 
   const toggleApproval = (id: number) => {
-    setCompanies(prev => prev.map(c =>
-      c.id === id ? { ...c, approval: c.approval === 'Approved' ? 'Pending' : 'Approved' } : c
-    ));
-    toast.success("Approval status updated successfully!");
+    toast.info("Integration for toggling approval is coming soon.");
   };
 
   const deleteCompany = (id: number) => {
-    setCompanies(prev => prev.filter(c => c.id !== id));
-    toast.error("Company profile removed from directory.");
+    toast.info("Integration for deleting companies is coming soon.");
   };
+
+  if (loading && reduxCompanies.length === 0) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-[60vh] flex-col items-center justify-center space-y-4">
+        <p className="text-rose-500 font-black uppercase tracking-widest">{error}</p>
+        <Button onClick={() => dispatch(fetchCompanies({}))}>Retry</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-in mt-2 p-4 md:p-0">
