@@ -112,7 +112,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <GraduationCap className="size-5" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="text-base font-semibold">Smart CPMS</span>
+                  <span className="text-[16px] font-semibold">Smart CPMS</span>
                   <span className="text-xs text-muted-foreground uppercase tracking-wider">{role} Portal</span>
                 </div>
               </a>

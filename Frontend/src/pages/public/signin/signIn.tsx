@@ -24,7 +24,7 @@ const SignIn: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [activeRole, setActiveRole] = useState<UserRole>("student");
-  const [email, setEmail] = useState("company@gmail.com");
+  const [email, setEmail] = useState("abhi.nayak@example.com");
   const [password, setPassword] = useState("Password@2026");
   const [isLoading, setIsLoading] = useState(false);
 
