@@ -17,11 +17,7 @@ const Applicants: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">All Applicants ({applicants.length})</h1>
-          <p className="text-slate-500 font-medium">Review and manage candidates for your active jobs.</p>
-        </div>
+      <div className="flex flex-col md:flex-row md:items-center justify-end gap-4">
         <Button variant="outline" className="font-bold border-slate-200 hover:border-blue-600 hover:text-blue-600 px-6 py-6 rounded-2xl transition-all">
           <Download className="w-5 h-5 mr-2" /> Download All Resumes
         </Button>
@@ -79,9 +75,9 @@ const Applicants: React.FC = () => {
                     <Badge variant={
                       applicant.status === 'Selected' ? 'success' : 
                       applicant.status === 'Rejected' ? 'danger' : 
-                      applicant.status === 'Shortlisted' ? 'primary' : 
+                      applicant.status === 'Shortlisted' ? 'default' : 
                       applicant.status === 'Interview' ? 'warning' : 'outline'
-                    } size="sm">
+                    }>
                       {applicant.status}
                     </Badge>
                   </td>

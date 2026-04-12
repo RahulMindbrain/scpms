@@ -8,15 +8,13 @@ import {
   Eye,
   ChevronDown,
   FileDown,
-  LayoutGrid,
-  Folder,
   Check,
-  X,
   AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 
 interface Document {
@@ -85,13 +83,8 @@ const DocumentManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-1 max-w-7xl mx-auto animate-in fade-in duration-700">
-      <div className="flex items-center gap-2 mb-8">
-        <div className="p-2 bg-slate-100 rounded-lg">
-          <Folder className="w-5 h-5 text-slate-600" />
-        </div>
-        <h1 className="text-xl font-bold text-slate-800 tracking-tight">Document Management</h1>
-      </div>
+    <div className="p-1  animate-in fade-in duration-700">
+      
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">

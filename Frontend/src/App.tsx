@@ -7,6 +7,8 @@ import { ScrollToTop } from "./components/scroll-to-top";
 import { PublicRoutes } from "./routes/publicRoutes.ts";
 import { PrivateRoutes } from "./routes/privateRoutes.ts";
 
+import HomePage from "./pages/public/homepage/homepage.tsx";
+
 function App() {
   return (
     <>
@@ -48,16 +50,19 @@ const PrivateLoginRedirect = () => {
   );
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <HomePage />;
   }
 
   // Redirect based on user role
-  if (userType?.toLowerCase() === "organization") {
+  const role = userType?.toLowerCase();
+  if (role === "admin") {
     return <Navigate to="/admin/dashboard" replace />;
-  } else if (userType?.toLowerCase() === "student") {
+  } else if (role === "student") {
     return <Navigate to="/student/dashboard" replace />;
+  } else if (role === "company") {
+    return <Navigate to="/company/dashboard" replace />;
   } else {
-    return <Navigate to="/login" replace />;
+    return <HomePage />;
   }
 };
 

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { 
-  Bell, CheckCircle2, AlertTriangle, Info, 
-  Settings, MoreVertical, Trash2, Check,
-  UserPlus, ExternalLink, Filter, Search,
+import {
+  AlertTriangle, Info,
+  Settings, MoreVertical, ExternalLink, Search,
   ShieldAlert, Clock
 } from 'lucide-react';
 
@@ -34,16 +33,7 @@ const AdminNotificationPage: React.FC = () => {
       isRead: false,
       actionLabel: 'Verify Profile'
     },
-    {
-      id: '2',
-      category: 'System',
-      title: 'Cloudinary API Limit Warning',
-      message: 'Storage usage has reached 85%. Consider upgrading the plan soon.',
-      time: '45 mins ago',
-      priority: 'high',
-      isRead: false,
-      actionLabel: 'View Billing'
-    },
+
     {
       id: '3',
       category: 'User Activity',
@@ -89,15 +79,7 @@ const AdminNotificationPage: React.FC = () => {
       <div className="max-w-5xl mx-auto">
         {/* Header Area */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <div className="p-2 bg-indigo-600 rounded-lg text-white shadow-lg shadow-indigo-200">
-                <Bell size={20} />
-              </div>
-              <h1 className="text-2xl font-black text-slate-900 tracking-tight">Notification Center</h1>
-            </div>
-            <p className="text-slate-500 font-medium">Manage system alerts and student placement activities.</p>
-          </div>
+
 
           <div className="flex items-center gap-3">
             <button className="p-2.5 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 transition-all">

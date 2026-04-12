@@ -1,7 +1,7 @@
 import React from 'react';
-import { Search, Filter, UserCheck, Star, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Search, Filter,  Star, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
 
 const Shortlist: React.FC = () => {
   const shortlisted = [
@@ -13,11 +13,7 @@ const Shortlist: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Shortlisted Candidates</h1>
-          <p className="text-slate-500 font-medium">Review and move shortlisted candidates to the next round.</p>
-        </div>
+      <div className="flex flex-col md:flex-row md:items-center justify-end gap-4">
         <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-6 rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center gap-2">
            Schedule Next Round <ArrowRight className="w-5 h-5" />
         </Button>
@@ -71,7 +67,7 @@ const Shortlist: React.FC = () => {
                   <td className="px-6 py-5 text-sm font-medium text-slate-500">{item.branch}</td>
                   <td className="px-6 py-5 font-black text-slate-700">{item.cgpa}</td>
                   <td className="px-6 py-5">
-                    <Badge variant="primary" className="px-3 py-1 rounded-lg">
+                    <Badge variant="default" className="px-3 py-1 rounded-lg">
                       {item.round}
                     </Badge>
                   </td>

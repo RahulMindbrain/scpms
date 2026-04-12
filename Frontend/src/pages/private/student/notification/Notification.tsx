@@ -1,8 +1,7 @@
-import React from 'react';
 import { 
-  Bell, CheckCircle2, Briefcase, Calendar, Mail, 
-  BellRing, MoreVertical, Filter, PanelLeftOpen,
-  Check, Info, ArrowRight
+  CheckCircle2, Briefcase, Calendar, 
+  MoreVertical, Filter, PanelLeftOpen,
+  ArrowRight
 } from 'lucide-react';
 
 const Notification = () => {
@@ -49,7 +48,6 @@ const Notification = () => {
     }
   ];
 
-  const unreadCount = notifications.filter(n => n.unread).length;
 
   const getStatusStyles = (status:any) => {
     switch (status) {
@@ -69,7 +67,7 @@ const Notification = () => {
             <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg lg:hidden transition-colors">
               <PanelLeftOpen size={20} />
             </button>
-            <h1 className="text-lg font-semibold text-slate-900 tracking-tight">Notifications</h1>
+            
           </div>
           
           <div className="flex items-center gap-5">

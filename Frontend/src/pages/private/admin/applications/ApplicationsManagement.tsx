@@ -1,16 +1,6 @@
 import React, { useState } from 'react';
-import { 
-  Search, 
-  Filter, 
-  ChevronDown, 
-  CheckCircle2, 
-  XCircle, 
-  Clock, 
-  MoreVertical,
-  Briefcase,
-  GraduationCap,
-  Building2,
-  Calendar
+import {
+  Search
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -60,12 +50,7 @@ const ApplicationsManagement: React.FC = () => {
 
   return (
     <div className="p-1">
-      <div className="flex items-center gap-2 mb-6">
-        <div className="p-2 bg-slate-100 rounded-lg">
-          <Briefcase className="w-5 h-5 text-slate-600" />
-        </div>
-        <h1 className="text-xl font-bold text-slate-800">Applications Management</h1>
-      </div>
+      
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">

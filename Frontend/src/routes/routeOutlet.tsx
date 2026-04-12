@@ -16,16 +16,21 @@ const RouteOutlet: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  // 🔥 Check route path
+  // 🔥 Check route path and enforce role matching
+  const role = userType?.toLowerCase();
+
   if (location.pathname.startsWith("/student")) {
+    if (role !== "student") return <Navigate to="/login" replace />;
     return <StudentLayout />;
   }
 
   if (location.pathname.startsWith("/admin")) {
+    if (role !== "admin") return <Navigate to="/login" replace />;
     return <AdminLayout />;
   }
 
   if (location.pathname.startsWith("/company")) {
+    if (role !== "company") return <Navigate to="/login" replace />;
     return <CompanyLayout />;
   }
 

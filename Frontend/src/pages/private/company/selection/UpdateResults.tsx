@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { CheckCircle2, XCircle, Clock, ChevronDown, Check, Send, Save, AlertCircle } from 'lucide-react';
+import { CheckCircle2, XCircle, Clock, ChevronDown, Check, Send, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';
@@ -60,10 +60,7 @@ const UpdateResults: React.FC = () => {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Update Results</h1>
-          <p className="text-slate-500 font-medium">Finalize candidate selection and publish results to students.</p>
-        </div>
+        
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -116,7 +113,7 @@ const UpdateResults: React.FC = () => {
                     <td className="px-6 py-6 font-black text-slate-800">{row.total}</td>
                     <td className="px-6 py-6 text-center">
                       <Badge
-                        variant={row.status === 'Selected' ? 'success' : row.status === 'Rejected' ? 'destructive' : 'outline'}
+                        variant={row.status === 'Selected' ? 'success' : row.status === 'Rejected' ? 'danger' : 'outline'}
                         className="px-4 py-1.5 rounded-full font-bold"
                       >
                         {row.status}

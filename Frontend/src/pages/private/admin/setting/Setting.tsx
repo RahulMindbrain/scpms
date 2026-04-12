@@ -15,7 +15,7 @@ const AdminSettings: React.FC = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">Portal Settings</h1>
+        
         <p className="text-gray-500 mb-8">Configure campus placement rules and administrative preferences.</p>
 
         <div className="flex flex-col md:flex-row gap-8">

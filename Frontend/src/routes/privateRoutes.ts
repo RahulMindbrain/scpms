@@ -19,6 +19,7 @@ import Shortlisting from "@/pages/private/admin/shortlisting/Shortlisting";
 import InterviewSchedulerPage from "@/pages/private/admin/interview/InterviewScheduler";
 import BulkEmail from "@/pages/private/admin/email/BulkEmail";
 import DocumentManagement from "@/pages/private/admin/documents/DocumentManagement";
+import AdminJobManagement from "@/pages/private/admin/jobs/JobManagement";
 import CompanyDashboard from "@/pages/private/company/dashboard/Dashboard";
 import PostJob from "@/pages/private/company/jobs/PostJob";
 import ManageJobs from "@/pages/private/company/jobs/ManageJobs";
@@ -26,6 +27,7 @@ import Applicants from "@/pages/private/company/applicants/Applicants";
 import Shortlist from "@/pages/private/company/selection/Shortlist";
 import InterviewRounds from "@/pages/private/company/selection/InterviewRounds";
 import UpdateResults from "@/pages/private/company/selection/UpdateResults";
+import CompanyProfile from "@/pages/private/company/profile/CompanyProfile";
 
 export const PrivateRoutes: RouteOptions<any>[] = [
     {
@@ -43,27 +45,27 @@ export const PrivateRoutes: RouteOptions<any>[] = [
     {
         path: "/admin/drives",
         component: PlacementDriveManagement,
-    
+
     },
     {
         path: "/admin/report",
         component: Report,
-    
+
     },
-       {
+    {
         path: "/admin/notification",
         component: AdminNotificationPage,
-    
+
     },
     {
         path: "/admin/setting",
         component: Setting,
-    
+
     },
-     {
+    {
         path: "/admin/event-management",
         component: InterviewSchedulerPage,
-    
+
     },
     {
         path: "/admin/applications",
@@ -81,7 +83,11 @@ export const PrivateRoutes: RouteOptions<any>[] = [
         path: "/admin/documents",
         component: DocumentManagement,
     },
- 
+    {
+        path: "/admin/jobs",
+        component: AdminJobManagement,
+    },
+
 
 
 
@@ -103,25 +109,29 @@ export const PrivateRoutes: RouteOptions<any>[] = [
     },
     {
         path: "/student/application",
-        component:ApplicationStatus
+        component: ApplicationStatus
     },
-     {
+    {
         path: "/student/notifications",
         component: Notification
     },
-     {
+    {
         path: "/student/documents",
-        component:Documents
+        component: Documents
     },
     {
         path: "/student/interview",
-        component:InterviewScheduler
+        component: InterviewScheduler
     },
-    
+
     // Company/Recruiter Routes
     {
         path: "/company/dashboard",
         component: CompanyDashboard
+    },
+    {
+        path: "/company/profile",
+        component: CompanyProfile
     },
     {
         path: "/company/post-job",
@@ -146,6 +156,5 @@ export const PrivateRoutes: RouteOptions<any>[] = [
     {
         path: "/company/results",
         component: UpdateResults
-    }
-
+    },
 ];
