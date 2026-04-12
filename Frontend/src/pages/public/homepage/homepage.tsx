@@ -51,7 +51,7 @@ const HomePage: React.FC = () => {
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-md border-b border-slate-200 py-3 shadow-sm' : 'bg-transparent py-5'
         }`}>
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className=" px-6 lg:px-8">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3 group cursor-pointer">
               <div className="p-2 rounded-xl bg-gradient-to-br from-blue-700 to-slate-900 shadow-lg shadow-blue-500/20">
@@ -185,7 +185,7 @@ const HomePage: React.FC = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-transparent"></div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 w-full">
+        <div className="relative z-10  px-6 lg:px-8 w-full">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 mb-8">
               <Zap size={14} className="text-blue-400" />
@@ -217,7 +217,7 @@ const HomePage: React.FC = () => {
       </header>
 
       {/* Stats Section Overlay */}
-      <section id="stats" className="relative z-20 max-w-7xl mx-auto px-6 lg:px-8 -mt-12 md:-mt-20">
+      <section id="stats" className="relative z-20  px-6 lg:px-8 -mt-12 md:-mt-20">
         <div className="bg-white rounded-[2rem] shadow-2xl shadow-blue-500/5 border border-slate-100 overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
             <StatItem value="570+" label="Registered Students" />
@@ -230,7 +230,7 @@ const HomePage: React.FC = () => {
 
       {/* "Everything You Need" Feature Grid */}
       <section id="features" className="py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className=" px-6 lg:px-8">
           <div className="text-center mb-20">
             <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Everything You Need</h2>
             <p className="text-lg text-slate-500 max-w-2xl mx-auto">
@@ -287,7 +287,7 @@ const HomePage: React.FC = () => {
 
       {/* "Built for Everyone" Portals Section */}
       <section id="portals" className="py-24 bg-slate-50/50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className=" px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-slate-900 mb-4">Built for Everyone</h2>
             <p className="text-slate-500 max-w-2xl mx-auto">
@@ -326,7 +326,7 @@ const HomePage: React.FC = () => {
 
       {/* "Why Go Digital?" Section */}
       <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+        <div className=" px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-16 items-center">
             <div className="flex-1">
               <h2 className="text-4xl font-bold text-slate-900 mb-8 leading-tight">Why Go Digital?</h2>
@@ -388,7 +388,7 @@ const HomePage: React.FC = () => {
 
       {/* Footer */}
       <footer className="bg-slate-50 border-t border-slate-200 py-12">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 text-center">
+        <div className=" px-6 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-6">
             <div className="bg-blue-600 p-1 rounded-md">
               <GraduationCap className="text-white" size={20} />

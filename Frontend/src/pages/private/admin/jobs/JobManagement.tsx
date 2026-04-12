@@ -40,30 +40,30 @@ const AdminJobManagement: React.FC = () => {
   };
 
   const toggleSelectJob = (id: number) => {
-    setSelectedJobIds(prev => 
+    setSelectedJobIds(prev =>
       prev.includes(id) ? prev.filter(jobId => jobId !== id) : [...prev, id]
     );
   };
 
-  const filteredJobs = (Array.isArray(jobs) ? jobs : []).filter(job => 
+  const filteredJobs = (Array.isArray(jobs) ? jobs : []).filter(job =>
     job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     job.company?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 p-4 md:p-0 mt-4 animate-in">
+    <div className=" space-y-8 p-4 md:p-0 mt-4 animate-in">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Job Management</h1>
           <p className="text-slate-500 font-medium tracking-tight">Review and manage job postings from partner companies.</p>
         </div>
-        
+
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
           <div className="relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="Search jobs or companies..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -80,11 +80,10 @@ const AdminJobManagement: React.FC = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 md:flex-none px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
-                activeTab === tab 
-                  ? 'bg-white text-blue-600 shadow-sm ring-1 ring-slate-200' 
+              className={`flex-1 md:flex-none px-8 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === tab
+                  ? 'bg-white text-blue-600 shadow-sm ring-1 ring-slate-200'
                   : 'text-slate-500 hover:text-slate-900'
-              }`}
+                }`}
             >
               {tab === 'PENDING' && <Clock className="w-3 h-3 inline-block mr-2 -mt-0.5" />}
               {tab === 'APPROVED' && <CheckCircle className="w-3 h-3 inline-block mr-2 -mt-0.5" />}
@@ -95,7 +94,7 @@ const AdminJobManagement: React.FC = () => {
         </div>
 
         {selectedJobIds.length > 0 && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             className="flex items-center gap-3 px-4 py-2 bg-blue-50 border border-blue-100 rounded-2xl"
@@ -103,7 +102,7 @@ const AdminJobManagement: React.FC = () => {
             <span className="text-xs font-bold text-blue-600 uppercase tracking-wider">{selectedJobIds.length} Selected</span>
             <div className="h-6 w-px bg-blue-200 mx-1"></div>
             {activeTab !== 'APPROVED' && (
-              <button 
+              <button
                 onClick={() => handleStatusUpdate(selectedJobIds, 'APPROVED')}
                 className="p-2 text-emerald-600 hover:bg-emerald-100 rounded-xl transition-colors active:scale-95"
                 title="Approve All"
@@ -112,7 +111,7 @@ const AdminJobManagement: React.FC = () => {
               </button>
             )}
             {activeTab !== 'REJECTED' && (
-              <button 
+              <button
                 onClick={() => handleStatusUpdate(selectedJobIds, 'REJECTED')}
                 className="p-2 text-rose-600 hover:bg-rose-100 rounded-xl transition-colors active:scale-95"
                 title="Reject All"
@@ -148,12 +147,12 @@ const AdminJobManagement: React.FC = () => {
               </div>
             ))
           ) : filteredJobs.length > 0 ? filteredJobs.map((job) => (
-            <motion.div 
+            <motion.div
               layout
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
-              key={job.id} 
+              key={job.id}
               className={`bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-500 group relative overflow-hidden ${selectedJobIds.includes(job.id) ? 'ring-2 ring-blue-500 bg-blue-50/10' : ''}`}
               onClick={() => toggleSelectJob(job.id)}
             >
@@ -197,7 +196,7 @@ const AdminJobManagement: React.FC = () => {
                 <div className="flex items-center gap-3 pt-4 border-t border-slate-50">
                   {activeTab === 'PENDING' ? (
                     <>
-                      <button 
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleStatusUpdate([job.id], 'APPROVED');
@@ -206,7 +205,7 @@ const AdminJobManagement: React.FC = () => {
                       >
                         <CheckCircle className="w-4 h-4" /> Approve
                       </button>
-                      <button 
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           handleStatusUpdate([job.id], 'REJECTED');
@@ -217,7 +216,7 @@ const AdminJobManagement: React.FC = () => {
                       </button>
                     </>
                   ) : (
-                    <button 
+                    <button
                       className="w-full py-3.5 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 active:scale-95 flex items-center justify-center gap-2"
                       onClick={(e) => e.stopPropagation()}
                     >
@@ -228,7 +227,7 @@ const AdminJobManagement: React.FC = () => {
               </div>
             </motion.div>
           )) : (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               className="col-span-full py-20 text-center bg-white rounded-[2.5rem] border border-slate-100 border-dashed"
@@ -237,7 +236,7 @@ const AdminJobManagement: React.FC = () => {
                 <Briefcase className="w-10 h-10 text-slate-200" />
               </div>
               <p className="text-slate-400 font-black uppercase tracking-widest text-sm">No {activeTab.toLowerCase()} jobs found</p>
-              <button 
+              <button
                 onClick={() => setSearchTerm('')}
                 className="mt-4 text-xs font-black text-blue-600 uppercase tracking-widest hover:underline"
               >

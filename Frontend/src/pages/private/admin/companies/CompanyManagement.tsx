@@ -12,7 +12,7 @@ import { Badge } from '@/components/ui/badge.tsx';
 import { Button } from '@/components/ui/button.tsx';
 import { toast } from 'sonner';
 import { Modal } from '@/components/ui/modal.tsx';
-import { useDispatch, useSelector } from 'react-redux'; 
+import { useDispatch, useSelector } from 'react-redux';
 import { fetchCompanies, fetchInactiveCompanies, activateCompanies } from '@/redux/thunks/companyThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
@@ -56,10 +56,10 @@ const CompanyManagement: React.FC = () => {
       id: c.id,
       userId: c.user?.id || c.userId,
       name: c.name || 'N/A',
-      sector: 'Technology', 
-      location: 'Multiple', 
-      avgPackage: 'Competitive', 
-      hiredCount: 0, 
+      sector: 'Technology',
+      location: 'Multiple',
+      avgPackage: 'Competitive',
+      hiredCount: 0,
       status: 'active',
       approval: 'Approved',
       logo: undefined,
@@ -135,7 +135,7 @@ const CompanyManagement: React.FC = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-in mt-2 p-4 md:p-0">
+    <div className=" space-y-8 animate-in mt-2 p-4 md:p-0">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>

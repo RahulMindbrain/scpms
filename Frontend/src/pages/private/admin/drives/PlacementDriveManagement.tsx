@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Calendar, 
-  MapPin, 
-  GraduationCap, 
-  Plus, 
-  Edit3, 
-  Trash2, 
+import {
+  Calendar,
+  MapPin,
+  GraduationCap,
+  Plus,
+  Edit3,
+  Trash2,
   CheckCircle2,
   ChevronDown,
   Building2,
@@ -49,53 +49,53 @@ const PlacementDriveManagement: React.FC = () => {
   }, []);
 
   const drives: Drive[] = [
-    { 
-      id: 1, 
-      company: 'Google', 
-      role: 'SDE Intern', 
-      status: 'active', 
-      description: 'Looking for talented SDE interns for summer program.', 
-      date: 'Apr 10, 2026', 
-      location: 'Bangalore', 
-      minCgpa: 8, 
-      package: '₹24 LPA', 
-      branches: ['CSE', 'IT'], 
-      applicants: 145 
+    {
+      id: 1,
+      company: 'Google',
+      role: 'SDE Intern',
+      status: 'active',
+      description: 'Looking for talented SDE interns for summer program.',
+      date: 'Apr 10, 2026',
+      location: 'Bangalore',
+      minCgpa: 8,
+      package: '₹24 LPA',
+      branches: ['CSE', 'IT'],
+      applicants: 145
     },
-    { 
-      id: 2, 
-      company: 'Microsoft', 
-      role: 'Full Stack Developer', 
-      status: 'completed', 
-      description: 'Full-time full stack developer position.', 
-      date: 'Apr 8, 2026', 
-      location: 'Hyderabad', 
-      minCgpa: 7.5, 
-      package: '₹20 LPA', 
-      branches: ['CSE', 'IT', 'ECE'], 
-      applicants: 198 
+    {
+      id: 2,
+      company: 'Microsoft',
+      role: 'Full Stack Developer',
+      status: 'completed',
+      description: 'Full-time full stack developer position.',
+      date: 'Apr 8, 2026',
+      location: 'Hyderabad',
+      minCgpa: 7.5,
+      package: '₹20 LPA',
+      branches: ['CSE', 'IT', 'ECE'],
+      applicants: 198
     },
-    { 
-      id: 3, 
-      company: 'Amazon', 
-      role: 'Data Analyst', 
-      status: 'completed', 
-      description: 'Data analytics role in cloud division.', 
-      date: 'Apr 5, 2026', 
-      location: 'Bangalore', 
-      minCgpa: 7, 
-      package: '₹18 LPA', 
-      branches: ['CSE', 'IT', 'ECE', 'EE'], 
-      applicants: 89 
+    {
+      id: 3,
+      company: 'Amazon',
+      role: 'Data Analyst',
+      status: 'completed',
+      description: 'Data analytics role in cloud division.',
+      date: 'Apr 5, 2026',
+      location: 'Bangalore',
+      minCgpa: 7,
+      package: '₹18 LPA',
+      branches: ['CSE', 'IT', 'ECE', 'EE'],
+      applicants: 89
     },
   ];
 
-  const filteredDrives = drives.filter(d => 
+  const filteredDrives = drives.filter(d =>
     filter === 'All Drives' || d.status.toLowerCase() === filter.toLowerCase()
   );
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-in mt-2 p-4 md:p-0">
+    <div className=" space-y-8 animate-in mt-2 p-4 md:p-0">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div>
@@ -104,12 +104,12 @@ const PlacementDriveManagement: React.FC = () => {
         </div>
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <div className="relative" ref={filterRef}>
-            <button 
+            <button
               onClick={() => setIsFilterOpen(!isFilterOpen)}
               className="flex w-full sm:w-auto items-center justify-between gap-4 px-6 py-3.5 bg-white border border-slate-200 rounded-2xl text-xs font-black uppercase tracking-widest text-slate-700 hover:border-blue-500 transition-all shadow-sm active:scale-95"
             >
               <Filter className="w-4 h-4 text-blue-600" />
-              {filter} 
+              {filter}
               <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-300 ${isFilterOpen ? 'rotate-180' : ''}`} />
             </button>
 
@@ -137,7 +137,7 @@ const PlacementDriveManagement: React.FC = () => {
               )}
             </AnimatePresence>
           </div>
-          <button 
+          <button
             onClick={() => setIsModalOpen(true)}
             className="flex items-center justify-center gap-2 px-8 py-3.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 active:scale-95"
           >
@@ -151,7 +151,7 @@ const PlacementDriveManagement: React.FC = () => {
         {filteredDrives.length > 0 ? filteredDrives.map((drive) => (
           <div key={drive.id} className="bg-white p-6 lg:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-500 group relative overflow-hidden">
             <div className={`absolute top-0 right-0 w-40 h-40 blur-[100px] opacity-10 transition-opacity group-hover:opacity-20 ${drive.status === 'active' ? 'bg-blue-600' : 'bg-emerald-600'}`}></div>
-            
+
             <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-10 relative z-10">
               <div className="space-y-6 flex-1">
                 <div className="flex items-center gap-4">
@@ -165,7 +165,7 @@ const PlacementDriveManagement: React.FC = () => {
                     </Badge>
                   </div>
                 </div>
-                
+
                 <div className="space-y-3">
                   <h4 className="text-xl font-bold text-slate-800">{drive.role}</h4>
                   <p className="text-sm text-slate-500 leading-relax max-w-2xl font-medium">{drive.description}</p>
@@ -216,14 +216,14 @@ const PlacementDriveManagement: React.FC = () => {
           </div>
         )) : (
           <div className="py-20 text-center bg-white rounded-[2.5rem] border border-slate-100 border-dashed">
-             <Search className="w-12 h-12 text-slate-200 mx-auto mb-4" />
-             <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No drives found matching your criteria</p>
+            <Search className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+            <p className="text-slate-400 font-bold uppercase tracking-widest text-sm">No drives found matching your criteria</p>
           </div>
         )}
       </div>
 
-      <Modal 
-        isOpen={isModalOpen} 
+      <Modal
+        isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title="Create Placement Drive"
         subtitle="Set up a new recruitment session and specify eligibility criteria."
