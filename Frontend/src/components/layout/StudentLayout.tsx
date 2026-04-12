@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logout } from '../../redux/slices/authSlice';
+import type { AppDispatch } from '../../redux/store/store';
 import Sidebar from './Sidebar';
 import type { SidebarItem } from './Sidebar';
 import {
@@ -16,6 +19,7 @@ import {
 
 const StudentLayout: React.FC = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -31,7 +35,7 @@ const StudentLayout: React.FC = () => {
   ];
 
   const handleSignOut = () => {
-    console.log('Signing out...');
+    dispatch(logout());
     navigate('/login');
   };
 

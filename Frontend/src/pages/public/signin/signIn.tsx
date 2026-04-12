@@ -24,8 +24,8 @@ const SignIn: React.FC = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [activeRole, setActiveRole] = useState<UserRole>("student");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("abhi.nayak@example.com");
+  const [password, setPassword] = useState("Password@2026");
   const [isLoading, setIsLoading] = useState(false);
 
   const roles: RoleConfig[] = [
@@ -39,9 +39,12 @@ const SignIn: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const user = await dispatch(
+      // loginUser now returns full API body: { token, data: { role, ...user } }
+      const result = await dispatch(
         loginUser({ email, password })
       ).unwrap();
+
+      const user = result.data;
 
       if (user.role.toLowerCase() !== activeRole) {
         toast.error(`Unauthorized: This account is registered as ${user.role.toLowerCase()}, but you are trying to sign in as ${activeRole}.`);
@@ -54,11 +57,9 @@ const SignIn: React.FC = () => {
       setTimeout(() => {
         if (user.role === "STUDENT") {
           navigate("/student/dashboard");
-        }
-        else if (user.role === "COMPANY") {
+        } else if (user.role === "COMPANY") {
           navigate("/company/dashboard");
-        }
-        else if (user.role === "ADMIN") {
+        } else if (user.role === "ADMIN") {
           navigate("/admin/dashboard");
         }
       }, 1000);

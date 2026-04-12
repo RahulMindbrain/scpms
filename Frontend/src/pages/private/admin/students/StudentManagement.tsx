@@ -1,51 +1,49 @@
-import React, { useState, useMemo } from 'react';
-import { 
-  Search, 
-  Download, 
-  Plus, 
-  MoreHorizontal, 
-  CheckCircle2, 
-  Clock,
-  ChevronDown,
-  UserPlus,
+import React, { useState, useMemo, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  Search,
+  Download,
+  Plus, CheckCircle2,
+  Clock, UserPlus,
   Trash2,
-  Edit2,
-  Filter
+  Edit2
 } from 'lucide-react';
 import { StatCard } from '@/components/ui/stat-card';
 import { Badge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { AnimatePresence, motion } from 'framer-motion';
 
-interface Student {
-  id: number;
-  name: string;
-  dept: string;
-  cgpa: number;
-  backlogs: number;
-  status: string;
-  verified: boolean;
-  company: string;
-  package: string;
-}
+import { fetchStudents } from '@/redux/thunks/studentThunk';
+import type { AppDispatch } from '@/redux/store/store';
+import type { RootState } from '@/redux/reducers/rootReducer';
 
 const StudentManagement: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { students: reduxStudents, loading, error } = useSelector((state: RootState) => state.student);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('All Depts');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
 
-  const [students, setStudents] = useState<Student[]>([
-    { id: 1, name: 'Priya Sharma', dept: 'CSE', cgpa: 9.4, backlogs: 0, status: 'placed', verified: true, company: 'Google', package: '₹24 LPA' },
-    { id: 2, name: 'Rahul Verma', dept: 'IT', cgpa: 9.2, backlogs: 0, status: 'placed', verified: true, company: 'Microsoft', package: '₹20 LPA' },
-    { id: 3, name: 'Ananya Patel', dept: 'ECE', cgpa: 9.1, backlogs: 0, status: 'placed', verified: true, company: 'Amazon', package: '₹18 LPA' },
-    { id: 4, name: 'Vikram Singh', dept: 'CSE', cgpa: 8.9, backlogs: 0, status: 'in-process', verified: true, company: '-', package: '-' },
-    { id: 5, name: 'Sneha Gupta', dept: 'ME', cgpa: 8.5, backlogs: 1, status: 'eligible', verified: false, company: '-', package: '-' },
-    { id: 6, name: 'Amit Kumar', dept: 'CE', cgpa: 7.8, backlogs: 0, status: 'eligible', verified: false, company: '-', package: '-' },
-    { id: 7, name: 'Neha Reddy', dept: 'EE', cgpa: 8.7, backlogs: 0, status: 'in-process', verified: true, company: '-', package: '-' },
-  ]);
+  useEffect(() => {
+    dispatch(fetchStudents({}));
+  }, [dispatch]);
+
+  const students = useMemo(() => {
+    return reduxStudents.map((s: any) => ({
+      id: s.id,
+      name: s.firstname || 'Unknown',
+      dept: s.student?.branch || 'N/A',
+      cgpa: s.student?.cgpa || 0,
+      backlogs: s.student?.backlogs || 0,
+      status: s.status.toLowerCase(),
+      verified: s.status === 'ACTIVE',
+      company: s.student?.placedAt || '-',
+      package: s.student?.salary || '-',
+    }));
+  }, [reduxStudents]);
 
   const departments = ['All Depts', 'CSE', 'IT', 'ECE', 'ME', 'EE', 'CE'];
 
@@ -72,9 +70,25 @@ const StudentManagement: React.FC = () => {
   };
 
   const toggleVerification = (id: number) => {
-    setStudents(prev => prev.map(s => s.id === id ? { ...s, verified: !s.verified } : s));
-    toast.success("Student verification status updated");
+    toast.info("Backend integration for verification status is pending.");
   };
+
+  if (loading && reduxStudents.length === 0) {
+    return (
+      <div className="flex h-[60vh] items-center justify-center">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex h-[60vh] flex-col items-center justify-center space-y-4">
+        <p className="text-red-500 font-bold uppercase tracking-widest">{error}</p>
+        <Button onClick={() => dispatch(fetchStudents({}))}>Retry</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-in fade-in duration-700 mt-2 p-4 md:p-0">
@@ -82,7 +96,7 @@ const StudentManagement: React.FC = () => {
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 bg-blue-600 rounded-[1.5rem] flex items-center justify-center text-white shadow-xl shadow-blue-500/20">
-             <UserPlus className="w-7 h-7" />
+            <UserPlus className="w-7 h-7" />
           </div>
           <div>
             <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Student Database</h1>
@@ -90,7 +104,7 @@ const StudentManagement: React.FC = () => {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <Button 
+          <Button
             variant="outline"
             onClick={handleExport}
             disabled={isExporting}
@@ -98,7 +112,7 @@ const StudentManagement: React.FC = () => {
           >
             <Download className="w-4 h-4 mr-2" /> Export
           </Button>
-          <Button 
+          <Button
             onClick={() => setIsAddModalOpen(true)}
             className="flex-1 lg:flex-none py-6 rounded-2xl font-black uppercase tracking-widest text-xs bg-blue-600 shadow-xl shadow-blue-500/20"
           >
@@ -119,27 +133,27 @@ const StudentManagement: React.FC = () => {
       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 bg-white p-6 rounded-[2rem] border border-slate-100 shadow-sm shadow-slate-200/20">
         <div className="relative flex-1 group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
-          <input 
-            type="text" 
+          <input
+            type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search by name, roll no, or branch..." 
+            placeholder="Search by name, roll no, or branch..."
             className="w-full pl-11 pr-4 py-4 bg-slate-50/50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-medium"
           />
         </div>
-        
+
         <div className="flex flex-wrap items-center gap-3">
-           <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-1.5 rounded-2xl">
-              {['All Depts', 'CSE', 'IT'].map(dept => (
-                <button 
-                  key={dept}
-                  onClick={() => setSelectedDept(dept)}
-                  className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${selectedDept === dept ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`}
-                >
-                  {dept}
-                </button>
-              ))}
-           </div>
+          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 p-1.5 rounded-2xl">
+            {['All Depts', 'CSE', 'IT'].map(dept => (
+              <button
+                key={dept}
+                onClick={() => setSelectedDept(dept)}
+                className={`px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${selectedDept === dept ? 'bg-white text-blue-600 shadow-sm' : 'text-slate-400'}`}
+              >
+                {dept}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -164,7 +178,7 @@ const StudentManagement: React.FC = () => {
                   <td className="px-8 py-5">
                     <div className="flex items-center gap-4">
                       <div className="w-11 h-11 rounded-2xl bg-slate-100 text-slate-700 flex items-center justify-center font-black text-xs shrink-0 uppercase border border-slate-200 shadow-sm group-hover:scale-110 transition-transform">
-                        {student.name.split(' ').map(n => n[0]).join('')}
+                        {student.name.split(' ').map((n: string) => n[0]).join('')}
                       </div>
                       <div className="flex flex-col">
                         <span className="text-sm font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{student.name}</span>
@@ -173,7 +187,7 @@ const StudentManagement: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-5">
-                     <Badge variant="outline" className="text-[10px] font-black">{student.dept}</Badge>
+                    <Badge variant="outline" className="text-[10px] font-black">{student.dept}</Badge>
                   </td>
                   <td className="px-6 py-5 text-center">
                     <span className="text-sm font-black text-slate-900 bg-slate-100 px-3 py-1 rounded-lg">{student.cgpa}</span>
@@ -189,20 +203,20 @@ const StudentManagement: React.FC = () => {
                     </Badge>
                   </td>
                   <td className="px-6 py-5">
-                    <button 
+                    <button
                       onClick={() => toggleVerification(student.id)}
-                      className={`flex items-center gap-1.5 py-1.5 px-4 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${student.verified 
-                        ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200' 
+                      className={`flex items-center gap-1.5 py-1.5 px-4 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${student.verified
+                        ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-200'
                         : 'bg-amber-100 text-amber-600 hover:bg-amber-200'
-                      }`}
+                        }`}
                     >
                       {student.verified ? <><CheckCircle2 className="w-3.5 h-3.5" /> Verified</> : <><Clock className="w-3.5 h-3.5" /> Pending</>}
                     </button>
                   </td>
                   <td className="px-8 py-5 text-right">
                     <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                       <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"><Edit2 size={16} /></button>
-                       <button className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"><Trash2 size={16} /></button>
+                      <button className="p-2.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"><Edit2 size={16} /></button>
+                      <button className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"><Trash2 size={16} /></button>
                     </div>
                   </td>
                 </tr>
@@ -211,8 +225,8 @@ const StudentManagement: React.FC = () => {
           </table>
           {filteredStudents.length === 0 && (
             <div className="py-20 text-center text-slate-300">
-                <Search className="w-12 h-12 mx-auto mb-4 opacity-10" />
-                <p className="font-bold uppercase tracking-widest">No results matched your search</p>
+              <Search className="w-12 h-12 mx-auto mb-4 opacity-10" />
+              <p className="font-bold uppercase tracking-widest">No results matched your search</p>
             </div>
           )}
         </div>

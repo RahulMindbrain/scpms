@@ -2,8 +2,11 @@ import React from 'react';
 import { Briefcase, Users, CheckCircle, Clock, ChevronRight } from 'lucide-react';
 import { StatCard } from '@/components/ui/stat-card';
 import { Badge } from '@/components/ui/badge';
+import useAuth from '@/redux/hooks/useAuth';
 
 const Dashboard: React.FC = () => {
+  const { fullName, companyData } = useAuth();
+
   const recentDrives = [
     { id: 1, title: "Software Engineer", deadline: "2026-04-20", applicants: 124, status: "Active" },
     { id: 2, title: "Data Analyst", deadline: "2026-04-25", applicants: 87, status: "Active" },
@@ -15,7 +18,9 @@ const Dashboard: React.FC = () => {
     <div className="space-y-8 animate-in fade-in duration-700">
       {/* Header Section */}
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Company Dashboard</h1>
+        <h1 className="text-3xl font-black text-slate-900 tracking-tight">
+          {companyData?.companyName ?? fullName} Dashboard
+        </h1>
         <p className="text-slate-500 font-medium">
           Overview of your recruitment activities and performance.
         </p>

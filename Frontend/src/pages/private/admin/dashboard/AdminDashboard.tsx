@@ -10,6 +10,7 @@ import {
   Pie, Cell, AreaChart, Area 
 } from 'recharts';
 import { motion } from 'framer-motion';
+import useAuth from '@/redux/hooks/useAuth';
 
 // --- Mock Data ---
 const deptData = [
@@ -63,6 +64,9 @@ const StatCard = ({ label, value, trend, icon: Icon, color }: any) => (
 );
 
 const AdminDashboard: React.FC = () => {
+  const { fullName, adminData } = useAuth();
+  const today = new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-8 font-sans text-slate-900">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -73,7 +77,7 @@ const AdminDashboard: React.FC = () => {
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900">
               Placement Portal <span className="text-indigo-600">Analytics</span>
             </h1>
-            <p className="text-slate-500 font-medium">Thursday, 9 April 2026</p>
+            <p className="text-slate-500 font-medium">{today} &nbsp;—&nbsp; Welcome, <span className="font-semibold text-slate-700">{fullName}</span></p>
           </div>
           
           <div className="flex items-center gap-3">

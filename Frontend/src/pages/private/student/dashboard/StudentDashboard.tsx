@@ -9,8 +9,11 @@ import {
 } from 'lucide-react';
 import { StatCard } from '@/components/ui/stat-card';
 import { Badge } from '@/components/ui/badge';
+import useAuth from '@/redux/hooks/useAuth';
 
 const StudentDashboard = () => {
+  const { firstName, initials, fullName, studentData } = useAuth();
+
   const applicationStatus = [
     { label: 'Applied', count: 8, color: 'bg-blue-600', percentage: 100 },
     { label: 'Shortlisted', count: 4, color: 'bg-indigo-500', percentage: 50 },
@@ -20,17 +23,19 @@ const StudentDashboard = () => {
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-in mt-2 p-4 md:p-0">
-      {/* Header Area (Refined) */}
+      {/* Header Area */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Welcome, Anjali! 👋</h1>
+          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Welcome, {firstName}! 👋</h1>
           <p className="text-slate-500 font-medium">Elevate your carrier. Here's your placement progress.</p>
         </div>
         <div className="hidden md:flex items-center gap-3 bg-white p-2 pr-6 rounded-2xl shadow-sm border border-slate-100 transition-all hover:shadow-md">
-          <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-xl flex items-center justify-center text-white font-black text-xs shadow-lg shadow-blue-500/20">AS</div>
+          <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-indigo-500 rounded-xl flex items-center justify-center text-white font-black text-xs shadow-lg shadow-blue-500/20">{initials}</div>
           <div>
-            <p className="text-xs font-black text-slate-900 leading-tight uppercase tracking-tight">Anjali Sharma</p>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">CSE • Batch 2026</p>
+            <p className="text-xs font-black text-slate-900 leading-tight uppercase tracking-tight">{fullName}</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              {studentData?.department ?? 'Student'} • {studentData?.batch ?? 'Batch 2026'}
+            </p>
           </div>
         </div>
       </header>

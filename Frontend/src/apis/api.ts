@@ -1,34 +1,39 @@
 import axios, { type AxiosRequestConfig } from "axios";
 
-const axiosInstance = axios.create({
+// ─── Base Configuration ───────────────────────────────────────────────────────
+const BASE_URL = "http://localhost:3030";
 
-    // baseURL: "http://localhost:8080/api",
+const api = axios.create({
+    baseURL: BASE_URL,
+    withCredentials: true, // send httpOnly auth cookie on every request
 });
 
-let cachedToken: any = null;
+// ─── Request Interceptor – attach Authorization token (from defaults) ────────
+// Token is set once via setAuthToken(); no need to read localStorage each time.
+api.interceptors.request.use(
+    (config) => config,
+    (error) => Promise.reject(error)
+);
 
-export const setInterceptors = async () => {
-    const token = localStorage.getItem("token");
+// Restore token from localStorage on page reload
+const _persistedToken = localStorage.getItem("token");
+if (_persistedToken) {
+    api.defaults.headers.common["Authorization"] = `Bearer ${_persistedToken}`;
+}
 
+// ─── Auth Token Helper ───────────────────────────────────────────────────────
+/** Call after login to inject token; call with null on logout to clear it. */
+export const setAuthToken = (token: string | null) => {
     if (token) {
-        cachedToken = token;
+        api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+        localStorage.setItem("token", token);
+    } else {
+        delete api.defaults.headers.common["Authorization"];
+        localStorage.removeItem("token");
     }
-
-    axiosInstance.interceptors.request.use(
-        (config: any) => {
-            if (cachedToken) {
-                config.headers.Authorization = `Bearer ${cachedToken}`;
-            }
-            return config;
-        },
-        (error: any) => Promise.reject(error)
-    );
 };
 
-const withInterceptors = async (callback: () => Promise<any>) => {
-    await setInterceptors();
-    return callback();
-};
+// ─── HTTP Helper Functions ────────────────────────────────────────────────────
 
 export const getAPI = async <T>(
     endpoint: string,
@@ -36,21 +41,12 @@ export const getAPI = async <T>(
     headers: AxiosRequestConfig["headers"] = {},
     responseType: AxiosRequestConfig["responseType"] = "json"
 ): Promise<T> => {
-    return withInterceptors(async () => {
-        try {
-            const response = await axiosInstance.get<T>(endpoint, {
-                params,
-                headers,
-                responseType,
-            });
-            return response.data;
-        } catch (error: any) {
-            if (error?.response?.data) {
-                throw error.response.data;
-            }
-            throw error;
-        }
-    });
+    try {
+        const response = await api.get<T>(endpoint, { params, headers, responseType });
+        return response.data;
+    } catch (error: any) {
+        throw error?.response?.data ?? error;
+    }
 };
 
 export const postAPI = async <T>(
@@ -60,21 +56,12 @@ export const postAPI = async <T>(
     headers: AxiosRequestConfig["headers"] = {},
     responseType: AxiosRequestConfig["responseType"] = "json"
 ): Promise<T> => {
-    return withInterceptors(async () => {
-        try {
-            const response = await axiosInstance.post<T>(endpoint, data, {
-                params,
-                headers,
-                responseType,
-            });
-            return response.data;
-        } catch (error: any) {
-            if (error?.response?.data) {
-                throw error.response.data;
-            }
-            throw error;
-        }
-    });
+    try {
+        const response = await api.post<T>(endpoint, data, { params, headers, responseType });
+        return response.data;
+    } catch (error: any) {
+        throw error?.response?.data ?? error;
+    }
 };
 
 export const putAPI = async <T>(
@@ -83,43 +70,12 @@ export const putAPI = async <T>(
     params: any = {},
     headers: AxiosRequestConfig["headers"] = {}
 ): Promise<T> => {
-    return withInterceptors(async () => {
-        try {
-            const response = await axiosInstance.put<T>(endpoint, data, {
-                params,
-                headers,
-            });
-            return response.data;
-        } catch (error: any) {
-            if (error?.response?.data) {
-                throw error.response.data;
-            }
-            throw error;
-        }
-    });
-};
-
-export const deleteAPI = async <T>(
-    endpoint: string,
-    data: any = {},
-    params: any = {},
-    headers: AxiosRequestConfig["headers"] = {}
-): Promise<T> => {
-    return withInterceptors(async () => {
-        try {
-            const response = await axiosInstance.delete<T>(endpoint, {
-                data,
-                params,
-                headers,
-            });
-            return response.data;
-        } catch (error: any) {
-            if (error?.response?.data) {
-                throw error.response.data;
-            }
-            throw error;
-        }
-    });
+    try {
+        const response = await api.put<T>(endpoint, data, { params, headers });
+        return response.data;
+    } catch (error: any) {
+        throw error?.response?.data ?? error;
+    }
 };
 
 export const patchAPI = async <T>(
@@ -128,18 +84,26 @@ export const patchAPI = async <T>(
     params: any = {},
     headers: AxiosRequestConfig["headers"] = {}
 ): Promise<T> => {
-    return withInterceptors(async () => {
-        try {
-            const response = await axiosInstance.patch<T>(endpoint, data, {
-                params,
-                headers,
-            });
-            return response.data;
-        } catch (error: any) {
-            if (error?.response?.data) {
-                throw error.response.data;
-            }
-            throw error;
-        }
-    });
+    try {
+        const response = await api.patch<T>(endpoint, data, { params, headers });
+        return response.data;
+    } catch (error: any) {
+        throw error?.response?.data ?? error;
+    }
 };
+
+export const deleteAPI = async <T>(
+    endpoint: string,
+    data: any = {},
+    params: any = {},
+    headers: AxiosRequestConfig["headers"] = {}
+): Promise<T> => {
+    try {
+        const response = await api.delete<T>(endpoint, { data, params, headers });
+        return response.data;
+    } catch (error: any) {
+        throw error?.response?.data ?? error;
+    }
+};
+
+export default api;
