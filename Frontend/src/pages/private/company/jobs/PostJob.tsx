@@ -90,10 +90,7 @@ const PostJob: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-black text-slate-900 tracking-tight">Post a New Job</h1>
-        <p className="text-slate-500 font-medium">Fill in the details below to create a new recruitment drive.</p>
-      </div>
+      
 
       <form onSubmit={handleSubmit} className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 space-y-8">
         <div className="space-y-6">

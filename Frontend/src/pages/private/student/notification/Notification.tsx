@@ -68,7 +68,7 @@ const Notification = () => {
             <button className="p-2 text-slate-500 hover:bg-slate-100 rounded-lg lg:hidden transition-colors">
               <PanelLeftOpen size={20} />
             </button>
-            <h1 className="text-lg font-semibold text-slate-900 tracking-tight">Notifications ({unreadCount})</h1>
+            
           </div>
           
           <div className="flex items-center gap-5">

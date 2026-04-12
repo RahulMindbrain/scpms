@@ -114,10 +114,7 @@ const InterviewScheduler: React.FC = () => {
           <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
             <Calendar className="w-5 h-5 text-primary" />
           </div>
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">Interview Scheduler</h1>
-            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Manage placement events</p>
-          </div>
+          
         </div>
         
         <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>

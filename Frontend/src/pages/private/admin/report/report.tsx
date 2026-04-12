@@ -54,10 +54,7 @@ const AnalyticsDashboard: React.FC = () => {
       {/* Header */}
       <div className=" mb-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-          <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Placement Analytics</h1>
-            <p className="text-slate-500 font-medium mt-1">Real-time performance tracking for the {timeRange}.</p>
-          </div>
+          
 
           <div className="flex items-center gap-3">
             <div className="flex bg-white border border-slate-200 p-1 rounded-xl shadow-sm">

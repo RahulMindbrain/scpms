@@ -77,10 +77,7 @@ const InterviewRounds: React.FC = () => {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Interview Round Management</h1>
-          <p className="text-slate-500 font-medium">Coordinate and track interview progress across different rounds.</p>
-        </div>
+        
       </div>
 
       <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 p-8 space-y-8">

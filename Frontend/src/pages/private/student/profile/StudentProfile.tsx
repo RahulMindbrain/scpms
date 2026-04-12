@@ -1,10 +1,10 @@
 import {
-  User, Mail, Phone, MapPin, GraduationCap,
+  Mail, Phone, MapPin, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
   Upload, Camera, Briefcase, Loader2, FileText, Calendar, Building2
 } from 'lucide-react';
 import ProjectModal from './modal/ProjectModal';
-import { uploadToCloudinary } from '../../../../lib/cloudinary';
+
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { useDispatch, useSelector } from 'react-redux';
@@ -125,51 +125,12 @@ const StudentProfile = () => {
   };
 
   const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    const toastId = toast.loading("Uploading profile image...");
-    try {
-      const url = await uploadToCloudinary(file);
-      setProfile({ ...profile, profileImage: url });
-      toast.success("Profile image updated!", { id: toastId });
-    } catch (error) {
-      toast.error("Failed to upload image", { id: toastId });
-    } finally {
-      setIsUploading(false);
-    }
+    toast.info("Image upload will be integrated with backend soon!");
   };
 
   const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploadingResume(true);
-    const toastId = toast.loading("Uploading resume to Cloudinary...");
-    try {
-      const url = await uploadToCloudinary(file);
-      const newResume = {
-        name: file.name,
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        size: `${(file.size / 1024).toFixed(1)} KB`,
-        url: url
-      };
-      setProfile({
-        ...profile,
-        stats: {
-          ...profile.stats,
-          resumeUrl: url
-        },
-        resumes: [newResume, ...profile.resumes]
-      });
-      toast.success("Resume uploaded successfully!", { id: toastId });
-    } catch (error) {
-      toast.error("Failed to upload resume", { id: toastId });
-    } finally {
-      setIsUploadingResume(false);
-    }
-  }
+    toast.info("Resume upload will be integrated with backend soon!");
+  };
 
   const handleAddProject = (project: any) => {
     const updatedProfile = {
@@ -200,10 +161,7 @@ const StudentProfile = () => {
     <div className="space-y-6 animate-in fade-in duration-500 mt-2 p-4 md:p-6">
       {/* Profile Header section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Profile</h1>
-          <p className="text-muted-foreground mt-1 text-sm">Manage your academic and professional identity.</p>
-        </div>
+        
         <Button
           onClick={() => setShowProfileEditDialog(true)}
           disabled={backendLoading}

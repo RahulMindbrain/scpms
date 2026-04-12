@@ -42,10 +42,7 @@ const Eligibility = () => {
         
         {/* Top Navigation / Header */}
         <header className="flex items-center justify-between mb-10">
-          <div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-slate-900">Placement Portal</h1>
-            <p className="text-slate-500 text-sm font-medium">Academic Year 2024-25</p>
-          </div>
+          
           <div className="flex items-center gap-4">
             <button className="relative p-2.5 bg-white border border-slate-200 rounded-full hover:bg-slate-50 transition-all shadow-sm">
               <Bell className="w-5 h-5 text-slate-600" />

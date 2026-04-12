@@ -1,12 +1,10 @@
 import React from 'react';
-import { 
-  Calendar, 
-  Clock, 
-  Video, 
-  MapPin, 
-  Bell, 
-  LayoutDashboard, 
-  History, 
+import {
+  Calendar,
+  Clock, MapPin,
+  Bell,
+  LayoutDashboard,
+  History,
   ChevronRight,
   ExternalLink,
   MoreVertical,
@@ -78,7 +76,6 @@ const InterviewSchedule: React.FC = () => {
           <div className="bg-blue-600 p-2 rounded-lg text-white">
             <LayoutDashboard size={20} />
           </div>
-          <h1 className="text-xl font-bold tracking-tight text-slate-800">Interview Scheduler</h1>
         </div>
 
         <div className="hidden md:flex items-center bg-slate-100 px-3 py-1.5 rounded-full w-64">

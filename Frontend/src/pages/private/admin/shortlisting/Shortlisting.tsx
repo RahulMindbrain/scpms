@@ -73,12 +73,7 @@ const Shortlisting: React.FC = () => {
 
   return (
     <div className="p-1">
-      <div className="flex items-center gap-2 mb-6">
-        <div className="p-2 bg-slate-100 rounded-lg">
-          <Menu className="w-5 h-5 text-slate-600" />
-        </div>
-        <h1 className="text-xl font-bold text-slate-800 tracking-tight">Shortlisting Management</h1>
-      </div>
+      
 
       {/* Control Panel */}
       <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8">

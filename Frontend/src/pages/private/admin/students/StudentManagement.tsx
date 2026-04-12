@@ -150,10 +150,7 @@ const StudentManagement: React.FC = () => {
           <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
             <UserPlus className="w-6 h-6" />
           </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Student Database</h1>
-            <p className="text-muted-foreground text-sm">Verify credentials and manage placement eligibility.</p>
-          </div>
+          
         </div>
         <div className="flex items-center gap-3">
           <Button

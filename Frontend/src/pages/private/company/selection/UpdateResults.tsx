@@ -60,10 +60,7 @@ const UpdateResults: React.FC = () => {
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-20">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight">Update Results</h1>
-          <p className="text-slate-500 font-medium">Finalize candidate selection and publish results to students.</p>
-        </div>
+        
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

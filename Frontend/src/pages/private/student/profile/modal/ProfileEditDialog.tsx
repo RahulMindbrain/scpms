@@ -241,12 +241,12 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: Prof
                     id="resumeUrl"
                     value={formData.stats.resumeUrl || ''}
                     onChange={(e) => updateStat("resumeUrl", e.target.value)}
-                    placeholder="https://cloudinary.com/..."
+                    placeholder="https://example.com/resume.pdf"
                     className={`rounded-2xl h-11 pl-10 border-slate-200 ${errors.resumeUrl ? 'border-red-500 bg-red-50/50' : ''}`}
                   />
                 </div>
                 {errors.resumeUrl && <p className="text-[10px] text-red-500 font-bold uppercase ml-2">{errors.resumeUrl}</p>}
-                <p className="text-[10px] text-slate-400 font-bold uppercase ml-2 mt-2">Uploading via main profile will also update this link.</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase ml-2 mt-2">Uploading via main profile will update this link (Coming Soon).</p>
               </div>
             </TabsContent>
           </Tabs>

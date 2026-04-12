@@ -98,10 +98,7 @@ const PlacementDriveManagement: React.FC = () => {
     <div className=" space-y-8 animate-in mt-2 p-4 md:p-0">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Placement Drives</h1>
-          <p className="text-slate-500 font-medium tracking-tight">Schedule and monitor ongoing recruitment processes.</p>
-        </div>
+        
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
           <div className="relative" ref={filterRef}>
             <button

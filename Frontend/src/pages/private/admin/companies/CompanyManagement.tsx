@@ -138,10 +138,7 @@ const CompanyManagement: React.FC = () => {
     <div className=" space-y-8 animate-in mt-2 p-4 md:p-0">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-        <div>
-          <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">Corporate Partners</h1>
-          <p className="text-slate-500 font-medium tracking-tight">Manage your placement ecosystem and recruiting alliances.</p>
-        </div>
+        
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
           <div className="relative group flex-1 sm:flex-none">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />

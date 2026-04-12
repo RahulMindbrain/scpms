@@ -80,7 +80,7 @@ const BulkEmail: React.FC = () => {
         <div className="p-2 bg-slate-100 rounded-lg">
           <Mail className="w-5 h-5 text-slate-600" />
         </div>
-        <h1 className="text-xl font-bold text-slate-800 tracking-tight">Communication Center</h1>
+        
       </div>
 
       {/* Stats Cards */}
