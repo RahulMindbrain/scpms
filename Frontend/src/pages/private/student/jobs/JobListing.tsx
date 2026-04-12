@@ -5,118 +5,83 @@ import {
   MapPin,
   Clock,
   BriefcaseBusiness,
-  ExternalLink,
   ChevronRight,
   DollarSign,
   Calendar
 } from 'lucide-react';
 import { useState } from 'react';
-import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { fetchJobs, applyJob, fetchStudentProfile } from '@/redux/thunks/studentThunk';
+import type { AppDispatch } from '@/redux/store/store';
+import type { RootState } from '@/redux/reducers/rootReducer';
+import { Loader2 } from 'lucide-react';
+import { Modal } from '@/components/ui/modal';
 
 interface Job {
   id: number;
   title: string;
-  company: string;
+  company: {
+    id: number;
+    name: string;
+  };
   location: string;
-  salary: string;
-  deadline: string;
-  eligible: boolean;
+  salary: number;
+  deadline?: string;
+  eligible?: boolean;
   postedAt: string;
-  logo: string;
-  logoBg: string;
-  description?: string;
+  logo?: string;
+  logoBg?: string;
+  description: string;
+  minCgpa?: number;
+  maxCgpa?: number;
 }
 
 const JobListing = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { jobs,   profile } = useSelector((state: RootState) => state.student);
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isApplying, setIsApplying] = useState(false);
 
-  const jobs: Job[] = [
-    {
-      id: 1,
-      title: 'SDE Intern',
-      company: 'Google',
-      location: 'Bangalore',
-      salary: '₹45 LPA',
-      deadline: 'Apr 15, 2026',
-      eligible: true,
-      postedAt: '2 days ago',
-      logo: 'Go',
-      logoBg: 'bg-blue-600',
-      description: 'We are looking for passionate Software Engineering Interns to join our core infrastructure team. You will work on massive-scale distributed systems.'
-    },
-    {
-      id: 2,
-      title: 'Full Stack Developer',
-      company: 'Microsoft',
-      location: 'Hyderabad',
-      salary: '₹38 LPA',
-      deadline: 'Apr 18, 2026',
-      eligible: true,
-      postedAt: '3 days ago',
-      logo: 'Mi',
-      logoBg: 'bg-blue-700',
-      description: 'Join the Azure team to build the next generation of cloud services. Proficiency in C#, React, and TypeScript is required.'
-    },
-    {
-      id: 3,
-      title: 'Data Analyst',
-      company: 'Amazon',
-      location: 'Mumbai',
-      salary: '₹28 LPA',
-      deadline: 'Apr 20, 2026',
-      eligible: true,
-      postedAt: '5 days ago',
-      logo: 'Am',
-      logoBg: 'bg-cyan-600',
-      description: 'Analyze complex data sets to drive business decisions. Experience with SQL and Python is a must.'
-    },
-    {
-      id: 4,
-      title: 'Quant Analyst',
-      company: 'Goldman Sachs',
-      location: 'Bangalore',
-      salary: '₹55 LPA',
-      deadline: 'Apr 12, 2026',
-      eligible: false,
-      postedAt: '1 week ago',
-      logo: 'Go',
-      logoBg: 'bg-blue-400'
-    },
-    {
-      id: 5,
-      title: 'System Engineer',
-      company: 'Infosys',
-      location: 'Pune',
-      salary: '₹6.5 LPA',
-      deadline: 'Apr 25, 2026',
-      eligible: true,
-      postedAt: '1 day ago',
-      logo: 'In',
-      logoBg: 'bg-cyan-700'
-    },
-    {
-      id: 6,
-      title: 'iOS Developer',
-      company: 'Apple',
-      location: 'Hyderabad',
-      salary: '₹42 LPA',
-      deadline: 'Apr 22, 2026',
-      eligible: true,
-      postedAt: '4 days ago',
-      logo: 'Ap',
-      logoBg: 'bg-blue-800'
+  useEffect(() => {
+    dispatch(fetchJobs({ status: 'APPROVED' }));
+    if (!profile) {
+      dispatch(fetchStudentProfile());
     }
-  ];
+  }, [dispatch, profile]);
 
-  const filteredJobs = jobs.filter(job => 
+  const filteredJobs = jobs.filter((job: any) => 
     job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    job.company.toLowerCase().includes(searchQuery.toLowerCase())
+    job.company.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const checkEligibility = (job: Job) => {
+    if (!profile) return true; // Assume eligible if profile not loaded yet or let backend handle it
+    if (job.minCgpa && profile.cgpa < job.minCgpa) return false;
+    return true;
+  };
+
+  const handleApply = async () => {
+    if (!selectedJob) return;
+    
+    setIsApplying(true);
+    const toastId = toast.loading(`Applying for ${selectedJob.title}...`);
+    try {
+      await dispatch(applyJob(selectedJob.id)).unwrap();
+      toast.success("Applied successfully!", { id: toastId });
+      setIsModalOpen(false);
+    } catch (error: any) {
+      toast.error(error || "Failed to apply", { id: toastId });
+    } finally {
+      setIsApplying(false);
+    }
+  };
 
   return (
     <div className="p-8 animate-in fade-in duration-700">
@@ -157,66 +122,69 @@ const JobListing = () => {
 
       {/* Jobs Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {filteredJobs.map((job) => (
-          <div key={job.id} className="bg-white p-8 rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-50 hover:border-blue-200 transition-all duration-300 relative group overflow-hidden">
-            {/* Eligibility Decor */}
-            <div className={`absolute top-0 right-0 w-32 h-32 blur-3xl opacity-10 transition-opacity group-hover:opacity-20 ${job.eligible ? 'bg-blue-600' : 'bg-red-600'}`}></div>
+        {filteredJobs.map((job: Job) => {
+          const isEligible = checkEligibility(job);
+          return (
+            <div key={job.id} className="bg-white p-8 rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-50 hover:border-blue-200 transition-all duration-300 relative group overflow-hidden">
+              {/* Eligibility Decor */}
+              <div className={`absolute top-0 right-0 w-32 h-32 blur-3xl opacity-10 transition-opacity group-hover:opacity-20 ${isEligible ? 'bg-blue-600' : 'bg-red-600'}`}></div>
 
-            <div className="flex gap-6 relative z-10">
-              {/* Logo */}
-              <div className={`w-16 h-16 ${job.logoBg} rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-black/10 transition-transform duration-500 group-hover:scale-110`}>
-                {job.logo}
-              </div>
-              
-              {/* Info */}
-              <div className="flex-1">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="text-xl font-black text-slate-900 leading-tight uppercase tracking-tight">{job.title}</h3>
-                  <Badge variant={job.eligible ? 'success' : 'danger'} className="uppercase tracking-widest text-[9px] font-black px-3">
-                    {job.eligible ? 'Eligible' : 'Not Eligible'}
-                  </Badge>
-                </div>
-                <div className="flex items-center gap-2 text-sm text-slate-500 font-bold mb-6">
-                  <BriefcaseBusiness className="w-4 h-4 text-blue-500" />
-                  <span>{job.company}</span>
+              <div className="flex gap-6 relative z-10">
+                {/* Logo */}
+                <div className={`w-16 h-16 ${job.logoBg || 'bg-blue-600'} rounded-2xl flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-black/10 transition-transform duration-500 group-hover:scale-110`}>
+                  {job.logo || job.company.name.substring(0, 2)}
                 </div>
                 
-                {/* Meta Grid */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100/50">
-                    <MapPin className="w-4 h-4 text-blue-500" />
-                    <span className="text-xs font-bold text-slate-600">{job.location}</span>
+                {/* Info */}
+                <div className="flex-1">
+                  <div className="flex items-start justify-between mb-2">
+                    <h3 className="text-xl font-black text-slate-900 leading-tight uppercase tracking-tight">{job.title}</h3>
+                    <Badge variant={isEligible ? 'success' : 'danger'} className="uppercase tracking-widest text-[9px] font-black px-3">
+                      {isEligible ? 'Eligible' : 'Not Eligible'}
+                    </Badge>
                   </div>
-                  <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100/50">
-                    <DollarSign className="w-4 h-4 text-emerald-500" />
-                    <span className="text-xs font-bold text-slate-600">{job.salary}</span>
+                  <div className="flex items-center gap-2 text-sm text-slate-500 font-bold mb-6">
+                    <BriefcaseBusiness className="w-4 h-4 text-blue-500" />
+                    <span>{job.company.name}</span>
+                  </div>
+                  
+                  {/* Meta Grid */}
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100/50">
+                      <MapPin className="w-4 h-4 text-blue-500" />
+                      <span className="text-xs font-bold text-slate-600">{job.location}</span>
+                    </div>
+                    <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100/50">
+                      <DollarSign className="w-4 h-4 text-emerald-500" />
+                      <span className="text-xs font-bold text-slate-600">{job.salary}</span>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between relative z-10">
-              <div className="flex items-center gap-2 text-slate-400">
-                <Clock className="w-3.5 h-3.5" />
-                <span className="text-[10px] font-black uppercase tracking-widest">Expires {job.deadline}</span>
+              <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between relative z-10">
+                <div className="flex items-center gap-2 text-slate-400">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span className="text-[10px] font-black uppercase tracking-widest">Posted {new Date(job.postedAt || (job as any).createdAt).toLocaleDateString()}</span>
+                </div>
+                <Button 
+                  onClick={() => {
+                    setSelectedJob(job);
+                    setIsModalOpen(true);
+                  }}
+                  disabled={!isEligible}
+                  className={`rounded-xl font-black text-xs uppercase tracking-widest px-6 py-5 ${
+                    isEligible 
+                      ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-500/20' 
+                      : 'bg-slate-50 text-slate-300 cursor-not-allowed border border-slate-100'
+                  }`}
+                >
+                  View & Apply <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
               </div>
-              <Button 
-                onClick={() => {
-                  setSelectedJob(job);
-                  setIsModalOpen(true);
-                }}
-                disabled={!job.eligible}
-                className={`rounded-xl font-black text-xs uppercase tracking-widest px-6 py-5 ${
-                  job.eligible 
-                    ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-xl shadow-blue-500/20' 
-                    : 'bg-slate-50 text-slate-300 cursor-not-allowed border border-slate-100'
-                }`}
-              >
-                View & Apply <ChevronRight className="w-4 h-4 ml-1" />
-              </Button>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {filteredJobs.length === 0 && (
@@ -233,7 +201,7 @@ const JobListing = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         title={selectedJob?.title || "Job Details"}
-        subtitle={`${selectedJob?.company} • ${selectedJob?.location}`}
+        subtitle={`${selectedJob?.company?.name} • ${selectedJob?.location}`}
       >
         <div className="space-y-8">
           <div className="flex flex-wrap gap-4">
@@ -260,14 +228,12 @@ const JobListing = () => {
           </div>
 
           <div className="pt-4 flex gap-4">
-             <Button 
+            <Button 
               className="flex-1 bg-blue-600 py-7 rounded-2xl font-black uppercase tracking-[0.2em] shadow-xl shadow-blue-500/20 hover:scale-[1.02] transition-transform"
-              onClick={() => {
-                toast.success(`Application submitted for ${selectedJob?.title}!`);
-                setIsModalOpen(false);
-              }}
+              onClick={handleApply}
+              disabled={isApplying}
             >
-              Apply Now
+              {isApplying ? <Loader2 className="animate-spin" /> : 'Apply Now'}
             </Button>
             <Button 
                variant="outline"

@@ -1,9 +1,10 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { fetchStudents, fetchInactiveStudents, activateStudents, fetchStudentProfile, createStudentProfile, updateStudentProfile } from "../thunks/studentThunk";
+import { fetchStudents, fetchInactiveStudents, activateStudents, fetchStudentProfile, createStudentProfile, updateStudentProfile, fetchJobs, applyJob } from "../thunks/studentThunk";
 
 interface StudentState {
   students: any[];
   inactiveStudents: any[];
+  jobs: any[];
   profile: any | null;
   loading: boolean;
   error: string | null;
@@ -18,6 +19,7 @@ interface StudentState {
 const initialState: StudentState = {
   students: [],
   inactiveStudents: [],
+  jobs: [],
   profile: null,
   loading: false,
   error: null,
@@ -108,6 +110,31 @@ const studentSlice = createSlice({
         state.profile = action.payload.data;
       })
       .addCase(updateStudentProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Fetch Jobs
+      .addCase(fetchJobs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchJobs.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.jobs = action.payload.data.data;
+        state.meta = action.payload.data.meta;
+      })
+      .addCase(fetchJobs.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Apply Job
+      .addCase(applyJob.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(applyJob.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(applyJob.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

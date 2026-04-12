@@ -57,7 +57,7 @@ export const createStudentProfile = createAsyncThunk(
             const response = await postAPI<any>("/student/profile", data);
             return response;
         } catch (error: any) {
-            return rejectWithValue(error?.message || "Failed to create student profile");
+            return rejectWithValue(error);
         }
     }
 );
@@ -69,7 +69,31 @@ export const updateStudentProfile = createAsyncThunk(
             const response = await putAPI<any>("/student/profile", data);
             return response;
         } catch (error: any) {
-            return rejectWithValue(error?.message || "Failed to update student profile");
+            return rejectWithValue(error);
+        }
+    }
+);
+
+export const fetchJobs = createAsyncThunk(
+    "student/fetchJobs",
+    async (params: any, { rejectWithValue }) => {
+        try {
+            const response = await getAPI<any>("/student/show-all-jobs", params);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to fetch jobs");
+        }
+    }
+);
+
+export const applyJob = createAsyncThunk(
+    "student/applyJob",
+    async (jobId: number, { rejectWithValue }) => {
+        try {
+            const response = await postAPI<any>("/student/apply-job", { jobId });
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to apply for job");
         }
     }
 );

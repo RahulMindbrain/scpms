@@ -1,6 +1,6 @@
 import {
   User, Mail, Phone, MapPin, GraduationCap,
-  Code2, Edit3, ExternalLink, Plus, Trash2, Save,
+  Code2, Edit3, ExternalLink, Plus, Trash2,
   Upload, Camera, Briefcase, Loader2, FileText
 } from 'lucide-react';
 import ProjectModal from './modal/ProjectModal';
@@ -12,6 +12,9 @@ import { fetchStudentProfile, createStudentProfile, updateStudentProfile } from 
 import { useEffect, useState, useRef } from 'react';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
+import ExperienceModal from './modal/ExperienceModal';
+import CertificateModal from './modal/CertificateModal';
+import ProfileEditDialog from './modal/ProfileEditDialog';
 
 const StudentProfile = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,12 +22,13 @@ const StudentProfile = () => {
   const { user } = useSelector((state: RootState) => state.auth);
 
   const [showProjectModal, setShowProjectModal] = useState(false)
-  const [isEditing, setIsEditing] = useState(false);
+  const [showExperienceModal, setShowExperienceModal] = useState(false)
+  const [showCertificateModal, setShowCertificateModal] = useState(false)
+  const [showProfileEditDialog, setShowProfileEditDialog] = useState(false)
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingResume, setIsUploadingResume] = useState(false);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
-  const [newSkill, setNewSkill] = useState("");
-  
+
   const [profile, setProfile] = useState<any>({
     name: user ? `${user.firstname} ${user.lastname}` : 'Student Name',
     profileImage: null,
@@ -75,29 +79,43 @@ const StudentProfile = () => {
     }
   }, [backendProfile, user]);
 
-  const handleSave = async () => {
-    const data = {
+  const handleSave = async (updatedData?: any) => {
+    const dataToSave = updatedData ? {
+      departmentId: parseInt(updatedData.stats.departmentId),
+      year: parseInt(updatedData.stats.year),
+      passingYear: parseInt(updatedData.stats.passingYear),
+      cgpa: parseFloat(updatedData.stats.cgpa),
+      resumeUrl: updatedData.stats.resumeUrl || updatedData.resumes[0]?.url || "",
+      skills: updatedData.skills.map((s: any) => s.name),
+      experiences: updatedData.experiences || [],
+      certificates: updatedData.certificates || [],
+    } : {
       departmentId: parseInt(profile.stats.departmentId),
       year: parseInt(profile.stats.year),
       passingYear: parseInt(profile.stats.passingYear),
       cgpa: parseFloat(profile.stats.cgpa),
-      resumeUrl: profile.resumes[0]?.url || "",
+      resumeUrl: profile.stats.resumeUrl || profile.resumes[0]?.url || "",
       skills: profile.skills.map((s: any) => s.name),
       experiences: profile.experiences || [],
       certificates: profile.certificates || [],
     };
 
+    if (updatedData) {
+      setProfile(updatedData);
+    }
+
     const toastId = toast.loading("Saving profile...");
     try {
       if (backendProfile) {
-        await dispatch(updateStudentProfile(data)).unwrap();
+        await dispatch(updateStudentProfile(dataToSave)).unwrap();
       } else {
-        await dispatch(createStudentProfile(data)).unwrap();
+        await dispatch(createStudentProfile(dataToSave)).unwrap();
       }
       toast.success("Profile saved successfully!", { id: toastId });
-      setIsEditing(false);
+      return { success: true };
     } catch (error: any) {
-      toast.error(error || "Failed to save profile", { id: toastId });
+      toast.error(error?.message || "Failed to save profile", { id: toastId });
+      return error;
     }
   };
 
@@ -134,6 +152,10 @@ const StudentProfile = () => {
       };
       setProfile({
         ...profile,
+        stats: {
+          ...profile.stats,
+          resumeUrl: url
+        },
         resumes: [newResume, ...profile.resumes]
       });
       toast.success("Resume uploaded successfully!", { id: toastId });
@@ -144,34 +166,30 @@ const StudentProfile = () => {
     }
   }
 
-  const addSkill = () => {
-    if (!newSkill.trim()) return;
-    setProfile({
-      ...profile,
-      skills: [...profile.skills, { name: newSkill, color: "bg-indigo-500" }]
-    });
-    setNewSkill("");
-  };
-
-  const deleteSkill = (index: number) => {
-    const updated = profile.skills.filter((_: any, i: number) => i !== index)
-    setProfile({ ...profile, skills: updated })
-  }
-
   const handleAddProject = (project: any) => {
-    setProfile({
+    const updatedProfile = {
       ...profile,
       projects: [...profile.projects, project]
-    });
+    };
+    setProfile(updatedProfile);
   };
 
-  const updateStat = (field: string, value: string) => {
-    setProfile({ ...profile, stats: { ...profile.stats, [field]: value } });
+  const handleAddExperience = (exp: any) => {
+    const updatedProfile = {
+      ...profile,
+      experiences: [...(profile.experiences || []), exp]
+    };
+    handleSave(updatedProfile);
   };
 
-  const updateProfileField = (field: string, value: string) => {
-    setProfile({ ...profile, [field]: value });
+  const handleAddCertificate = (cert: any) => {
+    const updatedProfile = {
+      ...profile,
+      certificates: [...(profile.certificates || []), cert]
+    };
+    handleSave(updatedProfile);
   };
+
 
   return (
     <div className="max-w-7xl mx-auto space-y-8 animate-in mt-2 p-4 md:p-0">
@@ -187,19 +205,11 @@ const StudentProfile = () => {
           </div>
         </div>
         <button
-          onClick={() => {
-            if (isEditing) {
-              handleSave();
-            } else {
-              setIsEditing(true);
-            }
-          }}
-          className={`px-8 py-3 rounded-2xl font-black text-sm transition-all shadow-xl tracking-widest flex items-center justify-center gap-3 ${
-            isEditing ? 'bg-blue-600 text-white shadow-blue-500/20' : 'bg-white text-slate-900 border border-slate-200'
-          }`}
+          onClick={() => setShowProfileEditDialog(true)}
+          className="px-8 py-3 rounded-2xl font-black text-sm transition-all shadow-xl tracking-widest flex items-center justify-center gap-3 bg-white text-slate-900 border border-slate-200"
           disabled={backendLoading}
         >
-          {backendLoading ? <Loader2 className="animate-spin" size={18} /> : (isEditing ? <><Save size={18} /> SAVE CHANGES</> : <><Edit3 size={18} /> EDIT PROFILE</>)}
+          {backendLoading ? <Loader2 className="animate-spin" size={18} /> : (<><Edit3 size={18} /> EDIT PROFILE</>)}
         </button>
       </div>
 
@@ -209,7 +219,7 @@ const StudentProfile = () => {
           {/* Identity Card */}
           <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm">
             <div className="h-40 bg-gradient-to-br from-blue-600 to-indigo-700 relative overflow-hidden">
-               <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
+              <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
             </div>
             <div className="px-8 pb-8">
               <div className="relative -mt-20 mb-6 flex justify-center lg:justify-start">
@@ -222,24 +232,18 @@ const StudentProfile = () => {
                       {profile.name.split(' ').map((n: string) => n[0]).join('')}
                     </div>
                   )}
-                  {isEditing && (
-                    <div onClick={() => profileImageInputRef.current?.click()} className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                      {isUploading ? <Loader2 className="text-white animate-spin" size={28} /> : <Camera className="text-white" size={28} />}
-                    </div>
-                  )}
+                  <div onClick={() => profileImageInputRef.current?.click()} className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                    {isUploading ? <Loader2 className="text-white animate-spin" size={28} /> : <Camera className="text-white" size={28} />}
+                  </div>
                 </div>
               </div>
 
               <div className="text-center lg:text-left space-y-1">
-                {isEditing ? (
-                  <input className="text-2xl font-black text-slate-900 w-full bg-slate-50 border-b-2 border-blue-500 px-2 py-1 outline-none uppercase" value={profile.name} onChange={(e) => updateProfileField("name", e.target.value)} />
-                ) : (
-                  <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{profile.name}</h2>
-                )}
+                <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{profile.name}</h2>
                 <p className="text-blue-600 font-black text-xs uppercase tracking-widest">{profile.branch}</p>
                 <div className="flex items-center justify-center lg:justify-start gap-2 pt-1">
-                   <Badge variant="secondary">{profile.batch}</Badge>
-                   <Badge variant="secondary">{profile.stats.rollNo}</Badge>
+                  <Badge variant="secondary">{profile.batch}</Badge>
+                  <Badge variant="secondary">{profile.stats.rollNo}</Badge>
                 </div>
               </div>
 
@@ -253,11 +257,7 @@ const StudentProfile = () => {
                     <div className="w-9 h-9 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
                       <item.icon size={18} />
                     </div>
-                    {isEditing ? (
-                      <input type={item.type} value={item.value as string} onChange={(e) => updateProfileField(item.field, e.target.value)} className="w-full text-sm font-bold text-slate-600 bg-transparent border-b border-slate-100 focus:border-blue-500 outline-none transition-colors" />
-                    ) : (
-                      <span className="text-sm font-bold text-slate-700 truncate">{item.value}</span>
-                    )}
+                    <span className="text-sm font-bold text-slate-700 truncate">{item.value}</span>
                   </div>
                 ))}
               </div>
@@ -280,16 +280,7 @@ const StudentProfile = () => {
               ].map((stat, i) => (
                 <div key={i} className="bg-slate-50 p-5 rounded-3xl border border-slate-100">
                   <p className="text-slate-400 text-[9px] font-black uppercase tracking-[0.2em] mb-1">{stat.label}</p>
-                  {isEditing ? (
-                    <input 
-                      type={stat.type || 'text'} 
-                      value={stat.value} 
-                      onChange={(e) => updateStat(stat.field, e.target.value)} 
-                      className="w-full text-lg font-black text-blue-600 bg-transparent border-b border-blue-200 outline-none" 
-                    />
-                  ) : (
-                    <p className="text-xl font-black text-blue-600 tracking-tight">{stat.value}</p>
-                  )}
+                  <p className="text-xl font-black text-blue-600 tracking-tight">{stat.value}</p>
                 </div>
               ))}
             </div>
@@ -305,25 +296,12 @@ const StudentProfile = () => {
                 <Code2 className="text-blue-600" size={22} />
                 <h3 className="font-black text-slate-900 uppercase tracking-widest text-sm">Technical Stack</h3>
               </div>
-              {isEditing && (
-                <div className="flex gap-2">
-                  <input
-                    value={newSkill}
-                    onChange={(e) => setNewSkill(e.target.value)}
-                    placeholder="Add skill"
-                    className="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/5 transition-all"
-                    onKeyPress={(e) => e.key === 'Enter' && addSkill()}
-                  />
-                  <button onClick={addSkill} className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-lg shadow-blue-500/10 uppercase tracking-widest active:scale-95 transition-all">Add</button>
-                </div>
-              )}
             </div>
             <div className="flex flex-wrap gap-4">
               {profile.skills.map((skill: any, i: number) => (
                 <div key={i} className="group flex items-center gap-2.5 px-5 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl hover:bg-white hover:border-blue-200 hover:shadow-md transition-all cursor-default">
                   <div className={`w-2.5 h-2.5 rounded-full ${skill.color || 'bg-blue-500'} shadow-sm`} />
                   <span className="text-sm font-black text-slate-700 uppercase tracking-tight">{skill.name}</span>
-                  {isEditing && <Trash2 size={14} className="text-slate-300 hover:text-red-500 cursor-pointer ml-1 transition-colors" onClick={() => deleteSkill(i)} />}
                 </div>
               ))}
             </div>
@@ -336,25 +314,12 @@ const StudentProfile = () => {
                 <Briefcase className="text-blue-600" size={22} />
                 <h3 className="font-black text-slate-900 uppercase tracking-widest text-sm">Work Experience</h3>
               </div>
-              {isEditing && (
-                <button 
-                  onClick={() => {
-                    const companyName = prompt("Company Name:");
-                    const role = prompt("Role:");
-                    const description = prompt("Description:");
-                    const startDate = prompt("Start Date (YYYY-MM-DD):");
-                    if (companyName && role) {
-                      setProfile({
-                        ...profile,
-                        experiences: [...(profile.experiences || []), { companyName, role, description, startDate }]
-                      });
-                    }
-                  }}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/10 active:scale-95 transition-all"
-                >
-                  <Plus size={16} /> Add Experience
-                </button>
-              )}
+              <button
+                onClick={() => setShowExperienceModal(true)}
+                className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/10 active:scale-95 transition-all"
+              >
+                <Plus size={16} /> Add Experience
+              </button>
             </div>
             <div className="space-y-6">
               {profile.experiences?.length > 0 ? profile.experiences.map((exp: any, i: number) => (
@@ -365,16 +330,15 @@ const StudentProfile = () => {
                       <p className="text-blue-600 font-bold text-sm uppercase tracking-widest">{exp.role}</p>
                       <p className="text-xs text-slate-400 font-black uppercase mt-1">{exp.startDate} {exp.endDate ? `— ${exp.endDate}` : '(Present)'}</p>
                     </div>
-                    {isEditing && (
-                      <Trash2 
-                        size={18} 
-                        className="text-slate-300 hover:text-red-500 cursor-pointer transition-colors" 
-                        onClick={() => {
-                          const updated = profile.experiences.filter((_: any, idx: number) => idx !== i);
-                          setProfile({ ...profile, experiences: updated });
-                        }} 
-                      />
-                    )}
+                    <Trash2
+                      size={18}
+                      className="text-slate-300 hover:text-red-500 cursor-pointer transition-colors"
+                      onClick={() => {
+                        const updated = profile.experiences.filter((_: any, idx: number) => idx !== i);
+                        setProfile({ ...profile, experiences: updated });
+                        handleSave({ ...profile, experiences: updated });
+                      }}
+                    />
                   </div>
                   <p className="mt-4 text-sm font-medium text-slate-500 leading-relaxed">{exp.description}</p>
                 </div>
@@ -391,24 +355,12 @@ const StudentProfile = () => {
                 <FileText className="text-blue-600" size={22} />
                 <h3 className="font-black text-slate-900 uppercase tracking-widest text-sm">Certifications</h3>
               </div>
-              {isEditing && (
-                <button 
-                  onClick={() => {
-                    const title = prompt("Certificate Title:");
-                    const issuer = prompt("Issuer:");
-                    const issuedDate = prompt("Issued Date (YYYY-MM-DD):");
-                    if (title && issuer) {
-                      setProfile({
-                        ...profile,
-                        certificates: [...(profile.certificates || []), { title, issuer, issuedDate }]
-                      });
-                    }
-                  }}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/10 active:scale-95 transition-all"
-                >
-                  <Plus size={16} /> Add Certificate
-                </button>
-              )}
+              <button
+                onClick={() => setShowCertificateModal(true)}
+                className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/10 active:scale-95 transition-all"
+              >
+                <Plus size={16} /> Add Certificate
+              </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {profile.certificates?.length > 0 ? profile.certificates.map((cert: any, i: number) => (
@@ -418,22 +370,21 @@ const StudentProfile = () => {
                       <h4 className="text-md font-black text-slate-900 uppercase tracking-tight">{cert.title}</h4>
                       <p className="text-blue-600 font-bold text-xs uppercase tracking-widest">{cert.issuer}</p>
                     </div>
-                    {isEditing && (
-                      <Trash2 
-                        size={16} 
-                        className="text-slate-300 hover:text-red-500 cursor-pointer transition-colors" 
-                        onClick={() => {
-                          const updated = profile.certificates.filter((_: any, idx: number) => idx !== i);
-                          setProfile({ ...profile, certificates: updated });
-                        }} 
-                      />
-                    )}
+                    <Trash2
+                      size={16}
+                      className="text-slate-300 hover:text-red-500 cursor-pointer transition-colors"
+                      onClick={() => {
+                        const updated = profile.certificates.filter((_: any, idx: number) => idx !== i);
+                        setProfile({ ...profile, certificates: updated });
+                        handleSave({ ...profile, certificates: updated });
+                      }}
+                    />
                   </div>
                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{cert.issuedDate}</p>
                 </div>
               )) : (
                 <div className="col-span-full py-8 text-center">
-                   <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">No certificates listed</p>
+                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">No certificates listed</p>
                 </div>
               )}
             </div>
@@ -446,11 +397,9 @@ const StudentProfile = () => {
                 <Briefcase className="text-blue-600" size={22} />
                 <h3 className="font-black text-slate-900 uppercase tracking-widest text-sm">Case Studies & Projects</h3>
               </div>
-              {isEditing && (
-                <button onClick={() => setShowProjectModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/10 active:scale-95 transition-all">
-                  <Plus size={16} /> New Project
-                </button>
-              )}
+              <button onClick={() => setShowProjectModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/10 active:scale-95 transition-all">
+                <Plus size={16} /> New Project
+              </button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {profile.projects.map((proj: any, i: number) => (
@@ -483,7 +432,7 @@ const StudentProfile = () => {
                 <h3 className="font-black text-slate-900 uppercase tracking-widest text-sm">Professional Documents</h3>
               </div>
               <label className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest cursor-pointer shadow-xl shadow-slate-900/10 active:scale-95 transition-all">
-                {isUploadingResume ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />} 
+                {isUploadingResume ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
                 {isUploadingResume ? 'PROCESSING...' : 'UPLOAD NEW RESUME'}
                 <input type="file" accept=".pdf" hidden onChange={handleResumeUpload} disabled={isUploadingResume} />
               </label>
@@ -511,6 +460,23 @@ const StudentProfile = () => {
             isOpen={showProjectModal}
             onClose={() => setShowProjectModal(false)}
             onAddProject={handleAddProject}
+          />
+          <ExperienceModal
+            isOpen={showExperienceModal}
+            onClose={() => setShowExperienceModal(false)}
+            onAddExperience={handleAddExperience}
+          />
+          <CertificateModal
+            isOpen={showCertificateModal}
+            onClose={() => setShowCertificateModal(false)}
+            onAddCertificate={handleAddCertificate}
+          />
+          <ProfileEditDialog
+            isOpen={showProfileEditDialog}
+            onClose={() => setShowProfileEditDialog(false)}
+            profile={profile}
+            onSave={handleSave}
+            isLoading={backendLoading}
           />
         </div>
       </div>
