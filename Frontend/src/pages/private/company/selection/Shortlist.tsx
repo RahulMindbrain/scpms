@@ -1,7 +1,7 @@
 import React from 'react';
-import { Search, Filter, UserCheck, Star, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Search, Filter,  Star, ArrowRight } from 'lucide-react';
+import { Button } from '@/components/ui/button.tsx';
+import { Badge } from '@/components/ui/badge.tsx';
 
 const Shortlist: React.FC = () => {
   const shortlisted = [
@@ -71,7 +71,7 @@ const Shortlist: React.FC = () => {
                   <td className="px-6 py-5 text-sm font-medium text-slate-500">{item.branch}</td>
                   <td className="px-6 py-5 font-black text-slate-700">{item.cgpa}</td>
                   <td className="px-6 py-5">
-                    <Badge variant="primary" className="px-3 py-1 rounded-lg">
+                    <Badge variant="default" className="px-3 py-1 rounded-lg">
                       {item.round}
                     </Badge>
                   </td>
