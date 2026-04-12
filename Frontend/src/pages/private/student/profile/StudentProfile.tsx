@@ -1,7 +1,7 @@
 import {
   User, Mail, Phone, MapPin, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
-  Upload, Camera, Briefcase, Loader2, FileText
+  Upload, Camera, Briefcase, Loader2, FileText, Calendar, Building2
 } from 'lucide-react';
 import ProjectModal from './modal/ProjectModal';
 import { uploadToCloudinary } from '../../../../lib/cloudinary';
@@ -15,6 +15,11 @@ import type { RootState } from '@/redux/reducers/rootReducer';
 import ExperienceModal from './modal/ExperienceModal';
 import CertificateModal from './modal/CertificateModal';
 import ProfileEditDialog from './modal/ProfileEditDialog';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Separator } from "@/components/ui/separator";
 
 const StudentProfile = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -192,294 +197,366 @@ const StudentProfile = () => {
 
 
   return (
-    <div className="max-w-7xl mx-auto space-y-8 animate-in mt-2 p-4 md:p-0">
-      {/* Profile Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="flex items-center gap-4">
-          <div className="bg-blue-600 p-2.5 rounded-2xl text-white shadow-lg shadow-blue-500/20">
-            <User size={24} />
-          </div>
-          <div>
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight uppercase">My Profile</h1>
-            <p className="text-slate-500 font-medium">Manage your academic and professional identity.</p>
-          </div>
+    <div className="max-w-6xl mx-auto space-y-6 animate-in fade-in duration-500 mt-2 p-4 md:p-6">
+      {/* Profile Header section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Profile</h1>
+          <p className="text-muted-foreground mt-1 text-sm">Manage your academic and professional identity.</p>
         </div>
-        <button
+        <Button
           onClick={() => setShowProfileEditDialog(true)}
-          className="px-8 py-3 rounded-2xl font-black text-sm transition-all shadow-xl tracking-widest flex items-center justify-center gap-3 bg-white text-slate-900 border border-slate-200"
           disabled={backendLoading}
+          className="gap-2"
         >
-          {backendLoading ? <Loader2 className="animate-spin" size={18} /> : (<><Edit3 size={18} /> EDIT PROFILE</>)}
-        </button>
+          {backendLoading ? <Loader2 className="animate-spin h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
+          Edit Profile
+        </Button>
       </div>
 
-      <div className="grid grid-cols-12 gap-6 lg:gap-8">
-        {/* Left Column: Personal Info & Academics */}
-        <div className="col-span-12 lg:col-span-4 space-y-6 lg:space-y-8">
-          {/* Identity Card */}
-          <div className="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden shadow-sm">
-            <div className="h-40 bg-gradient-to-br from-blue-600 to-indigo-700 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
-            </div>
-            <div className="px-8 pb-8">
-              <div className="relative -mt-20 mb-6 flex justify-center lg:justify-start">
-                <div className="w-36 h-36 rounded-[2.5rem] border-8 border-white overflow-hidden bg-slate-100 shadow-2xl group relative transition-transform hover:scale-105 duration-300">
-                  <input type="file" ref={profileImageInputRef} onChange={handleProfileImageUpload} hidden accept="image/*" />
-                  {profile.profileImage ? (
-                    <img src={profile.profileImage} className="w-full h-full object-cover" alt="Profile" />
-                  ) : (
-                    <div className="w-full h-full bg-blue-50 flex items-center justify-center text-blue-600 text-4xl font-black">
-                      {profile.name.split(' ').map((n: string) => n[0]).join('')}
-                    </div>
-                  )}
-                  <div onClick={() => profileImageInputRef.current?.click()} className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
-                    {isUploading ? <Loader2 className="text-white animate-spin" size={28} /> : <Camera className="text-white" size={28} />}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Left Sidebar - Personal Details & Academics */}
+        <div className="md:col-span-1 space-y-6">
+           <Card className="overflow-hidden">
+             <div className="h-24 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+             <CardContent className="pt-0 relative px-6 pb-6 text-center">
+               <div className="relative inline-block -mt-12 group cursor-pointer" onClick={() => profileImageInputRef.current?.click()}>
+                 <Avatar className="h-24 w-24 border-4 border-background shadow-md">
+                   {profile.profileImage ? (
+                     <AvatarImage src={profile.profileImage} alt={profile.name} className="object-cover" />
+                   ) : (
+                     <AvatarFallback className="text-2xl font-bold bg-blue-100 text-blue-700">
+                       {profile.name.split(' ').map((n: string) => n[0]).join('')}
+                     </AvatarFallback>
+                   )}
+                 </Avatar>
+                 <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    {isUploading ? <Loader2 className="h-6 w-6 text-white animate-spin" /> : <Camera className="h-6 w-6 text-white" />}
+                 </div>
+                 <input type="file" ref={profileImageInputRef} onChange={handleProfileImageUpload} hidden accept="image/*" />
+               </div>
+               <div className="mt-4">
+                 <h2 className="text-xl font-bold">{profile.name}</h2>
+                 <p className="text-sm text-muted-foreground mt-1 font-medium">{profile.branch || 'Branch'}</p>
+                 <div className="flex flex-wrap justify-center gap-2 mt-3 w-full max-w-full">
+                   <Badge variant="secondary" className="font-normal truncate max-w-[120px]" title={profile.batch || 'Batch'}>{profile.batch || 'Batch'}</Badge>
+                   <Badge variant="outline" className="font-normal truncate max-w-[120px]" title={`Roll: ${profile.stats?.rollNo || 'N/A'}`}>Roll: {profile.stats?.rollNo || 'N/A'}</Badge>
+                 </div>
+               </div>
+               
+               <Separator className="my-6" />
+               
+               <div className="space-y-4 text-left">
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground w-full">
+                    <Mail className="h-4 w-4 shrink-0 text-blue-500" />
+                    <span className="truncate text-foreground font-medium" title={profile.email}>{profile.email || 'N/A'}</span>
                   </div>
-                </div>
-              </div>
-
-              <div className="text-center lg:text-left space-y-1">
-                <h2 className="text-2xl font-black text-slate-900 uppercase tracking-tight">{profile.name}</h2>
-                <p className="text-blue-600 font-black text-xs uppercase tracking-widest">{profile.branch}</p>
-                <div className="flex items-center justify-center lg:justify-start gap-2 pt-1">
-                  <Badge variant="secondary">{profile.batch}</Badge>
-                  <Badge variant="secondary">{profile.stats.rollNo}</Badge>
-                </div>
-              </div>
-
-              <div className="mt-8 space-y-4 pt-6 border-t border-slate-50">
-                {[
-                  { icon: Mail, value: profile.email, field: 'email', type: 'email' },
-                  { icon: Phone, value: profile.phone, field: 'phone', type: 'tel' },
-                  { icon: MapPin, value: profile.location, field: 'location', type: 'text' }
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-4 group">
-                    <div className="w-9 h-9 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:bg-blue-50 group-hover:text-blue-500 transition-colors">
-                      <item.icon size={18} />
-                    </div>
-                    <span className="text-sm font-bold text-slate-700 truncate">{item.value}</span>
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground w-full">
+                    <Phone className="h-4 w-4 shrink-0 text-blue-500" />
+                    <span className="truncate text-foreground font-medium" title={profile.phone}>{profile.phone || 'Not provided'}</span>
                   </div>
-                ))}
-              </div>
-            </div>
-          </div>
+                  <div className="flex items-center gap-3 text-sm text-muted-foreground w-full">
+                    <MapPin className="h-4 w-4 shrink-0 text-blue-500" />
+                    <span className="truncate text-foreground font-medium" title={profile.location}>{profile.location || 'Not provided'}</span>
+                  </div>
+               </div>
+             </CardContent>
+           </Card>
 
-          {/* Academic Overview */}
-          <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
-            <div className="flex items-center gap-3 mb-8">
-              <GraduationCap className="text-blue-600" size={22} />
-              <h3 className="font-black text-slate-900 uppercase tracking-widest text-sm">Academic Standings</h3>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { label: 'CGPA', value: profile.stats.cgpa, field: 'cgpa' },
-                { label: 'BACKLOGS', value: profile.stats.backlogs, field: 'backlogs' },
-                { label: 'YEAR', value: profile.stats.year, field: 'year', type: 'number' },
-                { label: 'PASSING YEAR', value: profile.stats.passingYear, field: 'passingYear', type: 'number' },
-                { label: 'DEPT ID', value: profile.stats.departmentId, field: 'departmentId', type: 'number' }
-              ].map((stat, i) => (
-                <div key={i} className="bg-slate-50 p-5 rounded-3xl border border-slate-100">
-                  <p className="text-slate-400 text-[9px] font-black uppercase tracking-[0.2em] mb-1">{stat.label}</p>
-                  <p className="text-xl font-black text-blue-600 tracking-tight">{stat.value}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+           <Card>
+              <CardHeader className="pb-3 border-b border-border/50">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <GraduationCap className="h-4 w-4 text-blue-600" />
+                  Academic Standings
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-1 pt-4">
+                 <div className="flex justify-between items-center py-2.5 border-b border-border/50">
+                   <span className="text-sm text-muted-foreground font-medium">CGPA</span>
+                   <span className="font-bold text-blue-600">{profile.stats?.cgpa || 'N/A'}</span>
+                 </div>
+                 <div className="flex justify-between items-center py-2.5 border-b border-border/50">
+                   <span className="text-sm text-muted-foreground font-medium">Active Backlogs</span>
+                   <span className="font-semibold">{profile.stats?.backlogs || '0'}</span>
+                 </div>
+                 <div className="flex justify-between items-center py-2.5 border-b border-border/50">
+                   <span className="text-sm text-muted-foreground font-medium">Current Year</span>
+                   <span className="font-semibold">{profile.stats?.year || '1'}</span>
+                 </div>
+                 <div className="flex justify-between items-center py-2.5">
+                   <span className="text-sm text-muted-foreground font-medium">Passing Year</span>
+                   <span className="font-semibold">{profile.stats?.passingYear || 'N/A'}</span>
+                 </div>
+              </CardContent>
+           </Card>
         </div>
 
-        {/* Right Column: Skills, Projects, Docs */}
-        <div className="col-span-12 lg:col-span-8 space-y-6 lg:space-y-8">
-          {/* Tech Stack */}
-          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-              <div className="flex items-center gap-3">
-                <Code2 className="text-blue-600" size={22} />
-                <h3 className="font-black text-slate-900 uppercase tracking-widest text-sm">Technical Stack</h3>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-4">
-              {profile.skills.map((skill: any, i: number) => (
-                <div key={i} className="group flex items-center gap-2.5 px-5 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl hover:bg-white hover:border-blue-200 hover:shadow-md transition-all cursor-default">
-                  <div className={`w-2.5 h-2.5 rounded-full ${skill.color || 'bg-blue-500'} shadow-sm`} />
-                  <span className="text-sm font-black text-slate-700 uppercase tracking-tight">{skill.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+        {/* Right Content Area - Tabs for dynamic sections */}
+        <div className="md:col-span-2 space-y-6">
+           <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="w-full justify-start h-auto bg-transparent border-b border-border/60 rounded-none px-0 gap-6 flex-wrap">
+                <TabsTrigger value="overview" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground rounded-none px-1 py-3 border-b-2 border-transparent transition-all">Overview</TabsTrigger>
+                <TabsTrigger value="experience" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground rounded-none px-1 py-3 border-b-2 border-transparent transition-all">Experience & Projects</TabsTrigger>
+                <TabsTrigger value="documents" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground rounded-none px-1 py-3 border-b-2 border-transparent transition-all">Documents & Certs</TabsTrigger>
+              </TabsList>
 
-          {/* Experiences Section */}
-          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <Briefcase className="text-blue-600" size={22} />
-                <h3 className="font-black text-slate-900 uppercase tracking-widest text-sm">Work Experience</h3>
-              </div>
-              <button
-                onClick={() => setShowExperienceModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/10 active:scale-95 transition-all"
-              >
-                <Plus size={16} /> Add Experience
-              </button>
-            </div>
-            <div className="space-y-6">
-              {profile.experiences?.length > 0 ? profile.experiences.map((exp: any, i: number) => (
-                <div key={i} className="p-6 rounded-[2rem] border border-slate-100 bg-slate-50/50 group">
-                  <div className="flex justify-between items-start">
+              <TabsContent value="overview" className="mt-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-base flex items-center gap-2">
+                       <Code2 className="h-4 w-4 text-blue-600" />
+                       Technical Skills
+                    </CardTitle>
+                    <CardDescription>Programming languages, frameworks, and tools you are proficient in.</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {profile.skills?.length > 0 ? (
+                      <div className="flex flex-wrap gap-2">
+                        {profile.skills.map((skill: any, i: number) => (
+                          <Badge key={i} variant="secondary" className="px-3 py-1 text-xs font-semibold bg-slate-100/80 hover:bg-slate-200 transition-colors cursor-default text-slate-700">
+                             {skill.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-6 text-sm text-muted-foreground border-2 border-dashed rounded-lg bg-slate-50/50">
+                         No skills added yet. Click edit profile to add your technical skills.
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="experience" className="mt-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                {/* Experiences */}
+                <Card>
+                  <CardHeader className="flex flex-row items-start sm:items-center justify-between pb-3 gap-4">
                     <div>
-                      <h4 className="text-lg font-black text-slate-900 uppercase tracking-tight">{exp.companyName}</h4>
-                      <p className="text-blue-600 font-bold text-sm uppercase tracking-widest">{exp.role}</p>
-                      <p className="text-xs text-slate-400 font-black uppercase mt-1">{exp.startDate} {exp.endDate ? `— ${exp.endDate}` : '(Present)'}</p>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Briefcase className="h-4 w-4 text-blue-600" />
+                        Work Experience
+                      </CardTitle>
+                      <CardDescription className="mt-1">Internships and professional experiences.</CardDescription>
                     </div>
-                    <Trash2
-                      size={18}
-                      className="text-slate-300 hover:text-red-500 cursor-pointer transition-colors"
-                      onClick={() => {
-                        const updated = profile.experiences.filter((_: any, idx: number) => idx !== i);
-                        setProfile({ ...profile, experiences: updated });
-                        handleSave({ ...profile, experiences: updated });
-                      }}
-                    />
-                  </div>
-                  <p className="mt-4 text-sm font-medium text-slate-500 leading-relaxed">{exp.description}</p>
-                </div>
-              )) : (
-                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest text-center py-8">No experience listed</p>
-              )}
-            </div>
-          </div>
+                    <Button variant="outline" size="sm" onClick={() => setShowExperienceModal(true)} className="gap-1.5 shrink-0 h-8 text-xs">
+                      <Plus className="h-3.5 w-3.5" /> Add New
+                    </Button>
+                  </CardHeader>
+                  <CardContent className="space-y-6 pt-4">
+                    {profile.experiences?.length > 0 ? profile.experiences.map((exp: any, i: number) => (
+                      <div key={i} className="group flex gap-4 relative">
+                        <div className="mt-0.5 bg-slate-100 p-2.5 rounded-xl shrink-0 h-10 w-10 flex items-center justify-center text-slate-600 border border-border/50">
+                          <Building2 className="h-5 w-5" />
+                        </div>
+                        <div className="flex-1 space-y-2">
+                          <div className="flex items-start justify-between">
+                            <div>
+                               <h4 className="text-[15px] font-semibold leading-none text-foreground">{exp.companyName}</h4>
+                               <p className="text-sm font-medium text-blue-600 mt-1">{exp.role}</p>
+                            </div>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-red-50 hover:text-red-600 -mr-2 opacity-0 group-hover:opacity-100 transition-all absolute right-0 top-0" onClick={() => {
+                              const updated = profile.experiences.filter((_: any, idx: number) => idx !== i);
+                              setProfile({ ...profile, experiences: updated });
+                              handleSave({ ...profile, experiences: updated });
+                            }}>
+                               <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                          <div className="flex items-center text-[13px] text-muted-foreground font-medium gap-1.5">
+                             <Calendar className="h-3.5 w-3.5 opacity-70" />
+                             {exp.startDate} {exp.endDate ? `— ${exp.endDate}` : '— Present'}
+                          </div>
+                          {exp.description && (
+                            <p className="text-[13px] text-muted-foreground leading-relaxed pt-1 whitespace-pre-line">{exp.description}</p>
+                          )}
+                        </div>
+                      </div>
+                    )) : (
+                      <div className="text-center py-8 text-sm text-muted-foreground border-2 border-dashed rounded-lg bg-slate-50/50">
+                        No work experiences added.
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
 
-          {/* Certificates Section */}
-          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <FileText className="text-blue-600" size={22} />
-                <h3 className="font-black text-slate-900 uppercase tracking-widest text-sm">Certifications</h3>
-              </div>
-              <button
-                onClick={() => setShowCertificateModal(true)}
-                className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/10 active:scale-95 transition-all"
-              >
-                <Plus size={16} /> Add Certificate
-              </button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {profile.certificates?.length > 0 ? profile.certificates.map((cert: any, i: number) => (
-                <div key={i} className="p-6 rounded-[2rem] border border-slate-100 bg-slate-50/50 group">
-                  <div className="flex justify-between items-start mb-4">
+                {/* Projects */}
+                <Card>
+                  <CardHeader className="flex flex-row items-start sm:items-center justify-between pb-3 gap-4">
                     <div>
-                      <h4 className="text-md font-black text-slate-900 uppercase tracking-tight">{cert.title}</h4>
-                      <p className="text-blue-600 font-bold text-xs uppercase tracking-widest">{cert.issuer}</p>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Code2 className="h-4 w-4 text-blue-600" />
+                        Projects
+                      </CardTitle>
+                      <CardDescription className="mt-1">Academic and personal projects you've built.</CardDescription>
                     </div>
-                    <Trash2
-                      size={16}
-                      className="text-slate-300 hover:text-red-500 cursor-pointer transition-colors"
-                      onClick={() => {
-                        const updated = profile.certificates.filter((_: any, idx: number) => idx !== i);
-                        setProfile({ ...profile, certificates: updated });
-                        handleSave({ ...profile, certificates: updated });
-                      }}
-                    />
-                  </div>
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{cert.issuedDate}</p>
-                </div>
-              )) : (
-                <div className="col-span-full py-8 text-center">
-                  <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">No certificates listed</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Projects */}
-          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <Briefcase className="text-blue-600" size={22} />
-                <h3 className="font-black text-slate-900 uppercase tracking-widest text-sm">Case Studies & Projects</h3>
-              </div>
-              <button onClick={() => setShowProjectModal(true)} className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/10 active:scale-95 transition-all">
-                <Plus size={16} /> New Project
-              </button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {profile.projects.map((proj: any, i: number) => (
-                <div key={i} className="p-6 rounded-[2rem] border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-blue-200 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 group">
-                  <div className="flex justify-between items-start mb-4">
-                    <h4 className="text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight leading-tight">{proj.title}</h4>
-                    <ExternalLink size={18} className="text-slate-300 hover:text-blue-500 transition-colors cursor-pointer" />
-                  </div>
-                  {proj.image && (
-                    <img src={typeof proj.image === 'string' ? proj.image : URL.createObjectURL(proj.image)} className="w-full h-40 object-cover rounded-2xl mb-5 shadow-sm" alt={proj.title} />
-                  )}
-                  <p className="text-sm font-medium text-slate-500 mb-6 line-clamp-3 leading-relaxed">{proj.description}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {proj.tags.map((tag: string) => (
-                      <span key={tag} className="text-[10px] font-black px-3 py-1 bg-white border border-slate-100 text-slate-400 rounded-xl uppercase tracking-widest">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Featured Documents */}
-          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-              <div className="flex items-center gap-3">
-                <FileText className="text-blue-600" size={22} />
-                <h3 className="font-black text-slate-900 uppercase tracking-widest text-sm">Professional Documents</h3>
-              </div>
-              <label className="flex items-center justify-center gap-2 px-6 py-3 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest cursor-pointer shadow-xl shadow-slate-900/10 active:scale-95 transition-all">
-                {isUploadingResume ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                {isUploadingResume ? 'PROCESSING...' : 'UPLOAD NEW RESUME'}
-                <input type="file" accept=".pdf" hidden onChange={handleResumeUpload} disabled={isUploadingResume} />
-              </label>
-            </div>
-            <div className="space-y-4">
-              {profile.resumes.map((res: any, i: number) => (
-                <div key={i} className="flex items-center justify-between p-5 bg-slate-50 rounded-[2rem] border border-slate-100 hover:border-blue-200 hover:bg-white transition-all group">
-                  <div className="flex items-center gap-5">
-                    <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-rose-500 border border-slate-200/50 group-hover:scale-105 transition-transform">
-                      <FileText size={28} />
+                    <Button variant="outline" size="sm" onClick={() => setShowProjectModal(true)} className="gap-1.5 shrink-0 h-8 text-xs">
+                      <Plus className="h-3.5 w-3.5" /> Add New
+                    </Button>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {profile.projects?.length > 0 ? profile.projects.map((proj: any, i: number) => (
+                        <div key={i} className="rounded-xl border border-border/60 bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col group hover:border-blue-200 hover:shadow-md transition-all">
+                          {proj.image && (
+                            <div className="h-32 overflow-hidden border-b border-border/50">
+                               <img src={typeof proj.image === 'string' ? proj.image : URL.createObjectURL(proj.image)} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt={proj.title} />
+                            </div>
+                          )}
+                          <div className="p-4 flex flex-col flex-1">
+                             <div className="flex items-start justify-between mb-2 gap-2">
+                               <h4 className="font-semibold text-[15px] leading-tight line-clamp-2 text-foreground" title={proj.title}>{proj.title}</h4>
+                               {proj.link && (
+                                 <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-blue-600 shrink-0 mt-0.5 transition-colors">
+                                   <ExternalLink className="h-4 w-4" />
+                                 </a>
+                               )}
+                             </div>
+                             <p className="text-[13px] text-muted-foreground line-clamp-3 mb-4 flex-1 whitespace-pre-line">{proj.description}</p>
+                             <div className="flex flex-wrap gap-1.5 mt-auto pt-2">
+                               {proj.tags?.slice(0, 3).map((tag: string) => (
+                                 <Badge key={tag} variant="secondary" className="px-2 py-0 h-5 text-[10px] uppercase font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">
+                                   {tag}
+                                 </Badge>
+                               ))}
+                               {proj.tags?.length > 3 && (
+                                  <Badge variant="secondary" className="px-2 py-0 h-5 text-[10px] uppercase font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">
+                                    +{proj.tags.length - 3}
+                                  </Badge>
+                               )}
+                             </div>
+                          </div>
+                        </div>
+                      )) : (
+                        <div className="col-span-full text-center py-8 text-sm text-muted-foreground border-2 border-dashed rounded-lg bg-slate-50/50">
+                          No projects added.
+                        </div>
+                      )}
                     </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="documents" className="mt-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                 {/* Resumes */}
+                 <Card>
+                  <CardHeader className="flex flex-row items-start sm:items-center justify-between pb-3 gap-4">
                     <div>
-                      <p className="font-black text-slate-900 text-sm uppercase tracking-tight">{res.name}</p>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">{res.date} • {res.size}</p>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-blue-600" />
+                        Resumes
+                      </CardTitle>
+                      <CardDescription className="mt-1">Your uploaded ATS-friendly resumes.</CardDescription>
                     </div>
-                  </div>
-                  <a href={res.url} target="_blank" rel="noopener noreferrer" className="px-6 py-2.5 bg-white text-blue-600 font-black text-xs uppercase tracking-widest rounded-xl hover:bg-blue-600 hover:text-white border border-slate-200 hover:border-blue-600 transition-all shadow-sm">
-                    View
-                  </a>
-                </div>
-              ))}
-            </div>
-          </div>
-          <ProjectModal
-            isOpen={showProjectModal}
-            onClose={() => setShowProjectModal(false)}
-            onAddProject={handleAddProject}
-          />
-          <ExperienceModal
-            isOpen={showExperienceModal}
-            onClose={() => setShowExperienceModal(false)}
-            onAddExperience={handleAddExperience}
-          />
-          <CertificateModal
-            isOpen={showCertificateModal}
-            onClose={() => setShowCertificateModal(false)}
-            onAddCertificate={handleAddCertificate}
-          />
-          <ProfileEditDialog
-            isOpen={showProfileEditDialog}
-            onClose={() => setShowProfileEditDialog(false)}
-            profile={profile}
-            onSave={handleSave}
-            isLoading={backendLoading}
-          />
+                    <label className="shrink-0">
+                      <Button variant="outline" size="sm" asChild className="gap-1.5 cursor-pointer h-8 text-xs">
+                        <span>
+                          {isUploadingResume ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+                          Upload Resume
+                        </span>
+                      </Button>
+                      <input type="file" accept=".pdf" hidden onChange={handleResumeUpload} disabled={isUploadingResume} />
+                    </label>
+                  </CardHeader>
+                  <CardContent className="space-y-3 pt-4">
+                     {profile.resumes?.length > 0 ? profile.resumes.map((res: any, i: number) => (
+                        <div key={i} className="flex items-center justify-between p-3.5 border border-border/80 rounded-xl bg-slate-50/30 hover:bg-slate-50 hover:border-border transition-colors">
+                          <div className="flex items-center gap-3.5 min-w-0">
+                            <div className="h-10 w-10 bg-white rounded-lg shadow-sm border border-border flex items-center justify-center text-rose-500 shrink-0">
+                              <FileText className="h-5 w-5" />
+                            </div>
+                            <div className="min-w-0">
+                               <p className="font-semibold text-sm truncate text-foreground">{res.name}</p>
+                               <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
+                                 <span>{res.date}</span>
+                                 <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                                 <span>{res.size}</span>
+                               </div>
+                            </div>
+                          </div>
+                          <Button variant="secondary" size="sm" asChild className="shrink-0 font-medium px-4 h-8 text-xs ml-4">
+                             <a href={res.url} target="_blank" rel="noopener noreferrer">View</a>
+                          </Button>
+                        </div>
+                     )) : (
+                        <div className="text-center py-8 text-sm text-muted-foreground border-2 border-dashed rounded-lg bg-slate-50/50">
+                          No resume uploaded yet. Ensure you upload a PDF format.
+                        </div>
+                     )}
+                  </CardContent>
+                 </Card>
+
+                 {/* Certifications */}
+                 <Card>
+                  <CardHeader className="flex flex-row items-start sm:items-center justify-between pb-3 gap-4">
+                    <div>
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Badge className="h-4 w-4 p-0 bg-transparent text-blue-600 hover:bg-transparent"><GraduationCap className="h-4 w-4" /></Badge>
+                        Certifications
+                      </CardTitle>
+                      <CardDescription className="mt-1">Achievements and course certificates.</CardDescription>
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => setShowCertificateModal(true)} className="gap-1.5 shrink-0 h-8 text-xs">
+                      <Plus className="h-3.5 w-3.5" /> Add New
+                    </Button>
+                  </CardHeader>
+                  <CardContent className="pt-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {profile.certificates?.length > 0 ? profile.certificates.map((cert: any, i: number) => (
+                         <div key={i} className="group p-4 border border-border/80 rounded-xl flex flex-col hover:border-blue-200 hover:shadow-sm transition-all bg-card min-h-[110px] relative">
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:bg-red-50 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all absolute right-2 top-2 shrink-0 z-10" onClick={() => {
+                              const updated = profile.certificates.filter((_: any, idx: number) => idx !== i);
+                              setProfile({ ...profile, certificates: updated });
+                              handleSave({ ...profile, certificates: updated });
+                            }}>
+                               <Trash2 className="h-3.5 w-3.5" />
+                            </Button>
+                            
+                            <div className="flex-1 pr-6">
+                              <h4 className="font-semibold text-sm leading-snug text-foreground line-clamp-2" title={cert.title}>{cert.title}</h4>
+                              <p className="text-[13px] font-medium text-blue-600 mt-1.5 mb-3 line-clamp-1 truncate" title={cert.issuer}>{cert.issuer}</p>
+                            </div>
+                            
+                            <div className="mt-auto">
+                              <div className="inline-flex items-center bg-slate-100 rounded-md px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider text-slate-500 w-fit">
+                                Issued: {cert.issuedDate}
+                              </div>
+                            </div>
+                         </div>
+                      )) : (
+                        <div className="col-span-full text-center py-8 text-sm text-muted-foreground border-2 border-dashed rounded-lg bg-slate-50/50">
+                          No certifications added.
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                 </Card>
+              </TabsContent>
+           </Tabs>
         </div>
       </div>
+
+      <ProjectModal
+        isOpen={showProjectModal}
+        onClose={() => setShowProjectModal(false)}
+        onAddProject={handleAddProject}
+      />
+      <ExperienceModal
+        isOpen={showExperienceModal}
+        onClose={() => setShowExperienceModal(false)}
+        onAddExperience={handleAddExperience}
+      />
+      <CertificateModal
+        isOpen={showCertificateModal}
+        onClose={() => setShowCertificateModal(false)}
+        onAddCertificate={handleAddCertificate}
+      />
+      <ProfileEditDialog
+        isOpen={showProfileEditDialog}
+        onClose={() => setShowProfileEditDialog(false)}
+        profile={profile}
+        onSave={handleSave}
+        isLoading={backendLoading}
+      />
     </div>
   );
 };
