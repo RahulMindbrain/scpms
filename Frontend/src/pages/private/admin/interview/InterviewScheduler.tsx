@@ -11,7 +11,8 @@ import {
   ChevronRight,
   Menu
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import ScheduleEventModal from './ScheduleEventModal';
 
 interface Event {
   id: string;
@@ -26,6 +27,8 @@ interface Event {
 }
 
 const InterviewScheduler: React.FC = () => {
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+
   const events: Event[] = [
     {
       id: '1',
@@ -104,7 +107,10 @@ const InterviewScheduler: React.FC = () => {
             </div>
             <h1 className="text-xl font-bold text-slate-800">Interview Scheduler</h1>
         </div>
-        <button className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl font-semibold shadow-lg shadow-indigo-100 transition-all">
+        <button 
+          onClick={() => setIsModalOpen(true)}
+          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl font-semibold shadow-lg shadow-indigo-100 transition-all active:scale-95"
+        >
           <Plus className="w-4 h-4" />
           <span>Schedule Event</span>
         </button>
@@ -187,6 +193,11 @@ const InterviewScheduler: React.FC = () => {
           </motion.div>
         ))}
       </div>
+
+      <ScheduleEventModal 
+        isOpen={isModalOpen} 
+        onClose={() => setIsModalOpen(false)} 
+      />
     </div>
   );
 };
