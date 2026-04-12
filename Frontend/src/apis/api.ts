@@ -16,7 +16,7 @@ api.interceptors.request.use(
 );
 
 // Restore token from localStorage on page reload
-const _persistedToken = localStorage.getItem("token");
+const _persistedToken = localStorage.getItem("scpms_token");
 if (_persistedToken) {
     api.defaults.headers.common["Authorization"] = `Bearer ${_persistedToken}`;
 }
@@ -26,10 +26,10 @@ if (_persistedToken) {
 export const setAuthToken = (token: string | null) => {
     if (token) {
         api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-        localStorage.setItem("token", token);
+        localStorage.setItem("scpms_token", token);
     } else {
         delete api.defaults.headers.common["Authorization"];
-        localStorage.removeItem("token");
+        localStorage.removeItem("scpms_token");
     }
 };
 

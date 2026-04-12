@@ -15,7 +15,6 @@ import {
   CheckCircle2,
   Building2,
   LogOut,
-  User
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';

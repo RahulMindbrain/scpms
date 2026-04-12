@@ -60,32 +60,43 @@ interface AuthState {
 
 // ─── Helper: Persistence ───────────────────────────────────────────────────
 
-const loadPersistedUser = () => {
+const getInitialAuth = (): AuthState => {
     try {
-        const user = localStorage.getItem("user");
-        const token = localStorage.getItem("token");
-        if (user && token) {
-            return JSON.parse(user);
+        const userStr = localStorage.getItem("scpms_user");
+        const token = localStorage.getItem("scpms_token");
+        if (userStr) {
+            const user = JSON.parse(userStr);
+            const role = user.role?.toUpperCase() as AuthState["userType"];
+            return {
+                isAuthenticated: true,
+                userType: role,
+                user: user,
+                adminData: role === "ADMIN" ? (user as AdminUser) : null,
+                studentData: role === "STUDENT" ? (user as StudentUser) : null,
+                companyData: role === "COMPANY" ? (user as CompanyUser) : null,
+                token: token,
+                loading: false,
+                error: null,
+            };
         }
-    } catch {
-        return null;
+    } catch (e) {
+        console.error("Error loading auth state from localStorage:", e);
     }
-    return null;
+
+    return {
+        isAuthenticated: false,
+        userType: null,
+        user: null,
+        adminData: null,
+        studentData: null,
+        companyData: null,
+        token: null,
+        loading: false,
+        error: null,
+    };
 };
 
-const persistedUser = loadPersistedUser();
-
-const initialState: AuthState = {
-    isAuthenticated: !!persistedUser,
-    userType: persistedUser ? (persistedUser.role as AuthState["userType"]) : null,
-    user: persistedUser,
-    adminData: persistedUser?.role === "ADMIN" ? (persistedUser as AdminUser) : null,
-    studentData: persistedUser?.role === "STUDENT" ? (persistedUser as StudentUser) : null,
-    companyData: persistedUser?.role === "COMPANY" ? (persistedUser as CompanyUser) : null,
-    token: localStorage.getItem("token"),
-    loading: false,
-    error: null,
-};
+const initialState: AuthState = getInitialAuth();
 
 // ─── Slice ────────────────────────────────────────────────────────────────────
 
@@ -105,7 +116,7 @@ const authSlice = createSlice({
             state.error = null;
             // Clear token from axios default headers + localStorage
             setAuthToken(null);
-            localStorage.removeItem("user");
+            localStorage.removeItem("scpms_user");
         },
 
     },
@@ -128,15 +139,20 @@ const authSlice = createSlice({
 
                 state.loading = false;
                 state.isAuthenticated = true;
+                
+                // Normalize role to uppercase for internal state consistency
+                const normalizedRole = user.role.toUpperCase() as AuthState["userType"];
+                user.role = normalizedRole as any; 
+
                 state.user = user;
-                state.userType = user.role as AuthState["userType"];
+                state.userType = normalizedRole;
 
                 // ── Store in role-specific slot ────────────────────────────
-                if (user.role === "ADMIN") {
+                if (normalizedRole === "ADMIN") {
                     state.adminData = user as AdminUser;
-                } else if (user.role === "STUDENT") {
+                } else if (normalizedRole === "STUDENT") {
                     state.studentData = user as StudentUser;
-                } else if (user.role === "COMPANY") {
+                } else if (normalizedRole === "COMPANY") {
                     state.companyData = user as CompanyUser;
                 }
 
@@ -145,7 +161,7 @@ const authSlice = createSlice({
                 if (token) {
                     setAuthToken(token);
                 }
-                localStorage.setItem("user", JSON.stringify(user));
+                localStorage.setItem("scpms_user", JSON.stringify(user));
             })
 
             // ── Login failure ──────────────────────────────────────────────
