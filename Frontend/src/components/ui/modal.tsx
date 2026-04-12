@@ -14,6 +14,7 @@ interface ModalProps {
   title?: string;
   subtitle?: string;
   children: React.ReactNode;
+  footer?: React.ReactNode;
   className?: string;
   maxWidth?: string;
 }
@@ -24,6 +25,7 @@ export const Modal: React.FC<ModalProps> = ({
   title,
   subtitle,
   children,
+  footer,
   className,
   maxWidth = "sm:max-w-lg",
 }) => {
@@ -47,6 +49,11 @@ export const Modal: React.FC<ModalProps> = ({
         <div className="p-8 pt-6">
           {children}
         </div>
+        {footer && (
+          <div className="p-8 pt-0 flex items-center justify-end gap-3 border-t border-slate-50 bg-slate-50/50 mt-2">
+            {footer}
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

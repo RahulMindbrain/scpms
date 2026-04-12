@@ -1,17 +1,16 @@
-import React, { useState, useRef } from 'react';
-import { 
-  FileText, Upload, Download, Trash2, 
-  Bell, Plus, Loader2, Search,
-  FileCheck, FileClock, PanelLeftOpen,
+import   { useState, useRef } from 'react';
+import {
+  FileText, Upload, Download, Trash2,
+  Bell, Search,
+  FileCheck, FileClock,
   MoreVertical, ExternalLink, ShieldCheck
 } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Documents = () => {
   const [activeTab, setActiveTab] = useState('All');
-  const [isUploading, setIsUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
- const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const categories = ['All', 'Resume', 'Certificate', 'Offer Letter'];
 
@@ -51,7 +50,7 @@ const Documents = () => {
     return matchesTab && matchesSearch;
   });
 
-  const deleteDocument = (id:any) => {
+  const deleteDocument = (id: any) => {
     setDocuments(documents.filter(doc => doc.id !== id));
     toast.success("Document removed from vault");
   };
@@ -62,13 +61,13 @@ const Documents = () => {
       <nav className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-3">
         <div className="flex justify-between items-center max-w-7xl mx-auto">
           <div className="flex items-center gap-4">
-            
+
           </div>
-          
+
           <div className="flex items-center gap-6">
             <div className="hidden md:flex items-center relative">
               <Search className="absolute left-3 text-slate-400" size={16} />
-              <input 
+              <input
                 type="text"
                 placeholder="Search files..."
                 className="pl-10 pr-4 py-1.5 bg-slate-100 border-none rounded-full text-sm focus:ring-2 focus:ring-indigo-500 w-64 transition-all"
@@ -92,10 +91,10 @@ const Documents = () => {
             <h2 className="text-3xl font-extrabold text-slate-900">Academic Records</h2>
             <p className="text-slate-500 mt-1 font-medium">Manage and share your verified professional documents.</p>
           </div>
-          
+
           <div className="flex gap-3">
             <input type="file" ref={fileInputRef} className="hidden" />
-            <button 
+            <button
               onClick={() => fileInputRef.current?.click()}
               className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg active:scale-95"
             >
@@ -110,11 +109,10 @@ const Documents = () => {
             <button
               key={cat}
               onClick={() => setActiveTab(cat)}
-              className={`px-5 py-2 text-sm font-bold rounded-full border transition-all whitespace-nowrap ${
-                activeTab === cat 
-                  ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm' 
+              className={`px-5 py-2 text-sm font-bold rounded-full border transition-all whitespace-nowrap ${activeTab === cat
+                  ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm'
                   : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
-              }`}
+                }`}
             >
               {cat}
             </button>
@@ -127,9 +125,8 @@ const Documents = () => {
             filteredDocs.map((doc) => (
               <div key={doc.id} className="group bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-200 transition-all relative overflow-hidden">
                 <div className="flex justify-between items-start mb-4">
-                  <div className={`p-3 rounded-xl border ${
-                    doc.category === 'Resume' ? 'bg-blue-50 border-blue-100' : 'bg-emerald-50 border-emerald-100'
-                  }`}>
+                  <div className={`p-3 rounded-xl border ${doc.category === 'Resume' ? 'bg-blue-50 border-blue-100' : 'bg-emerald-50 border-emerald-100'
+                    }`}>
                     {doc.icon}
                   </div>
                   <button className="text-slate-400 hover:text-slate-600 p-1">
@@ -140,7 +137,7 @@ const Documents = () => {
                 <h3 className="font-bold text-slate-800 mb-1 truncate pr-4 group-hover:text-indigo-600 transition-colors" title={doc.name}>
                   {doc.name}
                 </h3>
-                
+
                 <div className="flex items-center gap-2 text-xs font-bold text-slate-400 mb-6">
                   <span className="bg-slate-100 px-2 py-0.5 rounded text-slate-600">{doc.category}</span>
                   <span>•</span>
@@ -148,31 +145,31 @@ const Documents = () => {
                 </div>
 
                 <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                   <div className="flex items-center gap-1.5">
-                     <ShieldCheck size={14} className={doc.status === 'Verified' ? 'text-emerald-500' : 'text-slate-300'} />
-                     <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{doc.status}</span>
-                   </div>
-                   <div className="flex items-center gap-1">
-                     <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
-                       <Download size={16} />
-                     </button>
-                     <button 
-                       onClick={() => deleteDocument(doc.id)}
-                       className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
-                     >
-                       <Trash2 size={16} />
-                     </button>
-                   </div>
+                  <div className="flex items-center gap-1.5">
+                    <ShieldCheck size={14} className={doc.status === 'Verified' ? 'text-emerald-500' : 'text-slate-300'} />
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{doc.status}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                      <Download size={16} />
+                    </button>
+                    <button
+                      onClick={() => deleteDocument(doc.id)}
+                      className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-all"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))
           ) : (
             <div className="col-span-full py-24 bg-white rounded-3xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400">
-               <div className="p-4 bg-slate-50 rounded-full mb-4">
-                  <FileClock size={40} strokeWidth={1.5} />
-               </div>
-               <p className="text-lg font-bold text-slate-600">No records found</p>
-               <p className="text-sm font-medium">Try adjusting your filters or upload a new document.</p>
+              <div className="p-4 bg-slate-50 rounded-full mb-4">
+                <FileClock size={40} strokeWidth={1.5} />
+              </div>
+              <p className="text-lg font-bold text-slate-600">No records found</p>
+              <p className="text-sm font-medium">Try adjusting your filters or upload a new document.</p>
             </div>
           )}
         </div>

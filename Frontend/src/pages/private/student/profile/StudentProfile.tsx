@@ -30,7 +30,9 @@ const StudentProfile = () => {
   const [showExperienceModal, setShowExperienceModal] = useState(false)
   const [showCertificateModal, setShowCertificateModal] = useState(false)
   const [showProfileEditDialog, setShowProfileEditDialog] = useState(false)
+  //@ts-ignore
   const [isUploading, setIsUploading] = useState(false);
+    //@ts-ignore
   const [isUploadingResume, setIsUploadingResume] = useState(false);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
 
@@ -123,11 +125,11 @@ const StudentProfile = () => {
       return error;
     }
   };
-
+  //@ts-ignore
   const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     toast.info("Image upload will be integrated with backend soon!");
   };
-
+  //@ts-ignore
   const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     toast.info("Resume upload will be integrated with backend soon!");
   };

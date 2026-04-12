@@ -1,15 +1,8 @@
 import React, { useState } from 'react';
 import { 
   Search, 
-  Menu, 
   ArrowRight, 
-  CheckCircle2, 
-  XCircle, 
-  Clock, 
-  CheckSquare,
-  Square,
-  Briefcase,
-  Users
+  CheckCircle2,  
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 

@@ -8,10 +8,7 @@ import {
   Eye,
   ChevronDown,
   FileDown,
-  LayoutGrid,
-  Folder,
   Check,
-  X,
   AlertCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';

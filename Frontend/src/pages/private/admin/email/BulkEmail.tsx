@@ -7,11 +7,9 @@ import {
   BarChart2,
   Eye,
   ChevronDown,
-  LayoutGrid,
-  FileText,
   AlertCircle
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion    } from 'framer-motion';
 import { toast } from 'sonner';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';

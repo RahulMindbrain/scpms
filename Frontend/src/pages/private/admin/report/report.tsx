@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React   from 'react';
 import {
   BarChart3, Users, Building2, GraduationCap,
-  TrendingUp, Download, Calendar, Filter,
-  ArrowUpRight, ArrowDownRight, Search,
-  FileSpreadsheet, FilePieChart, MoreHorizontal
+  TrendingUp, Download,  Filter,
+  ArrowUpRight, ArrowDownRight, Search 
 } from 'lucide-react';
 
 // --- Types ---
@@ -16,7 +15,6 @@ interface StatCard {
 }
 
 const AnalyticsDashboard: React.FC = () => {
-  const [timeRange, setTimeRange] = useState('2026 Batch');
 
   const stats: StatCard[] = [
     {

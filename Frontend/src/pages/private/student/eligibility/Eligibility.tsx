@@ -1,7 +1,5 @@
-import React, { useState } from 'react';
 import { 
   CheckCircle2, 
-  Briefcase, 
   Bell, 
   XCircle,
   Info,
@@ -15,7 +13,6 @@ import {
 } from 'lucide-react';
 
 const Eligibility = () => {
-  const [searchTerm, setSearchTerm] = useState('');
 
   const eligibilitySummary = [
     { label: 'Eligible Opportunities', value: '04', icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },

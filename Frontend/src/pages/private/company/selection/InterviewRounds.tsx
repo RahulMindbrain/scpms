@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, Plus, Clock, ChevronDown, CheckCircle2, User, Search, Filter, Save } from 'lucide-react';
+import { Calendar, Plus,   ChevronDown,   Save } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';

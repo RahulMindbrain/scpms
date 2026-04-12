@@ -98,6 +98,7 @@ const CompanyManagement: React.FC = () => {
     setNewCompany({ name: '', sector: '', location: '', email: '', description: '' });
   };
 
+  //@ts-ignore
   const toggleApproval = async (id: number, userId: number, currentStatus: string) => {
     if (currentStatus === 'Pending') {
       try {
@@ -112,7 +113,7 @@ const CompanyManagement: React.FC = () => {
       toast.info("Deactivation is coming soon.");
     }
   };
-
+//@ts-ignore
   const deleteCompany = (id: number) => {
     toast.info("Integration for deleting companies is coming soon.");
   };

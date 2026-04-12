@@ -157,7 +157,7 @@ const PlacementDriveManagement: React.FC = () => {
                   </div>
                   <div>
                     <h3 className="text-2xl font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight leading-none mb-2">{drive.company}</h3>
-                    <Badge variant={drive.status === 'active' ? 'primary' : 'success'} className="uppercase tracking-[0.2em] text-[9px] font-black px-3 py-1">
+                    <Badge variant={drive.status === 'active' ? 'default' : 'success'} className="uppercase tracking-[0.2em] text-[9px] font-black px-3 py-1">
                       {drive.status}
                     </Badge>
                   </div>
@@ -224,7 +224,7 @@ const PlacementDriveManagement: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         title="Create Placement Drive"
         subtitle="Set up a new recruitment session and specify eligibility criteria."
-        maxWidth="2xl"
+        maxWidth="sm:max-w-2xl"
         footer={
           <div className="flex items-center justify-end gap-3 font-sans">
             <button onClick={() => setIsModalOpen(false)} className="px-6 py-3 border border-slate-200 rounded-2xl text-sm font-bold text-slate-600 hover:bg-slate-50 transition-all">

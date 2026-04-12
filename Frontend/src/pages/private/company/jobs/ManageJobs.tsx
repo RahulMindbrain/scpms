@@ -47,7 +47,7 @@ const ManageJobs: React.FC = () => {
                   <td className="px-6 py-5 text-sm font-medium text-slate-500">{job.deadline}</td>
                   <td className="px-6 py-5">
                     <Badge variant={
-                      job.status === 'Active' ? 'primary' : 
+                      job.status === 'Active' ? 'default' : 
                       job.status === 'Closed' ? 'danger' : 
                       'outline'
                     }>

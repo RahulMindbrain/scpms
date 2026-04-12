@@ -75,9 +75,9 @@ const Applicants: React.FC = () => {
                     <Badge variant={
                       applicant.status === 'Selected' ? 'success' : 
                       applicant.status === 'Rejected' ? 'danger' : 
-                      applicant.status === 'Shortlisted' ? 'primary' : 
+                      applicant.status === 'Shortlisted' ? 'default' : 
                       applicant.status === 'Interview' ? 'warning' : 'outline'
-                    } size="sm">
+                    }>
                       {applicant.status}
                     </Badge>
                   </td>

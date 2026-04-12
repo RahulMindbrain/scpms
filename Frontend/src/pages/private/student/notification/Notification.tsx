@@ -48,7 +48,6 @@ const Notification = () => {
     }
   ];
 
-  const unreadCount = notifications.filter(n => n.unread).length;
 
   const getStatusStyles = (status:any) => {
     switch (status) {

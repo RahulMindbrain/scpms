@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, Circle, Clock, XCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, XCircle } from 'lucide-react';
 
 type Status = 'Applied' | 'Shortlisted' | 'Technical Round' | 'HR Round' | 'Selected' | 'Rejected';
 
@@ -47,7 +47,6 @@ const ApplicationStatus: React.FC<ApplicationProps> = ({
           // A stage is completed if we are past it, or if we have reached "Selected"
           const isCompleted = (index < currentIndex && currentIndex !== -1) || currentStatus === 'Selected';
           const isCurrent = index === currentIndex && !isRejected;
-          const isUpcoming = index > currentIndex || currentIndex === -1;
 
           return (
             <div key={stage} className="flex flex-col items-center relative z-10 w-full">

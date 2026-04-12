@@ -42,7 +42,7 @@ const driveSlice = createSlice({
                 state.loading = true;
                 state.error = null;
             })
-            .addCase(updateJobStatus.fulfilled, (state, action) => {
+            .addCase(updateJobStatus.fulfilled, (state) => {
                 state.loading = false;
                 // We might want to refresh the list or update locally
                 // For simplicity, we'll let the component re-fetch or we could update here
