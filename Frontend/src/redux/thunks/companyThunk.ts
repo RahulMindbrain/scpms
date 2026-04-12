@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getAPI, putAPI } from "../../apis/api";
+import { getAPI, putAPI, postAPI } from "../../apis/api";
 
 export const fetchCompanies = createAsyncThunk(
     "company/fetchCompanies",
@@ -33,6 +33,54 @@ export const activateCompanies = createAsyncThunk(
             return response;
         } catch (error: any) {
             return rejectWithValue(error?.message || "Failed to activate companies");
+        }
+    }
+);
+
+export const fetchCompanyProfile = createAsyncThunk(
+    "company/fetchCompanyProfile",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await getAPI<any>("/company/profile");
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to fetch company profile");
+        }
+    }
+);
+
+export const createCompanyProfile = createAsyncThunk(
+    "company/createCompanyProfile",
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const response = await postAPI<any>("/company/profile", data);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to create company profile");
+        }
+    }
+);
+
+export const updateCompanyProfile = createAsyncThunk(
+    "company/updateCompanyProfile",
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const response = await putAPI<any>("/company/profile", data);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to update company profile");
+        }
+    }
+);
+
+export const postJob = createAsyncThunk(
+    "company/postJob",
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const response = await postAPI<any>("/company/post-job", data);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to post job");
         }
     }
 );

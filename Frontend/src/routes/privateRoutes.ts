@@ -27,6 +27,7 @@ import Applicants from "@/pages/private/company/applicants/Applicants";
 import Shortlist from "@/pages/private/company/selection/Shortlist";
 import InterviewRounds from "@/pages/private/company/selection/InterviewRounds";
 import UpdateResults from "@/pages/private/company/selection/UpdateResults";
+import CompanyProfile from "@/pages/private/company/profile/CompanyProfile";
 
 export const PrivateRoutes: RouteOptions<any>[] = [
     {
@@ -127,6 +128,10 @@ export const PrivateRoutes: RouteOptions<any>[] = [
     {
         path: "/company/dashboard",
         component: CompanyDashboard
+    },
+    {
+        path: "/company/profile",
+        component: CompanyProfile
     },
     {
         path: "/company/post-job",

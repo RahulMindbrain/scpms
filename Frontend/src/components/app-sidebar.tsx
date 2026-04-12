@@ -77,6 +77,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       return {
         main: [
           { title: "Dashboard", url: "/company/dashboard", icon: <LayoutDashboard /> },
+          { title: "Profile", url: "/company/profile", icon: <Building2 /> },
           { title: "Post Job", url: "/company/post-job", icon: <PlusCircle /> },
           { title: "Manage Jobs", url: "/company/jobs", icon: <Briefcase /> },
           { title: "Applicants", url: "/company/applicants", icon: <Users /> },

@@ -1,33 +1,44 @@
 import React, { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { CheckCircle2, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
+import { postJob } from '@/redux/thunks/companyThunk';
+import type { AppDispatch } from '@/redux/store/store';
+import type { RootState } from '@/redux/reducers/rootReducer';
+
+const DEPARTMENTS = [
+  { id: 1, name: 'Computer Science' },
+  { id: 2, name: 'Information Technology' },
+  { id: 3, name: 'Electronics' },
+  { id: 4, name: 'Mechanical' },
+  { id: 5, name: 'Civil' },
+  { id: 6, name: 'Electrical' }
+];
 
 const PostJob: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { loading: isSubmitting } = useSelector((state: RootState) => state.company);
+
   const [formData, setFormData] = useState({
     title: '',
-    type: '',
-    package: '',
+    salary: '',
     location: '',
     minCgpa: '',
-    deadline: '',
+    maxCgpa: '',
     description: '',
-    selectionProcess: '',
   });
   
-  const [selectedBranches, setSelectedBranches] = useState<string[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const branches = ['Computer Science', 'Information Technology', 'Electronics', 'Mechanical', 'Civil', 'Electrical'];
+  const [selectedBranches, setSelectedBranches] = useState<number[]>([]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const toggleBranch = (branch: string) => {
+  const toggleBranch = (branchId: number) => {
     setSelectedBranches(prev => 
-      prev.includes(branch) ? prev.filter(b => b !== branch) : [...prev, branch]
+      prev.includes(branchId) ? prev.filter(b => b !== branchId) : [...prev, branchId]
     );
   };
 
@@ -35,7 +46,7 @@ const PostJob: React.FC = () => {
     e.preventDefault();
     
     // Validation
-    if (!formData.title || !formData.type || !formData.package || !formData.location || !formData.minCgpa || !formData.deadline || !formData.description) {
+    if (!formData.title || !formData.salary || !formData.location || !formData.minCgpa || !formData.maxCgpa || !formData.description) {
       toast.error("Please fill in all required fields");
       return;
     }
@@ -44,21 +55,36 @@ const PostJob: React.FC = () => {
       toast.error("Please select at least one eligible branch");
       return;
     }
-
-    setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      const payload = {
+        title: formData.title,
+        description: formData.description,
+        salary: Number(formData.salary),
+        location: formData.location,
+        minCgpa: Number(formData.minCgpa),
+        maxCgpa: Number(formData.maxCgpa),
+        eligibleDepartmentIds: selectedBranches
+      };
+
+      await dispatch(postJob(payload)).unwrap();
       toast.success("Job Drive posted successfully!", {
         description: `${formData.title} for ${formData.location} is now live.`,
         duration: 5000,
       });
-      // Reset form or navigate
-    } catch (error) {
-      toast.error("Failed to post job. Please try again.");
-    } finally {
-      setIsSubmitting(false);
+
+      // Reset form
+      setFormData({
+        title: '',
+        salary: '',
+        location: '',
+        minCgpa: '',
+        maxCgpa: '',
+        description: '',
+      });
+      setSelectedBranches([]);
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to post job. Please try again.");
     }
   };
 
@@ -87,28 +113,13 @@ const PostJob: React.FC = () => {
             </div>
             
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Employment Type</label>
-              <select 
-                name="type"
-                value={formData.type}
-                onChange={handleInputChange}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800 bg-white"
-              >
-                <option value="">Select type</option>
-                <option value="full-time">Full-time</option>
-                <option value="internship">Internship</option>
-                <option value="contract">Contract</option>
-              </select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Package (LPA)</label>
+              <label className="text-sm font-bold text-slate-700">Salary (Annual)</label>
               <input 
-                type="text" 
-                name="package"
-                value={formData.package}
+                type="number" 
+                name="salary"
+                value={formData.salary}
                 onChange={handleInputChange}
-                placeholder="e.g., 8-12" 
+                placeholder="e.g., 800000" 
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800"
               />
             </div>
@@ -138,13 +149,15 @@ const PostJob: React.FC = () => {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-bold text-slate-700">Application Deadline</label>
+              <label className="text-sm font-bold text-slate-700">Max CGPA Requirements</label>
               <input 
-                type="date" 
-                name="deadline"
-                value={formData.deadline}
+                type="number" 
+                step="0.01"
+                name="maxCgpa"
+                value={formData.maxCgpa}
                 onChange={handleInputChange}
                 className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800"
+                placeholder="e.g., 10.0"
               />
             </div>
           </div>
@@ -164,36 +177,26 @@ const PostJob: React.FC = () => {
           <div className="space-y-4">
             <label className="text-sm font-bold text-slate-700">Eligible Branches</label>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {branches.map((branch) => (
-                <label key={branch} className="flex items-center gap-3 group cursor-pointer">
+              {DEPARTMENTS.map((dept) => (
+                <label key={dept.id} className="flex items-center gap-3 group cursor-pointer">
                   <div className="relative flex items-center justify-center">
                     <input 
                       type="checkbox" 
-                      checked={selectedBranches.includes(branch)}
-                      onChange={() => toggleBranch(branch)}
+                      checked={selectedBranches.includes(dept.id)}
+                      onChange={() => toggleBranch(dept.id)}
                       className="peer appearance-none w-5 h-5 rounded-md border-2 border-slate-200 checked:bg-blue-600 checked:border-blue-600 transition-all cursor-pointer" 
                     />
                     <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4">
                       <path d="M5 13l4 4L19 7" />
                     </svg>
                   </div>
-                  <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">{branch}</span>
+                  <span className="text-sm font-medium text-slate-600 group-hover:text-slate-900 transition-colors">{dept.name}</span>
                 </label>
               ))}
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-700">Selection Process</label>
-            <textarea 
-              rows={2} 
-              name="selectionProcess"
-              value={formData.selectionProcess}
-              onChange={handleInputChange}
-              placeholder="e.g., Aptitude Test → Technical Interview → HR Interview" 
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all font-medium text-slate-800 resize-none"
-            ></textarea>
-          </div>
+
         </div>
 
         <div className="flex items-center gap-4 pt-4">

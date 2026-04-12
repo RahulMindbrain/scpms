@@ -1,9 +1,18 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { fetchCompanies, fetchInactiveCompanies, activateCompanies } from "../thunks/companyThunk";
+import { 
+  fetchCompanies, 
+  fetchInactiveCompanies, 
+  activateCompanies,
+  fetchCompanyProfile,
+  createCompanyProfile,
+  updateCompanyProfile,
+  postJob
+} from "../thunks/companyThunk";
 
 interface CompanyState {
   companies: any[];
   inactiveCompanies: any[];
+  profile: any | null;
   loading: boolean;
   error: string | null;
   meta: {
@@ -17,6 +26,7 @@ interface CompanyState {
 const initialState: CompanyState = {
   companies: [],
   inactiveCompanies: [],
+  profile: null,
   loading: false,
   error: null,
   meta: null,
@@ -70,6 +80,57 @@ const companySlice = createSlice({
         // but here we just stop loading. The component should probably re-fetch.
       })
       .addCase(activateCompanies.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Fetch Company Profile
+      .addCase(fetchCompanyProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCompanyProfile.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.profile = action.payload?.data || action.payload; // accommodate API response
+      })
+      .addCase(fetchCompanyProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Create Company Profile
+      .addCase(createCompanyProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createCompanyProfile.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.profile = action.payload?.data || action.payload;
+      })
+      .addCase(createCompanyProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Update Company Profile
+      .addCase(updateCompanyProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateCompanyProfile.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.profile = action.payload?.data || action.payload;
+      })
+      .addCase(updateCompanyProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Post Job
+      .addCase(postJob.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(postJob.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(postJob.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
