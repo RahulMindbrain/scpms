@@ -6,12 +6,20 @@ import {
   Plus, CheckCircle2,
   Clock, UserPlus,
   Trash2,
-  Edit2
+  Edit2,
+  UserX,
+  UserCheck
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -44,14 +52,15 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
-import { fetchStudents } from '@/redux/thunks/studentThunk';
+import { fetchStudents, fetchInactiveStudents, activateStudents } from '@/redux/thunks/studentThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 
 const StudentManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { students: reduxStudents, loading, error } = useSelector((state: RootState) => state.student);
+  const { students: reduxStudents, inactiveStudents: reduxInactiveStudents, loading, error } = useSelector((state: RootState) => state.student);
 
+  const [activeTab, setActiveTab] = useState('active');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDept, setSelectedDept] = useState('All Depts');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -59,10 +68,12 @@ const StudentManagement: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchStudents({}));
+    dispatch(fetchInactiveStudents({}));
   }, [dispatch]);
 
   const students = useMemo(() => {
-    return reduxStudents.map((s: any) => ({
+    const currentList = activeTab === 'active' ? reduxStudents : reduxInactiveStudents;
+    return currentList.map((s: any) => ({
       id: s.id,
       name: s.firstname ? `${s.firstname} ${s.lastname || ''}` : 'Unknown',
       dept: s.student?.branch || 'N/A',
@@ -73,7 +84,7 @@ const StudentManagement: React.FC = () => {
       company: s.student?.placedAt || '-',
       package: s.student?.salary || '-',
     }));
-  }, [reduxStudents]);
+  }, [reduxStudents, reduxInactiveStudents, activeTab]);
 
   const filteredStudents = useMemo(() => {
     return students.filter(student => {
@@ -97,8 +108,21 @@ const StudentManagement: React.FC = () => {
     setIsAddModalOpen(false);
   };
 
-  const toggleVerification = (id: number) => {
-    toast.info("Backend integration for verification status is pending.");
+  const toggleVerification = async (id: number) => {
+    if (activeTab === 'inactive') {
+      const toastId = toast.loading("Activating student account...");
+      try {
+        await dispatch(activateStudents([id])).unwrap();
+        toast.success("Student activated successfully!", { id: toastId });
+        // Refresh both lists
+        dispatch(fetchStudents({}));
+        dispatch(fetchInactiveStudents({}));
+      } catch (err: any) {
+        toast.error(err || "Failed to activate student", { id: toastId });
+      }
+    } else {
+      toast.info("Verification status management is pending for active students.");
+    }
   };
 
   if (loading && reduxStudents.length === 0) {
@@ -197,41 +221,58 @@ const StudentManagement: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="shadow-none border-slate-200">
           <CardHeader className="pb-2">
-            <CardDescription className="text-xs font-bold uppercase tracking-wider">Total Students</CardDescription>
-            <CardTitle className="text-2xl font-black">{students.length}</CardTitle>
+            <CardDescription className="text-xs font-bold uppercase tracking-wider">Total Active</CardDescription>
+            <CardTitle className="text-2xl font-black">{reduxStudents.length}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground font-medium">+24 added recently</p>
+            <p className="text-xs text-muted-foreground font-medium">Verified & ready</p>
           </CardContent>
         </Card>
         <Card className="shadow-none border-slate-200">
           <CardHeader className="pb-2">
-            <CardDescription className="text-xs font-bold uppercase tracking-wider">Verified</CardDescription>
-            <CardTitle className="text-2xl font-black">{students.filter(s => s.verified).length}</CardTitle>
+            <CardDescription className="text-xs font-bold uppercase tracking-wider">Inactive</CardDescription>
+            <CardTitle className="text-2xl font-black">{reduxInactiveStudents.length}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground font-medium">Ready for drives</p>
+            <p className="text-xs text-muted-foreground font-medium">Awaiting activation</p>
           </CardContent>
         </Card>
         <Card className="shadow-none border-slate-200">
           <CardHeader className="pb-2">
             <CardDescription className="text-xs font-bold uppercase tracking-wider">Backlogs</CardDescription>
-            <CardTitle className="text-2xl font-black">{students.filter(s => s.backlogs > 0).length}</CardTitle>
+            <CardTitle className="text-2xl font-black">{reduxStudents.filter((s: any) => (s.student?.backlogs || 0) > 0).length}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-xs text-muted-foreground font-medium">Awaiting clearance</p>
+            <p className="text-xs text-muted-foreground font-medium">Active with backlogs</p>
           </CardContent>
         </Card>
         <Card className="shadow-none border-slate-200">
           <CardHeader className="pb-2">
             <CardDescription className="text-xs font-bold uppercase tracking-wider">Placed</CardDescription>
-            <CardTitle className="text-2xl font-black">{students.filter(s => s.status === 'placed').length}</CardTitle>
+            <CardTitle className="text-2xl font-black">{reduxStudents.filter((s: any) => s.status === 'PLACED').length}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground font-medium">Target achieved</p>
           </CardContent>
         </Card>
       </div>
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="active" className="flex items-center gap-2">
+            <UserCheck className="w-4 h-4" /> Active Students
+          </TabsTrigger>
+          <TabsTrigger value="inactive" className="flex items-center gap-2">
+            <UserX className="w-4 h-4" /> Inactive Students
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="active">
+          {/* Filters Area moved inside TabsContent if needed, or kept outside for global filtering */}
+        </TabsContent>
+        <TabsContent value="inactive">
+        </TabsContent>
+      </Tabs>
 
       {/* Filters Area */}
       <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 bg-white p-4 rounded-2xl border border-slate-200">
@@ -307,10 +348,24 @@ const StudentManagement: React.FC = () => {
                     onClick={() => toggleVerification(student.id)}
                     className={`flex items-center gap-1.5 py-1 px-3 rounded-lg text-[9px] font-bold uppercase tracking-wider transition-all ${student.verified
                       ? 'bg-emerald-500 text-white shadow-sm'
-                      : 'bg-amber-100 text-amber-600 hover:bg-amber-200'
+                      : activeTab === 'inactive'
+                        ? 'bg-blue-100 text-blue-600 hover:bg-blue-200'
+                        : 'bg-amber-100 text-amber-600 hover:bg-amber-200'
                       }`}
                   >
-                    {student.verified ? <><CheckCircle2 className="w-3" /> Verified</> : <><Clock className="w-3" /> Pending</>}
+                    {student.verified ? (
+                      <>
+                        <CheckCircle2 className="w-3" /> Verified
+                      </>
+                    ) : activeTab === 'inactive' ? (
+                      <>
+                        <UserCheck className="w-3" /> Activate
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-3" /> Pending
+                      </>
+                    )}
                   </button>
                 </TableCell>
                 <TableCell className="text-right pr-6">

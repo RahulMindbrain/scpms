@@ -13,18 +13,19 @@ import { Button } from '@/components/ui/button.tsx';
 import { toast } from 'sonner';
 import { Modal } from '@/components/ui/modal.tsx';
 import { useDispatch, useSelector } from 'react-redux'; 
-import { fetchCompanies } from '@/redux/thunks/companyThunk';
+import { fetchCompanies, fetchInactiveCompanies, activateCompanies } from '@/redux/thunks/companyThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 
 interface Company {
   id: number;
+  userId: number;
   name: string;
   sector: string;
   location: string;
   avgPackage: string;
   hiredCount: number;
-  status: 'active' | 'upcoming' | 'completed';
+  status: 'active' | 'upcoming' | 'completed' | 'inactive';
   approval: 'Approved' | 'Pending';
   logo?: string;
   email?: string;
@@ -32,7 +33,7 @@ interface Company {
 
 const CompanyManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { companies: reduxCompanies, loading, error } = useSelector((state: RootState) => state.company);
+  const { companies: reduxCompanies, inactiveCompanies: reduxInactiveCompanies, loading, error } = useSelector((state: RootState) => state.company);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [filter, setFilter] = useState('All');
@@ -47,22 +48,40 @@ const CompanyManagement: React.FC = () => {
 
   useEffect(() => {
     dispatch(fetchCompanies({}));
+    dispatch(fetchInactiveCompanies({}));
   }, [dispatch]);
 
-  const companies = useMemo(() => {
-    return reduxCompanies.map((c: any) => ({
+  const companies = useMemo<Company[]>(() => {
+    const active = reduxCompanies.map((c: any): Company => ({
       id: c.id,
+      userId: c.user?.id || c.userId,
       name: c.name || 'N/A',
-      sector: 'Technology', // Defaulting since it's not in the main company schema yet
-      location: 'Multiple', // Defaulting since it's not in the main company schema yet
+      sector: 'Technology', 
+      location: 'Multiple', 
       avgPackage: 'Competitive', 
       hiredCount: 0, 
-      status: 'active' as const,
-      approval: c.user?.status === 'ACTIVE' ? 'Approved' : 'Pending',
+      status: 'active',
+      approval: 'Approved',
       logo: undefined,
       email: c.user?.email || 'N/A'
     }));
-  }, [reduxCompanies]);
+
+    const inactive = reduxInactiveCompanies.map((c: any): Company => ({
+      id: c.id,
+      userId: c.id, // Inactive list returns User records, so id is userId
+      name: c.firstname || 'N/A', // Firstname is used as name for User records
+      sector: 'Technology',
+      location: 'Multiple',
+      avgPackage: 'N/A',
+      hiredCount: 0,
+      status: 'inactive',
+      approval: 'Pending',
+      logo: undefined,
+      email: c.email || 'N/A'
+    }));
+
+    return [...active, ...inactive];
+  }, [reduxCompanies, reduxInactiveCompanies]);
 
   const filteredCompanies = useMemo(() => {
     return companies.filter(c => {
@@ -79,8 +98,19 @@ const CompanyManagement: React.FC = () => {
     setNewCompany({ name: '', sector: '', location: '', email: '', description: '' });
   };
 
-  const toggleApproval = (id: number) => {
-    toast.info("Integration for toggling approval is coming soon.");
+  const toggleApproval = async (id: number, userId: number, currentStatus: string) => {
+    if (currentStatus === 'Pending') {
+      try {
+        await dispatch(activateCompanies([userId])).unwrap();
+        toast.success("Company activated successfully!");
+        dispatch(fetchCompanies({}));
+        dispatch(fetchInactiveCompanies({}));
+      } catch (err: any) {
+        toast.error(err || "Failed to activate company");
+      }
+    } else {
+      toast.info("Deactivation is coming soon.");
+    }
   };
 
   const deleteCompany = (id: number) => {
@@ -143,7 +173,7 @@ const CompanyManagement: React.FC = () => {
       {/* Filters Area */}
       <div className="flex items-center gap-4">
         <div className="flex bg-white p-1.5 rounded-2xl border border-slate-100 shadow-sm">
-          {['All', 'Active', 'Upcoming', 'Completed'].map((opt) => (
+          {['All', 'Active', 'Inactive', 'Upcoming', 'Completed'].map((opt) => (
             <button
               key={opt}
               onClick={() => setFilter(opt)}
@@ -206,7 +236,7 @@ const CompanyManagement: React.FC = () => {
               </Badge>
 
               <button
-                onClick={() => toggleApproval(company.id)}
+                onClick={() => toggleApproval(company.id, company.userId, company.approval)}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${company.approval === 'Approved'
                   ? 'bg-emerald-500 text-white shadow-xl shadow-emerald-200 hover:bg-emerald-600'
                   : 'bg-amber-100 text-amber-600 hover:bg-amber-200'
