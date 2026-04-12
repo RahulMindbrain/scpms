@@ -7,12 +7,21 @@ import {
   Users, 
   Edit3, 
   Briefcase,
-  ExternalLink,
-  ChevronRight,
-  Menu
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import ScheduleEventModal from './ScheduleEventModal';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog"
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Event {
   id: string;
@@ -99,105 +108,141 @@ const InterviewScheduler: React.FC = () => {
   ];
 
   return (
-    <div className="p-1">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        <div className="flex items-center gap-2">
-            <div className="p-2 bg-slate-100 rounded-lg">
-                <Calendar className="w-5 h-5 text-slate-600" />
-            </div>
-            <h1 className="text-xl font-bold text-slate-800">Interview Scheduler</h1>
+    <div className="container mx-auto p-6 space-y-6 animate-in mt-2 bg-slate-50/50 rounded-3xl border border-slate-200/60">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
+            <Calendar className="w-5 h-5 text-primary" />
+          </div>
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">Interview Scheduler</h1>
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Manage placement events</p>
+          </div>
         </div>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl font-semibold shadow-lg shadow-indigo-100 transition-all active:scale-95"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Schedule Event</span>
-        </button>
-      </div>
-
-      <div className="mb-6">
-        <p className="text-sm font-medium text-slate-500">5 upcoming events</p>
-      </div>
-
-      <div className="space-y-4">
-        {events.map((event, i) => (
-          <motion.div 
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.05 }}
-            key={event.id}
-            className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center gap-6 hover:shadow-md transition-shadow"
-          >
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500/10 to-blue-500/10 rounded-xl flex items-center justify-center flex-shrink-0 border border-indigo-100/50">
-               <Calendar className="w-6 h-6 text-indigo-500" />
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-1.5">
-                <h3 className="font-bold text-slate-800 text-lg truncate">{event.type}</h3>
-                <span className={`px-3 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
-                  event.status === 'completed' ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-100' : 'bg-slate-100 text-slate-500 border border-slate-200'
-                }`}>
-                  {event.status}
-                </span>
-              </div>
-              <div className="flex flex-wrap items-center gap-y-2 gap-x-6 text-slate-400 font-semibold text-sm">
-                 <div className="flex items-center gap-1.5 whitespace-nowrap">
-                   <Briefcase className="w-4 h-4 text-slate-300" />
-                   <span>{event.company}</span>
-                 </div>
-                 <div className="flex items-center gap-1.5 whitespace-nowrap">
-                   <Calendar className="w-4 h-4 text-slate-300" />
-                   <span>{event.date}</span>
-                 </div>
-                 <div className="flex items-center gap-1.5 whitespace-nowrap">
-                   <Clock className="w-4 h-4 text-slate-300" />
-                   <span>{event.time}</span>
-                 </div>
-                 <div className="flex items-center gap-1.5 whitespace-nowrap">
-                   <MapPin className="w-4 h-4 text-slate-300" />
-                   <span>{event.location}</span>
-                 </div>
-              </div>
-              {event.assignedStudents.length > 0 && (
-                <div className="flex gap-2 mt-4">
-                  {event.assignedStudents.map(student => (
-                    <span key={student} className="bg-teal-500/10 text-teal-600 px-3 py-1 rounded-full text-[11px] font-bold border border-teal-100">
-                      {student}
-                    </span>
-                  ))}
+        
+        <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <DialogTrigger asChild>
+            <Button className="rounded-xl shadow-lg shadow-primary/20">
+              <Plus className="w-4 h-4 mr-2" />
+              Schedule Event
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>Schedule Interview Event</DialogTitle>
+              <DialogDescription>
+                Set interview date, time, and venue for the upcoming drive.
+              </DialogDescription>
+            </DialogHeader>
+            <form className="space-y-4 pt-4" onSubmit={(e) => { e.preventDefault(); setIsModalOpen(false); }}>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Company</label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Co." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="google">Google</SelectItem>
+                      <SelectItem value="microsoft">Microsoft</SelectItem>
+                      <SelectItem value="amazon">Amazon</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-              )}
-            </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Event Type</label>
+                  <Select>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="ppt">Pre-Placement Talk</SelectItem>
+                      <SelectItem value="test">Online Test</SelectItem>
+                      <SelectItem value="technical">Technical Interview</SelectItem>
+                      <SelectItem value="hr">HR Interview</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Date</label>
+                  <Input type="date" className="[color-scheme:light]" />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Time</label>
+                  <Input type="time" className="[color-scheme:light]" />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Venue</label>
+                <Input placeholder="e.g. Auditorium A or Online" />
+              </div>
+              <DialogFooter className="pt-4">
+                <Button type="submit" className="w-full">Schedule Drive</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
 
-            <div className="flex items-center gap-8">
-               <div className="text-right">
-                  {event.slots.total > 0 && (
-                     <div className="space-y-0.5">
-                       <p className="text-sm font-bold text-slate-700">{event.slots.filled}/{event.slots.total}</p>
-                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">slots left</p>
+      <div className="grid gap-4">
+        {events.map((event) => (
+          <Card key={event.id} className="group hover:border-primary/50 transition-colors shadow-none overflow-hidden">
+            <CardContent className="p-0">
+              <div className="flex flex-col md:flex-row items-center gap-6 p-5">
+                <div className="w-12 h-12 bg-slate-50 rounded-xl flex items-center justify-center flex-shrink-0 border border-slate-200 group-hover:bg-primary/5 group-hover:border-primary/20 transition-colors">
+                   <Calendar className="w-6 h-6 text-slate-400 group-hover:text-primary transition-colors" />
+                </div>
+
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-3 mb-1.5">
+                    <h3 className="font-bold text-slate-900 text-base truncate uppercase tracking-tight">{event.type}</h3>
+                    <Badge variant={event.status === 'completed' ? 'secondary' : 'default'} className="uppercase text-[9px] font-black tracking-widest px-2 py-0">
+                      {event.status}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-y-1 gap-x-5 text-muted-foreground font-semibold text-xs">
+                     <div className="flex items-center gap-1.5">
+                       <Briefcase className="w-3.5 h-3.5" />
+                       <span className="uppercase">{event.company}</span>
                      </div>
-                  )}
-               </div>
-               <div className="flex items-center gap-3">
-                 <button className="flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 px-5 py-2.5 rounded-xl text-sm font-bold border border-slate-200 transition-all hover:shadow-md active:scale-95">
-                   <Users className="w-4 h-4" />
-                   <span>Assign</span>
-                 </button>
-                 <button className="p-2.5 bg-white hover:bg-slate-50 text-slate-400 hover:text-slate-600 rounded-xl border border-slate-200 transition-all hover:shadow-md active:scale-95">
-                   <Edit3 className="w-4 h-4" />
-                 </button>
-               </div>
-            </div>
-          </motion.div>
+                     <div className="flex items-center gap-1.5">
+                       <Clock className="w-3.5 h-3.5" />
+                       <span>{event.date} • {event.time}</span>
+                     </div>
+                     <div className="flex items-center gap-1.5">
+                       <MapPin className="w-3.5 h-3.5" />
+                       <span>{event.location}</span>
+                     </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-6">
+                   <div className="text-right">
+                      {event.slots.total > 0 && (
+                         <div className="space-y-0 text-center">
+                           <p className="text-sm font-black text-slate-900">{event.slots.filled}/{event.slots.total}</p>
+                           <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">slots</p>
+                         </div>
+                      )}
+                   </div>
+                   <div className="flex items-center gap-2">
+                     <Button variant="outline" size="sm" className="rounded-lg h-9 font-bold uppercase text-[10px] tracking-wider">
+                       <Users className="w-3.5 h-3.5 mr-2" />
+                       Assign
+                     </Button>
+                     <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground hover:text-primary rounded-lg border border-slate-100">
+                       <Edit3 size={16} />
+                     </Button>
+                   </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         ))}
       </div>
-
-      <ScheduleEventModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-      />
+      <div className="h-10" />
     </div>
   );
 };
