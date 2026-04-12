@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getAPI, putAPI } from "../../apis/api";
+import { getAPI, putAPI, postAPI } from "../../apis/api";
 
 export const fetchStudents = createAsyncThunk(
     "student/fetchStudents",
@@ -33,6 +33,43 @@ export const activateStudents = createAsyncThunk(
             return response;
         } catch (error: any) {
             return rejectWithValue(error?.message || "Failed to activate students");
+        }
+    }
+);
+
+// Student Profile Thunks
+export const fetchStudentProfile = createAsyncThunk(
+    "student/fetchProfile",
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await getAPI<any>("/student/profile");
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to fetch student profile");
+        }
+    }
+);
+
+export const createStudentProfile = createAsyncThunk(
+    "student/createProfile",
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const response = await postAPI<any>("/student/profile", data);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to create student profile");
+        }
+    }
+);
+
+export const updateStudentProfile = createAsyncThunk(
+    "student/updateProfile",
+    async (data: any, { rejectWithValue }) => {
+        try {
+            const response = await putAPI<any>("/student/profile", data);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to update student profile");
         }
     }
 );

@@ -1,4 +1,3 @@
-import { useState, useRef } from 'react';
 import {
   User, Mail, Phone, MapPin, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2, Save,
@@ -8,50 +7,99 @@ import ProjectModal from './modal/ProjectModal';
 import { uploadToCloudinary } from '../../../../lib/cloudinary';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchStudentProfile, createStudentProfile, updateStudentProfile } from '../../../../redux/thunks/studentThunk';
+import { useEffect, useState, useRef } from 'react';
+import type { AppDispatch } from '@/redux/store/store';
+import type { RootState } from '@/redux/reducers/rootReducer';
 
 const StudentProfile = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { profile: backendProfile, loading: backendLoading } = useSelector((state: RootState) => state.student);
+  const { user } = useSelector((state: RootState) => state.auth);
+
   const [showProjectModal, setShowProjectModal] = useState(false)
   const [isEditing, setIsEditing] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [isUploadingResume, setIsUploadingResume] = useState(false);
   const profileImageInputRef = useRef<HTMLInputElement>(null);
   const [newSkill, setNewSkill] = useState("");
-  const [profile, setProfile] = useState({
-    name: 'Anjali Sharma',
+  
+  const [profile, setProfile] = useState<any>({
+    name: user ? `${user.firstname} ${user.lastname}` : 'Student Name',
     profileImage: null,
     batch: '2026 Batch',
     branch: 'B.Tech Computer Science',
-    email: 'anjali.sharma@campus.edu',
-    phone: '+91 98765 43210',
-    location: 'Mumbai, India',
+    email: user?.email || '',
+    phone: '',
+    location: '',
     stats: {
-      cgpa: '8.7',
-      tenth: '92.4%',
-      twelfth: '89.6%',
+      cgpa: '0.0',
+      tenth: '0%',
+      twelfth: '0%',
       backlogs: '0',
-      rollNo: 'CSE2022045',
-      department: 'CSE'
+      rollNo: '',
+      department: '',
+      year: 1,
+      passingYear: 2026,
+      departmentId: 1
     },
-    skills: [
-      { name: 'React', color: 'bg-blue-500' },
-      { name: 'TypeScript', color: 'bg-blue-600' },
-      { name: 'Node.js', color: 'bg-green-600' },
-      { name: 'Python', color: 'bg-yellow-600' },
-      { name: 'MongoDB', color: 'bg-green-500' },
-      { name: 'Git', color: 'bg-orange-600' },
-    ],
-    projects: [
-      {
-        title: 'E-Commerce Platform',
-        description: 'Full-stack e-commerce app with payment integration and admin dashboard.',
-        tags: ['React', 'Node.js', 'MongoDB'],
-        image: null
-      }
-    ],
-    resumes: [
-      { name: 'Anjali_Sharma_Resume.pdf', date: 'Apr 1, 2026', size: '245 KB', url: '#' }
-    ]
+    skills: [],
+    projects: [],
+    experiences: [],
+    certificates: [],
+    resumes: []
   });
+
+  useEffect(() => {
+    dispatch(fetchStudentProfile());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (backendProfile) {
+      setProfile((prev: any) => ({
+        ...prev,
+        ...backendProfile,
+        name: user ? `${user.firstname} ${user.lastname}` : 'Student Name',
+        email: user?.email || '',
+        stats: {
+          ...prev.stats,
+          cgpa: backendProfile.cgpa?.toString() || '0.0',
+          year: backendProfile.year || 1,
+          passingYear: backendProfile.passingYear || 2026,
+          departmentId: backendProfile.departmentId || 1,
+        },
+        skills: backendProfile.skills?.map((s: string) => ({ name: s, color: 'bg-blue-500' })) || [],
+        resumes: backendProfile.resumeUrl ? [{ name: 'Resume', url: backendProfile.resumeUrl, date: 'N/A', size: 'N/A' }] : []
+      }));
+    }
+  }, [backendProfile, user]);
+
+  const handleSave = async () => {
+    const data = {
+      departmentId: parseInt(profile.stats.departmentId),
+      year: parseInt(profile.stats.year),
+      passingYear: parseInt(profile.stats.passingYear),
+      cgpa: parseFloat(profile.stats.cgpa),
+      resumeUrl: profile.resumes[0]?.url || "",
+      skills: profile.skills.map((s: any) => s.name),
+      experiences: profile.experiences || [],
+      certificates: profile.certificates || [],
+    };
+
+    const toastId = toast.loading("Saving profile...");
+    try {
+      if (backendProfile) {
+        await dispatch(updateStudentProfile(data)).unwrap();
+      } else {
+        await dispatch(createStudentProfile(data)).unwrap();
+      }
+      toast.success("Profile saved successfully!", { id: toastId });
+      setIsEditing(false);
+    } catch (error: any) {
+      toast.error(error || "Failed to save profile", { id: toastId });
+    }
+  };
 
   const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -106,7 +154,7 @@ const StudentProfile = () => {
   };
 
   const deleteSkill = (index: number) => {
-    const updated = profile.skills.filter((_, i) => i !== index)
+    const updated = profile.skills.filter((_: any, i: number) => i !== index)
     setProfile({ ...profile, skills: updated })
   }
 
@@ -139,12 +187,19 @@ const StudentProfile = () => {
           </div>
         </div>
         <button
-          onClick={() => setIsEditing(!isEditing)}
+          onClick={() => {
+            if (isEditing) {
+              handleSave();
+            } else {
+              setIsEditing(true);
+            }
+          }}
           className={`px-8 py-3 rounded-2xl font-black text-sm transition-all shadow-xl tracking-widest flex items-center justify-center gap-3 ${
             isEditing ? 'bg-blue-600 text-white shadow-blue-500/20' : 'bg-white text-slate-900 border border-slate-200'
           }`}
+          disabled={backendLoading}
         >
-          {isEditing ? <><Save size={18} /> SAVE CHANGES</> : <><Edit3 size={18} /> EDIT PROFILE</>}
+          {backendLoading ? <Loader2 className="animate-spin" size={18} /> : (isEditing ? <><Save size={18} /> SAVE CHANGES</> : <><Edit3 size={18} /> EDIT PROFILE</>)}
         </button>
       </div>
 
@@ -164,7 +219,7 @@ const StudentProfile = () => {
                     <img src={profile.profileImage} className="w-full h-full object-cover" alt="Profile" />
                   ) : (
                     <div className="w-full h-full bg-blue-50 flex items-center justify-center text-blue-600 text-4xl font-black">
-                      {profile.name.split(' ').map(n => n[0]).join('')}
+                      {profile.name.split(' ').map((n: string) => n[0]).join('')}
                     </div>
                   )}
                   {isEditing && (
@@ -183,8 +238,8 @@ const StudentProfile = () => {
                 )}
                 <p className="text-blue-600 font-black text-xs uppercase tracking-widest">{profile.branch}</p>
                 <div className="flex items-center justify-center lg:justify-start gap-2 pt-1">
-                   <Badge variant="secondary" size="xs">{profile.batch}</Badge>
-                   <Badge variant="secondary" size="xs">{profile.stats.rollNo}</Badge>
+                   <Badge variant="secondary">{profile.batch}</Badge>
+                   <Badge variant="secondary">{profile.stats.rollNo}</Badge>
                 </div>
               </div>
 
@@ -219,13 +274,19 @@ const StudentProfile = () => {
               {[
                 { label: 'CGPA', value: profile.stats.cgpa, field: 'cgpa' },
                 { label: 'BACKLOGS', value: profile.stats.backlogs, field: 'backlogs' },
-                { label: '10TH GRADE', value: profile.stats.tenth, field: 'tenth' },
-                { label: '12TH GRADE', value: profile.stats.twelfth, field: 'twelfth' }
+                { label: 'YEAR', value: profile.stats.year, field: 'year', type: 'number' },
+                { label: 'PASSING YEAR', value: profile.stats.passingYear, field: 'passingYear', type: 'number' },
+                { label: 'DEPT ID', value: profile.stats.departmentId, field: 'departmentId', type: 'number' }
               ].map((stat, i) => (
                 <div key={i} className="bg-slate-50 p-5 rounded-3xl border border-slate-100">
                   <p className="text-slate-400 text-[9px] font-black uppercase tracking-[0.2em] mb-1">{stat.label}</p>
                   {isEditing ? (
-                    <input value={stat.value} onChange={(e) => updateStat(stat.field, e.target.value)} className="w-full text-lg font-black text-blue-600 bg-transparent border-b border-blue-200 outline-none" />
+                    <input 
+                      type={stat.type || 'text'} 
+                      value={stat.value} 
+                      onChange={(e) => updateStat(stat.field, e.target.value)} 
+                      className="w-full text-lg font-black text-blue-600 bg-transparent border-b border-blue-200 outline-none" 
+                    />
                   ) : (
                     <p className="text-xl font-black text-blue-600 tracking-tight">{stat.value}</p>
                   )}
@@ -246,19 +307,135 @@ const StudentProfile = () => {
               </div>
               {isEditing && (
                 <div className="flex gap-2">
-                  <input value={newSkill} onChange={(e) => setNewSkill(e.target.value)} placeholder="Add skill" className="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/5 transition-all" />
+                  <input
+                    value={newSkill}
+                    onChange={(e) => setNewSkill(e.target.value)}
+                    placeholder="Add skill"
+                    className="bg-slate-50 border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/5 transition-all"
+                    onKeyPress={(e) => e.key === 'Enter' && addSkill()}
+                  />
                   <button onClick={addSkill} className="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-black shadow-lg shadow-blue-500/10 uppercase tracking-widest active:scale-95 transition-all">Add</button>
                 </div>
               )}
             </div>
             <div className="flex flex-wrap gap-4">
-              {profile.skills.map((skill, i) => (
+              {profile.skills.map((skill: any, i: number) => (
                 <div key={i} className="group flex items-center gap-2.5 px-5 py-2.5 bg-slate-50 border border-slate-100 rounded-2xl hover:bg-white hover:border-blue-200 hover:shadow-md transition-all cursor-default">
-                  <div className={`w-2.5 h-2.5 rounded-full ${skill.color} shadow-sm`} />
+                  <div className={`w-2.5 h-2.5 rounded-full ${skill.color || 'bg-blue-500'} shadow-sm`} />
                   <span className="text-sm font-black text-slate-700 uppercase tracking-tight">{skill.name}</span>
                   {isEditing && <Trash2 size={14} className="text-slate-300 hover:text-red-500 cursor-pointer ml-1 transition-colors" onClick={() => deleteSkill(i)} />}
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Experiences Section */}
+          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <Briefcase className="text-blue-600" size={22} />
+                <h3 className="font-black text-slate-900 uppercase tracking-widest text-sm">Work Experience</h3>
+              </div>
+              {isEditing && (
+                <button 
+                  onClick={() => {
+                    const companyName = prompt("Company Name:");
+                    const role = prompt("Role:");
+                    const description = prompt("Description:");
+                    const startDate = prompt("Start Date (YYYY-MM-DD):");
+                    if (companyName && role) {
+                      setProfile({
+                        ...profile,
+                        experiences: [...(profile.experiences || []), { companyName, role, description, startDate }]
+                      });
+                    }
+                  }}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/10 active:scale-95 transition-all"
+                >
+                  <Plus size={16} /> Add Experience
+                </button>
+              )}
+            </div>
+            <div className="space-y-6">
+              {profile.experiences?.length > 0 ? profile.experiences.map((exp: any, i: number) => (
+                <div key={i} className="p-6 rounded-[2rem] border border-slate-100 bg-slate-50/50 group">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="text-lg font-black text-slate-900 uppercase tracking-tight">{exp.companyName}</h4>
+                      <p className="text-blue-600 font-bold text-sm uppercase tracking-widest">{exp.role}</p>
+                      <p className="text-xs text-slate-400 font-black uppercase mt-1">{exp.startDate} {exp.endDate ? `— ${exp.endDate}` : '(Present)'}</p>
+                    </div>
+                    {isEditing && (
+                      <Trash2 
+                        size={18} 
+                        className="text-slate-300 hover:text-red-500 cursor-pointer transition-colors" 
+                        onClick={() => {
+                          const updated = profile.experiences.filter((_: any, idx: number) => idx !== i);
+                          setProfile({ ...profile, experiences: updated });
+                        }} 
+                      />
+                    )}
+                  </div>
+                  <p className="mt-4 text-sm font-medium text-slate-500 leading-relaxed">{exp.description}</p>
+                </div>
+              )) : (
+                <p className="text-slate-400 text-xs font-bold uppercase tracking-widest text-center py-8">No experience listed</p>
+              )}
+            </div>
+          </div>
+
+          {/* Certificates Section */}
+          <div className="bg-white p-8 md:p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-3">
+                <FileText className="text-blue-600" size={22} />
+                <h3 className="font-black text-slate-900 uppercase tracking-widest text-sm">Certifications</h3>
+              </div>
+              {isEditing && (
+                <button 
+                  onClick={() => {
+                    const title = prompt("Certificate Title:");
+                    const issuer = prompt("Issuer:");
+                    const issuedDate = prompt("Issued Date (YYYY-MM-DD):");
+                    if (title && issuer) {
+                      setProfile({
+                        ...profile,
+                        certificates: [...(profile.certificates || []), { title, issuer, issuedDate }]
+                      });
+                    }
+                  }}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest shadow-lg shadow-blue-500/10 active:scale-95 transition-all"
+                >
+                  <Plus size={16} /> Add Certificate
+                </button>
+              )}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {profile.certificates?.length > 0 ? profile.certificates.map((cert: any, i: number) => (
+                <div key={i} className="p-6 rounded-[2rem] border border-slate-100 bg-slate-50/50 group">
+                  <div className="flex justify-between items-start mb-4">
+                    <div>
+                      <h4 className="text-md font-black text-slate-900 uppercase tracking-tight">{cert.title}</h4>
+                      <p className="text-blue-600 font-bold text-xs uppercase tracking-widest">{cert.issuer}</p>
+                    </div>
+                    {isEditing && (
+                      <Trash2 
+                        size={16} 
+                        className="text-slate-300 hover:text-red-500 cursor-pointer transition-colors" 
+                        onClick={() => {
+                          const updated = profile.certificates.filter((_: any, idx: number) => idx !== i);
+                          setProfile({ ...profile, certificates: updated });
+                        }} 
+                      />
+                    )}
+                  </div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{cert.issuedDate}</p>
+                </div>
+              )) : (
+                <div className="col-span-full py-8 text-center">
+                   <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">No certificates listed</p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -276,7 +453,7 @@ const StudentProfile = () => {
               )}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {profile.projects.map((proj, i) => (
+              {profile.projects.map((proj: any, i: number) => (
                 <div key={i} className="p-6 rounded-[2rem] border border-slate-100 bg-slate-50/50 hover:bg-white hover:border-blue-200 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 group">
                   <div className="flex justify-between items-start mb-4">
                     <h4 className="text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight leading-tight">{proj.title}</h4>
@@ -287,7 +464,7 @@ const StudentProfile = () => {
                   )}
                   <p className="text-sm font-medium text-slate-500 mb-6 line-clamp-3 leading-relaxed">{proj.description}</p>
                   <div className="flex flex-wrap gap-2">
-                    {proj.tags.map(tag => (
+                    {proj.tags.map((tag: string) => (
                       <span key={tag} className="text-[10px] font-black px-3 py-1 bg-white border border-slate-100 text-slate-400 rounded-xl uppercase tracking-widest">
                         {tag}
                       </span>
@@ -312,7 +489,7 @@ const StudentProfile = () => {
               </label>
             </div>
             <div className="space-y-4">
-              {profile.resumes.map((res, i) => (
+              {profile.resumes.map((res: any, i: number) => (
                 <div key={i} className="flex items-center justify-between p-5 bg-slate-50 rounded-[2rem] border border-slate-100 hover:border-blue-200 hover:bg-white transition-all group">
                   <div className="flex items-center gap-5">
                     <div className="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-rose-500 border border-slate-200/50 group-hover:scale-105 transition-transform">

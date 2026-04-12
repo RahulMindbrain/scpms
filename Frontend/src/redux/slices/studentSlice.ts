@@ -1,9 +1,10 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { fetchStudents, fetchInactiveStudents, activateStudents } from "../thunks/studentThunk";
+import { fetchStudents, fetchInactiveStudents, activateStudents, fetchStudentProfile, createStudentProfile, updateStudentProfile } from "../thunks/studentThunk";
 
 interface StudentState {
   students: any[];
   inactiveStudents: any[];
+  profile: any | null;
   loading: boolean;
   error: string | null;
   meta: {
@@ -17,6 +18,7 @@ interface StudentState {
 const initialState: StudentState = {
   students: [],
   inactiveStudents: [],
+  profile: null,
   loading: false,
   error: null,
   meta: null,
@@ -67,6 +69,45 @@ const studentSlice = createSlice({
         state.loading = false;
       })
       .addCase(activateStudents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Fetch Student Profile
+      .addCase(fetchStudentProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchStudentProfile.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.profile = action.payload.data;
+      })
+      .addCase(fetchStudentProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Create Student Profile
+      .addCase(createStudentProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(createStudentProfile.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.profile = action.payload.data;
+      })
+      .addCase(createStudentProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Update Student Profile
+      .addCase(updateStudentProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateStudentProfile.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.profile = action.payload.data;
+      })
+      .addCase(updateStudentProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });
