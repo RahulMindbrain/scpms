@@ -53,7 +53,7 @@ const AdminJobManagement: React.FC = () => {
   return (
     <div className=" space-y-8 p-4 md:p-0 mt-4 animate-in">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-end gap-6">
         
 
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">

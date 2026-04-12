@@ -160,8 +160,7 @@ const StudentProfile = () => {
   return (
     <div className="space-y-6 animate-in fade-in duration-500 mt-2 p-4 md:p-6">
       {/* Profile Header section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-        
+      <div className="flex flex-col md:flex-row md:items-center justify-end gap-4 mb-6">
         <Button
           onClick={() => setShowProfileEditDialog(true)}
           disabled={backendLoading}

@@ -17,8 +17,7 @@ const Applicants: React.FC = () => {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        
+      <div className="flex flex-col md:flex-row md:items-center justify-end gap-4">
         <Button variant="outline" className="font-bold border-slate-200 hover:border-blue-600 hover:text-blue-600 px-6 py-6 rounded-2xl transition-all">
           <Download className="w-5 h-5 mr-2" /> Download All Resumes
         </Button>

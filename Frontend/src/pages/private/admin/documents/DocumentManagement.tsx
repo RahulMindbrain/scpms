@@ -87,12 +87,7 @@ const DocumentManagement: React.FC = () => {
 
   return (
     <div className="p-1  animate-in fade-in duration-700">
-      <div className="flex items-center gap-2 mb-8">
-        <div className="p-2 bg-slate-100 rounded-lg">
-          <Folder className="w-5 h-5 text-slate-600" />
-        </div>
-        
-      </div>
+      
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
