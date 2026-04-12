@@ -58,14 +58,31 @@ interface AuthState {
     error: string | null;
 }
 
+// ─── Helper: Persistence ───────────────────────────────────────────────────
+
+const loadPersistedUser = () => {
+    try {
+        const user = localStorage.getItem("user");
+        const token = localStorage.getItem("token");
+        if (user && token) {
+            return JSON.parse(user);
+        }
+    } catch {
+        return null;
+    }
+    return null;
+};
+
+const persistedUser = loadPersistedUser();
+
 const initialState: AuthState = {
-    isAuthenticated: false,
-    userType: null,
-    user: null,
-    adminData: null,
-    studentData: null,
-    companyData: null,
-    token: null,
+    isAuthenticated: !!persistedUser,
+    userType: persistedUser ? (persistedUser.role as AuthState["userType"]) : null,
+    user: persistedUser,
+    adminData: persistedUser?.role === "ADMIN" ? (persistedUser as AdminUser) : null,
+    studentData: persistedUser?.role === "STUDENT" ? (persistedUser as StudentUser) : null,
+    companyData: persistedUser?.role === "COMPANY" ? (persistedUser as CompanyUser) : null,
+    token: localStorage.getItem("token"),
     loading: false,
     error: null,
 };
@@ -88,6 +105,7 @@ const authSlice = createSlice({
             state.error = null;
             // Clear token from axios default headers + localStorage
             setAuthToken(null);
+            localStorage.removeItem("user");
         },
 
     },
@@ -127,6 +145,7 @@ const authSlice = createSlice({
                 if (token) {
                     setAuthToken(token);
                 }
+                localStorage.setItem("user", JSON.stringify(user));
             })
 
             // ── Login failure ──────────────────────────────────────────────

@@ -13,10 +13,15 @@ import {
   FileText,
   Mail,
   CheckCircle2,
-  Building2
+  Building2,
+  LogOut,
+  User
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { logout } from '@/redux/slices/authSlice';
+import type { RootState } from '@/redux/reducers/rootReducer';
 
 const HomePage: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -27,6 +32,20 @@ const HomePage: React.FC = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isAuthenticated, user, userType } = useSelector((state: RootState) => state.auth);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/');
+  };
+
+  const getDashboardLink = () => {
+    if (!userType) return '/';
+    return `/${userType.toLowerCase()}/dashboard`;
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-teal-500/30">
@@ -54,19 +73,45 @@ const HomePage: React.FC = () => {
                 ))}
               </div>
               <div className="flex items-center gap-6 ml-4 border-l border-slate-200/20 pl-6">
-                <a href="/login" className={`text-sm font-bold ${scrolled ? 'text-slate-900' : 'text-white'} hover:text-blue-500 transition-colors`}>
-                  Sign In
-                </a>
-                <Link
-                  to="/signup"
-                  className="bg-gradient-to-br from-blue-700 to-slate-900 text-white px-6 py-2 rounded-lg text-sm font-bold flex items-center gap-2"
-                >
-                  Get Started <ArrowRight size={16} />
-                </Link>
+                {!isAuthenticated ? (
+                  <>
+                    <a href="/login" className={`text-sm font-bold ${scrolled ? 'text-slate-900' : 'text-white'} hover:text-blue-500 transition-colors`}>
+                      Sign In
+                    </a>
+                    <Link
+                      to="/signup"
+                      className="bg-gradient-to-br from-blue-700 to-slate-900 text-white px-6 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/20"
+                    >
+                      Get Started <ArrowRight size={16} />
+                    </Link>
+                  </>
+                ) : (
+                  <div className="flex items-center gap-4">
+                    <Link
+                      to={getDashboardLink()}
+                      className={`flex items-center gap-2 py-1.5 px-3 rounded-full border transition-all ${scrolled
+                        ? 'bg-blue-50 border-blue-100 text-blue-700'
+                        : 'bg-white/10 border-white/20 text-white hover:bg-white/20'
+                        }`}
+                    >
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${scrolled ? 'bg-blue-600 text-white' : 'bg-white text-blue-700'}`}>
+                        {user?.firstname?.charAt(0).toUpperCase() || 'U'}
+                      </div>
+                      <span className="text-xs font-bold whitespace-nowrap">Dashboard</span>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className={`p-2 rounded-lg transition-all ${scrolled ? 'text-slate-400 hover:text-red-500 hover:bg-red-50' : 'text-slate-300 hover:text-white hover:bg-white/10'}`}
+                      title="Logout"
+                    >
+                      <LogOut size={18} />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
 
-            <button className= {`md:hidden p-2 ${scrolled || isMenuOpen ? 'text-slate-900' : 'text-white'}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+            <button className={`md:hidden p-2 ${scrolled || isMenuOpen ? 'text-slate-900' : 'text-white'}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
               {isMenuOpen ? <X /> : <Menu />}
             </button>
           </div>
@@ -86,14 +131,45 @@ const HomePage: React.FC = () => {
               ))}
             </div>
             <div className="flex flex-col gap-4">
-              <a href="/login"
-                onClick={() => setIsMenuOpen(false)}
-                className="flex items-center justify-center py-4 text-lg font-bold text-slate-900 border border-slate-200 rounded-2xl">
-                Sign In
-              </a>
-              <button className="py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-2xl text-lg font-bold shadow-xl shadow-blue-500/20">
-                Get Started Now
-              </button>
+              {!isAuthenticated ? (
+                <>
+                  <a href="/login"
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center justify-center py-4 text-lg font-bold text-slate-900 border border-slate-200 rounded-2xl">
+                    Sign In
+                  </a>
+                  <button
+                    onClick={() => { setIsMenuOpen(false); navigate('/signup'); }}
+                    className="py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-2xl text-lg font-bold shadow-xl shadow-blue-500/20">
+                    Get Started Now
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to={getDashboardLink()}
+                    onClick={() => setIsMenuOpen(false)}
+                    className="flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-2xl group"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
+                        {user?.firstname?.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="text-sm text-blue-600 font-bold uppercase tracking-wider">{userType}</p>
+                        <p className="text-lg font-bold text-slate-900">{user?.firstname} {user?.lastname}</p>
+                      </div>
+                    </div>
+                    <ChevronRight size={20} className="text-blue-600 group-hover:translate-x-1 transition-transform" />
+                  </Link>
+                  <button
+                    onClick={() => { handleLogout(); setIsMenuOpen(false); }}
+                    className="flex items-center justify-center gap-2 py-4 text-lg font-bold text-red-600 border border-red-100 bg-red-50 rounded-2xl"
+                  >
+                    <LogOut size={20} /> Sign Out
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -128,8 +204,10 @@ const HomePage: React.FC = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <button className="px-8 py-3.5 bg-gradient-to-br from-blue-700 to-slate-900 text-white rounded-xl font-bold flex items-center gap-2 shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:translate-y-[-2px]">
-                Launch Dashboard <ChevronRight size={18} />
+              <button
+                onClick={() => navigate(getDashboardLink())}
+                className="px-8 py-3.5 bg-gradient-to-br from-blue-700 to-slate-900 text-white rounded-xl font-bold flex items-center gap-2 shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:translate-y-[-2px]">
+                {isAuthenticated ? 'Go to Dashboard' : 'Launch Dashboard'} <ChevronRight size={18} />
               </button>
               <button className="px-8 py-3.5 bg-white text-slate-900 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition-all">
                 Explore Features
@@ -233,7 +311,7 @@ const HomePage: React.FC = () => {
               title="Students"
               desc="Build your portfolio, track eligibility, apply to drives, and follow your application status in real time."
               buttonText="Student Portal"
-               navigateTo="/login"
+              navigateTo="/login"
             />
             <PortalCard
               icon={Building2}
@@ -241,7 +319,7 @@ const HomePage: React.FC = () => {
               title="Companies"
               desc="Post job descriptions, filter candidates by criteria, schedule interviews, and update selection results."
               buttonText="Company Portal"
-               navigateTo="/login"
+              navigateTo="/login"
             />
           </div>
         </div>
@@ -382,7 +460,7 @@ const PortalCard = ({
 
   return (
     <div className="bg-white p-10 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 text-center flex flex-col items-center">
-      
+
       <div className={`w-16 h-16 ${iconColor} rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-black/5`}>
         <Icon size={32} className="text-white" />
       </div>
