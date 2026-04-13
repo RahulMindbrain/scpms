@@ -84,13 +84,21 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: Prof
           <DialogDescription className="text-slate-500 font-medium">Update your academic and contact information.</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6 py-4">
+        <form onSubmit={handleSubmit} className="space-y-9 py-4">
           <Tabs defaultValue="personal" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 rounded-2xl p-1 bg-slate-100 mb-6 font-bold uppercase tracking-widest text-[9px]">
-              <TabsTrigger value="personal" className="rounded-xl p-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">Contact</TabsTrigger>
-              <TabsTrigger value="academic" className="rounded-xl p-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">Academic</TabsTrigger>
-              <TabsTrigger value="skills" className="rounded-xl p-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">Skills</TabsTrigger>
-              <TabsTrigger value="docs" className="rounded-xl p-2 data-[state=active]:bg-white data-[state=active]:shadow-sm">Docs</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-4 bg-slate-100 rounded-xl p-1 mb-6">
+              <TabsTrigger
+                value="personal"
+                className="w-full text-xs font-semibold rounded-lg py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >
+                Contact
+              </TabsTrigger>
+              <TabsTrigger value="academic" className="w-full text-xs font-semibold rounded-lg py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >Academic</TabsTrigger>
+              <TabsTrigger value="skills" className="w-full text-xs font-semibold rounded-lg py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >Skills</TabsTrigger>
+              <TabsTrigger value="docs" className="w-full text-xs font-semibold rounded-lg py-2 data-[state=active]:bg-white data-[state=active]:shadow-sm"
+              >Docs</TabsTrigger>
             </TabsList>
 
             <TabsContent value="personal" className="space-y-4">

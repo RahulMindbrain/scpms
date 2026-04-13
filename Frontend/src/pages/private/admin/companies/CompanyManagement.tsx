@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   Building2,
-  MapPin, Search, Plus, CheckCircle2,
+  MapPin, Search, CheckCircle2,
   Mail, Trash2,
   XCircle,
   ExternalLink,
@@ -151,12 +151,7 @@ const CompanyManagement: React.FC = () => {
               className="w-full sm:w-72 pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all placeholder:text-slate-300"
             />
           </div>
-          <Button
-            onClick={() => setIsAddModalOpen(true)}
-            className="flex items-center justify-center gap-2 py-7 px-8 bg-blue-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20"
-          >
-            <Plus className="w-5 h-5" /> Add Partner
-          </Button>
+         
         </div>
       </div>
 

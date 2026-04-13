@@ -18,16 +18,13 @@ const useAuth = () => {
 
     const user = auth.user;
 
-    /** "Abhinash" */
+   
     const firstName = user?.firstname ?? "User";
 
-    /** "Abhinash Nayak" */
+ 
     const fullName = user ? `${user.firstname} ${user.lastname}` : "User";
 
-    /**
-     * Up to 2 initials from first + last name.
-     * "Abhinash Nayak" → "AN"
-     */
+    
     const initials = user
         ? `${user.firstname?.[0] ?? ""}${user.lastname?.[0] ?? ""}`.toUpperCase()
         : "?";

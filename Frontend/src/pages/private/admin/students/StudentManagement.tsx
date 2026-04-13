@@ -104,7 +104,7 @@ const StudentManagement: React.FC = () => {
 
   const handleAddStudent = (e: React.FormEvent) => {
     e.preventDefault();
-    toast.success("Integrate with backend to add new student records.");
+    toast.success(" add new student records.");
     setIsAddModalOpen(false);
   };
 
