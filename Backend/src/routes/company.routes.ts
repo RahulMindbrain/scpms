@@ -11,7 +11,10 @@ import {
   updateCompanySchema,
 } from "../validators/company.validators";
 import authenticateUser from "../middlewares/authenticateUser";
-import { createJobController } from "../controllers/job.controller";
+import {
+  createJobController,
+  getJobsController,
+} from "../controllers/job.controller";
 import { createJobSchema } from "../validators/job.validator";
 import {
   getApplicationsController,
@@ -52,6 +55,13 @@ CompanyRoutes.post(
 );
 
 CompanyRoutes.get(
+  "/get-jobs",
+  authenticateUser,
+  authorizeRoles("COMPANY"),
+  getJobsController,
+);
+
+CompanyRoutes.get(
   "/get-job-application",
   authenticateUser,
   authorizeRoles("COMPANY"),
@@ -59,7 +69,7 @@ CompanyRoutes.get(
 );
 
 CompanyRoutes.put(
-  "/update-job-status",
+  "/update-job-status/:id",
   authenticateUser,
   authorizeRoles("COMPANY"),
   updateApplicationController,

@@ -12,7 +12,10 @@ import {
   updateStudentSchema,
 } from "../validators/sudent.validator";
 import { getJobsController } from "../controllers/job.controller";
-import { createApplicationController } from "../controllers/application.controller";
+import {
+  createApplicationController,
+  getApplicationsController,
+} from "../controllers/application.controller";
 
 const StudentRoutes = Router();
 
@@ -51,6 +54,13 @@ StudentRoutes.post(
   authenticateUser,
   authorizeRoles("STUDENT"),
   createApplicationController,
+);
+
+StudentRoutes.get(
+  "/get-job-application",
+  authenticateUser,
+  authorizeRoles("STUDENT"),
+  getApplicationsController,
 );
 
 export default StudentRoutes;

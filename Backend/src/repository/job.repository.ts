@@ -2,11 +2,17 @@ import { JobStatus } from "@prisma/client";
 import prisma from "../config/db";
 
 export const createJob = async (data: any) => {
-  const { eligibleDepartmentIds, skillIds, companyId, ...rest } = data;
+  const { eligibleDepartmentIds, skillIds, companyId, salary, ...rest } = data;
+
+  // ✅ Validate salary
+  if (!salary || salary <= 0) {
+    throw new Error("Valid salary is required");
+  }
 
   return prisma.job.create({
     data: {
       ...rest,
+      salary, // ✅ explicitly include
 
       company: {
         connect: { id: companyId },
@@ -28,7 +34,7 @@ export const createJob = async (data: any) => {
     include: {
       company: true,
       eligibleDepartments: true,
-      skills: true, // include for response
+      skills: true,
     },
   });
 };
@@ -82,12 +88,18 @@ export const getCompanyByUserId = async (userId: number) => {
 };
 
 export const updateJob = async (id: number, data: any) => {
-  const { eligibleDepartmentIds, ...rest } = data;
+  const { eligibleDepartmentIds, salary, ...rest } = data;
+
+  // ✅ Optional validation
+  if (salary !== undefined && salary <= 0) {
+    throw new Error("Salary must be positive");
+  }
 
   return prisma.job.update({
     where: { id },
     data: {
       ...rest,
+      ...(salary !== undefined && { salary }), // ✅ update salary safely
 
       ...(eligibleDepartmentIds && {
         eligibleDepartments: {
@@ -234,3 +246,18 @@ export const getApplicationByStudentAndJob = async (
     },
   });
 };
+
+// export const getJobs = async (params: {
+//   page: number;
+//   limit: number;
+//   status?: JobStatus;
+//   minSalary?: number;
+//   maxSalary?: number;
+// }) => {
+//   const { page, limit, status, minSalary, maxSalary } = params;
+
+//   const where = {
+//     ...(status && { status }),
+//     ...(minSalary && { salary: { gte: minSalary } }),
+//     ...(maxSalary && { salary: { lte: maxSalary } }),
+//   };
