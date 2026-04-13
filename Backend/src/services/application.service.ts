@@ -1,9 +1,11 @@
+import prisma from "../config/db";
 import {
   createApplication,
   deleteApplication,
   getApplications,
   updateApplicationStatus,
 } from "../repository/application.repository";
+import { getCompanyByUserId } from "../repository/company.repository";
 import {
   getApplicationByStudentAndJob,
   getJobById,
@@ -47,8 +49,41 @@ export const createApplicationService = async (
   });
 };
 
-export const getApplicationsService = async (studentId: number) => {
-  return getApplications(studentId);
+export const getApplicationsService = async (
+  user: any,
+  filters: any,
+  page: number,
+  limit: number,
+) => {
+  try {
+    let enrichedUser: any = { ...user };
+
+    if (user.role === "COMPANY") {
+      const company = await getCompanyByUserId(user.id);
+
+      if (!company) {
+        throw new Error("Company not found");
+      }
+
+      enrichedUser.companyId = company.id;
+    }
+
+    if (user.role === "STUDENT") {
+      const student = await getStudentByUserId(user.id);
+
+      if (!student) {
+        throw new Error("Student not found");
+      }
+
+      // ✅ FIX: assign properly
+      enrichedUser.studentId = student.id;
+    }
+
+    return await getApplications(enrichedUser, filters, page, limit);
+  } catch (error) {
+    console.error("Service Error:", error);
+    throw error;
+  }
 };
 
 export const updateApplicationService = async (id: number, status: any) => {

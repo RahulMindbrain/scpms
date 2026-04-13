@@ -297,3 +297,17 @@ export const getInactiveStudentUsers = async (params: {
     },
   };
 };
+
+export const getDeptWiseStats = async () => {
+  return prisma.student.findMany({
+    include: {
+      department: true,
+      applications: {
+        where: {
+          status: "SELECTED",
+        },
+        select: { id: true },
+      },
+    },
+  });
+};

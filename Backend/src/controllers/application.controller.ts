@@ -34,19 +34,42 @@ export const createApplicationController = async (
 };
 
 export const getApplicationsController = async (
-  _req: Request,
+  req: Request,
   res: Response,
 ) => {
-  const user = res.locals.user;
-  const data = await getApplicationsService(user.id);
-  return sendSuccess(res, 200, "Applications fetched", data);
+  try {
+    const user = res.locals.user;
+
+    const filters = {
+      applicationId: req.query.applicationId
+        ? Number(req.query.applicationId)
+        : undefined,
+      jobId: req.query.jobId ? Number(req.query.jobId) : undefined,
+      companyId: req.query.companyId ? Number(req.query.companyId) : undefined,
+      studentId: req.query.studentId ? Number(req.query.studentId) : undefined,
+      status: req.query.status as any,
+    };
+
+    // ✅ Pagination params
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const limit = req.query.limit ? Number(req.query.limit) : 10;
+
+    const data = await getApplicationsService(user, filters, page, limit);
+
+    return sendSuccess(res, 200, "Applications fetched", data);
+  } catch (error: any) {
+    console.error("Controller Error:", error);
+    return sendError(res, 500, "Failed to fetch applications");
+  }
 };
 
 export const updateApplicationController = async (
   req: Request,
   res: Response,
 ) => {
+  // const { id } = req.body;
   const { id } = req.params;
+  console.log(id);
   const { status } = req.body;
 
   const data = await updateApplicationService(Number(id), status);
