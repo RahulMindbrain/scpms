@@ -10,6 +10,8 @@ import adminRoutes from "./routes/admin.routes.js";
 import CompanyRoutes from "./routes/company.routes.js";
 import AuthRoutes from "./routes/auth.routes.js";
 import StudentRoutes from "./routes/student.routes.js";
+import DepartmentRoutes from "./routes/department.routes.js";
+import cloudinaryRoute from "./routes/cloudinary.routes.js";
 
 const app = express();
 
@@ -42,5 +44,7 @@ app.use("/users", UserRoutes);
 app.use("/admin", adminRoutes);
 app.use("/company", CompanyRoutes);
 app.use("/student", StudentRoutes);
+app.use("/dept", DepartmentRoutes);
+app.use("/cloudinary", cloudinaryRoute);
 
 export default app;

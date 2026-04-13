@@ -4,6 +4,7 @@ import {
   activateUsersController,
   createAdminController,
   getCompaniesController,
+  getDashboardStatsController,
   getInactiveCompaniesController,
   getInactiveStudentsController,
   getStudentsController,
@@ -92,6 +93,12 @@ adminRoutes.put(
   authenticateUser,
   authorizeRoles("ADMIN"),
   updateApplicationController,
+);
+adminRoutes.get(
+  "/dashboard",
+  authenticateUser,
+  authorizeRoles("ADMIN"),
+  getDashboardStatsController,
 );
 
 export default adminRoutes;

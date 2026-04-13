@@ -247,6 +247,21 @@ export const getApplicationByStudentAndJob = async (
   });
 };
 
+export const getJobBasicDetails = async (id: number) => {
+  return prisma.job.findUnique({
+    where: { id },
+    select: {
+      title: true,
+      location: true,
+      company: {
+        select: {
+          name: true,
+        },
+      },
+    },
+  });
+};
+
 // export const getJobs = async (params: {
 //   page: number;
 //   limit: number;
