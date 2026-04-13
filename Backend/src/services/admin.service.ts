@@ -12,8 +12,11 @@ import {
 } from "../repository/admin.repository";
 import { hashPassword } from "../utils/hashPassword";
 import {
+  getDeptWiseStats,
   getInactiveStudents,
   getInactiveStudentUsers,
+  getSalaryDataRepo,
+  getTotalPlacedStudentsRepo,
 } from "../repository/student.repository";
 import { sendSuccess } from "../utils/response";
 import {
@@ -278,4 +281,116 @@ export const updateJobStatusByAdminService = async (
 
   // ✅ Bulk
   return updateJobStatusBulk(jobIds, status, adminId);
+};
+
+export const activateCompaniesService = async (userIds: number[]) => {
+  const users = await getUsersByIds(userIds);
+
+  if (!users.length) {
+    throw new Error("No users found");
+  }
+
+  const nonCompanyUsers = users.filter((u) => u.role !== "COMPANY");
+
+  if (nonCompanyUsers.length) {
+    throw new Error(
+      `Some users are not companies: ${nonCompanyUsers
+        .map((u) => u.id)
+        .join(", ")}`,
+    );
+  }
+
+  const alreadyActive = users.filter((u) => u.status === "ACTIVE");
+
+  if (alreadyActive.length) {
+    throw new Error(
+      `Some companies already active: ${alreadyActive
+        .map((u) => u.id)
+        .join(", ")}`,
+    );
+  }
+
+  if (userIds.length === 1) {
+    return activateCompanies(userIds);
+  }
+
+  return activateCompanies(userIds);
+};
+
+export const getDashboardStatsService = async () => {
+  try {
+    const [students, totalPlaced, salaryData] = await Promise.all([
+      getDeptWiseStats(),
+      getTotalPlacedStudentsRepo(),
+      getSalaryDataRepo(),
+    ]);
+
+    const deptMap: any = {};
+
+    students.forEach((student) => {
+      const dept = student.department.name;
+
+      if (!deptMap[dept]) {
+        deptMap[dept] = {
+          total: 0,
+          placed: 0,
+        };
+      }
+
+      deptMap[dept].total++;
+
+      if (student.applications.length > 0) {
+        deptMap[dept].placed++;
+      }
+    });
+
+    const deptStats = Object.entries(deptMap).map(([dept, data]: any) => ({
+      department: dept,
+      totalStudents: data.total,
+      placedStudents: data.placed,
+      percentage:
+        data.total > 0
+          ? Number(((data.placed / data.total) * 100).toFixed(2))
+          : 0,
+    }));
+
+    let totalSalary = 0;
+
+    const deptSalaryMap: any = {};
+
+    salaryData.forEach((item) => {
+      const salary = item.job.salary;
+      const deptId = item.student.departmentId;
+
+      totalSalary += salary;
+
+      if (!deptSalaryMap[deptId]) {
+        deptSalaryMap[deptId] = [];
+      }
+
+      deptSalaryMap[deptId].push(salary);
+    });
+
+    const avgSalary =
+      salaryData.length > 0 ? Math.round(totalSalary / salaryData.length) : 0;
+
+    const deptAvgSalary = Object.entries(deptSalaryMap).map(
+      ([deptId, salaries]: any) => ({
+        departmentId: Number(deptId),
+        avgSalary: Math.round(
+          salaries.reduce((a: number, b: number) => a + b, 0) / salaries.length,
+        ),
+      }),
+    );
+
+    return {
+      totalPlacedStudents: totalPlaced,
+      avgSalary,
+      deptStats,
+      deptAvgSalary,
+    };
+  } catch (error) {
+    console.error("Dashboard Service Error:", error);
+    throw error;
+  }
 };

@@ -16,6 +16,7 @@ import {
   createApplicationController,
   getApplicationsController,
 } from "../controllers/application.controller";
+import { getCloudinarySignatureController } from "../cloudinaryUploads/cloudinary";
 
 const StudentRoutes = Router();
 
@@ -62,5 +63,12 @@ StudentRoutes.get(
   authorizeRoles("STUDENT"),
   getApplicationsController,
 );
+
+// StudentRoutes.post(
+//   "/cloudinary/signature",
+//   authenticateUser,
+//   authorizeRoles("STUDENT"),
+//   getCloudinarySignatureController,
+// );
 
 export default StudentRoutes;

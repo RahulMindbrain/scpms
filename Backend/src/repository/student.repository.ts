@@ -300,14 +300,106 @@ export const getInactiveStudentUsers = async (params: {
 
 export const getDeptWiseStats = async () => {
   return prisma.student.findMany({
-    include: {
-      department: true,
+    select: {
+      id: true,
+      department: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
       applications: {
         where: {
           status: "SELECTED",
         },
         select: { id: true },
       },
+    },
+  });
+};
+
+export const getTotalPlacedStudentsRepo = async () => {
+  const result = await prisma.application.groupBy({
+    by: ["studentId"],
+    where: {
+      status: "SELECTED",
+    },
+  });
+
+  return result.length;
+};
+
+export const getSalaryDataRepo = async () => {
+  return prisma.application.findMany({
+    where: {
+      status: "SELECTED",
+    },
+    select: {
+      job: {
+        select: { salary: true },
+      },
+      student: {
+        select: {
+          departmentId: true,
+        },
+      },
+    },
+  });
+};
+
+// export const getDeptPlacedCountRepo = async () => {
+//   return prisma.application.groupBy({
+//     by: ["studentId"],
+//     where: {
+//       status: "SELECTED",
+//     },
+//   });
+// };
+
+// export const getAvgSalaryRepo = async () => {
+//   const result = await prisma.application.findMany({
+//     where: { status: "SELECTED" },
+//     select: {
+//       job: {
+//         select: {
+//           salary: true,
+//         },
+//       },
+//     },
+//   });
+
+//   return result;
+// };
+
+// export const getDeptSalaryRepo = async () => {
+//   return prisma.application.findMany({
+//     where: {
+//       status: "SELECTED",
+//     },
+//     select: {
+//       job: {
+//         select: { salary: true },
+//       },
+//       student: {
+//         select: {
+//           departmentId: true,
+//         },
+//       },
+//     },
+//   });
+// };
+
+export const getUnplacedStudents = async () => {
+  return prisma.student.findMany({
+    where: {
+      applications: {
+        none: {
+          status: "SELECTED",
+        },
+      },
+    },
+    include: {
+      user: true,
     },
   });
 };

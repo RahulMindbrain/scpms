@@ -8,11 +8,13 @@ import {
   createAdminService,
   getActiveStudentsService,
   getCompaniesService,
+  getDashboardStatsService,
   getInactiveCompaniesService,
   getInactiveStudentsService,
   getStudentsService,
   updateJobStatusByAdminService,
 } from "../services/admin.service";
+import { notifyUnplacedStudentsForJob } from "../services/notification.service";
 
 export const createAdminController = async (req: Request, res: Response) => {
   try {
@@ -150,6 +152,7 @@ export const activateCompaniesController = async (
 
     return sendSuccess(res, 200, "Companies activated successfully", result);
   } catch (error: any) {
+    console.log(error);
     return sendError(res, 400, error.message);
   }
 };
@@ -205,6 +208,12 @@ export const updateJobStatusByAdminController = async (
       user.id,
     );
 
+    // console.log(updatedJobs);
+
+    if (updatedJobs.status === "APPROVED") {
+      notifyUnplacedStudentsForJob(updatedJobs.id);
+    }
+
     return sendSuccess(
       res,
       200,
@@ -213,5 +222,19 @@ export const updateJobStatusByAdminController = async (
     );
   } catch (error: any) {
     return sendError(res, 400, error.message);
+  }
+};
+
+export const getDashboardStatsController = async (
+  _req: Request,
+  res: Response,
+) => {
+  try {
+    const data = await getDashboardStatsService();
+
+    return sendSuccess(res, 200, "Dashboard stats fetched successfully", data);
+  } catch (error: any) {
+    console.error("Dashboard Controller Error:", error);
+    return sendError(res, 500, "Failed to fetch dashboard stats");
   }
 };
