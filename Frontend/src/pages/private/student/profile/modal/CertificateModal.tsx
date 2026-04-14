@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
+import { Loader2, Upload } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,19 +16,32 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
   const [certificate, setCertificate] = useState({
     title: "",
     issuer: "",
-    issuedDate: ""
+    issuedDate: "",
+    certificateUrl: ""
   });
+  const [file, setFile] = useState<File | null>(null);
 
-  const handleSubmit = () => {
+  const { upload: uploadToCloudinary, isUploading } = useCloudinaryUpload();
+
+  const handleSubmit = async () => {
     if (!certificate.title.trim() || !certificate.issuer.trim()) return;
 
-    onAddCertificate(certificate);
+    let finalUrl = certificate.certificateUrl;
+
+    if (file) {
+      const url = await uploadToCloudinary(file, "certificates");
+      if (url) finalUrl = url;
+    }
+
+    onAddCertificate({ ...certificate, certificateUrl: finalUrl });
     onClose();
     setCertificate({
       title: "",
       issuer: "",
-      issuedDate: ""
+      issuedDate: "",
+      certificateUrl: ""
     });
+    setFile(null);
   };
 
   return (
@@ -59,7 +74,7 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
             />
           </div>
 
-          <div className="space-y-2">
+           <div className="space-y-2">
             <Label htmlFor="date" className="text-xs font-black uppercase tracking-widest text-slate-500">Issued Date</Label>
             <Input
               id="date"
@@ -69,14 +84,36 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
               onChange={(e) => setCertificate({ ...certificate, issuedDate: e.target.value })}
             />
           </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs font-black uppercase tracking-widest text-slate-500">Certificate File (Optional)</Label>
+            <div className="flex items-center gap-4">
+               <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all group">
+                  {isUploading ? <Loader2 size={18} className="animate-spin text-blue-500" /> : <Upload size={18} className="text-slate-400 group-hover:text-blue-500" />}
+                  <span className="text-sm font-bold text-slate-500 group-hover:text-blue-700">
+                    {file ? file.name : 'Click to upload PDF/Image'}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*,application/pdf"
+                    className="hidden"
+                    onChange={(e: any) => setFile(e.target.files[0])}
+                  />
+               </label>
+            </div>
+          </div>
         </div>
 
         <DialogFooter className="flex-row gap-3 mt-2">
           <Button variant="outline" onClick={onClose} className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest border-slate-200">
             Cancel
           </Button>
-          <Button onClick={handleSubmit} className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest bg-blue-600">
-            Add
+          <Button 
+            onClick={handleSubmit} 
+            disabled={isUploading}
+            className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            {isUploading ? "Uploading..." : "Add"}
           </Button>
         </DialogFooter>
       </DialogContent>

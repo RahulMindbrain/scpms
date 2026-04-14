@@ -14,6 +14,7 @@ import type { RootState } from '@/redux/reducers/rootReducer';
 import ExperienceModal from './modal/ExperienceModal';
 import CertificateModal from './modal/CertificateModal';
 import ProfileEditDialog from './modal/ProfileEditDialog';
+import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,6 +34,7 @@ const StudentProfile = () => {
   const [isUploading, setIsUploading] = useState(false);
   //@ts-ignore
   const [isUploadingResume, setIsUploadingResume] = useState(false);
+  const { upload: uploadToCloudinary } = useCloudinaryUpload();
   const profileImageInputRef = useRef<HTMLInputElement>(null);
 
   const [profile, setProfile] = useState<any>({
@@ -124,13 +126,53 @@ const StudentProfile = () => {
       return error;
     }
   };
-  //@ts-ignore
   const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    toast.info("Image upload will be integrated with backend soon!");
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const url = await uploadToCloudinary(file, "profile_images");
+      if (url) {
+        const updatedProfile = { ...profile, profileImage: url };
+        setProfile(updatedProfile);
+        // If we want to save immediately:
+        await handleSave(updatedProfile);
+        toast.success("Profile image updated!");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsUploading(false);
+    }
   };
-  //@ts-ignore
+
   const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    toast.info("Resume upload will be integrated with backend soon!");
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a PDF file for your resume");
+      return;
+    }
+
+    setIsUploadingResume(true);
+    try {
+      const url = await uploadToCloudinary(file, "resumes");
+      if (url) {
+        const updatedProfile = {
+          ...profile,
+          resumes: [{ name: file.name, url, date: new Date().toLocaleDateString(), size: `${(file.size / 1024 / 1024).toFixed(2)} MB` }]
+        };
+        setProfile(updatedProfile);
+        await handleSave(updatedProfile);
+        toast.success("Resume uploaded successfully!");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsUploadingResume(false);
+    }
   };
 
   const handleAddProject = (project: any) => {

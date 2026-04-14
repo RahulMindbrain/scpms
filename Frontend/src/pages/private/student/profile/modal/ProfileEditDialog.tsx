@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Plus, Trash2, Link as LinkIcon } from "lucide-react";
+import { Loader2, Plus, Trash2, Link as LinkIcon, Upload } from "lucide-react";
+import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
+import { toast } from "sonner";
 
 type ProfileEditDialogProps = {
   isOpen: boolean;
@@ -18,6 +20,9 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: Prof
   const [formData, setFormData] = useState(profile);
   const [newSkill, setNewSkill] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isLocalUploading, setIsLocalUploading] = useState(false);
+
+  const { upload: uploadToCloudinary } = useCloudinaryUpload();
 
   useEffect(() => {
     setFormData(profile);
@@ -242,19 +247,53 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: Prof
 
             <TabsContent value="docs" className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="resumeUrl" className="text-xs font-black uppercase tracking-widest text-slate-500">Resume URL</Label>
-                <div className="relative">
-                  <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <Input
-                    id="resumeUrl"
-                    value={formData.stats.resumeUrl || ''}
-                    onChange={(e) => updateStat("resumeUrl", e.target.value)}
-                    placeholder="https://example.com/resume.pdf"
-                    className={`rounded-2xl h-11 pl-10 border-slate-200 ${errors.resumeUrl ? 'border-red-500 bg-red-50/50' : ''}`}
-                  />
+                <Label htmlFor="resumeUrl" className="text-xs font-black uppercase tracking-widest text-slate-500">Resume</Label>
+                <div className="space-y-3">
+                  <div className="relative">
+                    <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Input
+                      id="resumeUrl"
+                      value={formData.stats.resumeUrl || ''}
+                      onChange={(e) => updateStat("resumeUrl", e.target.value)}
+                      placeholder="https://example.com/resume.pdf"
+                      className={`rounded-2xl h-11 pl-10 border-slate-200 ${errors.resumeUrl ? 'border-red-500 bg-red-50/50' : ''}`}
+                    />
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <label className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all group">
+                       {isLocalUploading ? <Loader2 size={16} className="animate-spin text-blue-500" /> : <Upload size={16} className="text-slate-400 group-hover:text-blue-500" />}
+                       <span className="text-xs font-bold text-slate-500 group-hover:text-blue-700">
+                         {isLocalUploading ? "Uploading..." : "Upload New PDF"}
+                       </span>
+                       <input
+                         type="file"
+                         accept=".pdf"
+                         className="hidden"
+                         disabled={isLocalUploading}
+                         onChange={async (e) => {
+                           const file = e.target.files?.[0];
+                           if (!file) return;
+                           
+                           setIsLocalUploading(true);
+                           try {
+                             const url = await uploadToCloudinary(file, "resumes");
+                             if (url) {
+                               updateStat("resumeUrl", url);
+                               toast.success("Resume uploaded and link updated!");
+                             }
+                           } catch (err) {
+                             console.error(err);
+                           } finally {
+                             setIsLocalUploading(false);
+                           }
+                         }}
+                       />
+                    </label>
+                  </div>
                 </div>
                 {errors.resumeUrl && <p className="text-[10px] text-red-500 font-bold uppercase ml-2">{errors.resumeUrl}</p>}
-                <p className="text-[10px] text-slate-400 font-bold uppercase ml-2 mt-2">Uploading via main profile will update this link (Coming Soon).</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase ml-2 mt-2">Uploading will automatically update the direct link above.</p>
               </div>
             </TabsContent>
           </Tabs>

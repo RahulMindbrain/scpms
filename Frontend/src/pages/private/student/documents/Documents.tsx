@@ -6,10 +6,14 @@ import {
   MoreVertical, ExternalLink, ShieldCheck
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
+import { Loader2 } from 'lucide-react';
 
 const Documents = () => {
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isUploading, setIsUploading] = useState(false);
+  const { upload: uploadToCloudinary } = useCloudinaryUpload();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const categories = ['All', 'Resume', 'Certificate', 'Offer Letter'];
@@ -55,6 +59,36 @@ const Documents = () => {
     toast.success("Document removed from vault");
   };
 
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      // Determine folder based on activeTab or default to documents
+      const folder = activeTab === 'All' ? 'documents' : activeTab.toLowerCase().replace(' ', '_');
+      const url = await uploadToCloudinary(file, folder);
+      
+      if (url) {
+        const newDoc = {
+          id: Date.now(),
+          name: file.name,
+          category: activeTab === 'All' ? 'Resume' : activeTab, // Defaulting if 'All' is selected
+          size: `${(file.size / 1024).toFixed(0)} KB`,
+          date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+          status: 'Verified',
+          icon: <FileText size={18} className="text-blue-600" />
+        };
+        setDocuments([newDoc, ...documents]);
+        toast.success("Document uploaded successfully!");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
       {/* Refined Navbar */}
@@ -93,12 +127,14 @@ const Documents = () => {
           </div>
 
           <div className="flex gap-3">
-            <input type="file" ref={fileInputRef} className="hidden" />
+            <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg active:scale-95"
+              disabled={isUploading}
+              className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg active:scale-95 disabled:opacity-70"
             >
-              <Upload size={16} /> Quick Upload
+              {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload size={16} />}
+              {isUploading ? "Uploading..." : "Quick Upload"}
             </button>
           </div>
         </div>
