@@ -7,7 +7,7 @@ import campp from "../../../assets/campp.jpg";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../../redux/store/store";
 import { loginUser } from "../../../redux/thunks/loginThunk";
-import { logout } from "../../../redux/slices/authSlice";
+import { logoutUser } from "../../../redux/thunks/logoutThunk";
 import { toast } from "sonner";
 
 // Define Roles for type safety
@@ -48,7 +48,7 @@ const SignIn: React.FC = () => {
 
       if (user.role.toLowerCase() !== activeRole) {
         toast.error(`Unauthorized: This account is registered as ${user.role.toLowerCase()}, but you are trying to sign in as ${activeRole}.`);
-        dispatch(logout());
+        dispatch(logoutUser());
         return;
       }
 
