@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux"
 import { useNavigate } from "react-router-dom"
-import { logout } from "@/redux/slices/authSlice"
+import { logoutUser } from "@/redux/thunks/logoutThunk"
 import type { AppDispatch } from "@/redux/store/store"
 import {
   Avatar,
@@ -38,7 +38,7 @@ export function NavUser({
   const navigate = useNavigate()
 
   const handleLogout = () => {
-    dispatch(logout())
+    dispatch(logoutUser())
     navigate("/login")
   }
 

@@ -19,7 +19,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { logout } from '@/redux/slices/authSlice';
+import { logoutUser } from '@/redux/thunks/logoutThunk';
 import type { RootState } from '@/redux/reducers/rootReducer';
 
 const HomePage: React.FC = () => {
@@ -37,7 +37,7 @@ const HomePage: React.FC = () => {
   const { isAuthenticated, user, userType } = useSelector((state: RootState) => state.auth);
 
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser() as any);
     navigate('/');
   };
 

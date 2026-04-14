@@ -1,4 +1,4 @@
-import axios, { type AxiosRequestConfig } from "axios";
+import axios, { type AxiosRequestConfig, type AxiosError } from "axios";
 
 // ─── Base Configuration ───────────────────────────────────────────────────────
 const BASE_URL = "http://localhost:3030";
@@ -8,8 +8,22 @@ const api = axios.create({
     withCredentials: true, // send httpOnly auth cookie on every request
 });
 
+// ─── Variables for Token Refresh Logic ────────────────────────────────────────
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+    failedQueue.forEach((prom) => {
+        if (error) {
+            prom.reject(error);
+        } else {
+            prom.resolve(token);
+        }
+    });
+    failedQueue = [];
+};
+
 // ─── Request Interceptor – attach Authorization token (from defaults) ────────
-// Token is set once via setAuthToken(); no need to read localStorage each time.
 api.interceptors.request.use(
     (config) => config,
     (error) => Promise.reject(error)
@@ -20,6 +34,65 @@ const _persistedToken = localStorage.getItem("scpms_token");
 if (_persistedToken) {
     api.defaults.headers.common["Authorization"] = `Bearer ${_persistedToken}`;
 }
+
+// ─── Response Interceptor – handle 401 Unauthorized for Token Refresh ────────
+api.interceptors.response.use(
+    (response) => response,
+    async (error: AxiosError) => {
+        const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
+
+        // If the error is 401 and it's not a retry and not the refresh request itself
+        if (
+            error.response?.status === 401 &&
+            !originalRequest._retry &&
+            originalRequest.url !== "/auth/refresh"
+        ) {
+            
+            // If we are already refreshing, queue this request
+            if (isRefreshing) {
+                return new Promise((resolve, reject) => {
+                    failedQueue.push({ resolve, reject });
+                })
+                    .then(() => {
+                        return api(originalRequest);
+                    })
+                    .catch((err) => {
+                        return Promise.reject(err);
+                    });
+            }
+
+            originalRequest._retry = true;
+            isRefreshing = true;
+
+            try {
+                // Call the refresh endpoint
+                // The backend handles cookies automatically due to withCredentials: true
+                await api.post("/auth/refresh");
+                
+                isRefreshing = false;
+                processQueue(null);
+                
+                // Retry the original request
+                return api(originalRequest);
+            } catch (refreshError) {
+                isRefreshing = false;
+                processQueue(refreshError);
+                
+                // If refresh fails, clear auth state
+                setAuthToken(null);
+                localStorage.removeItem("scpms_user");
+                
+                // Optional: redirect to login
+                // window.location.href = "/signin";
+                
+                return Promise.reject(refreshError);
+            }
+        }
+
+        return Promise.reject(error);
+    }
+);
+
 
 // ─── Auth Token Helper ───────────────────────────────────────────────────────
 /** Call after login to inject token; call with null on logout to clear it. */
@@ -106,4 +179,4 @@ export const deleteAPI = async <T>(
     }
 };
 
-export default api;
+export default api;

@@ -14,6 +14,7 @@ import type { RootState } from '@/redux/reducers/rootReducer';
 import ExperienceModal from './modal/ExperienceModal';
 import CertificateModal from './modal/CertificateModal';
 import ProfileEditDialog from './modal/ProfileEditDialog';
+import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,6 +34,7 @@ const StudentProfile = () => {
   const [isUploading, setIsUploading] = useState(false);
   //@ts-ignore
   const [isUploadingResume, setIsUploadingResume] = useState(false);
+  const { upload: uploadToCloudinary } = useCloudinaryUpload();
   const profileImageInputRef = useRef<HTMLInputElement>(null);
 
   const [profile, setProfile] = useState<any>({
@@ -124,13 +126,53 @@ const StudentProfile = () => {
       return error;
     }
   };
-  //@ts-ignore
   const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    toast.info("Image upload will be integrated with backend soon!");
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const url = await uploadToCloudinary(file, "profile_images");
+      if (url) {
+        const updatedProfile = { ...profile, profileImage: url };
+        setProfile(updatedProfile);
+        // If we want to save immediately:
+        await handleSave(updatedProfile);
+        toast.success("Profile image updated!");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsUploading(false);
+    }
   };
-  //@ts-ignore
+
   const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    toast.info("Resume upload will be integrated with backend soon!");
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+      toast.error("Please upload a PDF file for your resume");
+      return;
+    }
+
+    setIsUploadingResume(true);
+    try {
+      const url = await uploadToCloudinary(file, "resumes");
+      if (url) {
+        const updatedProfile = {
+          ...profile,
+          resumes: [{ name: file.name, url, date: new Date().toLocaleDateString(), size: `${(file.size / 1024 / 1024).toFixed(2)} MB` }]
+        };
+        setProfile(updatedProfile);
+        await handleSave(updatedProfile);
+        toast.success("Resume uploaded successfully!");
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsUploadingResume(false);
+    }
   };
 
   const handleAddProject = (project: any) => {
@@ -159,13 +201,14 @@ const StudentProfile = () => {
 
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 mt-2 p-4 md:p-6">
-      {/* Profile Header section */}
-      <div className="flex flex-col md:flex-row md:items-center justify-end gap-4 mb-6">
+    <div className="min-h-screen bg-[#fcfcfd] pb-20">
+      <div className="max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-700 px-4 sm:px-6 lg:px-10 pt-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
+        <h1 className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-500 bg-clip-text text-transparent">Student Profile</h1>
         <Button
           onClick={() => setShowProfileEditDialog(true)}
           disabled={backendLoading}
-          className="gap-2"
+          className="gap-2 rounded-full h-10 px-6 font-semibold shadow-md hover:shadow-lg transition-all bg-blue-600 hover:bg-blue-700 active:scale-95"
         >
           {backendLoading ? <Loader2 className="animate-spin h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
           Edit Profile
@@ -175,8 +218,10 @@ const StudentProfile = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Left Sidebar - Personal Details & Academics */}
         <div className="md:col-span-1 space-y-6">
-          <Card className="overflow-hidden">
-            <div className="h-24 bg-gradient-to-r from-blue-600 to-indigo-600"></div>
+          <Card className="overflow-hidden border-none shadow-xl shadow-slate-200/40 rounded-[2.5rem]">
+            <div className="h-32 bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 relative rounded-b-[2.5rem]">
+              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+            </div>
             <CardContent className="pt-0 relative px-6 pb-6 text-center">
               <div className="relative inline-block -mt-12 group cursor-pointer" onClick={() => profileImageInputRef.current?.click()}>
                 <Avatar className="h-24 w-24 border-4 border-background shadow-md">
@@ -204,62 +249,79 @@ const StudentProfile = () => {
 
               <Separator className="my-6" />
 
-              <div className="space-y-4 text-left">
-                <div className="flex items-center gap-3 text-sm text-muted-foreground w-full">
-                  <Mail className="h-4 w-4 shrink-0 text-blue-500" />
-                  <span className="truncate text-foreground font-medium" title={profile.email}>{profile.email || 'N/A'}</span>
+              <div className="space-y-4 text-left mt-6">
+                <div className="flex items-center gap-4 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
+                  <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <Mail className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Email Address</p>
+                    <p className="truncate text-slate-700 font-semibold" title={profile.email}>{profile.email || 'N/A'}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground w-full">
-                  <Phone className="h-4 w-4 shrink-0 text-blue-500" />
-                  <span className="truncate text-foreground font-medium" title={profile.phone}>{profile.phone || 'Not provided'}</span>
+                <div className="flex items-center gap-4 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
+                  <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <Phone className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Phone Number</p>
+                    <p className="truncate text-slate-700 font-semibold" title={profile.phone}>{profile.phone || 'Not provided'}</p>
+                  </div>
                 </div>
-                <div className="flex items-center gap-3 text-sm text-muted-foreground w-full">
-                  <MapPin className="h-4 w-4 shrink-0 text-blue-500" />
-                  <span className="truncate text-foreground font-medium" title={profile.location}>{profile.location || 'Not provided'}</span>
+                <div className="flex items-center gap-4 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
+                  <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <MapPin className="h-4 w-4" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Location</p>
+                    <p className="truncate text-slate-700 font-semibold" title={profile.location}>{profile.location || 'Not provided'}</p>
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
             <CardHeader className="pb-3 border-b border-border/50">
               <CardTitle className="text-base flex items-center gap-2">
                 <GraduationCap className="h-4 w-4 text-blue-600" />
                 Academic Standings
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-1 pt-4">
-              <div className="flex justify-between items-center py-2.5 border-b border-border/50">
-                <span className="text-sm text-muted-foreground font-medium">CGPA</span>
-                <span className="font-bold text-blue-600">{profile.stats?.cgpa || 'N/A'}</span>
+            <CardContent className="space-y-2 pt-6">
+              <div className="flex justify-between items-center p-3 rounded-xl bg-blue-50/50 border border-blue-100/50">
+                <span className="text-sm text-blue-700 font-semibold uppercase tracking-wider text-[11px]">Average CGPA</span>
+                <span className="text-xl font-bold text-blue-600">{profile.stats?.cgpa || 'N/A'}</span>
               </div>
-              <div className="flex justify-between items-center py-2.5 border-b border-border/50">
-                <span className="text-sm text-muted-foreground font-medium">Active Backlogs</span>
-                <span className="font-semibold">{profile.stats?.backlogs || '0'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2.5 border-b border-border/50">
-                <span className="text-sm text-muted-foreground font-medium">Current Year</span>
-                <span className="font-semibold">{profile.stats?.year || '1'}</span>
-              </div>
-              <div className="flex justify-between items-center py-2.5">
-                <span className="text-sm text-muted-foreground font-medium">Passing Year</span>
-                <span className="font-semibold">{profile.stats?.passingYear || 'N/A'}</span>
+              <div className="grid grid-cols-1 gap-2 mt-4">
+                <div className="flex justify-between items-center py-2.5 px-1 border-b border-slate-50">
+                  <span className="text-sm text-slate-500 font-medium">Active Backlogs</span>
+                  <span className="font-bold text-slate-700">{profile.stats?.backlogs || '0'}</span>
+                </div>
+                <div className="flex justify-between items-center py-2.5 px-1 border-b border-slate-50">
+                  <span className="text-sm text-slate-500 font-medium">Current Year</span>
+                  <span className="font-bold text-slate-700">{profile.stats?.year || '1'}</span>
+                </div>
+                <div className="flex justify-between items-center py-2.5 px-1">
+                  <span className="text-sm text-slate-500 font-medium">Passing Year</span>
+                  <span className="font-bold text-slate-700">{profile.stats?.passingYear || 'N/A'}</span>
+                </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
         {/* Right Content Area - Tabs for dynamic sections */}
-        <div className="md:col-span-2 space-y-6">
+        <div className="md:col-span-2 space-y-8">
           <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="w-full justify-start h-auto bg-transparent border-b border-border/60 rounded-none px-0 gap-6 flex-wrap">
-              <TabsTrigger value="overview" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground rounded-none px-1 py-3 border-b-2 border-transparent transition-all">Overview</TabsTrigger>
-              <TabsTrigger value="experience" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground rounded-none px-1 py-3 border-b-2 border-transparent transition-all">Experience & Projects</TabsTrigger>
-              <TabsTrigger value="documents" className="data-[state=active]:bg-transparent data-[state=active]:border-b-2 data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:text-foreground text-muted-foreground rounded-none px-1 py-3 border-b-2 border-transparent transition-all">Documents & Certs</TabsTrigger>
+            <TabsList variant="line" className="w-full justify-start h-auto bg-transparent border-b border-slate-200 rounded-none px-0 gap-10 mb-6 relative">
+              <TabsTrigger value="overview" className="data-[state=active]:bg-transparent data-[state=active]:border-b-[3px] data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:text-blue-600 text-slate-500 rounded-none px-0 py-4 border-b-[3px] border-transparent transition-all font-bold text-sm hover:text-blue-500">Overview</TabsTrigger>
+              <TabsTrigger value="experience" className="data-[state=active]:bg-transparent data-[state=active]:border-b-[3px] data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:text-blue-600 text-slate-500 rounded-none px-0 py-4 border-b-[3px] border-transparent transition-all font-bold text-sm hover:text-blue-500">Experience & Projects</TabsTrigger>
+              <TabsTrigger value="documents" className="data-[state=active]:bg-transparent data-[state=active]:border-b-[3px] data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:text-blue-600 text-slate-500 rounded-none px-0 py-4 border-b-[3px] border-transparent transition-all font-bold text-sm hover:text-blue-500">Documents & Certs</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview" className="mt-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-              <Card>
+              <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
                 <CardHeader>
                   <CardTitle className="text-base flex items-center gap-2">
                     <Code2 className="h-4 w-4 text-blue-600" />
@@ -271,13 +333,13 @@ const StudentProfile = () => {
                   {profile.skills?.length > 0 ? (
                     <div className="flex flex-wrap gap-2">
                       {profile.skills.map((skill: any, i: number) => (
-                        <Badge key={i} variant="secondary" className="px-3 py-1 text-xs font-semibold bg-slate-100/80 hover:bg-slate-200 transition-colors cursor-default text-slate-700">
+                        <Badge key={i} variant="secondary" className="px-3 py-1 text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors cursor-default rounded-lg border-none">
                           {skill.name}
                         </Badge>
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-6 text-sm text-muted-foreground border-2 border-dashed rounded-lg bg-slate-50/50">
+                    <div className="text-center py-6 text-sm text-muted-foreground border-2 border-dashed rounded-xl bg-slate-50/50">
                       No skills added yet. Click edit profile to add your technical skills.
                     </div>
                   )}
@@ -287,7 +349,7 @@ const StudentProfile = () => {
 
             <TabsContent value="experience" className="mt-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
               {/* Experiences */}
-              <Card>
+              <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
                 <CardHeader className="flex flex-row items-start sm:items-center justify-between pb-3 gap-4">
                   <div>
                     <CardTitle className="text-base flex items-center gap-2">
@@ -296,8 +358,8 @@ const StudentProfile = () => {
                     </CardTitle>
                     <CardDescription className="mt-1">Internships and professional experiences.</CardDescription>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => setShowExperienceModal(true)} className="gap-1.5 shrink-0 h-8 text-xs">
-                    <Plus className="h-3.5 w-3.5" /> Add New
+                  <Button variant="outline" size="sm" onClick={() => setShowExperienceModal(true)} className="gap-1.5 shrink-0 h-9 text-xs rounded-xl font-medium border-blue-100 hover:bg-blue-50 text-blue-600 px-4">
+                    <Plus className="h-4 w-4" /> Add New
                   </Button>
                 </CardHeader>
                 <CardContent className="space-y-6 pt-4">
@@ -338,7 +400,7 @@ const StudentProfile = () => {
               </Card>
 
               {/* Projects */}
-              <Card>
+              <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
                 <CardHeader className="flex flex-row items-start sm:items-center justify-between pb-3 gap-4">
                   <div>
                     <CardTitle className="text-base flex items-center gap-2">
@@ -347,17 +409,17 @@ const StudentProfile = () => {
                     </CardTitle>
                     <CardDescription className="mt-1">Academic and personal projects you've built.</CardDescription>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => setShowProjectModal(true)} className="gap-1.5 shrink-0 h-8 text-xs">
-                    <Plus className="h-3.5 w-3.5" /> Add New
+                  <Button variant="outline" size="sm" onClick={() => setShowProjectModal(true)} className="gap-1.5 shrink-0 h-9 text-xs rounded-xl font-medium border-blue-100 hover:bg-blue-50 text-blue-600 px-4">
+                    <Plus className="h-4 w-4" /> Add New
                   </Button>
                 </CardHeader>
                 <CardContent className="pt-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {profile.projects?.length > 0 ? profile.projects.map((proj: any, i: number) => (
-                      <div key={i} className="rounded-xl border border-border/60 bg-card text-card-foreground shadow-sm overflow-hidden flex flex-col group hover:border-blue-200 hover:shadow-md transition-all">
+                      <div key={i} className="rounded-2xl border border-slate-100 bg-white shadow-sm overflow-hidden flex flex-col group hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
                         {proj.image && (
-                          <div className="h-32 overflow-hidden border-b border-border/50">
-                            <img src={typeof proj.image === 'string' ? proj.image : URL.createObjectURL(proj.image)} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" alt={proj.title} />
+                          <div className="h-36 overflow-hidden border-b border-slate-50">
+                            <img src={typeof proj.image === 'string' ? proj.image : URL.createObjectURL(proj.image)} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt={proj.title} />
                           </div>
                         )}
                         <div className="p-4 flex flex-col flex-1">
@@ -396,7 +458,7 @@ const StudentProfile = () => {
 
             <TabsContent value="documents" className="mt-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
               {/* Resumes */}
-              <Card>
+              <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
                 <CardHeader className="flex flex-row items-start sm:items-center justify-between pb-3 gap-4">
                   <div>
                     <CardTitle className="text-base flex items-center gap-2">
@@ -406,9 +468,9 @@ const StudentProfile = () => {
                     <CardDescription className="mt-1">Your uploaded ATS-friendly resumes.</CardDescription>
                   </div>
                   <label className="shrink-0">
-                    <Button variant="outline" size="sm" asChild className="gap-1.5 cursor-pointer h-8 text-xs">
+                    <Button variant="outline" size="sm" asChild className="gap-1.5 cursor-pointer h-9 text-xs rounded-xl font-medium border-blue-100 hover:bg-blue-50 text-blue-600 px-4">
                       <span>
-                        {isUploadingResume ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-3.5 w-3.5" />}
+                        {isUploadingResume ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-4 w-4" />}
                         Upload Resume
                       </span>
                     </Button>
@@ -431,7 +493,7 @@ const StudentProfile = () => {
                           </div>
                         </div>
                       </div>
-                      <Button variant="secondary" size="sm" asChild className="shrink-0 font-medium px-4 h-8 text-xs ml-4">
+                      <Button variant="secondary" size="sm" asChild className="shrink-0 font-semibold px-4 h-9 text-xs ml-4 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors border-none">
                         <a href={res.url} target="_blank" rel="noopener noreferrer">View</a>
                       </Button>
                     </div>
@@ -444,17 +506,17 @@ const StudentProfile = () => {
               </Card>
 
               {/* Certifications */}
-              <Card>
+              <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
                 <CardHeader className="flex flex-row items-start sm:items-center justify-between pb-3 gap-4">
                   <div>
                     <CardTitle className="text-base flex items-center gap-2">
-                      <Badge className="h-4 w-4 p-0 bg-transparent text-blue-600 hover:bg-transparent"><GraduationCap className="h-4 w-4" /></Badge>
+                      <GraduationCap className="h-4 w-4 text-blue-600" />
                       Certifications
                     </CardTitle>
                     <CardDescription className="mt-1">Achievements and course certificates.</CardDescription>
                   </div>
-                  <Button variant="outline" size="sm" onClick={() => setShowCertificateModal(true)} className="gap-1.5 shrink-0 h-8 text-xs">
-                    <Plus className="h-3.5 w-3.5" /> Add New
+                  <Button variant="outline" size="sm" onClick={() => setShowCertificateModal(true)} className="gap-1.5 shrink-0 h-9 text-xs rounded-xl font-medium border-blue-100 hover:bg-blue-50 text-blue-600 px-4">
+                    <Plus className="h-4 w-4" /> Add New
                   </Button>
                 </CardHeader>
                 <CardContent className="pt-4">
@@ -516,7 +578,8 @@ const StudentProfile = () => {
         isLoading={backendLoading}
       />
     </div>
-  );
+  </div>
+);
 };
 
 export default StudentProfile;

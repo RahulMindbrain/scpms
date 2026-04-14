@@ -1,5 +1,7 @@
 import { X, Upload } from "lucide-react";
 import { useState } from "react";
+import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
+import { Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,8 +22,16 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
     image: null as File | null
   });
 
-  const handleSubmit = () => {
+  const { upload: uploadToCloudinary, isUploading } = useCloudinaryUpload();
+
+  const handleSubmit = async () => {
     if (!project.title.trim()) return;
+
+    let imageUrl = "";
+    if (project.image) {
+      const uploadedUrl = await uploadToCloudinary(project.image, "project_snapshots");
+      if (uploadedUrl) imageUrl = uploadedUrl;
+    }
 
     const tagsArray = project.tags.split(",").map(tag => tag.trim()).filter(t => t);
 
@@ -29,7 +39,7 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
       title: project.title,
       description: project.description,
       tags: tagsArray,
-      image: project.image
+      image: imageUrl || project.image // Fallback or handle null
     });
 
     onClose();
@@ -117,9 +127,11 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
           </Button>
           <Button
             onClick={handleSubmit}
+            disabled={isUploading}
             className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20"
           >
-            Add Project
+            {isUploading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : null}
+            {isUploading ? "Uploading..." : "Add Project"}
           </Button>
         </DialogFooter>
       </DialogContent>
