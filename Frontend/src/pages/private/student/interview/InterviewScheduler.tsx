@@ -78,9 +78,9 @@ const InterviewSchedule: React.FC = () => {
               <h2 className="text-2xl font-bold text-slate-800">Upcoming Interviews</h2>
               <p className="text-slate-500 text-sm mt-1">You have {UpcomingInterviews.length} interviews scheduled for this week.</p>
             </div>
-            <button className="text-sm font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 px-4 py-2 rounded-lg transition-colors">
+            {/* <button className="text-sm font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 px-4 py-2 rounded-lg transition-colors">
               View Calendar
-            </button>
+            </button> */}
           </div>
 
           <div className="space-y-4">
@@ -144,7 +144,7 @@ const InterviewSchedule: React.FC = () => {
 
         {/* Sidebar Area */}
         <div className="space-y-6">
-          <div className="bg-slate-900 rounded-2xl p-6 text-white overflow-hidden relative">
+          {/* <div className="bg-slate-900 rounded-2xl p-6 text-white overflow-hidden relative">
             <div className="relative z-10">
               <h3 className="text-lg font-bold mb-2">Interview Prep</h3>
               <p className="text-slate-400 text-sm mb-4">Complete your mock assessment to increase your chances by 40%.</p>
@@ -153,9 +153,9 @@ const InterviewSchedule: React.FC = () => {
               </button>
             </div>
             <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl"></div>
-          </div>
+          </div> */}
 
-          <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          {/* <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <History size={18} className="text-slate-400" />
@@ -186,7 +186,7 @@ const InterviewSchedule: React.FC = () => {
             <button className="w-full mt-8 flex items-center justify-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors">
               View All History <ChevronRight size={16} />
             </button>
-          </div>
+          </div> */}
         </div>
       </main>
     </div>

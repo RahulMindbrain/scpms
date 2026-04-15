@@ -401,7 +401,7 @@ const ApplicationStatus = () => {
           </div>
 
           {/* ─── Suggested Jobs ─── */}
-          <div>
+          {/* <div>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-base font-bold text-slate-800">Suggested For You</h3>
               <button
@@ -416,7 +416,7 @@ const ApplicationStatus = () => {
                 <SuggestedJobCard key={i} {...job} />
               ))}
             </div>
-          </div>
+          </div> */}
         </div>
       )}
     </div>
