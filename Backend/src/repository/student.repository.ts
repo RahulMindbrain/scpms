@@ -19,36 +19,30 @@ import { Prisma } from "@prisma/client";
 //   });
 // };
 
-export const createStudent = async (
-  userId: number,
-  departmentId: number,
-  year: number,
-  passingYear: number,
-  cgpa?: number,
-  resumeUrl?: string,
-  skillIds?: number[],
-  experiences?: any[],
-  certificates?: any[],
-) => {
+export const createStudent = async (userId: number, data: any) => {
   return prisma.student.create({
     data: {
       userId,
-      departmentId,
-      year,
-      passingYear,
+      departmentId: data.departmentId,
+      year: data.year,
+      passingYear: data.passingYear,
 
-      ...(cgpa !== undefined && { cgpa }),
-      ...(resumeUrl && { resumeUrl }),
+      ...(data.cgpa !== undefined && { cgpa: data.cgpa }),
+      ...(data.resumeUrl && { resumeUrl: data.resumeUrl }),
 
-      ...(skillIds?.length && {
+      ...(data.linkedinUrl && { linkedinUrl: data.linkedinUrl }),
+      ...(data.githubUrl && { githubUrl: data.githubUrl }),
+      ...(data.portfolioUrl && { portfolioUrl: data.portfolioUrl }),
+
+      ...(data.skillIds?.length && {
         skills: {
-          connect: skillIds.map((id: number) => ({ id })),
+          connect: data.skillIds.map((id: number) => ({ id })),
         },
       }),
 
-      ...(experiences?.length && {
+      ...(data.experiences?.length && {
         experiences: {
-          create: experiences.map((exp) => ({
+          create: data.experiences.map((exp: any) => ({
             ...exp,
             startDate: new Date(exp.startDate),
             ...(exp.endDate && { endDate: new Date(exp.endDate) }),
@@ -56,9 +50,9 @@ export const createStudent = async (
         },
       }),
 
-      ...(certificates?.length && {
+      ...(data.certificates?.length && {
         certificates: {
-          create: certificates.map((cert) => ({
+          create: data.certificates.map((cert: any) => ({
             ...cert,
             ...(cert.issuedDate && {
               issuedDate: new Date(cert.issuedDate),
@@ -66,11 +60,18 @@ export const createStudent = async (
           })),
         },
       }),
+
+      ...(data.projects?.length && {
+        projects: {
+          create: data.projects,
+        },
+      }),
     },
     include: {
       skills: true,
       experiences: true,
       certificates: true,
+      projects: true,
     },
   });
 };
@@ -132,57 +133,173 @@ export const getStudentByUserId = async (userId: number) => {
 };
 
 export const updateStudent = async (userId: number, data: any) => {
-  const { skillIds, experiences, certificates, ...rest } = data;
+  const {
+    // skills
+    addSkillIds,
+    removeSkillIds,
 
-  const existing = await prisma.student.findUnique({
-    where: { userId },
-  });
+    // experiences
+    addExperiences,
+    updateExperiences,
+    deleteExperienceIds,
 
-  if (!existing) {
-    throw new Error("Student profile not found");
+    // projects
+    addProjects,
+    updateProjects,
+    deleteProjectIds,
+
+    // certificates
+    addCertificates,
+    updateCertificates,
+    deleteCertificateIds,
+
+    ...rest
+  } = data;
+
+  // =========================
+  // EXPERIENCE OPS
+  // =========================
+  const experienceOps: any = {};
+
+  if (addExperiences?.length) {
+    experienceOps.create = addExperiences.map((exp: any) => ({
+      ...exp,
+      startDate: new Date(exp.startDate),
+      ...(exp.endDate && { endDate: new Date(exp.endDate) }),
+    }));
+  }
+
+  if (updateExperiences?.length) {
+    experienceOps.update = updateExperiences.map((exp: any) => ({
+      where: { id: exp.id },
+      data: {
+        companyName: exp.companyName,
+        role: exp.role,
+        description: exp.description,
+        startDate: new Date(exp.startDate),
+        ...(exp.endDate && { endDate: new Date(exp.endDate) }),
+      },
+    }));
+  }
+
+  if (deleteExperienceIds?.length) {
+    experienceOps.deleteMany = {
+      id: { in: deleteExperienceIds },
+    };
+  }
+
+  // =========================
+  // PROJECT OPS
+  // =========================
+  const projectOps: any = {};
+
+  if (addProjects?.length) {
+    projectOps.create = addProjects;
+  }
+
+  if (updateProjects?.length) {
+    projectOps.update = updateProjects.map((proj: any) => ({
+      where: { id: proj.id },
+      data: {
+        title: proj.title,
+        description: proj.description,
+        techStack: proj.techStack,
+        githubUrl: proj.githubUrl,
+        liveUrl: proj.liveUrl,
+      },
+    }));
+  }
+
+  if (deleteProjectIds?.length) {
+    projectOps.deleteMany = {
+      id: { in: deleteProjectIds },
+    };
+  }
+
+  // =========================
+  // CERTIFICATE OPS
+  // =========================
+  const certificateOps: any = {};
+
+  if (addCertificates?.length) {
+    certificateOps.create = addCertificates.map((cert: any) => ({
+      ...cert,
+      ...(cert.issuedDate && {
+        issuedDate: new Date(cert.issuedDate),
+      }),
+    }));
+  }
+
+  if (updateCertificates?.length) {
+    certificateOps.update = updateCertificates.map((cert: any) => ({
+      where: { id: cert.id },
+      data: {
+        title: cert.title,
+        issuer: cert.issuer,
+        certificateUrl: cert.certificateUrl,
+        ...(cert.issuedDate && {
+          issuedDate: new Date(cert.issuedDate),
+        }),
+      },
+    }));
+  }
+
+  if (deleteCertificateIds?.length) {
+    certificateOps.deleteMany = {
+      id: { in: deleteCertificateIds },
+    };
   }
 
   return prisma.student.update({
     where: { userId },
+
     data: {
-      // ✅ scalar fields
+      // =========================
+      // SCALAR (OVERWRITE)
+      // =========================
       ...rest,
 
-      // ✅ skills (replace)
-      ...(skillIds && {
+      // =========================
+      // SKILLS
+      // =========================
+      ...(addSkillIds && {
         skills: {
-          connect: skillIds.map((id: number) => ({ id })),
+          connect: addSkillIds.map((id: number) => ({ id })),
         },
       }),
 
-      // ✅ experiences (replace strategy)
-      ...(experiences && {
-        experiences: {
-          deleteMany: {}, // remove old
-          create: experiences.map((exp: any) => ({
-            ...exp,
-            startDate: new Date(exp.startDate),
-            ...(exp.endDate && { endDate: new Date(exp.endDate) }),
-          })),
+      ...(removeSkillIds && {
+        skills: {
+          disconnect: removeSkillIds.map((id: number) => ({ id })),
         },
       }),
 
-      // ✅ certificates (replace strategy)
-      ...(certificates && {
-        certificates: {
-          deleteMany: {},
-          create: certificates.map((cert: any) => ({
-            ...cert,
-            ...(cert.issuedDate && {
-              issuedDate: new Date(cert.issuedDate),
-            }),
-          })),
-        },
+      // =========================
+      // EXPERIENCES
+      // =========================
+      ...(Object.keys(experienceOps).length && {
+        experiences: experienceOps,
+      }),
+
+      // =========================
+      // PROJECTS
+      // =========================
+      ...(Object.keys(projectOps).length && {
+        projects: projectOps,
+      }),
+
+      // =========================
+      // CERTIFICATES
+      // =========================
+      ...(Object.keys(certificateOps).length && {
+        certificates: certificateOps,
       }),
     },
+
     include: {
       skills: true,
       experiences: true,
+      projects: true,
       certificates: true,
     },
   });
@@ -389,17 +506,80 @@ export const getSalaryDataRepo = async () => {
 //   });
 // };
 
-export const getUnplacedStudents = async () => {
+// export const getUnplacedStudents = async () => {
+//   return prisma.student.findMany({
+//     where: {
+//       applications: {
+//         none: {
+//           status: "SELECTED",
+//         },
+//       },
+//     },
+//     include: {
+//       user: true,
+//     },
+//   });
+// };
+
+export const getEligibleUnplacedStudents = async (jobId: number) => {
+  const job = await prisma.job.findUnique({
+    where: { id: jobId },
+    select: {
+      minCgpa: true,
+      maxCgpa: true,
+      maxBacklogs: true,
+      eligibleDepartments: {
+        select: { id: true },
+      },
+    },
+  });
+
+  if (!job) throw new Error("Job not found");
+
+  const deptIds = job.eligibleDepartments.map((d) => d.id);
+
   return prisma.student.findMany({
     where: {
-      applications: {
-        none: {
-          status: "SELECTED",
-        },
+      // ✅ only unplaced
+      isPlaced: false,
+
+      // ✅ department filter
+      departmentId: {
+        in: deptIds,
       },
+
+      // ✅ CGPA filter
+      ...(job.minCgpa !== null && {
+        cgpa: {
+          gte: job.minCgpa,
+        },
+      }),
+
+      ...(job.maxCgpa !== null && {
+        cgpa: {
+          lte: job.maxCgpa,
+        },
+      }),
+
+      // ✅ backlog filter
+      ...(job.maxBacklogs !== null && {
+        activeBacklogs: {
+          lte: job.maxBacklogs,
+        },
+      }),
     },
     include: {
       user: true,
+    },
+  });
+};
+
+export const markStudentPlaced = async (studentId: number) => {
+  return prisma.student.update({
+    where: { id: studentId },
+    data: {
+      isPlaced: true,
+      placedAt: new Date(),
     },
   });
 };

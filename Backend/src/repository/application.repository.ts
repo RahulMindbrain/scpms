@@ -93,16 +93,22 @@ export const getApplications = async (
   }
 };
 
-export const updateApplicationStatus = async (
-  id: number,
-  status: ApplicationStatus,
-) => {
+export const updateApplicationStatus = async (id: number, status: any) => {
   return prisma.application.update({
-    where: {
-      id: id,
-    },
-    data: {
-      status,
+    where: { id },
+    data: { status },
+    include: {
+      student: {
+        select: {
+          userId: true,
+        },
+      },
+      job: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
     },
   });
 };
@@ -116,6 +122,61 @@ export const getTotalPlacedStudents = async () => {
     by: ["studentId"],
     where: {
       status: "SELECTED",
+    },
+  });
+};
+
+export const getApplicationById = async (id: number) => {
+  return prisma.application.findUnique({
+    where: { id },
+  });
+};
+
+export const acceptApplication = async (id: number) => {
+  return prisma.application.update({
+    where: { id },
+    data: {
+      isAccepted: true,
+      acceptedAt: new Date(),
+    },
+  });
+};
+
+export const withdrawApplication = async (id: number) => {
+  return prisma.application.update({
+    where: { id },
+    data: {
+      status: "WITHDRAWN",
+    },
+  });
+};
+
+export const getApplicationByIdAndStudent = async (
+  applicationId: number,
+  studentId: number,
+) => {
+  return prisma.application.findFirst({
+    where: {
+      id: applicationId,
+      studentId: studentId,
+    },
+  });
+};
+
+export const withdrawOtherApplications = async (
+  studentId: number,
+  acceptedApplicationId: number,
+) => {
+  return prisma.application.updateMany({
+    where: {
+      studentId: studentId,
+      id: {
+        not: acceptedApplicationId,
+      },
+      status: "SELECTED",
+    },
+    data: {
+      status: "WITHDRAWN",
     },
   });
 };

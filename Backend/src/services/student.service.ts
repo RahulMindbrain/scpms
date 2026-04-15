@@ -1,8 +1,15 @@
+import {
+  acceptApplication,
+  getApplicationByIdAndStudent,
+  withdrawApplication,
+  withdrawOtherApplications,
+} from "../repository/application.repository";
 import { getDepartmentById } from "../repository/department.repository";
 import { getSkillsByIds } from "../repository/skill.repostiory";
 import {
   createStudent,
   getStudentByUserId,
+  markStudentPlaced,
   updateStudent,
 } from "../repository/student.repository";
 
@@ -28,52 +35,22 @@ import {
 //   return createStudent(userId, departmentId, year, passingYear, cgpa);
 // };
 
-export const createStudentService = async (
-  userId: number,
-  departmentId: number,
-  year: number,
-  passingYear: number,
-  cgpa?: number,
-  resumeUrl?: string,
-  skillIds?: number[],
-  experiences?: any[],
-  certificates?: any[],
-) => {
+export const createStudentService = async (userId: number, data: any) => {
   const existing = await getStudentByUserId(userId);
+  if (existing) throw new Error("Student profile already exists");
 
-  if (existing) {
-    throw new Error("Student profile already exists");
-  }
+  const dept = await getDepartmentById(data.departmentId);
+  if (!dept) throw new Error("Department does not exist");
 
-  const departmentExist = await getDepartmentById(departmentId);
-
-  if (!departmentExist) {
-    throw new Error("Department does not exist");
-  }
-
-  if (skillIds?.length) {
-    const skills = await getSkillsByIds(skillIds);
-
+  if (data.skillIds?.length) {
+    const skills = await getSkillsByIds(data.skillIds);
     const foundIds = skills.map((s) => s.id);
-
-    const missingIds = skillIds.filter((id) => !foundIds.includes(id));
-
-    if (missingIds.length) {
-      throw new Error(`Invalid skill IDs: ${missingIds.join(", ")}`);
-    }
+    const missing = data.skillIds.filter((id) => !foundIds.includes(id));
+    if (missing.length)
+      throw new Error(`Invalid skill IDs: ${missing.join(", ")}`);
   }
 
-  return createStudent(
-    userId,
-    departmentId,
-    year,
-    passingYear,
-    cgpa,
-    resumeUrl,
-    skillIds,
-    experiences,
-    certificates,
-  );
+  return createStudent(userId, data);
 };
 
 export const getStudentProfileService = async (userId: number) => {
@@ -88,27 +65,62 @@ export const getStudentProfileService = async (userId: number) => {
 
 export const updateStudentService = async (userId: number, data: any) => {
   const existing = await getStudentByUserId(userId);
+  if (!existing) throw new Error("Student profile not found");
 
-  if (!existing) {
+  if (data.skillIds?.length) {
+    const skills = await getSkillsByIds(data.skillIds);
+    const foundIds = skills.map((s) => s.id);
+    const missing = data.skillIds.filter((id) => !foundIds.includes(id));
+    if (missing.length)
+      throw new Error(`Invalid skill IDs: ${missing.join(", ")}`);
+  }
+
+  return updateStudent(userId, data);
+};
+
+export const applicationActionService = async (
+  userId: number,
+  applicationId: number,
+  action: "ACCEPT" | "REJECT",
+) => {
+  const student = await getStudentByUserId(userId);
+
+  if (!student) {
     throw new Error("Student profile not found");
   }
 
-  const { skillIds, ...rest } = data;
+  const application = await getApplicationByIdAndStudent(
+    applicationId,
+    student.id,
+  );
 
-  if (skillIds?.length) {
-    const skills = await getSkillsByIds(skillIds);
-
-    const foundIds = skills.map((s) => s.id);
-
-    const missingIds = skillIds.filter((id) => !foundIds.includes(id));
-
-    if (missingIds.length) {
-      throw new Error(`Invalid skill IDs: ${missingIds.join(", ")}`);
-    }
+  if (!application) {
+    throw new Error("Application not found or unauthorized");
   }
 
-  return updateStudent(userId, {
-    ...rest,
-    skillIds,
-  });
+  if (application.status !== "SELECTED") {
+    throw new Error("Only selected applications can be acted upon");
+  }
+
+  if (action === "ACCEPT") {
+    if (student.isPlaced) {
+      throw new Error("You have already accepted an offer");
+    }
+
+    await acceptApplication(applicationId);
+
+    await withdrawOtherApplications(student.id, applicationId);
+
+    await markStudentPlaced(student.id);
+
+    return { type: "ACCEPTED", applicationId };
+  }
+
+  if (action === "REJECT") {
+    await withdrawApplication(applicationId);
+
+    return { type: "REJECTED", applicationId };
+  }
+
+  throw new Error("Invalid action");
 };

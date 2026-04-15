@@ -75,8 +75,12 @@ export const getJobById = async (id: number) => {
   return prisma.job.findUnique({
     where: { id },
     include: {
-      company: true,
-      eligibleDepartments: true,
+      company: {
+        select: {
+          userId: true,
+          name: true,
+        },
+      },
     },
   });
 };
@@ -247,15 +251,33 @@ export const getApplicationByStudentAndJob = async (
   });
 };
 
-export const getJobBasicDetails = async (id: number) => {
+export const getJobDisplayDetails = async (id: number) => {
   return prisma.job.findUnique({
     where: { id },
     select: {
+      id: true,
       title: true,
       location: true,
       company: {
         select: {
           name: true,
+          userId: true,
+        },
+      },
+    },
+  });
+};
+
+export const getJobEligibilityDetails = async (id: number) => {
+  return prisma.job.findUnique({
+    where: { id },
+    select: {
+      minCgpa: true,
+      maxCgpa: true,
+      maxBacklogs: true,
+      eligibleDepartments: {
+        select: {
+          id: true,
         },
       },
     },
