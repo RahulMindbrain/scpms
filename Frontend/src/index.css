@@ -127,3 +127,37 @@
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
+/* Skeleton loader animation */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 1; }
+}
+.skeleton {
+  @apply bg-slate-200 rounded-lg animate-pulse;
+}
+.skeleton-text {
+  @apply bg-slate-200 rounded h-4 animate-pulse;
+}
+.skeleton-circle {
+  @apply bg-slate-200 rounded-full animate-pulse;
+}
+/* Progress bar fill animation */
+@keyframes progress-fill {
+  from { width: 0%; }
+}
+.animate-progress {
+  animation: progress-fill 1s ease-out forwards;
+}
+/* Subtle dot pattern for banners */
+.dot-pattern {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
+  background-size: 16px 16px;
+}
+/* No scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

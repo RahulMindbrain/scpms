@@ -1,7 +1,7 @@
-import   { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import {
   FileText, Upload, Download, Trash2,
-  Bell, Search,
+  Search,
   FileCheck, FileClock,
   MoreVertical, ExternalLink, ShieldCheck
 } from 'lucide-react';
@@ -89,52 +89,52 @@ const Documents = () => {
     }
   };
 
+  // Status badge styles
+  const getStatusStyles = (status: string) => {
+    switch (status) {
+      case 'Verified': return 'text-emerald-600';
+      case 'Pending': return 'text-amber-600';
+      default: return 'text-slate-400';
+    }
+  };
+
+  const getStatusIconColor = (status: string) => {
+    switch (status) {
+      case 'Verified': return 'text-emerald-500';
+      case 'Pending': return 'text-amber-500';
+      default: return 'text-slate-300';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
-      {/* Refined Navbar */}
-      <nav className="sticky top-0 z-30 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 px-8 py-3">
-        <div className="flex justify-between items-center max-w-7xl mx-auto">
-          <div className="flex items-center gap-4">
-
+      <main className="max-w-6xl mx-auto px-8 py-10">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+          <div>
+            <h2 className="text-2xl font-bold text-slate-900">Academic Records</h2>
+            <p className="text-slate-500 mt-1 font-medium text-sm">Manage and share your verified professional documents.</p>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex gap-3">
             <div className="hidden md:flex items-center relative">
               <Search className="absolute left-3 text-slate-400" size={16} />
               <input
                 type="text"
                 placeholder="Search files..."
-                className="pl-10 pr-4 py-1.5 bg-slate-100 border-none rounded-full text-sm focus:ring-2 focus:ring-indigo-500 w-64 transition-all"
+                className="pl-10 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 outline-none w-56 transition-all"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <button className="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
-              <Bell size={20} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
-            </button>
-            <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-xs font-bold shadow-sm">AS</div>
-          </div>
-        </div>
-      </nav>
-
-      <main className="max-w-6xl mx-auto px-8 py-10">
-        {/* Header Section */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-          <div>
-            <h2 className="text-3xl font-extrabold text-slate-900">Academic Records</h2>
-            <p className="text-slate-500 mt-1 font-medium">Manage and share your verified professional documents.</p>
-          </div>
-
-          <div className="flex gap-3">
             <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className="flex items-center gap-2 px-6 py-2.5 bg-slate-900 text-white text-sm font-bold rounded-xl hover:bg-slate-800 transition-all shadow-lg active:scale-95 disabled:opacity-70"
+              className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-500/20 active:scale-95 disabled:opacity-70"
             >
               {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload size={16} />}
-              {isUploading ? "Uploading..." : "Quick Upload"}
+              {isUploading ? "Uploading..." : "Upload"}
             </button>
           </div>
         </div>
@@ -146,8 +146,8 @@ const Documents = () => {
               key={cat}
               onClick={() => setActiveTab(cat)}
               className={`px-5 py-2 text-sm font-bold rounded-full border transition-all whitespace-nowrap ${activeTab === cat
-                  ? 'bg-indigo-50 border-indigo-200 text-indigo-700 shadow-sm'
-                  : 'bg-white border-slate-200 text-slate-600 hover:border-slate-300'
+                  ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm'
+                  : 'bg-white border-slate-200 text-slate-400 hover:border-slate-300 hover:text-slate-600'
                 }`}
             >
               {cat}
@@ -159,9 +159,9 @@ const Documents = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredDocs.length > 0 ? (
             filteredDocs.map((doc) => (
-              <div key={doc.id} className="group bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-xl hover:shadow-indigo-500/5 hover:border-indigo-200 transition-all relative overflow-hidden">
+              <div key={doc.id} className="group bg-white rounded-2xl border border-slate-200 p-5 hover:shadow-xl hover:shadow-blue-500/5 hover:border-blue-200 transition-all relative overflow-hidden">
                 <div className="flex justify-between items-start mb-4">
-                  <div className={`p-3 rounded-xl border ${doc.category === 'Resume' ? 'bg-blue-50 border-blue-100' : 'bg-emerald-50 border-emerald-100'
+                  <div className={`p-3 rounded-xl border ${doc.category === 'Resume' ? 'bg-blue-50 border-blue-100' : doc.category === 'Offer Letter' ? 'bg-indigo-50 border-indigo-100' : 'bg-emerald-50 border-emerald-100'
                     }`}>
                     {doc.icon}
                   </div>
@@ -170,7 +170,7 @@ const Documents = () => {
                   </button>
                 </div>
 
-                <h3 className="font-bold text-slate-800 mb-1 truncate pr-4 group-hover:text-indigo-600 transition-colors" title={doc.name}>
+                <h3 className="font-bold text-slate-800 mb-1 truncate pr-4 group-hover:text-blue-600 transition-colors" title={doc.name}>
                   {doc.name}
                 </h3>
 
@@ -182,11 +182,11 @@ const Documents = () => {
 
                 <div className="flex items-center justify-between pt-4 border-t border-slate-50">
                   <div className="flex items-center gap-1.5">
-                    <ShieldCheck size={14} className={doc.status === 'Verified' ? 'text-emerald-500' : 'text-slate-300'} />
-                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{doc.status}</span>
+                    <ShieldCheck size={14} className={getStatusIconColor(doc.status)} />
+                    <span className={`text-[11px] font-bold uppercase tracking-wider ${getStatusStyles(doc.status)}`}>{doc.status}</span>
                   </div>
                   <div className="flex items-center gap-1">
-                    <button className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
+                    <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
                       <Download size={16} />
                     </button>
                     <button
@@ -200,7 +200,7 @@ const Documents = () => {
               </div>
             ))
           ) : (
-            <div className="col-span-full py-24 bg-white rounded-3xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400">
+            <div className="col-span-full py-24 bg-white rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center text-slate-400">
               <div className="p-4 bg-slate-50 rounded-full mb-4">
                 <FileClock size={40} strokeWidth={1.5} />
               </div>
@@ -217,7 +217,7 @@ const Documents = () => {
               <ShieldCheck size={28} className="text-indigo-300" />
             </div>
             <div>
-              <p className="text-indigo-200/70 text-sm font-medium">All documents are encrypted and accessible only by verified COMPANYs.</p>
+              <p className="text-indigo-200/70 text-sm font-medium">All documents are encrypted and accessible only by verified companies.</p>
             </div>
           </div>
           <button className="px-6 py-2.5 bg-white text-slate-900 text-sm font-bold rounded-xl hover:bg-indigo-50 transition-all flex items-center gap-2">
