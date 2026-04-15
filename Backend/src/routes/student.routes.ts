@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  applicationActionController,
   createStudentController,
   getStudentProfileController,
   updateStudentController,
@@ -64,11 +65,11 @@ StudentRoutes.get(
   getApplicationsController,
 );
 
-// StudentRoutes.post(
-//   "/cloudinary/signature",
-//   authenticateUser,
-//   authorizeRoles("STUDENT"),
-//   getCloudinarySignatureController,
-// );
+StudentRoutes.put(
+  "/application/:applicationId",
+  authenticateUser,
+  authorizeRoles("STUDENT"),
+  applicationActionController,
+);
 
 export default StudentRoutes;

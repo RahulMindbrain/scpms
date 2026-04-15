@@ -2,24 +2,31 @@ import http from "http";
 import app from "./app";
 import { getDatabaseUrl } from "./config/db.URL";
 import { ensureDatabaseExists } from "./utils/initDB";
+import { initializeSocket } from "./socket";
 
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
 
-process.env.DATABASE_URL = getDatabaseUrl();
-
-const startServer = async () => {
+// =========================
+// BOOTSTRAP SERVER
+// =========================
+const startServer = async (): Promise<void> => {
   try {
-    // Set DB URL
+    // ✅ Set DATABASE URL (single source of truth)
     process.env.DATABASE_URL = getDatabaseUrl();
 
-    // Ensure DB exists
+    // ✅ Ensure DB exists
     await ensureDatabaseExists();
 
-    // Create server
+    // ✅ Create HTTP server
     const server = http.createServer(app);
 
+    // ✅ Initialize socket
+    initializeSocket(server);
+    console.log("🔥 Socket initialized");
+
+    // ✅ Start server
     server.listen(PORT, () => {
-      console.log("http://localhost:" + PORT);
+      console.log(`🚀 Server running at http://localhost:${PORT}`);
     });
   } catch (error) {
     console.error("❌ Server startup failed:", error);
@@ -27,4 +34,7 @@ const startServer = async () => {
   }
 };
 
+// =========================
+// START
+// =========================
 startServer();

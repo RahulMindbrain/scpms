@@ -11,6 +11,8 @@ import {
   getJobById,
 } from "../repository/job.repository";
 import { getStudentByUserId } from "../repository/student.repository";
+import { emitToUser } from "../socket";
+import { SOCKET_EVENTS } from "../socket.event";
 
 export const createApplicationService = async (
   userId: number,
@@ -34,19 +36,41 @@ export const createApplicationService = async (
     throw new Error("Already applied to this job");
   }
 
+  let application;
+
+  // =========================
+  // NOT ELIGIBLE CASE
+  // =========================
   if (job.minCgpa && student.cgpa && student.cgpa < job.minCgpa) {
-    return createApplication({
+    application = await createApplication({
       studentId: student.id,
       jobId,
       status: "NOT_ELIGIBLE",
       reason: "CGPA below requirement",
     });
+
+    return application; // ❌ no need to notify company
   }
 
-  return createApplication({
+  // =========================
+  // NORMAL APPLY
+  // =========================
+  application = await createApplication({
     studentId: student.id,
     jobId,
   });
+
+  // =========================
+  // 🔥 SOCKET EMIT (to company)
+  // =========================
+  emitToUser(job.company.userId, SOCKET_EVENTS.NEW_APPLICATION, {
+    applicationId: application.id,
+    jobId,
+    studentId: student.id,
+    studentName: student.user?.name, // if available
+  });
+
+  return application;
 };
 
 export const getApplicationsService = async (
@@ -87,7 +111,20 @@ export const getApplicationsService = async (
 };
 
 export const updateApplicationService = async (id: number, status: any) => {
-  return updateApplicationStatus(id, status);
+  const application = await updateApplicationStatus(id, status);
+
+  emitToUser(
+    application.student.userId,
+    SOCKET_EVENTS.APPLICATION_STATUS_UPDATED,
+    {
+      applicationId: application.id,
+      status: application.status,
+      jobId: application.job.id,
+      jobTitle: application.job.title,
+    },
+  );
+
+  return application;
 };
 
 export const deleteApplicationService = async (id: number) => {

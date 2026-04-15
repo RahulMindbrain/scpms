@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { sendError, sendSuccess } from "../utils/response";
 import {
+  applicationActionService,
   createStudentService,
   getStudentProfileService,
   updateStudentService,
@@ -31,32 +32,10 @@ export const createStudentController = async (req: Request, res: Response) => {
   try {
     const user = res.locals.user;
 
-    const {
-      departmentId,
-      year,
-      passingYear,
-      cgpa,
-      resumeUrl,
-      skillIds,
-      experiences,
-      certificates,
-    } = req.body;
-
-    const student = await createStudentService(
-      user.id,
-      departmentId,
-      year,
-      passingYear,
-      cgpa,
-      resumeUrl,
-      skillIds,
-      experiences,
-      certificates,
-    );
+    const student = await createStudentService(user.id, req.body);
 
     return sendSuccess(res, 201, "Student created", student);
   } catch (error: any) {
-    // console.log(error);
     return sendError(res, 400, error.message);
   }
 };
@@ -82,6 +61,27 @@ export const updateStudentController = async (req: Request, res: Response) => {
     const updated = await updateStudentService(user.id, req.body);
 
     return sendSuccess(res, 200, "Student profile updated", updated);
+  } catch (error: any) {
+    return sendError(res, 400, error.message);
+  }
+};
+
+export const applicationActionController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const user = res.locals.user;
+    const { applicationId } = req.params;
+    const { action } = req.body;
+
+    const result = await applicationActionService(
+      user.id,
+      Number(applicationId),
+      action,
+    );
+
+    return sendSuccess(res, 200, "Action performed successfully", result);
   } catch (error: any) {
     return sendError(res, 400, error.message);
   }

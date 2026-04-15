@@ -73,19 +73,26 @@ model Student {
   year         Int        
   passingYear  Int       
 
-  resumeUrl    String?   
-
+  resumeUrl    String?
+  activeBacklogs Int @default(0)   
+  linkedinUrl String?
+  githubUrl   String?
+  portfolioUrl String?
+  isPlaced Boolean @default(false)
+  placedAt DateTime?
+  
   skills       Skill[]
   experiences  Experience[]
   certificates Certificate[]
 
+  projects Project[]
   applications Application[]
 
   createdAt    DateTime @default(now())
 
   @@index([departmentId])
   @@index([passingYear])
-}
+} 
 
 model Skill {
   id        Int       @id @default(autoincrement())
@@ -132,6 +139,25 @@ model Certificate {
 
   @@index([studentId])
 }
+
+model Project {
+  id          Int      @id @default(autoincrement())
+
+  studentId   Int
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  title       String
+  description String?
+  techStack   String?   // or separate relation later
+
+  githubUrl   String?
+  liveUrl     String?
+
+  createdAt   DateTime @default(now())
+
+  @@index([studentId])
+}
+
 
 model Company {
   id        Int     @id @default(autoincrement())
@@ -204,6 +230,8 @@ model Application {
 
   student   Student @relation(fields: [studentId], references: [id])
   job       Job     @relation(fields: [jobId], references: [id])
+  isAccepted Boolean @default(false)
+acceptedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
