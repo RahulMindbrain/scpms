@@ -128,7 +128,7 @@ const CompanyManagement: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex h-[60vh] flex-col items-center justify-center space-y-4">
+ <div className="max-w-7xl mx-auto px-4 space-y-8 animate-in mt-2">
         <p className="text-rose-500 font-black uppercase tracking-widest">{error}</p>
         <Button onClick={() => dispatch(fetchCompanies({}))}>Retry</Button>
       </div>
@@ -136,20 +136,19 @@ const CompanyManagement: React.FC = () => {
   }
 
   return (
-    <div className=" space-y-8 animate-in mt-2 p-4 md:p-0">
+  <div className="max-w-7xl mx-auto px-6 space-y-8 animate-in mt-2">
       {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 px-1">
         
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-          <div className="relative group flex-1 sm:flex-none">
+<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div className="relative group flex-1 sm:flex-none">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Filter by name..."
-              className="w-full sm:w-72 pl-11 pr-4 py-3.5 bg-white border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all placeholder:text-slate-300"
-            />
+className="w-full sm:w-72 pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"/>
           </div>
          
         </div>
@@ -170,7 +169,7 @@ const CompanyManagement: React.FC = () => {
             <button
               key={opt}
               onClick={() => setFilter(opt)}
-              className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === opt ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/10' : 'text-slate-400 hover:text-slate-600'}`}
+              className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${filter === opt ? 'bg-slate-900 text-white shadow-blue-500/10' : 'text-slate-500 hover:text-slate-900 '}`}
             >
               {opt}
             </button>
@@ -179,21 +178,21 @@ const CompanyManagement: React.FC = () => {
       </div>
 
       {/* Company Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCompanies.map((company) => (
-          <div key={company.id} className="bg-white p-8 rounded-[2.5rem] border border-slate-50 shadow-xl shadow-slate-200/20 hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-500 group relative overflow-hidden">
-            <div className={`absolute top-0 right-0 w-32 h-32 blur-3xl opacity-10 transition-opacity group-hover:opacity-20 ${company.approval === 'Approved' ? 'bg-blue-600' : 'bg-amber-600'}`}></div>
+          <div key={company.id} className="bg-white p-6 rounded-2xl border border-slate-50 shadow-sm hover:shadow-md transition-all transition-all duration-500 group relative overflow-hidden">
+            {/* <div className={`absolute top-0 right-0 w-32 h-32 blur-3xl opacity-10 transition-opacity group-hover:opacity-20 ${company.approval === 'Approved' ? 'bg-blue-600' : 'bg-amber-600'}`}></div> */}
 
             <div className="flex justify-between items-start mb-8 relative z-10">
               <div className="flex items-center gap-6">
                 <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 group-hover:bg-white group-hover:border-blue-100 shadow-sm transition-all duration-300">
-                  <Building2 className="w-8 h-8 text-slate-300 group-hover:text-blue-600 transition-colors" />
+                  <Building2 className="text-slate-400 group-hover:text-slate-700 transition-colors" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-black text-slate-900 group-hover:text-blue-600 transition-colors uppercase tracking-tight">{company.name}</h3>
+                <h3 className="text-lg font-semibold text-slate-900 group-hover:text-slate-700 transition-colors">{company.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></div>
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{company.sector}</span>
+                    <span className="text-xs text-slate-500 ">{company.sector}</span>
                   </div>
                 </div>
               </div>
@@ -207,7 +206,7 @@ const CompanyManagement: React.FC = () => {
               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
                 <div className="flex items-center gap-3">
                   <MapPin className="w-4 h-4 text-slate-300" />
-                  <span className="text-xs font-bold text-slate-600 uppercase tracking-tight">{company.location}</span>
+                <span className="text-sm text-slate-600">{company.location}</span>
                 </div>
                 <Badge variant="outline" className="text-[9px] border-slate-200">Global Hub</Badge>
               </div>
@@ -231,7 +230,7 @@ const CompanyManagement: React.FC = () => {
               <button
                 onClick={() => toggleApproval(company.id, company.userId, company.approval)}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${company.approval === 'Approved'
-                  ? 'bg-emerald-500 text-white shadow-xl shadow-emerald-200 hover:bg-emerald-600'
+                  ? 'bg-emerald-500 text-white hover:bg-emerald-600'
                   : 'bg-amber-100 text-amber-600 hover:bg-amber-200'
                   }`}
               >
@@ -283,7 +282,7 @@ const CompanyManagement: React.FC = () => {
                   onChange={(e) => setNewCompany({ ...newCompany, location: e.target.value })}
                   type="text"
                   placeholder="Primary location"
-                  className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-sans"
+                  className="w-full px-5 py-4 bg-slate-50 border border-slate-200 text-xs text-slate-500 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-sans"
                 />
               </div>
             </div>

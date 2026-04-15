@@ -257,19 +257,19 @@ const StudentManagement: React.FC = () => {
         </div>
         
         <div className="flex flex-row items-center gap-3 w-full xl:w-auto">
-          <Button
+          {/* <Button
             variant="outline"
             onClick={handleExport}
             disabled={isExporting}
             className="flex-1 xl:flex-none h-10 bg-white border border-slate-200 text-slate-700 shadow-sm hover:bg-slate-50"
           >
             <Download className="w-4 h-4 mr-2" /> Export
-          </Button>
+          </Button> */}
           <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
             <DialogTrigger asChild>
-              <Button className="flex-1 xl:flex-none h-10 shadow-sm bg-blue-600 hover:bg-blue-700 text-white">
+              {/* <Button className="flex-1 xl:flex-none h-10 shadow-sm bg-blue-600 hover:bg-blue-700 text-white">
                 <UserPlus className="w-4 h-4 mr-2" /> Add Student
-              </Button>
+              </Button> */}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>

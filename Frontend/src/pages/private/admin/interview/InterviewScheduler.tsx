@@ -146,7 +146,7 @@ const InterviewScheduler: React.FC = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="space-y-2">
+                {/* <div className="space-y-2">
                   <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Event Type</label>
                   <Select>
                     <SelectTrigger>
@@ -159,7 +159,7 @@ const InterviewScheduler: React.FC = () => {
                       <SelectItem value="hr">HR Interview</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
+                </div> */}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
