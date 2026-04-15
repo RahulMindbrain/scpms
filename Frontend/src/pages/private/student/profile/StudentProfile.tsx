@@ -1,7 +1,8 @@
 import {
   Mail, Phone, MapPin, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
-  Upload, Camera, Briefcase, Loader2, FileText, Calendar, Building2
+  Upload, Camera, Briefcase, Loader2, FileText, Calendar, Building2,
+  Lightbulb, ArrowRight
 } from 'lucide-react';
 import ProjectModal from './modal/ProjectModal';
 import { toast } from 'sonner';
@@ -200,11 +201,29 @@ const StudentProfile = () => {
   };
 
 
+  // Profile completion calculation
+  const getProfileCompletion = () => {
+    const fields = [
+      { name: 'Name', filled: !!profile.name && profile.name !== 'Student Name' },
+      { name: 'Email', filled: !!profile.email },
+      { name: 'Phone', filled: !!profile.phone },
+      { name: 'Location', filled: !!profile.location },
+      { name: 'Skills', filled: profile.skills?.length > 0 },
+      { name: 'CGPA', filled: !!profile.stats?.cgpa && profile.stats.cgpa !== '0.0' },
+      { name: 'Resume', filled: profile.resumes?.length > 0 },
+      { name: 'Experience', filled: profile.experiences?.length > 0 },
+    ];
+    const filled = fields.filter(f => f.filled).length;
+    const missing = fields.filter(f => !f.filled).map(f => f.name);
+    return { percent: Math.round((filled / fields.length) * 100), missing };
+  };
+  const completion = getProfileCompletion();
+
   return (
     <div className="min-h-screen bg-[#fcfcfd] pb-20">
-      <div className="max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-700 px-4 sm:px-6 lg:px-10 pt-4">
+      <div className="max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-700 px-4 sm:px-6 lg:px-8 pt-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-2">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-slate-800 to-slate-500 bg-clip-text text-transparent">Student Profile</h1>
+        <h1 className="text-xl font-bold text-slate-800">Student Profile</h1>
         <Button
           onClick={() => setShowProfileEditDialog(true)}
           disabled={backendLoading}
@@ -215,12 +234,12 @@ const StudentProfile = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Left Sidebar - Personal Details & Academics */}
-        <div className="md:col-span-1 space-y-6">
-          <Card className="overflow-hidden border-none shadow-xl shadow-slate-200/40 rounded-[2.5rem]">
-            <div className="h-32 bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-600 relative rounded-b-[2.5rem]">
-              <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+        <div className="md:col-span-1 space-y-4">
+          <Card className="overflow-hidden border-none shadow-xl shadow-slate-200/40 rounded-2xl">
+            <div className="h-28 bg-blue-600 relative">
+              <div className="absolute inset-0 dot-pattern"></div>
             </div>
             <CardContent className="pt-0 relative px-6 pb-6 text-center">
               <div className="relative inline-block -mt-12 group cursor-pointer" onClick={() => profileImageInputRef.current?.click()}>
@@ -247,41 +266,57 @@ const StudentProfile = () => {
                 </div>
               </div>
 
-              <Separator className="my-6" />
+              {/* Profile Completion Progress */}
+              {completion.percent < 100 && (
+                <div className="mt-4 mx-1">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Profile Completion</span>
+                    <span className="text-xs font-bold text-blue-600">{completion.percent}%</span>
+                  </div>
+                  <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-blue-600 rounded-full animate-progress transition-all" style={{ width: `${completion.percent}%` }} />
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1.5 leading-snug">
+                    Add <span className="font-semibold text-slate-600">{completion.missing.slice(0, 2).join(' & ')}</span>{completion.missing.length > 2 ? ` +${completion.missing.length - 2} more` : ''} to complete
+                  </p>
+                </div>
+              )}
 
-              <div className="space-y-4 text-left mt-6">
-                <div className="flex items-center gap-4 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
+              <Separator className="my-4" />
+
+              <div className="space-y-3 text-left">
+                <div className="flex items-center gap-3 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
                   <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                     <Mail className="h-4 w-4" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Email Address</p>
-                    <p className="truncate text-slate-700 font-semibold" title={profile.email}>{profile.email || 'N/A'}</p>
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Email</p>
+                    <p className="truncate text-slate-700 font-semibold text-[13px]" title={profile.email}>{profile.email || 'N/A'}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
+                <div className="flex items-center gap-3 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
                   <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                     <Phone className="h-4 w-4" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Phone Number</p>
-                    <p className="truncate text-slate-700 font-semibold" title={profile.phone}>{profile.phone || 'Not provided'}</p>
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Phone</p>
+                    <p className="truncate text-slate-700 font-semibold text-[13px]" title={profile.phone}>{profile.phone || 'Not provided'}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-4 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
+                <div className="flex items-center gap-3 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
                   <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                     <MapPin className="h-4 w-4" />
                   </div>
                   <div className="min-w-0">
                     <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Location</p>
-                    <p className="truncate text-slate-700 font-semibold" title={profile.location}>{profile.location || 'Not provided'}</p>
+                    <p className="truncate text-slate-700 font-semibold text-[13px]" title={profile.location}>{profile.location || 'Not provided'}</p>
                   </div>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-xl shadow-slate-200/50 rounded-2xl overflow-hidden">
+          <Card className="border-none shadow-lg shadow-slate-200/40 rounded-2xl overflow-hidden">
             <CardHeader className="pb-3 border-b border-border/50">
               <CardTitle className="text-base flex items-center gap-2">
                 <GraduationCap className="h-4 w-4 text-blue-600" />
@@ -312,7 +347,7 @@ const StudentProfile = () => {
         </div>
 
         {/* Right Content Area - Tabs for dynamic sections */}
-        <div className="md:col-span-2 space-y-8">
+        <div className="md:col-span-2 space-y-6">
           <Tabs defaultValue="overview" className="w-full">
             <TabsList variant="line" className="w-full justify-start h-auto bg-transparent border-b border-slate-200 rounded-none px-0 gap-10 mb-6 relative">
               <TabsTrigger value="overview" className="data-[state=active]:bg-transparent data-[state=active]:border-b-[3px] data-[state=active]:border-blue-600 data-[state=active]:shadow-none data-[state=active]:text-blue-600 text-slate-500 rounded-none px-0 py-4 border-b-[3px] border-transparent transition-all font-bold text-sm hover:text-blue-500">Overview</TabsTrigger>
@@ -339,8 +374,20 @@ const StudentProfile = () => {
                       ))}
                     </div>
                   ) : (
-                    <div className="text-center py-6 text-sm text-muted-foreground border-2 border-dashed rounded-xl bg-slate-50/50">
-                      No skills added yet. Click edit profile to add your technical skills.
+                    <div className="flex flex-col items-center py-10 border-2 border-dashed rounded-2xl bg-slate-50/30">
+                      <div className="h-14 w-14 rounded-2xl bg-blue-50 flex items-center justify-center mb-4">
+                        <Lightbulb className="h-7 w-7 text-blue-500" />
+                      </div>
+                      <p className="text-sm font-semibold text-slate-700 mb-1">No technical skills added</p>
+                      <p className="text-xs text-slate-400 mb-4 max-w-xs text-center">Showcase your programming languages, frameworks, and tools to stand out to recruiters.</p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowProfileEditDialog(true)}
+                        className="gap-1.5 rounded-xl text-xs font-semibold border-blue-200 text-blue-600 hover:bg-blue-50 px-5"
+                      >
+                        <Plus className="h-3.5 w-3.5" /> Add Skills
+                      </Button>
                     </div>
                   )}
                 </CardContent>

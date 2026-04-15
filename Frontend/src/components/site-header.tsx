@@ -10,6 +10,7 @@ import {
 const routeIcons: Record<string, any> = {
   "/admin/dashboard": LayoutDashboard,
   "/admin/students": Users,
+  "/admin/departments": Building2,
   "/admin/companies": Building2,
   "/admin/drives": Briefcase,
   "/admin/jobs": ListChecks,
