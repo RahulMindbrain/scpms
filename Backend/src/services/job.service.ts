@@ -51,6 +51,7 @@ export const getJobsService = async (params: {
   page?: number;
   limit?: number;
   status?: "PENDING" | "APPROVED" | "REJECTED";
+  companyId?: number;
 }) => {
   const page = params.page ?? 1;
 
@@ -62,9 +63,9 @@ export const getJobsService = async (params: {
     page,
     limit: finalLimit,
     status: params.status,
+    companyId: params.companyId, // ✅ pass forward
   });
 };
-
 export const updateJobService = async (id: number, data: any) => {
   return updateJob(id, data);
 };

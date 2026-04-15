@@ -43,12 +43,14 @@ export const getJobs = async (params: {
   page: number;
   limit: number;
   status?: JobStatus;
+  companyId?: number;
 }) => {
-  const { page, limit, status } = params;
+  const { page, limit, status, companyId } = params;
   const skip = (page - 1) * limit;
 
   const where = {
     ...(status && { status }),
+    ...(companyId && { companyId }), // ✅ ADD THIS
   };
 
   const [data, total] = await Promise.all([
@@ -67,10 +69,14 @@ export const getJobs = async (params: {
 
   return {
     data,
-    meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
   };
 };
-
 export const getJobById = async (id: number) => {
   return prisma.job.findUnique({
     where: { id },
@@ -228,12 +234,30 @@ export const getRejectedJobs = async (params: {
   };
 };
 
-export const getJobsByIds = async (ids: number[]) => {
+// export const getJobsByIds = async (ids: number[]) => {
+//   if (!ids.length) return [];
+//   return prisma.job.findMany({
+//     where: {
+//       id: { in: ids },
+//     },
+//   });
+// };
+
+export const getJobsByIds = async (
+  ids: number[],
+  options?: {
+    include?: any;
+    select?: any;
+  },
+) => {
   if (!ids.length) return [];
+
   return prisma.job.findMany({
     where: {
       id: { in: ids },
     },
+    ...(options?.include && { include: options.include }),
+    ...(options?.select && { select: options.select }),
   });
 };
 
@@ -298,3 +322,20 @@ export const getJobEligibilityDetails = async (id: number) => {
 //     ...(minSalary && { salary: { gte: minSalary } }),
 //     ...(maxSalary && { salary: { lte: maxSalary } }),
 //   };
+
+// job.repository.ts
+export const getActiveJobsByCompanyId = async (companyId: number) => {
+  return prisma.job.findMany({
+    where: {
+      companyId,
+      status: "APPROVED",
+    },
+    select: {
+      id: true,
+      title: true,
+      eligibleDepartments: {
+        select: { id: true },
+      },
+    },
+  });
+};

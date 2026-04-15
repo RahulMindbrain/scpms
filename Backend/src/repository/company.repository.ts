@@ -117,6 +117,12 @@ export const getCompanyDetails = async (userId: number) => {
   });
 };
 
+export const getCompanyById = async (id: number) => {
+  return prisma.company.findUnique({
+    where: { id },
+  });
+};
+
 export const getCompanies = async (params: {
   page?: number;
   limit?: number;
