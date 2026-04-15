@@ -12,6 +12,7 @@ import AuthRoutes from "./routes/auth.routes.js";
 import StudentRoutes from "./routes/student.routes.js";
 import DepartmentRoutes from "./routes/department.routes.js";
 import cloudinaryRoute from "./routes/cloudinary.routes.js";
+import Skillsroute from "./routes/skills.routes.js";
 
 const app = express();
 
@@ -46,5 +47,6 @@ app.use("/company", CompanyRoutes);
 app.use("/student", StudentRoutes);
 app.use("/dept", DepartmentRoutes);
 app.use("/cloudinary", cloudinaryRoute);
+app.use("/skills", Skillsroute);
 
 export default app;
