@@ -104,10 +104,10 @@ export const logoutRepo = async (userId: number) => {
     data: { status: "INACTIVE" },
   });
 
-  await prisma.user.update({
-    where: { id: userId },
-    data: { socketId: null },
-  });
+  // await prisma.user.update({
+  //   where: { id: userId },
+  //   data: { socketId: null },
+  // });
 
   return true;
 };

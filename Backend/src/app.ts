@@ -13,6 +13,8 @@ import StudentRoutes from "./routes/student.routes.js";
 import DepartmentRoutes from "./routes/department.routes.js";
 import cloudinaryRoute from "./routes/cloudinary.routes.js";
 import Skillsroute from "./routes/skills.routes.js";
+import scheduleRoute from "./routes/schedule.routes.js";
+import { attachQueryLogger } from "./middlewares/queryLogger.js";
 
 const app = express();
 
@@ -48,5 +50,8 @@ app.use("/student", StudentRoutes);
 app.use("/dept", DepartmentRoutes);
 app.use("/cloudinary", cloudinaryRoute);
 app.use("/skills", Skillsroute);
+app.use("/interview-schedule", scheduleRoute);
+
+app.use(attachQueryLogger);
 
 export default app;

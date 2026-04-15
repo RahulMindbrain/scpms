@@ -8,6 +8,10 @@ import { sendError, sendSuccess } from "../utils/response";
 
 import { Request, Response } from "express";
 import { createJobSchema } from "../validators/job.validator";
+import {
+  getCompanyById,
+  getCompanyByUserId,
+} from "../repository/company.repository";
 
 export const createJobController = async (req: Request, res: Response) => {
   try {
@@ -30,13 +34,43 @@ export const createJobController = async (req: Request, res: Response) => {
     return sendError(res, 400, error.message);
   }
 };
-
 export const getJobsController = async (req: Request, res: Response) => {
   try {
-    const { page, limit, status } = req.query;
+    const user = res.locals.user;
+    if (!user) {
+      return sendError(res, 401, "Unauthorized");
+    }
 
+    const { page, limit, status, companyId: bodyCompanyId } = req.body;
+
+    let companyId: number | undefined;
+
+    // 🔥 CASE 1: COMPANY USER → force their own company
+    if (user.role === "COMPANY") {
+      const company = await getCompanyByUserId(user.id);
+
+      if (!company) {
+        return sendError(res, 404, "Company not found");
+      }
+
+      companyId = company.id;
+    }
+
+    // 🔥 CASE 2: ADMIN → can pass companyId
+    else if (user.role === "ADMIN") {
+      if (bodyCompanyId) {
+        const company = await getCompanyById(Number(bodyCompanyId));
+
+        if (!company) {
+          return sendError(res, 404, "Company not found");
+        }
+
+        companyId = company.id;
+      }
+    }
+
+    // 🔥 Pagination parsing (same as before)
     const parsedPage = page === undefined ? 1 : Number(page);
-
     if (
       page !== undefined &&
       (!Number.isFinite(parsedPage) || parsedPage < 1)
@@ -45,7 +79,6 @@ export const getJobsController = async (req: Request, res: Response) => {
     }
 
     const parsedLimit = limit === undefined ? undefined : Number(limit);
-
     if (
       limit !== undefined &&
       (!Number.isFinite(parsedLimit) || parsedLimit < 1)
@@ -57,6 +90,7 @@ export const getJobsController = async (req: Request, res: Response) => {
       page: parsedPage,
       limit: parsedLimit,
       status,
+      companyId, // ✅ PASS THIS
     });
 
     return sendSuccess(res, 200, "Jobs fetched", data);

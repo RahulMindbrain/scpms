@@ -20,6 +20,7 @@ import {
   getApplicationsController,
   updateApplicationController,
 } from "../controllers/application.controller";
+import { sendBulkMailController } from "../controllers/bulkmail.controller";
 
 const adminRoutes = Router();
 
@@ -99,6 +100,13 @@ adminRoutes.get(
   authenticateUser,
   authorizeRoles("ADMIN"),
   getDashboardStatsController,
+);
+
+adminRoutes.post(
+  "/send-mails",
+  authenticateUser,
+  authorizeRoles("ADMIN"),
+  sendBulkMailController,
 );
 
 export default adminRoutes;

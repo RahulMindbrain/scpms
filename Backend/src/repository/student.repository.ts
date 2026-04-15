@@ -583,3 +583,56 @@ export const markStudentPlaced = async (studentId: number) => {
     },
   });
 };
+
+export const getEligibleUnplacedStudentsForJobs = async (jobIds: number[]) => {
+  if (!jobIds.length) return [];
+
+  // 1. Fetch job eligibility data
+  const jobs = await prisma.job.findMany({
+    where: {
+      id: { in: jobIds },
+      status: "APPROVED", // safety
+    },
+    select: {
+      id: true,
+      eligibleDepartments: {
+        select: { id: true },
+      },
+    },
+  });
+
+  if (!jobs.length) {
+    throw new Error("No valid jobs found");
+  }
+
+  // 2. Collect unique department IDs
+  const departmentIds = [
+    ...new Set(jobs.flatMap((job) => job.eligibleDepartments.map((d) => d.id))),
+  ];
+
+  if (!departmentIds.length) {
+    return [];
+  }
+
+  // 3. Fetch students
+  return prisma.student.findMany({
+    where: {
+      isPlaced: false,
+      departmentId: {
+        in: departmentIds,
+      },
+    },
+    select: {
+      id: true,
+      departmentId: true,
+      user: {
+        select: {
+          id: true,
+          firstname: true,
+          lastname: true,
+          email: true,
+        },
+      },
+    },
+  });
+};
