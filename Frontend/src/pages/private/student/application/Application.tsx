@@ -1,12 +1,13 @@
 import React, { useEffect } from 'react';
 import {
   CheckCircle2, Circle, Clock, XCircle, Briefcase,
-  ChevronRight, Loader2, Search, FileText, BarChart3,
-  ArrowRight, MapPin, Building2, Sparkles, UserCircle,
-  Rocket, TrendingUp
+  ChevronRight, Search, FileText, BarChart3,
+  ArrowRight, Sparkles, UserCircle,
+  Rocket, TrendingUp, Loader2
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchJobApplications } from '@/redux/thunks/studentThunk';
+import { fetchJobApplications, updateApplicationStatus } from '@/redux/thunks/studentThunk';
+import { toast } from 'sonner';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import { Button } from '@/components/ui/button';
@@ -15,21 +16,28 @@ import { useNavigate } from 'react-router-dom';
 type Status = 'APPLIED' | 'SHORTLISTED' | 'TECHNICAL_ROUND' | 'HR_ROUND' | 'SELECTED' | 'REJECTED';
 
 interface ApplicationProps {
+  id: number;
   companyName: string;
   role: string;
   appliedDate: string;
   currentStatus: Status;
   reason?: string | null;
+  onUpdate: () => void;
 }
 
 /* ─── Reusable Application Card (when user HAS applications) ─── */
 const ApplicationCard: React.FC<ApplicationProps> = ({
+  id,
   companyName,
   role,
   appliedDate,
   currentStatus,
   reason,
+  onUpdate
 }) => {
+  const dispatch = useDispatch<AppDispatch>();
+  const [updating, setUpdating] = React.useState<"ACCEPT" | "REJECT" | null>(null);
+
   const stages: Status[] = ['APPLIED', 'SHORTLISTED', 'TECHNICAL_ROUND', 'HR_ROUND', 'SELECTED'];
   const statusDisplayMap: Record<Status, string> = {
     APPLIED: 'Applied',
@@ -43,6 +51,19 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
   const getStatusIndex = (status: Status) => stages.indexOf(status);
   const currentIndex = getStatusIndex(currentStatus);
   const isRejected = currentStatus === 'REJECTED';
+
+  const handleAction = async (action: "ACCEPT" | "REJECT") => {
+    setUpdating(action);
+    try {
+      await dispatch(updateApplicationStatus({ id, action })).unwrap();
+      toast.success(`Application ${action.toLowerCase()}ed successfully`);
+      onUpdate();
+    } catch (error: any) {
+      toast.error(error || `Failed to ${action.toLowerCase()} application`);
+    } finally {
+      setUpdating(null);
+    }
+  };
 
   return (
     <div className="bg-white p-6 md:p-8 rounded-2xl shadow-lg shadow-slate-200/40 border border-slate-100 w-full hover:border-blue-200 transition-all duration-300 overflow-hidden">
@@ -72,10 +93,10 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
             <div key={stage} className="flex flex-col items-center relative z-10 w-full">
               <div
                 className={`flex items-center justify-center w-10 h-10 rounded-full mb-3 border-2 transition-all duration-500 ${isCompleted
-                    ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-200'
-                    : isCurrent
-                      ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-200 scale-110'
-                      : 'bg-white border-slate-200 text-slate-300'
+                  ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-200'
+                  : isCurrent
+                    ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-200 scale-110'
+                    : 'bg-white border-slate-200 text-slate-300'
                   }`}
               >
                 {isCompleted ? (
@@ -120,17 +141,41 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
               {isRejected
                 ? reason || 'Your application was not moved forward for this role.'
                 : currentStatus === 'SELECTED'
-                  ? 'Congratulations! Check your email for offer details.'
+                  ? 'Congratulations! You have received an offer.'
                   : 'Your profile is under internal review with the hiring team.'}
             </p>
           </div>
         </div>
-        <Button
-          variant="ghost"
-          className="rounded-xl font-semibold text-xs text-slate-400 hover:text-blue-600 hover:bg-white group transition-all"
-        >
-          Details <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-        </Button>
+
+        {currentStatus === 'SELECTED' ? (
+          <div className="flex items-center gap-2">
+            <Button
+              size="sm"
+              onClick={() => handleAction('REJECT')}
+              disabled={!!updating}
+              className="rounded-xl font-bold text-xs bg-white text-red-600 border-red-100 hover:bg-red-50 hover:text-red-700 border"
+            >
+              {updating === 'REJECT' ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
+              Reject
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => handleAction('ACCEPT')}
+              disabled={!!updating}
+              className="rounded-xl font-bold text-xs bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm shadow-emerald-200"
+            >
+              {updating === 'ACCEPT' ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
+              Accept Offer
+            </Button>
+          </div>
+        ) : (
+          <Button
+            variant="ghost"
+            className="rounded-xl font-semibold text-xs text-slate-400 hover:text-blue-600 hover:bg-white group transition-all"
+          >
+            Details <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        )}
       </div>
     </div>
   );
@@ -182,37 +227,6 @@ const QuickActionCard: React.FC<{
       Get started <ArrowRight size={12} />
     </div>
   </button>
-);
-
-/* ─── Suggested Job Card Component ─── */
-const SuggestedJobCard: React.FC<{
-  title: string;
-  company: string;
-  location: string;
-  type: string;
-  logo: string;
-  color: string;
-}> = ({ title, company, location, type, logo, color }) => (
-  <div className="group bg-white rounded-xl border border-slate-100 p-4 hover:shadow-lg hover:shadow-blue-500/5 hover:border-blue-200 transition-all duration-300 cursor-pointer">
-    <div className="flex items-start gap-3.5">
-      <div className={`w-10 h-10 ${color} rounded-xl flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-sm`}>
-        {logo}
-      </div>
-      <div className="flex-1 min-w-0">
-        <h5 className="text-sm font-bold text-slate-900 leading-tight group-hover:text-blue-600 transition-colors truncate">{title}</h5>
-        <p className="text-xs text-slate-500 font-medium mt-0.5 truncate">{company}</p>
-        <div className="flex items-center gap-3 mt-2">
-          <span className="flex items-center gap-1 text-[11px] text-slate-400 font-medium">
-            <MapPin size={11} /> {location}
-          </span>
-          <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-600 border border-blue-100">
-            {type}
-          </span>
-        </div>
-      </div>
-      <ChevronRight size={16} className="text-slate-300 group-hover:text-blue-500 mt-1 transition-colors shrink-0" />
-    </div>
-  </div>
 );
 
 /* ─── Main Page Component ─── */
@@ -293,11 +307,13 @@ const ApplicationStatus = () => {
           {applications.map((app: any) => (
             <ApplicationCard
               key={app.id}
+              id={app.id}
               companyName={app.job?.company?.name || "Company"}
               role={app.job?.title || "Role Not Specified"}
               appliedDate={app.createdAt}
               currentStatus={app.status as Status}
               reason={app.reason}
+              onUpdate={() => dispatch(fetchJobApplications({}))}
             />
           ))}
         </div>

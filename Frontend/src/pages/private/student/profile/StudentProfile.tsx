@@ -2,7 +2,7 @@ import {
   Mail, Phone, MapPin, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
   Upload, Camera, Briefcase, Loader2, FileText, Calendar, Building2,
-  Lightbulb, ArrowRight
+  Lightbulb, Globe  
 } from 'lucide-react';
 import ProjectModal from './modal/ProjectModal';
 import { toast } from 'sonner';
@@ -50,13 +50,16 @@ const StudentProfile = () => {
       cgpa: '0.0',
       tenth: '0%',
       twelfth: '0%',
-      backlogs: '0',
+      activeBacklogs: 0,
       rollNo: '',
       department: '',
       year: 1,
       passingYear: 2026,
       departmentId: 1
     },
+    linkedinUrl: '',
+    githubUrl: '',
+    portfolioUrl: '',
     skills: [],
     projects: [],
     experiences: [],
@@ -81,7 +84,11 @@ const StudentProfile = () => {
           year: backendProfile.year || 1,
           passingYear: backendProfile.passingYear || 2026,
           departmentId: backendProfile.departmentId || 1,
+          activeBacklogs: backendProfile.activeBacklogs || 0,
         },
+        linkedinUrl: backendProfile.linkedinUrl || '',
+        githubUrl: backendProfile.githubUrl || '',
+        portfolioUrl: backendProfile.portfolioUrl || '',
         skills: backendProfile.skills?.map((s: string) => ({ name: s, color: 'bg-blue-500' })) || [],
         resumes: backendProfile.resumeUrl ? [{ name: 'Resume', url: backendProfile.resumeUrl, date: 'N/A', size: 'N/A' }] : []
       }));
@@ -94,7 +101,11 @@ const StudentProfile = () => {
       year: parseInt(updatedData.stats.year),
       passingYear: parseInt(updatedData.stats.passingYear),
       cgpa: parseFloat(updatedData.stats.cgpa),
-      resumeUrl: updatedData.stats.resumeUrl || updatedData.resumes[0]?.url || "",
+      activeBacklogs: parseInt(updatedData.stats.activeBacklogs) || 0,
+      linkedinUrl: updatedData.linkedinUrl || "",
+      githubUrl: updatedData.githubUrl || "",
+      portfolioUrl: updatedData.portfolioUrl || "",
+      resumeUrl: updatedData.stats.resumeUrl || updatedData.resumes?.[0]?.url || "",
       skills: updatedData.skills.map((s: any) => s.name),
       experiences: updatedData.experiences || [],
       certificates: updatedData.certificates || [],
@@ -103,7 +114,11 @@ const StudentProfile = () => {
       year: parseInt(profile.stats.year),
       passingYear: parseInt(profile.stats.passingYear),
       cgpa: parseFloat(profile.stats.cgpa),
-      resumeUrl: profile.stats.resumeUrl || profile.resumes[0]?.url || "",
+      activeBacklogs: parseInt(profile.stats.activeBacklogs) || 0,
+      linkedinUrl: profile.linkedinUrl || "",
+      githubUrl: profile.githubUrl || "",
+      portfolioUrl: profile.portfolioUrl || "",
+      resumeUrl: profile.stats.resumeUrl || profile.resumes?.[0]?.url || "",
       skills: profile.skills.map((s: any) => s.name),
       experiences: profile.experiences || [],
       certificates: profile.certificates || [],
@@ -313,6 +328,43 @@ const StudentProfile = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Social Links */}
+              <div className="mt-6 pt-6 border-t border-slate-100">
+                <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                  <Globe className="h-3 w-3" />
+                  Professional Links
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {profile.linkedinUrl && (
+                    <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer">
+                      <Badge variant="outline" className="h-9 px-3 gap-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer rounded-xl">
+                        {/* <Linkedin className="h-3.5 w-3.5 text-[#0077B5]" /> */}
+                        <span className="text-xs font-semibold">LinkedIn</span>
+                      </Badge>
+                    </a>
+                  )}
+                  {profile.githubUrl && (
+                    <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer">
+                      <Badge variant="outline" className="h-9 px-3 gap-2 border-slate-200 hover:border-slate-400 hover:bg-slate-50 transition-all cursor-pointer rounded-xl">
+                        {/* <Github className="h-3.5 w-3.5 text-[#333]" /> */}
+                        <span className="text-xs font-semibold">GitHub</span>
+                      </Badge>
+                    </a>
+                  )}
+                  {profile.portfolioUrl && (
+                    <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer">
+                      <Badge variant="outline" className="h-9 px-3 gap-2 border-slate-200 hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer rounded-xl">
+                        <Globe className="h-3.5 w-3.5 text-blue-600" />
+                        <span className="text-xs font-semibold">Portfolio</span>
+                      </Badge>
+                    </a>
+                  )}
+                  {!profile.linkedinUrl && !profile.githubUrl && !profile.portfolioUrl && (
+                    <p className="text-xs text-slate-400 italic">No social links added yet.</p>
+                  )}
+                </div>
+              </div>
             </CardContent>
           </Card>
 
@@ -331,7 +383,9 @@ const StudentProfile = () => {
               <div className="grid grid-cols-1 gap-2 mt-4">
                 <div className="flex justify-between items-center py-2.5 px-1 border-b border-slate-50">
                   <span className="text-sm text-slate-500 font-medium">Active Backlogs</span>
-                  <span className="font-bold text-slate-700">{profile.stats?.backlogs || '0'}</span>
+                  <span className={`font-bold ${profile.stats?.activeBacklogs > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
+                    {profile.stats?.activeBacklogs || '0'}
+                  </span>
                 </div>
                 <div className="flex justify-between items-center py-2.5 px-1 border-b border-slate-50">
                   <span className="text-sm text-slate-500 font-medium">Current Year</span>
