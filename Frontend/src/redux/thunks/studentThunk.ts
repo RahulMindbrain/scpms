@@ -97,3 +97,15 @@ export const applyJob = createAsyncThunk(
         }
     }
 );
+
+export const fetchJobApplications = createAsyncThunk(
+    "student/fetchJobApplications",
+    async (params: any, { rejectWithValue }) => {
+        try {
+            const response = await getAPI<any>("/student/get-job-application", params);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to fetch job applications");
+        }
+    }
+);
