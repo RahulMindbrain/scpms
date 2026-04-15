@@ -6,13 +6,19 @@ import {
   fetchCompanyProfile,
   createCompanyProfile,
   updateCompanyProfile,
-  postJob
+  postJob,
+  fetchCompanyJobs,
+  fetchJobApplications,
+  updateJobApplicationStatus
 } from "../thunks/companyThunk";
 
 interface CompanyState {
   companies: any[];
   inactiveCompanies: any[];
   profile: any | null;
+  jobs: any[];
+  applications: any[];
+  statusCounts: any[];
   loading: boolean;
   error: string | null;
   meta: {
@@ -27,6 +33,9 @@ const initialState: CompanyState = {
   companies: [],
   inactiveCompanies: [],
   profile: null,
+  jobs: [],
+  applications: [],
+  statusCounts: [],
   loading: false,
   error: null,
   meta: null,
@@ -133,6 +142,44 @@ const companySlice = createSlice({
       .addCase(postJob.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      // Fetch Company Jobs
+      .addCase(fetchCompanyJobs.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCompanyJobs.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.jobs = action.payload.data.data;
+        state.meta = action.payload.data.meta;
+      })
+      .addCase(fetchCompanyJobs.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Fetch Job Applications
+      .addCase(fetchJobApplications.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchJobApplications.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.applications = action.payload.data.applications;
+        state.statusCounts = action.payload.data.statusCounts;
+        state.meta = action.payload.data.pagination;
+      })
+      .addCase(fetchJobApplications.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Update Job Application Status
+      .addCase(updateJobApplicationStatus.fulfilled, (state, action: PayloadAction<any>) => {
+        const updatedApp = action.payload.data;
+        if (updatedApp && updatedApp.id) {
+          state.applications = state.applications.map((app: any) => 
+            app.id === updatedApp.id ? { ...app, status: updatedApp.status } : app
+          );
+        }
       });
   },
 });

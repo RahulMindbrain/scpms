@@ -19,6 +19,7 @@ interface ApplicationProps {
   role: string;
   appliedDate: string;
   currentStatus: Status;
+  reason?: string | null;
 }
 
 /* ─── Reusable Application Card (when user HAS applications) ─── */
@@ -27,6 +28,7 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
   role,
   appliedDate,
   currentStatus,
+  reason,
 }) => {
   const stages: Status[] = ['APPLIED', 'SHORTLISTED', 'TECHNICAL_ROUND', 'HR_ROUND', 'SELECTED'];
   const statusDisplayMap: Record<Status, string> = {
@@ -69,13 +71,12 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
           return (
             <div key={stage} className="flex flex-col items-center relative z-10 w-full">
               <div
-                className={`flex items-center justify-center w-10 h-10 rounded-full mb-3 border-2 transition-all duration-500 ${
-                  isCompleted
+                className={`flex items-center justify-center w-10 h-10 rounded-full mb-3 border-2 transition-all duration-500 ${isCompleted
                     ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-200'
                     : isCurrent
-                    ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-200 scale-110'
-                    : 'bg-white border-slate-200 text-slate-300'
-                }`}
+                      ? 'bg-blue-600 border-blue-600 text-white shadow-xl shadow-blue-200 scale-110'
+                      : 'bg-white border-slate-200 text-slate-300'
+                  }`}
               >
                 {isCompleted ? (
                   <CheckCircle2 size={18} strokeWidth={3} />
@@ -84,9 +85,8 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
                 )}
               </div>
               <span
-                className={`text-[9px] font-bold uppercase tracking-widest text-center px-1 ${
-                  isCurrent ? 'text-blue-600' : isCompleted ? 'text-emerald-600' : 'text-slate-400'
-                }`}
+                className={`text-[9px] font-bold uppercase tracking-widest text-center px-1 ${isCurrent ? 'text-blue-600' : isCompleted ? 'text-emerald-600' : 'text-slate-400'
+                  }`}
               >
                 {statusDisplayMap[stage]}
               </span>
@@ -105,9 +105,8 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
 
       {/* Action Footer */}
       <div
-        className={`p-4 rounded-xl flex items-center justify-between border ${
-          isRejected ? 'bg-red-50/50 border-red-100' : 'bg-blue-50/50 border-blue-100'
-        }`}
+        className={`p-4 rounded-xl flex items-center justify-between border ${isRejected ? 'bg-red-50/50 border-red-100' : 'bg-blue-50/50 border-blue-100'
+          }`}
       >
         <div className="flex items-center gap-3">
           <div className={`p-2 rounded-lg ${isRejected ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
@@ -119,10 +118,10 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
             </p>
             <p className={`text-xs font-medium ${isRejected ? 'text-red-700/70' : 'text-blue-700/70'}`}>
               {isRejected
-                ? 'Your application was not moved forward for this role.'
+                ? reason || 'Your application was not moved forward for this role.'
                 : currentStatus === 'SELECTED'
-                ? 'Congratulations! Check your email for offer details.'
-                : 'Your profile is under internal review with the hiring team.'}
+                  ? 'Congratulations! Check your email for offer details.'
+                  : 'Your profile is under internal review with the hiring team.'}
             </p>
           </div>
         </div>
@@ -220,7 +219,7 @@ const SuggestedJobCard: React.FC<{
 const ApplicationStatus = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { applications = [], loading } = useSelector((state: RootState) => state.student);
+  const { applications = [], loading, meta } = useSelector((state: RootState) => state.student);
 
   useEffect(() => {
     dispatch(fetchJobApplications({}));
@@ -230,12 +229,7 @@ const ApplicationStatus = () => {
     (a: any) => !['SELECTED', 'REJECTED'].includes(a.status)
   );
 
-  const suggestedJobs = [
-    { title: 'Software Engineer Intern', company: 'Google India', location: 'Bangalore', type: 'Intern', logo: 'G', color: 'bg-blue-600' },
-    { title: 'Full Stack Developer', company: 'Microsoft', location: 'Hyderabad', type: 'Full-time', logo: 'M', color: 'bg-emerald-600' },
-    { title: 'Data Analyst', company: 'Amazon', location: 'Chennai', type: 'Intern', logo: 'A', color: 'bg-orange-500' },
-    { title: 'Product Design Intern', company: 'Flipkart', location: 'Bangalore', type: 'Intern', logo: 'F', color: 'bg-yellow-500' },
-  ];
+
 
   /* ─── Loading State ─── */
   if (loading && applications.length === 0) {
@@ -278,7 +272,7 @@ const ApplicationStatus = () => {
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none">Total</p>
-              <p className="text-lg font-bold text-slate-900 leading-tight">{applications.length}</p>
+              <p className="text-lg font-bold text-slate-900 leading-tight">{meta?.total || applications.length}</p>
             </div>
           </div>
           <div className="bg-white pl-4 pr-5 py-2.5 rounded-xl border border-slate-100 shadow-sm flex items-center gap-3 hover:border-emerald-200 transition-colors">
@@ -299,10 +293,11 @@ const ApplicationStatus = () => {
           {applications.map((app: any) => (
             <ApplicationCard
               key={app.id}
-              companyName={app.job.company.name}
-              role={app.job.title}
+              companyName={app.job?.company?.name || "Company"}
+              role={app.job?.title || "Role Not Specified"}
               appliedDate={app.createdAt}
               currentStatus={app.status as Status}
+              reason={app.reason}
             />
           ))}
         </div>

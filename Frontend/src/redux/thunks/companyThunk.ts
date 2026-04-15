@@ -84,3 +84,39 @@ export const postJob = createAsyncThunk(
         }
     }
 );
+
+export const fetchCompanyJobs = createAsyncThunk(
+    "company/fetchCompanyJobs",
+    async (params: { page?: number; limit?: number }, { rejectWithValue }) => {
+        try {
+            const response = await getAPI<any>("/company/get-jobs", params);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to fetch company jobs");
+        }
+    }
+);
+
+export const fetchJobApplications = createAsyncThunk(
+    "company/fetchJobApplications",
+    async (params: { status?: string; page?: number; }, { rejectWithValue }) => {
+        try {
+            const response = await getAPI<any>("/company/get-job-application", params);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to fetch job applications");
+        }
+    }
+);
+
+export const updateJobApplicationStatus = createAsyncThunk(
+    "company/updateJobApplicationStatus",
+    async ({ id, status }: { id: number; status: string }, { rejectWithValue }) => {
+        try {
+            const response = await putAPI<any>(`/company/update-job-status/${id}`, { status });
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to update status");
+        }
+    }
+);

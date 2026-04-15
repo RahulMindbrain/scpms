@@ -111,11 +111,17 @@ export const setAuthToken = (token: string | null) => {
 export const getAPI = async <T>(
     endpoint: string,
     params: any = {},
+    data: any = {},   // 👈 add body support
     headers: AxiosRequestConfig["headers"] = {},
     responseType: AxiosRequestConfig["responseType"] = "json"
 ): Promise<T> => {
     try {
-        const response = await api.get<T>(endpoint, { params, headers, responseType });
+        const response = await api.get<T>(endpoint, {
+            params,
+            data, // 👈 important (GET body)
+            headers,
+            responseType,
+        });
         return response.data;
     } catch (error: any) {
         throw error?.response?.data ?? error;
@@ -179,4 +185,4 @@ export const deleteAPI = async <T>(
     }
 };
 
-export default api;
+export default api;

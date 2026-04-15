@@ -6,6 +6,7 @@ interface StudentState {
   inactiveStudents: any[];
   jobs: any[];
   applications: any[];
+  statusCounts: any[];
   profile: any | null;
   loading: boolean;
   error: string | null;
@@ -22,6 +23,7 @@ const initialState: StudentState = {
   inactiveStudents: [],
   jobs: [],
   applications: [],
+  statusCounts: [],
   profile: null,
   loading: false,
   error: null,
@@ -147,10 +149,16 @@ const studentSlice = createSlice({
       })
       .addCase(fetchJobApplications.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.applications = action.payload.data.data;
-        if (action.payload.data.meta) {
-          state.meta = action.payload.data.meta;
+        state.applications = action.payload.data.applications;
+        if (action.payload.data.pagination) {
+          state.meta = {
+            total: action.payload.data.pagination.totalCount,
+            page: action.payload.data.pagination.currentPage,
+            limit: action.payload.data.pagination.limit,
+            totalPages: action.payload.data.pagination.totalPages,
+          };
         }
+        state.statusCounts = action.payload.data.statusCounts || [];
       })
       .addCase(fetchJobApplications.rejected, (state, action) => {
         state.loading = false;
