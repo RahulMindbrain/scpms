@@ -172,7 +172,6 @@ const StudentManagement: React.FC = () => {
       try {
         await dispatch(activateStudents([id])).unwrap();
         toast.success("Student activated successfully!", { id: toastId });
-        // Refresh both lists
         dispatch(fetchStudents({}));
         dispatch(fetchInactiveStudents({}));
       } catch (err: any) {
@@ -180,6 +179,23 @@ const StudentManagement: React.FC = () => {
       }
     } else {
       toast.info("Verification status management is pending for active students.");
+    }
+  };
+
+  const handleActivateAll = async () => {
+    const allIds = reduxInactiveStudents.map((s: any) => s.id);
+    if (allIds.length === 0) {
+      toast.info("No inactive students to activate.");
+      return;
+    }
+    const toastId = toast.loading(`Activating all ${allIds.length} students...`);
+    try {
+      await dispatch(activateStudents(allIds)).unwrap();
+      toast.success(`${allIds.length} student(s) activated successfully!`, { id: toastId });
+      dispatch(fetchStudents({}));
+      dispatch(fetchInactiveStudents({}));
+    } catch (err: any) {
+      toast.error(err || "Failed to activate all students", { id: toastId });
     }
   };
 
@@ -332,38 +348,51 @@ const StudentManagement: React.FC = () => {
       </div>
 
       {/* Students Table */}
-      {/* Tabs */}
-      <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 w-fit shadow-sm">
-        <button
-          onClick={() => setActiveTab('active')}
-          className={`px-5 py-2 rounded-lg text-[13px] font-semibold transition-all ${
-            activeTab === 'active'
-              ? 'bg-blue-600 text-white shadow-sm'
-              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-          }`}
-        >
-          Active Students
-          <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-            activeTab === 'active' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
-          }`}>
-            {reduxStudents.length}
-          </span>
-        </button>
-        <button
-          onClick={() => setActiveTab('inactive')}
-          className={`px-5 py-2 rounded-lg text-[13px] font-semibold transition-all ${
-            activeTab === 'inactive'
-              ? 'bg-orange-500 text-white shadow-sm'
-              : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
-          }`}
-        >
-          Inactive Students
-          <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-            activeTab === 'inactive' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
-          }`}>
-            {reduxInactiveStudents.length}
-          </span>
-        </button>
+      {/* Tabs + Activate All */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 w-fit shadow-sm">
+          <button
+            onClick={() => setActiveTab('active')}
+            className={`px-5 py-2 rounded-lg text-[13px] font-semibold transition-all ${
+              activeTab === 'active'
+                ? 'bg-blue-600 text-white shadow-sm'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+            }`}
+          >
+            Active Students
+            <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+              activeTab === 'active' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+            }`}>
+              {reduxStudents.length}
+            </span>
+          </button>
+          <button
+            onClick={() => setActiveTab('inactive')}
+            className={`px-5 py-2 rounded-lg text-[13px] font-semibold transition-all ${
+              activeTab === 'inactive'
+                ? 'bg-orange-500 text-white shadow-sm'
+                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+            }`}
+          >
+            Inactive Students
+            <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
+              activeTab === 'inactive' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+            }`}>
+              {reduxInactiveStudents.length}
+            </span>
+          </button>
+        </div>
+
+        {/* Activate All — visible only on Inactive tab */}
+        {activeTab === 'inactive' && reduxInactiveStudents.length > 0 && (
+          <Button
+            onClick={handleActivateAll}
+            className="h-10 bg-orange-500 hover:bg-orange-600 text-white shadow-sm font-semibold text-[13px] px-5 rounded-xl transition-all"
+          >
+            <UserCheck className="w-4 h-4 mr-2" />
+            Activate All ({reduxInactiveStudents.length})
+          </Button>
+        )}
       </div>
 
       <Card className="overflow-hidden shadow-sm border border-slate-200/60 bg-white rounded-xl">
