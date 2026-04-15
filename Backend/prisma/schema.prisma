@@ -33,6 +33,19 @@ enum ApplicationStatus {
   NOT_ELIGIBLE
 }
 
+enum ScheduleStatus {
+  SCHEDULED
+  ONGOING
+  COMPLETED
+  CANCELLED
+}
+
+enum ScheduleMode {
+  ONLINE
+  OFFLINE
+  HYBRID
+}
+
 enum NotificationType {
   APPLICATION_UPDATE
   JOB_ALERT
@@ -45,7 +58,7 @@ model User {
   lastname   String?
   email      String   @unique
   password   String
-  socketId   String?
+  
 
   role       Role
   status     Status   @default(INACTIVE)
@@ -92,7 +105,9 @@ model Student {
 
   @@index([departmentId])
   @@index([passingYear])
+  @@index([isPlaced])
 } 
+
 
 model Skill {
   id        Int       @id @default(autoincrement())
@@ -168,6 +183,8 @@ model Company {
   description String?
 
   jobs      Job[]
+   interviewSchedules InterviewSchedule[]
+
 
   createdAt DateTime @default(now())
 }
@@ -178,6 +195,7 @@ model Admin {
   user   User @relation(fields: [userId], references: [id])
 
   approvedJobs Job[] @relation("AdminApprovedJobs")
+  schedules InterviewSchedule[]
 }
 
 model Department {
@@ -200,6 +218,7 @@ model Job {
   status      JobStatus @default(PENDING)
   minCgpa     Float?
   maxCgpa     Float?
+  maxBacklogs Int?
 
   companyId   Int
   company     Company @relation(fields: [companyId], references: [id])
@@ -209,6 +228,10 @@ model Job {
   approvedBy  Int?
   approver    Admin? @relation("AdminApprovedJobs", fields: [approvedBy], references: [id], onDelete: SetNull)
 
+  interviewScheduleId Int?
+  interviewSchedule   InterviewSchedule? @relation(fields: [interviewScheduleId], references: [id])
+
+
   applications Application[]
 
   eligibleDepartments Department[]
@@ -217,6 +240,7 @@ model Job {
 
   @@index([status])
   @@index([companyId])
+  @@index([interviewScheduleId])
 }
 
 model Application {
@@ -253,6 +277,38 @@ model Token {
   createdAt     DateTime @default(now())
 
   @@index([userId])
+}
+
+model InterviewSchedule {
+  id        Int      @id @default(autoincrement())
+
+  title     String
+
+ 
+  companyId Int
+  company   Company  @relation(fields: [companyId], references: [id])
+
+  startTime DateTime
+  endTime   DateTime
+
+  venue     String?
+
+  
+  status    ScheduleStatus @default(SCHEDULED)
+
+  
+  createdBy Int
+  admin     Admin @relation(fields: [createdBy], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+ 
+  jobs      Job[]
+
+  @@index([startTime, endTime])
+  @@index([companyId])
+  @@index([status])
 }
 
 model Notification {
