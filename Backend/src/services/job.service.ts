@@ -1,7 +1,11 @@
-import { getJobs } from "../repository/admin.repository";
 import { getCompanyByUserId } from "../repository/company.repository";
 import { getDepartmentsByIds } from "../repository/department.repository";
-import { createJob, deleteJob, updateJob } from "../repository/job.repository";
+import {
+  createJob,
+  deleteJob,
+  getJobs,
+  updateJob,
+} from "../repository/job.repository";
 import { getSkillsByIds } from "../repository/skill.repostiory";
 
 export const createJobService = async (data: any, userId: number) => {
