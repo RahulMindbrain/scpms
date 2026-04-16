@@ -111,39 +111,29 @@ export const getUsers = async (params: {
 };
 
 export const getJobs = async (params: {
-  page?: number;
-  limit?: number;
-  status?: "PENDING" | "APPROVED" | "REJECTED";
+  page: number;
+  limit: number;
+  status?: JobStatus;
+  companyId?: number;
 }) => {
-  const { page, limit, status } = params;
+  const { page, limit, status, companyId } = params;
 
-  const safePage = Math.max(1, page ?? 1);
-  const safeLimit = Math.max(1, limit ?? 1);
-  const skip = (safePage - 1) * safeLimit;
+  const skip = (page - 1) * limit;
 
   const where = {
     ...(status && { status }),
+    ...(companyId && { companyId }), // ✅ THIS WAS MISSING
   };
 
   const [data, total] = await Promise.all([
     prisma.job.findMany({
       where,
       skip,
-      take: safeLimit,
+      take: limit,
       orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        title: true,
-        status: true,
-        salary: true,
-        location: true,
-        createdAt: true,
-        company: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+      include: {
+        company: true,
+        eligibleDepartments: true,
       },
     }),
     prisma.job.count({ where }),
@@ -151,12 +141,7 @@ export const getJobs = async (params: {
 
   return {
     data,
-    meta: {
-      total,
-      page: safePage,
-      limit: safeLimit,
-      totalPages: safeLimit ? Math.ceil(total / safeLimit) : 0,
-    },
+    meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
   };
 };
 
