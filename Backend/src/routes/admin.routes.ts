@@ -4,6 +4,7 @@ import {
   activateUsersController,
   createAdminController,
   getCompaniesController,
+  getCompanyByIdController,
   getDashboardStatsController,
   getInactiveCompaniesController,
   getInactiveStudentsController,
@@ -21,6 +22,7 @@ import {
   updateApplicationController,
 } from "../controllers/application.controller";
 import { sendBulkMailController } from "../controllers/bulkmail.controller";
+import { getCompanyById } from "../repository/company.repository";
 
 const adminRoutes = Router();
 
@@ -107,6 +109,20 @@ adminRoutes.post(
   authenticateUser,
   authorizeRoles("ADMIN"),
   sendBulkMailController,
+);
+
+adminRoutes.get(
+  "/get-company/:id",
+  authenticateUser,
+  authorizeRoles("ADMIN"),
+  getCompanyByIdController,
+);
+
+adminRoutes.get(
+  "/get-jobs-by-comp",
+  authenticateUser,
+  authorizeRoles("ADMIN"),
+  getJobsByCompanyController,
 );
 
 export default adminRoutes;

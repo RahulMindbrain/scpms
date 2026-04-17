@@ -19,6 +19,7 @@ export const initializeSocket = (server: HTTPServer): void => {
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
+      credentials: true,
     },
   });
 

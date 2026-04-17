@@ -18,6 +18,12 @@ enum Role {
   ADMIN
 }
 
+enum CompanyApprovalStatus {
+  PENDING // waiting for company response
+  APPROVED // company confirmed
+  REJECTED // company declined
+}
+
 enum JobStatus {
   PENDING
   APPROVED
@@ -53,138 +59,136 @@ enum NotificationType {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  firstname  String
-  lastname   String?
-  email      String   @unique
-  password   String
-  
+  id        Int     @id @default(autoincrement())
+  firstname String
+  lastname  String?
+  email     String  @unique
+  password  String
 
-  role       Role
-  status     Status   @default(INACTIVE)
+  role   Role
+  status Status @default(INACTIVE)
 
-  student    Student?
-  company    Company?
-  admin      Admin?
+  student Student?
+  company Company?
+  admin   Admin?
 
-  tokens         Token[]
-  notifications  Notification[]
+  tokens        Token[]
+  notifications Notification[]
+  sentMessages  ScheduleMessage[]
 
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Student {
-  id           Int     @id @default(autoincrement())
-  userId       Int     @unique
-  user         User    @relation(fields: [userId], references: [id])
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
 
   departmentId Int
   department   Department @relation(fields: [departmentId], references: [id])
 
-  cgpa         Float?
-  year         Int        
-  passingYear  Int       
+  cgpa        Float?
+  year        Int
+  passingYear Int
 
-  resumeUrl    String?
-  activeBacklogs Int @default(0)   
-  linkedinUrl String?
-  githubUrl   String?
-  portfolioUrl String?
-  isPlaced Boolean @default(false)
-  placedAt DateTime?
-  
+  resumeUrl      String?
+  activeBacklogs Int       @default(0)
+  linkedinUrl    String?
+  githubUrl      String?
+  portfolioUrl   String?
+  isPlaced       Boolean   @default(false)
+  placedAt       DateTime?
+
   skills       Skill[]
   experiences  Experience[]
   certificates Certificate[]
 
-  projects Project[]
+  projects     Project[]
   applications Application[]
 
-  createdAt    DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([departmentId])
   @@index([passingYear])
   @@index([isPlaced])
-} 
-
+}
 
 model Skill {
-  id        Int       @id @default(autoincrement())
-  name      String    @unique
+  id   Int    @id @default(autoincrement())
+  name String @unique
 
-  students  Student[]   // many-to-many
-  jobs   Job[]
+  students Student[] // many-to-many
+  jobs     Job[]
 
-  createdAt DateTime  @default(now())
+  createdAt DateTime @default(now())
+
   @@index([name])
 }
 
 model Experience {
-  id          Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  studentId   Int
-  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   companyName String
   role        String
   description String?
 
-  startDate   DateTime
-  endDate     DateTime?
+  startDate DateTime
+  endDate   DateTime?
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([studentId])
 }
 
 model Certificate {
-  id             Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  studentId      Int
-  student        Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   title          String
   issuer         String
   certificateUrl String?
 
-  issuedDate     DateTime?
+  issuedDate DateTime?
 
-  createdAt      DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([studentId])
 }
 
 model Project {
-  id          Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  studentId   Int
-  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   title       String
   description String?
-  techStack   String?   // or separate relation later
+  techStack   String? // or separate relation later
 
-  githubUrl   String?
-  liveUrl     String?
+  githubUrl String?
+  liveUrl   String?
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([studentId])
 }
 
-
 model Company {
-  id        Int     @id @default(autoincrement())
-  userId    Int     @unique
-  user      User    @relation(fields: [userId], references: [id])
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id])
 
-  name      String
+  name        String
   description String?
 
-  jobs      Job[]
-   interviewSchedules InterviewSchedule[]
-
+  jobs               Job[]
+  interviewSchedules InterviewSchedule[]
 
   createdAt DateTime @default(now())
 }
@@ -194,22 +198,22 @@ model Admin {
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id])
 
-  approvedJobs Job[] @relation("AdminApprovedJobs")
-  schedules InterviewSchedule[]
+  approvedJobs Job[]               @relation("AdminApprovedJobs")
+  schedules    InterviewSchedule[]
 }
 
 model Department {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
+  id   Int    @id @default(autoincrement())
+  name String @unique
 
-  students  Student[]
-  jobs      Job[]
+  students Student[]
+  jobs     Job[]
 
   createdAt DateTime @default(now())
 }
 
 model Job {
-  id          Int      @id @default(autoincrement())
+  id          Int    @id @default(autoincrement())
   title       String
   description String
   salary      Float
@@ -220,23 +224,22 @@ model Job {
   maxCgpa     Float?
   maxBacklogs Int?
 
-  companyId   Int
-  company     Company @relation(fields: [companyId], references: [id])
+  companyId Int
+  company   Company @relation(fields: [companyId], references: [id])
 
   skills Skill[]
 
-  approvedBy  Int?
-  approver    Admin? @relation("AdminApprovedJobs", fields: [approvedBy], references: [id], onDelete: SetNull)
+  approvedBy Int?
+  approver   Admin? @relation("AdminApprovedJobs", fields: [approvedBy], references: [id], onDelete: SetNull)
 
   interviewScheduleId Int?
   interviewSchedule   InterviewSchedule? @relation(fields: [interviewScheduleId], references: [id])
-
 
   applications Application[]
 
   eligibleDepartments Department[]
 
-  createdAt   DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([status])
   @@index([companyId])
@@ -244,18 +247,18 @@ model Job {
 }
 
 model Application {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   studentId Int
   jobId     Int
 
-  status    ApplicationStatus @default(APPLIED)
-  reason    String?
+  status ApplicationStatus @default(APPLIED)
+  reason String?
 
-  student   Student @relation(fields: [studentId], references: [id])
-  job       Job     @relation(fields: [jobId], references: [id])
-  isAccepted Boolean @default(false)
-acceptedAt DateTime?
+  student    Student   @relation(fields: [studentId], references: [id])
+  job        Job       @relation(fields: [jobId], references: [id])
+  isAccepted Boolean   @default(false)
+  acceptedAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -266,62 +269,86 @@ acceptedAt DateTime?
 }
 
 model Token {
-  id            Int      @id @default(autoincrement())
-  refreshToken  String   @unique
+  id           Int    @id @default(autoincrement())
+  refreshToken String @unique
 
-  status        Status   @default(ACTIVE)
+  status Status @default(ACTIVE)
 
-  userId        Int
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  createdAt     DateTime @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId])
 }
 
 model InterviewSchedule {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  title     String
+  title String
 
- 
   companyId Int
-  company   Company  @relation(fields: [companyId], references: [id])
+  company   Company @relation(fields: [companyId], references: [id])
 
   startTime DateTime
   endTime   DateTime
 
-  venue     String?
+  venue String?
 
   
-  status    ScheduleStatus @default(SCHEDULED)
+  status ScheduleStatus @default(SCHEDULED)
 
   
+  companyApprovalStatus CompanyApprovalStatus @default(PENDING)
+
+  approvedAt      DateTime?
+  rejectedAt      DateTime?
+  rejectionReason String?
+
   createdBy Int
   admin     Admin @relation(fields: [createdBy], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
- 
-  jobs      Job[]
+  jobs Job[]
+
+  
+  messages ScheduleMessage[]
 
   @@index([startTime, endTime])
   @@index([companyId])
-  @@index([status])
+  @@index([status]) 
+  @@index([companyApprovalStatus]) 
+}
+
+model ScheduleMessage {
+  id Int @id @default(autoincrement())
+
+  scheduleId Int
+  schedule   InterviewSchedule @relation(fields: [scheduleId], references: [id])
+
+  senderId Int
+  sender   User @relation(fields: [senderId], references: [id])
+
+  message String
+
+  createdAt DateTime @default(now())
+
+  @@index([scheduleId])
 }
 
 model Notification {
-  id        Int      @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  title     String
-  message   String
+  title   String
+  message String
 
-  type      NotificationType
-  read      Boolean  @default(false)
+  type NotificationType
+  read Boolean          @default(false)
 
   createdAt DateTime @default(now())
 

@@ -64,12 +64,53 @@ export const getApplications = async (
         skip,
         take: limit,
         orderBy: { createdAt: "desc" },
-        include: {
-          job: true,
-          student: true,
+
+        // ✅ FIXED SELECT
+        select: {
+          id: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+
+          job: {
+            select: {
+              id: true,
+              title: true,
+              location: true,
+              status: true,
+              companyId: true,
+            },
+          },
+
+          student: {
+            select: {
+              id: true,
+
+              user: {
+                select: {
+                  firstname: true,
+                  lastname: true,
+                  email: true,
+                },
+              },
+
+              department: {
+                select: {
+                  id: true,
+                  name: true, // ✅ THIS IS WHAT YOU WANTED
+                },
+              },
+
+              cgpa: true,
+              activeBacklogs: true,
+              isPlaced: true,
+            },
+          },
         },
       }),
+
       prisma.application.count({ where }),
+
       prisma.application.groupBy({
         by: ["status"],
         _count: { status: true },
