@@ -44,7 +44,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         main: [
           { title: "Dashboard", url: "/admin/dashboard", icon: <LayoutDashboard /> },
           { title: "Students", url: "/admin/students", icon: <Users /> },
-          { title: "Departments", url: "/admin/departments", icon: <Building2 /> },
           { title: "Companies", url: "/admin/companies", icon: <Briefcase /> },
           { title: "Placement Drives", url: "/admin/drives", icon: <Briefcase /> },
           { title: "Manage Jobs", url: "/admin/jobs", icon: <ListChecks /> },
@@ -53,9 +52,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           { title: "Interview Scheduler", url: "/admin/event-management", icon: <Calendar /> },
         ],
         secondary: [
-          { title: "Analytics", url: "/admin/report", icon: <BarChart3 /> },
+          // { title: "Analytics", url: "/admin/report", icon: <BarChart3 /> },
           { title: "Bulk Email", url: "/admin/bulk-email", icon: <Mail /> },
-          { title: "Document Management", url: "/admin/documents", icon: <Folder /> },
+          { title: "Departments", url: "/admin/departments", icon: <Building2 /> },
+            { title: "Document Management", url: "/admin/documents", icon: <Folder /> },
           { title: "Settings", url: "/admin/setting", icon: <Settings /> },
         ],
       }
