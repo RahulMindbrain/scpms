@@ -18,35 +18,55 @@ export const useSocket = () => {
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { isAuthenticated, user, userType } = useSelector((state: RootState) => state.auth);
 
-    useEffect(() => {
-        if (isAuthenticated && user) {
-            // Establish connection
-            socket.connect();
+    // useEffect(() => {
+    //     if (isAuthenticated && user) {
+    //         // Establish connection
+    //         socket.connect();
 
-            // Join user-specific rooms
-            socket.emit("join", {
-                userId: user.id,
-                role: userType,
-            });
+    //         // Join user-specific rooms
+    //         socket.emit("join", {
+    //             userId: user.id,
+    //             role: userType,
+    //         });
 
-            console.log("🔌 Socket connected and joined rooms for user:", user.id);
-        } else {
-            if (socket.connected) {
-                socket.disconnect();
-                console.log("❌ Socket disconnected (user logged out)");
-            }
-        }
+    //         console.log("🔌 Socket connected and joined rooms for user:", user.id);
+    //     } else {
+    //         if (socket.connected) {
+    //             socket.disconnect();
+    //             console.log("❌ Socket disconnected (user logged out)");
+    //         }
+    //     }
 
-        return () => {
-            socket.off("connect");
-            socket.off("disconnect");
-            socket.off(SOCKET_EVENTS.NEW_APPLICATION);
-            socket.off(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED);
-            socket.off(SOCKET_EVENTS.OFFER_ACCEPTED);
-            socket.off(SOCKET_EVENTS.SYSTEM_ALERT);
-        };
-    }, [isAuthenticated, user, userType]);
+    //     return () => {
+    //         socket.off("connect");
+    //         socket.off("disconnect");
+    //         socket.off(SOCKET_EVENTS.NEW_APPLICATION);
+    //         socket.off(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED);
+    //         socket.off(SOCKET_EVENTS.OFFER_ACCEPTED);
+    //         socket.off(SOCKET_EVENTS.SYSTEM_ALERT);
+    //     };
+    // }, [isAuthenticated, user, userType]);
+useEffect(() => {
+  if (!isAuthenticated || !user) return;
 
+  const handleConnect = () => {
+    console.log("✅ Connected:", socket.id);
+
+    socket.emit("join", {
+      userId: user.id,
+      role: userType,
+    });
+
+    console.log("🚪 Joined room:", `user:${user.id}`);
+  };
+
+  socket.connect();
+  socket.on("connect", handleConnect);
+
+  return () => {
+    socket.off("connect", handleConnect);
+  };
+}, [isAuthenticated, user, userType]);
     useEffect(() => {
         // =========================
         // GLOBAL EVENT LISTENERS
