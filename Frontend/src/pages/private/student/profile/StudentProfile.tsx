@@ -2,8 +2,14 @@ import {
   Mail, Phone, MapPin, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
   Upload, Camera, Briefcase, Loader2, FileText, Calendar, Building2,
-  Lightbulb, Globe
+  Lightbulb, Globe, Eye
 } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import ProjectModal from './modal/ProjectModal';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
@@ -37,6 +43,8 @@ const StudentProfile = () => {
   const [isUploadingResume, setIsUploadingResume] = useState(false);
   const { upload: uploadToCloudinary } = useCloudinaryUpload();
   const profileImageInputRef = useRef<HTMLInputElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewName, setPreviewName] = useState<string>('');
 
   const [profile, setProfile] = useState<any>({
     name: user ? `${user.firstname} ${user.lastname}` : 'Student Name',
@@ -211,6 +219,21 @@ const handleSave = async (updatedProfile: any) => {
     } finally {
       setIsUploadingResume(false);
     }
+  };
+
+  const openFile = (url: string, name = '') => {
+    if (!url) return;
+    
+    // Ensure PDF extension for better browser handling if it's a PDF
+    let finalUrl = url;
+    const isPdf = name.toLowerCase().endsWith('.pdf') || url.toLowerCase().includes('.pdf');
+    
+    if (isPdf && !finalUrl.toLowerCase().endsWith('.pdf')) {
+      finalUrl = finalUrl + '.pdf';
+    }
+
+    setPreviewName(name);
+    setPreviewUrl(finalUrl);
   };
 
   const handleAddProject = (project: any) => {
@@ -628,8 +651,13 @@ const handleAddCertificate = (cert: any) => {
                             </div>
                           </div>
                         </div>
-                        <Button variant="secondary" size="sm" asChild className="shrink-0 font-semibold px-4 h-9 text-xs ml-4 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors border-none">
-                          <a href={res.url} target="_blank" rel="noopener noreferrer">View</a>
+                        <Button 
+                          variant="secondary" 
+                          size="sm" 
+                          onClick={() => openFile(res.url, res.name)}
+                          className="shrink-0 font-semibold px-4 h-9 text-xs ml-4 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors border-none"
+                        >
+                          View
                         </Button>
                       </div>
                     )) : (
@@ -722,6 +750,39 @@ const handleAddCertificate = (cert: any) => {
           onSave={handleSave}
           isLoading={backendLoading}
         />
+
+        {/* 📄 PDF/Document Preview Modal */}
+        <Dialog open={!!previewUrl} onOpenChange={(open) => !open && setPreviewUrl(null)}>
+          <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden flex flex-col border-none shadow-2xl">
+            <DialogHeader className="p-4 border-b bg-white shrink-0">
+              <div className="flex items-center justify-between pr-8">
+                <DialogTitle className="text-lg font-bold truncate flex items-center gap-2">
+                  <FileText className="text-blue-600" size={18} />
+                  {previewName}
+                </DialogTitle>
+                <div className="flex items-center gap-2">
+                    <button 
+                      onClick={() => window.open(previewUrl!, '_blank')}
+                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                    >
+                      <ExternalLink size={14} />
+                      Open in New Tab
+                    </button>
+                </div>
+              </div>
+            </DialogHeader>
+            
+            <div className="flex-1 bg-slate-100 relative">
+              {previewUrl && (
+                <iframe
+                  src={`${previewUrl}#toolbar=0`}
+                  className="w-full h-full border-none"
+                  title="Preview"
+                />
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
