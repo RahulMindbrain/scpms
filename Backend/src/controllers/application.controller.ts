@@ -2,6 +2,7 @@ import {
   createApplicationService,
   deleteApplicationService,
   getApplicationsService,
+  getScheduleApplicationsService,
   updateApplicationService,
 } from "../services/application.service";
 import { sendError, sendSuccess } from "../utils/response";
@@ -83,4 +84,20 @@ export const deleteApplicationController = async (
   const { id } = req.params;
   await deleteApplicationService(Number(id));
   return sendSuccess(res, 200, "Application deleted");
+};
+
+export const getScheduleApplicationsController = async (req, res) => {
+  try {
+    const scheduleId = Number(req.params.id);
+
+    if (isNaN(scheduleId)) {
+      return sendError(res, 400, "Invalid schedule id");
+    }
+
+    const data = await getScheduleApplicationsService(scheduleId);
+
+    return sendSuccess(res, 200, "Applications fetched", data);
+  } catch (err: any) {
+    return sendError(res, 400, err.message);
+  }
 };

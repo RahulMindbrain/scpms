@@ -64,7 +64,17 @@ export const detachJobsFromSchedule = async (jobIds: number[]) => {
 export const getScheduleById = async (id: number) => {
   return prisma.interviewSchedule.findUnique({
     where: { id },
-    include: baseScheduleInclude,
+    include: {
+      company: true,
+      admin: {
+        include: {
+          user: true,
+        },
+      },
+      jobs: {
+        select: { id: true },
+      },
+    },
   });
 };
 
@@ -183,5 +193,103 @@ export const createScheduleWithJobs = async (
       where: { id: schedule.id },
       include: baseScheduleInclude,
     });
+  });
+};
+
+export const getScheduleWithParticipants = async (scheduleId: number) => {
+  return prisma.interviewSchedule.findUnique({
+    where: { id: scheduleId },
+    include: {
+      company: {
+        include: {
+          user: true,
+        },
+      },
+      admin: {
+        include: {
+          user: true,
+        },
+      },
+    },
+  });
+};
+
+export const getScheduleWithJobsAndApplications = async (
+  scheduleId: number,
+) => {
+  return prisma.interviewSchedule.findUnique({
+    where: { id: scheduleId },
+    include: {
+      company: {
+        select: {
+          id: true,
+          name: true,
+          userId: true,
+        },
+      },
+      jobs: {
+        select: {
+          id: true,
+          title: true,
+          applications: {
+            select: {
+              id: true,
+              student: {
+                select: {
+                  id: true,
+                  user: {
+                    select: {
+                      id: true,
+                      firstname: true,
+                      lastname: true,
+                      email: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+};
+
+export const updateScheduleApprovalStatus = async (
+  scheduleId: number,
+  data: {
+    companyApprovalStatus: "APPROVED" | "REJECTED";
+    approvedAt?: Date;
+    rejectedAt?: Date;
+    rejectionReason?: string;
+  },
+) => {
+  return prisma.interviewSchedule.update({
+    where: { id: scheduleId },
+    data,
+  });
+};
+
+export const getSchedulesByCompanyIdRepo = async (companyId: number) => {
+  return prisma.interviewSchedule.findMany({
+    where: {
+      companyId,
+      companyApprovalStatus: "APPROVED",
+    },
+    include: {
+      jobs: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+      company: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+    orderBy: { startTime: "asc" },
   });
 };
