@@ -13,10 +13,9 @@ import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import type { AppDispatch } from "../../../redux/store/store";
 import { registerUser } from "../../../redux/thunks/registerThunk";
-
 import { toast } from "sonner";
 
-type RegisterRole = "student" | "company";
+type RegisterRole = "STUDENT" | "COMPANY";
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -31,11 +30,6 @@ const SignUp: React.FC = () => {
     email: "",
     password: "",
     confirmPassword: "",
-    university: "",
-    course: "",
-    graduationYear: "",
-    companyName: "",
-    designation: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,59 +38,54 @@ const SignUp: React.FC = () => {
 
   const handleRoleSelect = (role: RegisterRole) => {
     setActiveRole(role);
-    // Add a slight delay for better UX feel before transitioning
     setTimeout(() => setStep(2), 200);
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  if (!agreed) {
-    toast.error("Please agree to the Terms and Privacy Policy");
-    return;
-  }
+    if (!agreed) {
+      toast.error("Please agree to the Terms and Privacy Policy");
+      return;
+    }
 
-  if (form.password !== form.confirmPassword) {
-    toast.error("Passwords do not match");
-    return;
-  }
+    if (form.password !== form.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
 
-  if (form.password.length < 6) {
-    toast.error("Password must be at least 6 characters long");
-    return;
-  }
+    if (form.password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return;
+    }
 
-  const names = form.fullName.trim().split(" ");
-  const firstname = names[0];
-  const lastname = names.length > 1 ? names.slice(1).join(" ") : "NA";
+    // Logic to split name into First and Last for the payload
+    const names = form.fullName.trim().split(" ");
+    const firstname = names[0];
+    const lastname = names.length > 1 ? names.slice(1).join(" ") : "Jackson"; // Fallback as per your sample
 
-  const payload = {
-    firstname,
-    lastname,
-    email: form.email,
-    password: form.password,
-    role: activeRole === "student" ? "STUDENT" : "COMPANY",
+    const payload = {
+      firstname,
+      lastname,
+      email: form.email,
+      password: form.password,
+      role: activeRole,
+    };
+
+    setIsSubmitting(true);
+    try {
+      await dispatch(registerUser(payload)).unwrap();
+      toast.success("Registration successful! Please login to continue.");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+    } catch (err: any) {
+      toast.error(err || "Registration failed. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
-  setIsSubmitting(true);
-  try {
-    const response = await dispatch(registerUser(payload)).unwrap();
-    console.log("Registration response:", response);
-
-    toast.success("Registration successful! Please login to continue.");
-
-    // ✅ redirect to login
-    setTimeout(() => {
-      navigate("/login");
-    }, 1500);
-
-  } catch (err: any) {
-    toast.error(err || "Registration failed. Please try again.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-  // Reusable input style
   const inputClasses = "w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all duration-200 outline-none text-slate-700 placeholder:text-slate-400";
 
   return (
@@ -139,12 +128,12 @@ const handleSubmit = async (e: React.FormEvent) => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-16">
                 <button
-                  onClick={() => handleRoleSelect("student")}
+                  onClick={() => handleRoleSelect("STUDENT")}
                   className={`group relative flex flex-col items-center text-center p-8 rounded-[2rem] border-2 transition-all duration-300 shadow-sm
-                    ${activeRole === "student" ? "border-indigo-600 bg-indigo-50/30 ring-4 ring-indigo-600/5" : "border-slate-100 hover:border-indigo-200 hover:shadow-md bg-white"}`}
+                    ${activeRole === "STUDENT" ? "border-indigo-600 bg-indigo-50/30 ring-4 ring-indigo-600/5" : "border-slate-100 hover:border-indigo-200 hover:shadow-md bg-white"}`}
                 >
                   <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300
-                    ${activeRole === "student" ? "bg-indigo-600 text-white scale-110 shadow-lg shadow-indigo-200" : "bg-slate-100 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-600"}`}>
+                    ${activeRole === "STUDENT" ? "bg-indigo-600 text-white scale-110 shadow-lg shadow-indigo-200" : "bg-slate-100 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-600"}`}>
                     <GraduationCap size={32} />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900">Student</h3>
@@ -152,12 +141,12 @@ const handleSubmit = async (e: React.FormEvent) => {
                 </button>
 
                 <button
-                  onClick={() => handleRoleSelect("company")}
+                  onClick={() => handleRoleSelect("COMPANY")}
                   className={`group relative flex flex-col items-center text-center p-8 rounded-[2rem] border-2 transition-all duration-300 shadow-sm
-                    ${activeRole === "company" ? "border-indigo-600 bg-indigo-50/30 ring-4 ring-indigo-600/5" : "border-slate-100 hover:border-indigo-200 hover:shadow-md bg-white"}`}
+                    ${activeRole === "COMPANY" ? "border-indigo-600 bg-indigo-50/30 ring-4 ring-indigo-600/5" : "border-slate-100 hover:border-indigo-200 hover:shadow-md bg-white"}`}
                 >
                   <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-4 transition-all duration-300
-                    ${activeRole === "company" ? "bg-indigo-600 text-white scale-110 shadow-lg shadow-indigo-200" : "bg-slate-100 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-600"}`}>
+                    ${activeRole === "COMPANY" ? "bg-indigo-600 text-white scale-110 shadow-lg shadow-indigo-200" : "bg-slate-100 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-600"}`}>
                     <Briefcase size={28} />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900">COMPANY</h3>
@@ -179,22 +168,20 @@ const handleSubmit = async (e: React.FormEvent) => {
 
               <div className="mb-8">
                 <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-                  {activeRole === "student" ? "Student Registration" : "COMPANY Registration"}
+                  {activeRole === "STUDENT" ? "Student Registration" : "COMPANY Registration"}
                 </h2>
                 <p className="text-slate-500 mt-1">Complete the details below to initialize your profile.</p>
               </div>
 
               <div className="grid grid-cols-1 gap-4">
-                {/* NAME */}
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                   <input name="fullName" onChange={handleChange} required placeholder="Full Name" className={inputClasses} />
                 </div>
 
-                {/* EMAIL */}
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                  <input name="email" type="email" onChange={handleChange} required placeholder={activeRole === "student" ? "Institution Email" : "Work Email"} className={inputClasses} />
+                  <input name="email" type="email" onChange={handleChange} required placeholder="Email Address" className={inputClasses} />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -207,21 +194,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                     <input name="confirmPassword" type="password" onChange={handleChange} required placeholder="Confirm" className={inputClasses} />
                   </div>
                 </div>
-
-                {activeRole === "student" ? (
-                  <>
-                    <input name="university" onChange={handleChange} required placeholder="University Name" className={inputClasses.replace("pl-12", "pl-6")} />
-                    <div className="grid grid-cols-2 gap-4">
-                        <input name="course" onChange={handleChange} required placeholder="Course" className={inputClasses.replace("pl-12", "pl-6")} />
-                        <input name="graduationYear" onChange={handleChange} required placeholder="Grad Year" className={inputClasses.replace("pl-12", "pl-6")} />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <input name="companyName" onChange={handleChange} required placeholder="Company Name" className={inputClasses.replace("pl-12", "pl-6")} />
-                    <input name="designation" onChange={handleChange} required placeholder="Designation" className={inputClasses.replace("pl-12", "pl-6")} />
-                  </>
-                )}
               </div>
 
               <div
@@ -243,7 +215,6 @@ const handleSubmit = async (e: React.FormEvent) => {
                 {isSubmitting ? "Initializing..." : "Initialize Profile"}
                 {!isSubmitting && <ArrowRight size={20} />}
               </button>
-              
             </form>
           )}
         </div>
