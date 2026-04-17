@@ -1,3 +1,4 @@
+import { JobStatus } from "@prisma/client";
 import prisma from "../config/db";
 
 export const getAdminCount = async () => {

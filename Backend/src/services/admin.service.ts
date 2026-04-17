@@ -8,6 +8,7 @@ import {
   createAdmin,
   getActiveStudentsByYear,
   getAdminCount,
+  getJobs,
   getStudents,
 } from "../repository/admin.repository";
 import { hashPassword } from "../utils/hashPassword";
@@ -396,11 +397,21 @@ export const getDashboardStatsService = async () => {
   }
 };
 
-export const getCompanyByIdServices = async (companyId: number) => {
+export const getJobsByCompanyIdServices = async (params: {
+  companyId: number;
+  page: number;
+  limit: number;
+  status?: JobStatus;
+}) => {
   try {
-    const company = await getCompanyById(companyId);
+    const jobs = await getJobs({
+      page: params.page,
+      limit: params.limit,
+      status: params.status,
+      companyId: params.companyId,
+    });
 
-    return company;
+    return jobs;
   } catch (error: any) {
     console.log(error);
     throw error;

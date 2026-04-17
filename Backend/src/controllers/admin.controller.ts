@@ -8,7 +8,7 @@ import {
   createAdminService,
   getActiveStudentsService,
   getCompaniesService,
-  getCompanyByIdServices,
+  getJobsByCompanyIdServices,
   getDashboardStatsService,
   getInactiveCompaniesService,
   getInactiveStudentsService,
@@ -343,38 +343,47 @@ export const getDashboardStatsController = async (
   }
 };
 
-export const getCompanyByIdController = async (req: Request, res: Response) => {
+export const getJobsByCompanyIdController = async (
+  req: Request,
+  res: Response,
+) => {
   try {
-    const { id: companyId } = req.params;
+    const { id } = req.params;
 
-    if (!companyId) {
-      return sendError(res, 400, "companyId is required");
-    }
+    const page = req.query.page !== undefined ? Number(req.query.page) : 1;
 
-    const data = await getCompanyByIdServices(Number(companyId));
+    const limit =
+      req.query.limit !== undefined
+        ? Number(req.query.limit)
+        : Number(process.env.DEFAULT_LIMIT) || 10;
 
-    if (!data) {
-      return sendError(res, 400, "Company not found");
-    }
+    const status = req.query.status as JobStatus;
 
-    return sendSuccess(res, 200, "Company Fetched", data);
+    const data = await getJobsByCompanyIdServices({
+      companyId: Number(id),
+      page,
+      limit,
+      status,
+    });
+
+    return sendSuccess(res, 200, "Company Jobs Fetched", data);
   } catch (error: any) {
     console.log(error);
-    return sendError(res, 500, "Failed to fetch Company By Id");
+    return sendError(res, 500, "Failed");
   }
 };
 
-export const getJobsByCompanyController = async(req:Request, res:Response)=>{
-  try{
+// export const getJobsByCompanyController = async(req:Request, res:Response)=>{
+//   try{
 
-    const {id:companyId} = req.body;
+//     const {id:companyId} = req.body;
 
-    if(!)
+//     if(!)
 
-    if()
+//     if()
 
-  }catch(error:any){
-    console.log(error);
-    return sendError(res,500,"Failed to fetch jobs by company");
-  }
-}
+//   }catch(error:any){
+//     console.log(error);
+//     return sendError(res,500,"Failed to fetch jobs by company");
+//   }
+// }
