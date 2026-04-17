@@ -22,6 +22,7 @@ import { sendSuccess } from "../utils/response";
 import {
   activateCompanies,
   getCompanies,
+  getCompanyById,
   getInactiveCompanies,
 } from "../repository/company.repository";
 import {
@@ -391,6 +392,17 @@ export const getDashboardStatsService = async () => {
     };
   } catch (error) {
     console.error("Dashboard Service Error:", error);
+    throw error;
+  }
+};
+
+export const getCompanyByIdServices = async (companyId: number) => {
+  try {
+    const company = await getCompanyById(companyId);
+
+    return company;
+  } catch (error: any) {
+    console.log(error);
     throw error;
   }
 };
