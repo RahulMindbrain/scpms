@@ -121,3 +121,68 @@ export const updateSocketId = async (
     data: { socketId },
   });
 };
+
+export const updatePasswordById = async (id: number, password: string) => {
+  return prisma.user.update({
+    where: { id },
+    data: { password },
+  });
+};
+
+export const clearOtp = async (id: number) => {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      otp: null,
+      otpExpiry: null,
+      otpAttempts: 0,
+      otpGenerations: 0,
+    },
+  });
+};
+export const incrementOtpAttempts = async (id: number) => {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      otpAttempts: { increment: 1 },
+    },
+  });
+};
+
+export const storeOtpByUserId = async (
+  id: number,
+  hashedOtp: string,
+  expiryMinutes: number,
+) => {
+  return prisma.user.update({
+    where: { id },
+    data: {
+      otp: hashedOtp,
+      otpExpiry: new Date(Date.now() + expiryMinutes * 60 * 1000),
+      otpAttempts: 0,
+      otpGenerations: {
+        increment: 1,
+      },
+    },
+    select: {
+      id: true,
+      email: true,
+      otpExpiry: true,
+      otpGenerations: true,
+    },
+  });
+};
+
+export const getUserOtpState = async (email: string) => {
+  return prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      email: true,
+      otp: true,
+      otpExpiry: true,
+      otpAttempts: true,
+      otpGenerations: true,
+    },
+  });
+};

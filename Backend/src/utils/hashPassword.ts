@@ -11,3 +11,10 @@ export const comparePassword = async (
 ): Promise<boolean> => {
   return bcrypt.compare(plainPassword, hashedPassword);
 };
+
+export const generateOtp = async () => {
+  const otp = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedOtp = await bcrypt.hash(otp, 10);
+
+  return { otp, hashedOtp };
+};

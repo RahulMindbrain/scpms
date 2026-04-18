@@ -72,6 +72,11 @@ model User {
   company Company?
   admin   Admin?
 
+  otp             String?
+  otpExpiry       DateTime?
+  otpAttempts     Int @default(0)   // wrong attempts
+  otpGenerations  Int @default(0)   // how many times OTP generated
+
   tokens        Token[]
   notifications Notification[]
   sentMessages  ScheduleMessage[]

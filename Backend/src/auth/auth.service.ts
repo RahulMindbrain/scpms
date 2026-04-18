@@ -1,10 +1,16 @@
 import {
+  clearOtp,
   findByEmail,
   findById,
+  getUserOtpState,
+  incrementOtpAttempts,
   logoutRepo,
+  storeOtpByUserId,
   storeRefreshToken,
+  updatePasswordById,
 } from "../repository/auth.repository";
 import { findActiveToken } from "../repository/user.repository";
+import { generateOtp } from "../utils/hashPassword";
 
 import {
   generateAccessToken,
@@ -13,6 +19,11 @@ import {
 
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import { sendOtpEmail } from "../utils/mails/otp.mail.helper";
+
+const OTP_EXPIRY = Number(process.env.OTP_EXPIRY_MINUTES || 5);
+const MAX_GEN = Number(process.env.OTP_MAX_GENERATIONS || 5);
+const MAX_ATTEMPTS = Number(process.env.OTP_MAX_ATTEMPTS || 5);
 
 export const loginService = async (mobile: string, password: string) => {
   const existUser = await findByEmail(mobile);
@@ -89,4 +100,109 @@ export const logoutService = async (id: number) => {
 
   await logoutRepo(id);
   return true;
+};
+
+export const forgotPasswordService = async (email: string) => {
+  const user = await getUserOtpState(email);
+  if (!user) throw new Error("User not found");
+
+  const now = new Date();
+
+  // block resend if still valid
+  if (
+    user.otp &&
+    user.otpExpiry &&
+    now.getTime() < new Date(user.otpExpiry).getTime()
+  ) {
+    throw new Error("OTP already sent. Please wait.");
+  }
+
+  if (user.otpGenerations >= MAX_GEN) {
+    throw new Error("OTP request limit reached");
+  }
+
+  const { otp, hashedOtp } = await generateOtp();
+
+  const updated = await storeOtpByUserId(user.id, hashedOtp, OTP_EXPIRY);
+
+  // ✅ send email
+  await sendOtpEmail(user.email, otp);
+
+  return {
+    message: "OTP sent",
+    otpExpiry: updated.otpExpiry,
+  };
+};
+
+export const resendOtpService = async (email: string) => {
+  const user = await getUserOtpState(email);
+  if (!user) throw new Error("User not found");
+
+  const now = new Date();
+
+  if (user.otp && user.otpExpiry && now.getTime() < user.otpExpiry) {
+    throw new Error("OTP still valid. Cannot resend yet.");
+  }
+
+  if (user.otpGenerations >= MAX_GEN) {
+    throw new Error("Max resend limit reached");
+  }
+
+  const { otp, hashedOtp } = await generateOtp();
+
+  const updated = await storeOtpByUserId(user.id, hashedOtp, OTP_EXPIRY);
+
+  // TODO: send email with `otp`
+
+  return {
+    message: "OTP resent",
+    otpExpiry: updated.otpExpiry,
+  };
+};
+
+export const verifyOtpService = async (email: string, inputOtp: string) => {
+  const user = await getUserOtpState(email);
+
+  if (!user) throw new Error("User not found");
+
+  const { otp, otpExpiry, otpAttempts, id } = user;
+
+  if (!otp || !otpExpiry) {
+    throw new Error("OTP not found");
+  }
+
+  // 👇 force correct type (cleanest minimal fix)
+  const expiry = new Date(otpExpiry);
+
+  if (Date.now() > expiry.getTime()) {
+    throw new Error("OTP expired");
+  }
+
+  if (otpAttempts >= MAX_ATTEMPTS) {
+    throw new Error("Too many attempts");
+  }
+
+  const isMatch = await bcrypt.compare(inputOtp, otp);
+
+  if (!isMatch) {
+    await incrementOtpAttempts(id);
+    throw new Error("Invalid OTP");
+  }
+
+  return { verified: true };
+};
+
+export const resetPasswordService = async (
+  email: string,
+  newPassword: string,
+) => {
+  const user = await getUserOtpState(email);
+  if (!user) throw new Error("User not found");
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  await updatePasswordById(user.id, hashedPassword);
+  await clearOtp(user.id); // clears otp + resets counters
+
+  return { message: "Password reset successful" };
 };
