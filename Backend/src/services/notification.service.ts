@@ -14,7 +14,7 @@ import {
 } from "../repository/student.repository";
 import { emitToUsers } from "../socket";
 import { SOCKET_EVENTS } from "../socket.event";
-import { sendEmailService } from "./mail.service";
+import { sendEmailService } from "./mail/mail.service";
 
 // notification.service.ts
 export const createNotificationService = async (data: any) => {

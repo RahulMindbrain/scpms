@@ -4,10 +4,10 @@ import {
   activateUsersController,
   createAdminController,
   getCompaniesController,
-  getCompanyByIdController,
   getDashboardStatsController,
   getInactiveCompaniesController,
   getInactiveStudentsController,
+  getJobsByCompanyIdController,
   getStudentsController,
   updateJobStatusByAdminController,
 } from "../controllers/admin.controller";
@@ -112,17 +112,10 @@ adminRoutes.post(
 );
 
 adminRoutes.get(
-  "/get-company/:id",
+  "/get-jobs-company/:id",
   authenticateUser,
   authorizeRoles("ADMIN"),
-  getCompanyByIdController,
-);
-
-adminRoutes.get(
-  "/get-jobs-by-comp",
-  authenticateUser,
-  authorizeRoles("ADMIN"),
-  getJobsByCompanyController,
+  getJobsByCompanyIdController,
 );
 
 export default adminRoutes;

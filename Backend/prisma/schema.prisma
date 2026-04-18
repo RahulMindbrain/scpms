@@ -19,9 +19,9 @@ enum Role {
 }
 
 enum CompanyApprovalStatus {
-  PENDING // waiting for company response
-  APPROVED // company confirmed
-  REJECTED // company declined
+  PENDING 
+  APPROVED 
+  REJECTED 
 }
 
 enum JobStatus {

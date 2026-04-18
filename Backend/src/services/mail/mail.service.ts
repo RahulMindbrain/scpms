@@ -1,4 +1,4 @@
-import { sendMail } from "../utils/mails/transporter.mail";
+import { sendMail } from "../../utils/mails/transporter.mail";
 
 type SendEmailParams = {
   recipients: string | string[];

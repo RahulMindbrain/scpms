@@ -221,3 +221,57 @@ export const withdrawOtherApplications = async (
     },
   });
 };
+
+export const getApplicationsBySchedule = async (scheduleId: number) => {
+  const applications = await prisma.application.findMany({
+    where: {
+      job: {
+        interviewScheduleId: scheduleId,
+      },
+    },
+    select: {
+      id: true,
+      status: true,
+
+      job: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+
+      student: {
+        select: {
+          id: true,
+          departmentId: true,
+          user: {
+            select: {
+              id: true,
+              firstname: true,
+              lastname: true,
+              email: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "asc",
+    },
+  });
+
+  // 🔥 flatten for frontend
+  return applications.map((app) => ({
+    applicationId: app.id,
+    status: app.status,
+
+    jobId: app.job.id,
+    jobTitle: app.job.title,
+
+    studentId: app.student.id,
+    departmentId: app.student.departmentId,
+
+    name: `${app.student.user.firstname} ${app.student.user.lastname}`,
+    email: app.student.user.email,
+  }));
+};

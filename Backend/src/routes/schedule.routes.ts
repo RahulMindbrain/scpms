@@ -8,9 +8,19 @@ import {
   deleteScheduleController,
   addJobsController,
   removeJobsController,
+  updateScheduleApprovalController,
+  getSchedulesForUserController,
 } from "../controllers/schedule.controller";
+
 import authenticateUser from "../middlewares/authenticateUser";
 import { authorizeRoles } from "../middlewares/verifyRole";
+
+import {
+  getScheduleMessagesController,
+  sendScheduleMessageController,
+} from "../controllers/schedule.message.controller";
+
+import { getScheduleApplicationsController } from "../controllers/application.controller";
 
 const scheduleRoute = Router();
 
@@ -18,7 +28,6 @@ const scheduleRoute = Router();
 // 🔹 ADMIN ROUTES
 // =======================================================
 
-// Create schedule
 scheduleRoute.post(
   "/",
   authenticateUser,
@@ -26,7 +35,6 @@ scheduleRoute.post(
   createScheduleController,
 );
 
-// Get all schedules
 scheduleRoute.get(
   "/",
   authenticateUser,
@@ -34,7 +42,6 @@ scheduleRoute.get(
   getAllSchedulesController,
 );
 
-// Update schedule
 scheduleRoute.put(
   "/:id",
   authenticateUser,
@@ -42,7 +49,6 @@ scheduleRoute.put(
   updateScheduleController,
 );
 
-// Delete schedule
 scheduleRoute.delete(
   "/:id",
   authenticateUser,
@@ -50,7 +56,6 @@ scheduleRoute.delete(
   deleteScheduleController,
 );
 
-// Add jobs to schedule
 scheduleRoute.post(
   "/:id/jobs",
   authenticateUser,
@@ -58,7 +63,6 @@ scheduleRoute.post(
   addJobsController,
 );
 
-// Remove jobs from schedule
 scheduleRoute.delete(
   "/jobs",
   authenticateUser,
@@ -78,7 +82,50 @@ scheduleRoute.get(
 );
 
 // =======================================================
-// 🔹 COMMON (ALL ROLES CAN VIEW BY ID)
+// 🔹 SPECIFIC ROUTES (VERY IMPORTANT ORDER)
+// =======================================================
+
+// 🔹 Get applications for a schedule
+scheduleRoute.get(
+  "/:id/applications",
+  authenticateUser,
+  authorizeRoles("ADMIN", "COMPANY"),
+  getScheduleApplicationsController,
+);
+
+// 🔹 Messages
+scheduleRoute.post(
+  "/:id/messages",
+  authenticateUser,
+  authorizeRoles("ADMIN", "COMPANY"),
+  sendScheduleMessageController,
+);
+
+scheduleRoute.get(
+  "/:id/messages",
+  authenticateUser,
+  authorizeRoles("ADMIN", "COMPANY"),
+  getScheduleMessagesController,
+);
+
+// 🔹 Approval
+scheduleRoute.put(
+  "/:id/approval",
+  authenticateUser,
+  authorizeRoles("COMPANY"),
+  updateScheduleApprovalController,
+);
+
+// 🔹 Custom route (must come before /:id)
+scheduleRoute.get(
+  "/by-company-id",
+  authenticateUser,
+  authorizeRoles("ADMIN", "COMPANY"),
+  getSchedulesForUserController,
+);
+
+// =======================================================
+// 🔹 GENERIC ROUTE (ALWAYS LAST)
 // =======================================================
 
 scheduleRoute.get(

@@ -636,3 +636,28 @@ export const getEligibleUnplacedStudentsForJobs = async (jobIds: number[]) => {
     },
   });
 };
+
+export const getAppliedStudentsForJobs = async (jobIds: number[]) => {
+  if (!jobIds.length) return [];
+
+  return prisma.application.findMany({
+    where: {
+      jobId: { in: jobIds },
+    },
+    select: {
+      student: {
+        select: {
+          id: true,
+          user: {
+            select: {
+              id: true,
+              firstname: true,
+              lastname: true,
+              email: true,
+            },
+          },
+        },
+      },
+    },
+  });
+};

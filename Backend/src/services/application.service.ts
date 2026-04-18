@@ -3,6 +3,7 @@ import {
   createApplication,
   deleteApplication,
   getApplications,
+  getApplicationsBySchedule,
   updateApplicationStatus,
 } from "../repository/application.repository";
 import { getCompanyByUserId } from "../repository/company.repository";
@@ -129,4 +130,14 @@ export const updateApplicationService = async (id: number, status: any) => {
 
 export const deleteApplicationService = async (id: number) => {
   return deleteApplication(id);
+};
+
+export const getScheduleApplicationsService = async (scheduleId: number) => {
+  const applications = await getApplicationsBySchedule(scheduleId);
+
+  if (!applications.length) {
+    throw new Error("No applications found for this schedule");
+  }
+
+  return applications;
 };

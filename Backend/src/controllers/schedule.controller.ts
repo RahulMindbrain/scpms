@@ -8,9 +8,13 @@ import {
   deleteScheduleService,
   addJobsToScheduleService,
   removeJobsFromScheduleService,
+  approveScheduleService,
+  updateScheduleApprovalService,
+  getSchedulesForUserService,
 } from "../services/schedule.service";
 
 import { sendSuccess, sendError } from "../utils/response";
+import { getSchedulesByCompanyIdRepo } from "../repository/schedule.repository";
 
 // =======================================================
 // CREATE
@@ -18,6 +22,10 @@ import { sendSuccess, sendError } from "../utils/response";
 export const createScheduleController = async (req: Request, res: Response) => {
   try {
     const user = res.locals.user;
+
+    if (user.role !== "ADMIN") {
+      return sendError(res, 403, "Only admins can create schedules");
+    }
 
     const schedule = await createInterviewScheduleService({
       ...req.body,
@@ -137,6 +145,63 @@ export const removeJobsController = async (req: Request, res: Response) => {
     await removeJobsFromScheduleService(jobIds);
 
     return sendSuccess(res, 200, "Jobs removed from schedule", {});
+  } catch (error: any) {
+    return sendError(res, 400, error.message);
+  }
+};
+
+export const updateScheduleApprovalController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const user = res.locals.user;
+
+    const scheduleId = Number(req.params.id);
+
+    if (isNaN(scheduleId)) {
+      return sendError(res, 400, "Invalid schedule id");
+    }
+
+    const { status, rejectionReason } = req.body;
+
+    if (!status) {
+      return sendError(res, 400, "Approval status is required");
+    }
+
+    const data = await updateScheduleApprovalService(
+      scheduleId,
+      user.id,
+      status,
+      rejectionReason,
+    );
+
+    return sendSuccess(res, 200, "Schedule updated", data);
+  } catch (error: any) {
+    console.error(error);
+    return sendError(res, 400, error.message);
+  }
+};
+
+export const getSchedulesForUserController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const user = res.locals.user;
+
+    const companyId = req.query.companyId
+      ? Number(req.query.companyId)
+      : undefined;
+    console.log("params:", req.params);
+    console.log("query:", req.query);
+    const data = await getSchedulesForUserService(
+      user.id,
+      user.role,
+      companyId,
+    );
+
+    return sendSuccess(res, 200, "Schedules fetched", data);
   } catch (error: any) {
     return sendError(res, 400, error.message);
   }
