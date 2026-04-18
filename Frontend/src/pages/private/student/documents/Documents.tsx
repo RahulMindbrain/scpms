@@ -13,6 +13,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Document, Page, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+
+// Configure PDF worker
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
 const Documents = () => {
   const [activeTab, setActiveTab] = useState('All');
@@ -21,6 +27,8 @@ const Documents = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewName, setPreviewName] = useState<string>('');
+  const [numPages, setNumPages] = useState<number | null>(null);
+  const [pageNumber, setPageNumber] = useState(1);
 
   const { upload: uploadToCloudinary } = useCloudinaryUpload();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -107,7 +115,7 @@ const Documents = () => {
   };
 
   // ✅ UNIVERSAL OPEN FUNCTION (VIEW + DOWNLOAD FIX)
-  const openFile = (url: string, download = false, name = '') => {
+  const openFile = async (url: string, download = false, name = '') => {
     if (!url) {
       toast.error("Invalid file URL");
       return;
@@ -122,21 +130,36 @@ const Documents = () => {
     }
 
     if (download) {
-      finalUrl = finalUrl.replace('/upload/', '/upload/fl_attachment/');
-      
-      const link = document.createElement('a');
-      link.href = finalUrl;
-      link.target = '_blank';
-      link.rel = 'noopener noreferrer';
-      link.setAttribute('download', name || 'document');
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      try {
+        const response = await fetch(finalUrl);
+        const blob = await response.blob();
+        const blobUrl = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = name || 'document.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(blobUrl);
+        toast.success("Download started");
+      } catch (error) {
+        console.error("Download failed:", error);
+        // Fallback to direct link if fetch fails (CORS issue)
+        const link = document.createElement('a');
+        link.href = finalUrl.replace('/upload/', '/upload/fl_attachment/');
+        link.target = '_blank';
+        link.download = name || 'document';
+        link.click();
+      }
     } else {
-      // For viewing, we can choose to open in new tab or use our internal preview
       setPreviewName(name);
       setPreviewUrl(finalUrl);
+      setPageNumber(1); // Reset to first page
     }
+  };
+
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+    setNumPages(numPages);
   };
 
   // ✅ Helper to get thumbnail
@@ -305,23 +328,68 @@ const Documents = () => {
               </DialogTitle>
               <div className="flex items-center gap-2">
                   <button 
-                    onClick={() => window.open(previewUrl!, '_blank')}
+                    onClick={() => openFile(previewUrl!, true, previewName)}
                     className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
                   >
+                    <Download size={14} />
+                    Download
+                  </button>
+                  <button 
+                    onClick={() => window.open(previewUrl!, '_blank')}
+                    className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-slate-50 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
+                  >
                     <ExternalLink size={14} />
-                    Open in New Tab
+                    Full Screen
                   </button>
               </div>
             </div>
           </DialogHeader>
           
-          <div className="flex-1 bg-slate-100 relative">
+          <div className="flex-1 bg-slate-100 overflow-auto flex justify-center p-4">
             {previewUrl && (
-              <iframe
-                src={`${previewUrl}#toolbar=0`}
-                className="w-full h-full border-none"
-                title="Preview"
-              />
+              <div className="shadow-lg h-fit">
+                {previewName.toLowerCase().endsWith('.pdf') || previewUrl.toLowerCase().includes('.pdf') ? (
+                  <div className="flex flex-col items-center">
+                    <Document
+                      file={previewUrl}
+                      onLoadSuccess={onDocumentLoadSuccess}
+                      loading={<Loader2 className="animate-spin text-blue-600 m-10" size={40} />}
+                    >
+                      <Page 
+                        pageNumber={pageNumber} 
+                        scale={1.2}
+                        renderAnnotationLayer={false}
+                        renderTextLayer={false}
+                        className="shadow-2xl"
+                      />
+                    </Document>
+                    
+                    {numPages && numPages > 1 && (
+                      <div className="sticky bottom-4 mt-4 flex items-center gap-4 bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-lg border border-slate-200">
+                        <button
+                          disabled={pageNumber <= 1}
+                          onClick={() => setPageNumber(prev => prev - 1)}
+                          className="p-1 disabled:opacity-30"
+                        >
+                          Previous
+                        </button>
+                        <p className="text-sm font-medium">
+                          Page {pageNumber} of {numPages}
+                        </p>
+                        <button
+                          disabled={pageNumber >= numPages}
+                          onClick={() => setPageNumber(prev => prev + 1)}
+                          className="p-1 disabled:opacity-30"
+                        >
+                          Next
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <img src={previewUrl} alt={previewName} className="max-w-full h-auto rounded-lg" />
+                )}
+              </div>
             )}
           </div>
         </DialogContent>
