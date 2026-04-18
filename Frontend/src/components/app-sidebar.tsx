@@ -48,15 +48,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           { title: "Placement Drives", url: "/admin/drives", icon: <Briefcase /> },
           { title: "Manage Jobs", url: "/admin/jobs", icon: <ListChecks /> },
           { title: "Applications", url: "/admin/applications", icon: <FileText /> },
-          { title: "Shortlisting", url: "/admin/shortlisting", icon: <ListChecks /> },
+          // { title: "Shortlisting", url: "/admin/shortlisting", icon: <ListChecks /> },
           { title: "Interview Scheduler", url: "/admin/event-management", icon: <Calendar /> },
         ],
         secondary: [
           // { title: "Analytics", url: "/admin/report", icon: <BarChart3 /> },
           { title: "Bulk Email", url: "/admin/bulk-email", icon: <Mail /> },
           { title: "Departments", url: "/admin/departments", icon: <Building2 /> },
-            { title: "Document Management", url: "/admin/documents", icon: <Folder /> },
-          { title: "Settings", url: "/admin/setting", icon: <Settings /> },
+            // { title: "Document Management", url: "/admin/documents", icon: <Folder /> },
+          // { title: "Settings", url: "/admin/setting", icon: <Settings /> },
         ],
       }
     } else if (role === "student") {

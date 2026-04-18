@@ -1,92 +1,162 @@
-import React from 'react';
-import { Search, Filter,  Star, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button.tsx';
-import { Badge } from '@/components/ui/badge.tsx';
+import React, { useEffect, useState } from 'react';
+import { Search, Filter, ArrowRight, User, GraduationCap } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchApplications } from '@/redux/thunks/applicationThunk';
+import type { RootState, AppDispatch } from '@/redux/store/store';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 const Shortlist: React.FC = () => {
-  const shortlisted = [
-    { name: "Priya Sharma", branch: "CSE", cgpa: "8.9", round: "Technical Round", rating: 4.5 },
-    { name: "Ananya Patel", branch: "CSE", cgpa: "9.1", round: "Technical Round", rating: 4.8 },
-    { name: "Rahul Verma", branch: "IT", cgpa: "8.2", round: "Applied", rating: 4.0 },
-    { name: "Kavita Joshi", branch: "CSE", cgpa: "9.3", round: "Technical Round", rating: 4.7 },
-  ];
+  const dispatch = useDispatch<AppDispatch>();
+  const { applications, loading } = useSelector((state: RootState) => state.application);
+
+  const [search, setSearch] = useState("");
+  const [branchFilter, setBranchFilter] = useState("All");
+
+  useEffect(() => {
+    dispatch(fetchApplications(1));
+  }, [dispatch]);
+
+  const departmentMap: Record<number, string> = {
+    1: "CSE",
+    6: "IT",
+  };
+
+  // Transform and Filter Data
+  const filteredData = applications
+    ?.filter((app: any) => app.status === "SHORTLISTED")
+    ?.map((app: any) => ({
+      ...app,
+      branch: departmentMap[app.departmentId] || "Other",
+    }))
+    ?.filter((item: any) => {
+      return (
+        item.name.toLowerCase().includes(search.toLowerCase()) &&
+        (branchFilter === "All" || item.branch === branchFilter)
+      );
+    });
+
+  if (loading) {
+    return (
+      <div className="flex h-64 items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-end gap-4">
-        <Button className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-6 rounded-2xl shadow-lg shadow-blue-200 transition-all flex items-center gap-2">
-           Schedule Next Round <ArrowRight className="w-5 h-5" />
-        </Button>
+    <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+      
+      {/* Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Shortlisted Candidates</h1>
+          <p className="text-sm text-gray-500">Manage and move candidates to the next stage.</p>
+        </div>
+        
       </div>
 
-      <div className="bg-white rounded-[2rem] border border-slate-100 shadow-xl shadow-slate-200/50 p-8 space-y-6">
+      {/* Filters Card */}
+      <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
         <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-            <input 
-              type="text" 
-              placeholder="Search shortlisted..." 
-              className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all font-medium text-slate-800"
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <input
+              type="text"
+              placeholder="Search by name or email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all"
             />
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-6 py-3 bg-slate-50 rounded-2xl border border-slate-100">
-              <Filter className="w-4 h-4 text-slate-400" />
-              <select className="bg-transparent text-sm font-bold text-slate-600 focus:outline-none cursor-pointer">
-                <option>All Branches</option>
-                <option>CSE</option>
-                <option>IT</option>
-              </select>
-            </div>
+
+          <div className="flex items-center gap-2">
+            <Filter className="w-4 h-4 text-gray-500" />
+            <select
+              value={branchFilter}
+              onChange={(e) => setBranchFilter(e.target.value)}
+              className="bg-gray-50 border-none px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 min-w-[120px]"
+            >
+              <option value="All">All Departments</option>
+              <option value="CSE">CSE</option>
+              <option value="IT">IT</option>
+            </select>
           </div>
         </div>
+      </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="border-b border-slate-100">
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Candidate</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Branch</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">CGPA</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Current Round</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Rating</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Action</th>
+      {/* Responsive Content: Table for Desktop, Cards for Mobile */}
+      <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <table className="w-full text-left">
+          <thead className="bg-gray-50 border-b border-gray-100">
+            <tr>
+              <th className="px-6 py-4 text-sm font-semibold text-gray-600">Candidate</th>
+              <th className="px-6 py-4 text-sm font-semibold text-gray-600">Department</th>
+              <th className="px-6 py-4 text-sm font-semibold text-gray-600">Status</th>
+              <th className="px-6 py-4 text-sm font-semibold text-gray-600">Email</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-50">
+            {filteredData?.length === 0 ? (
+              <tr>
+                <td colSpan={4} className="text-center py-12 text-gray-400">No candidates found</td>
               </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {shortlisted.map((item, index) => (
-                <tr key={index} className="hover:bg-slate-50/50 transition-all group">
-                  <td className="px-6 py-5">
+            ) : (
+              filteredData?.map((item: any) => (
+                <tr key={item.applicationId} className="hover:bg-blue-50/30 transition-colors">
+                  <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 font-bold">
-                        {item.name.charAt(0)}
+                      <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold">
+                        {item.name.charAt(0).toUpperCase()}
                       </div>
-                      <div className="font-bold text-slate-800">{item.name}</div>
+                      <span className="font-medium text-gray-900">{item.name}</span>
                     </div>
                   </td>
-                  <td className="px-6 py-5 text-sm font-medium text-slate-500">{item.branch}</td>
-                  <td className="px-6 py-5 font-black text-slate-700">{item.cgpa}</td>
-                  <td className="px-6 py-5">
-                    <Badge variant="default" className="px-3 py-1 rounded-lg">
-                      {item.round}
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-2 text-gray-600">
+                      <GraduationCap className="w-4 h-4" />
+                      {item.branch}
+                    </div>
+                  </td>
+                  <td className="px-6 py-4">
+                    <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 border-none px-3 py-1">
+                      {item.status}
                     </Badge>
                   </td>
-                  <td className="px-6 py-5">
-                    <div className="flex items-center gap-1 text-amber-500">
-                      <Star className="w-4 h-4 fill-current" />
-                      <span className="text-sm font-black">{item.rating}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-5 text-right">
-                    <button className="text-sm font-bold text-blue-600 hover:text-blue-700 hover:underline">
-                      View Profile
-                    </button>
-                  </td>
+                  <td className="px-6 py-4 text-gray-500 text-sm">{item.email}</td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="grid grid-cols-1 gap-4 md:hidden">
+        {filteredData?.map((item: any) => (
+          <div key={item.applicationId} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-lg">
+                {item.name.charAt(0).toUpperCase()}
+              </div>
+              <div>
+                <h3 className="font-bold text-gray-900">{item.name}</h3>
+                <p className="text-xs text-gray-500">{item.email}</p>
+              </div>
+            </div>
+            
+            <div className="flex justify-between items-center pt-2 border-t border-gray-50">
+              <div className="flex items-center gap-2 text-sm text-gray-600">
+                <GraduationCap className="w-4 h-4" />
+                {item.branch}
+              </div>
+              <Badge className="bg-green-100 text-green-700 border-none">{item.status}</Badge>
+            </div>
+          </div>
+        ))}
+        {filteredData?.length === 0 && (
+          <p className="text-center py-10 text-gray-400">No candidates found</p>
+        )}
       </div>
     </div>
   );

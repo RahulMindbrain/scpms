@@ -6,7 +6,7 @@ import companyReducer from "../slices/companySlice";
 import driveReducer from "../slices/driveSlice";
 import departmentReducer from "../slices/departmentSlice";
 import dashboardReducer from "../slices/dashboardSlice";
-
+import applicationReducer from "../slices/applicationSlices"
 import interviewReducer from "../slices/interviewSlice";
 
 const rootReducer = combineReducers({
@@ -17,6 +17,7 @@ const rootReducer = combineReducers({
     department: departmentReducer,
     dashboard: dashboardReducer,
     interview: interviewReducer,
+    application:applicationReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;
