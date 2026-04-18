@@ -50,17 +50,17 @@ const interviewSlice = createSlice({
         state.error = action.payload as string;
       })
       // Update Schedule
-      .addCase(updateSchedule.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateSchedule.fulfilled, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        const updatedSchedule = action.payload.data;
-        state.schedules = state.schedules.map((s) => 
-          s.id === updatedSchedule.id ? updatedSchedule : s
-        );
-      })
+    .addCase(updateSchedule.fulfilled, (state, action: PayloadAction<any>) => {
+  state.loading = false;
+
+  const updated = action.payload.data;
+
+  state.schedules = state.schedules.map((s) =>
+    s.id === updated.id
+      ? { ...s, ...updated }   // ✅ THIS LINE IS THE FIX
+      : s
+  );
+})
       .addCase(updateSchedule.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
@@ -70,6 +70,7 @@ const interviewSlice = createSlice({
         state.schedules = state.schedules.filter((s) => s.id !== action.payload.id);
       });
   },
+  
 });
 
 export const { clearError } = interviewSlice.actions;

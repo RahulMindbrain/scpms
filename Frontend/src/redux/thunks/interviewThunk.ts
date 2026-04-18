@@ -27,16 +27,29 @@ export const createSchedule = createAsyncThunk(
 
 export const updateSchedule = createAsyncThunk(
   "interview/updateSchedule",
-  async ({ id, scheduleData }: { id: number; scheduleData: any }, { rejectWithValue }) => {
+  async (
+    { id, scheduleData }: { id: number; scheduleData: any },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await putAPI<any>(`/interview-schedule/${id}`, scheduleData);
+      // ✅ sanitize payload (CRITICAL FIX)
+      const payload: any = {};
+
+      if (scheduleData.startTime) payload.startTime = scheduleData.startTime;
+      if (scheduleData.endTime) payload.endTime = scheduleData.endTime;
+      if (scheduleData.venue !== undefined) payload.venue = scheduleData.venue;
+
+      const response = await putAPI<any>(
+        `/interview-schedule/${id}`,
+        payload
+      );
+
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to update schedule");
     }
   }
 );
-
 export const deleteSchedule = createAsyncThunk(
   "interview/deleteSchedule",
   async (id: number, { rejectWithValue }) => {
@@ -45,6 +58,31 @@ export const deleteSchedule = createAsyncThunk(
       return { id, message: response.message };
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to delete schedule");
+    }
+  }
+
+);
+export const sendScheduleMessage = createAsyncThunk(
+  "interview/sendMessage",
+  async (
+    { id, message }: { id: number; message: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await postAPI<any>(
+        `/interview-schedule/${id}/messages`,
+        { message }
+      );
+
+      // ✅ normalize response
+      return {
+        id,
+        message: response?.message || "Message sent successfully",
+        raw: response
+      };
+
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to send message");
     }
   }
 );

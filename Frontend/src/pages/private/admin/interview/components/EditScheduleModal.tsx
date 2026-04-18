@@ -1,16 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog, DialogContent, DialogDescription,
+  DialogHeader, DialogTitle, DialogFooter
+} from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Edit3, PlusCircle, AlertCircle, MapPin, Building2, Calendar as CalendarIcon, Clock, Layers } from 'lucide-react';
+import {
+  Edit3, PlusCircle, MapPin, 
+  Calendar as CalendarIcon, 
+  Building2, Briefcase, MessageSquare,
+  Clock
+} from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/redux/store/store';
 import { fetchCompanies, fetchJobsByCompanyId } from '@/redux/thunks/companyThunk';
-import { createSchedule, updateSchedule } from '@/redux/thunks/interviewThunk';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  createSchedule,
+  updateSchedule,
+  sendScheduleMessage
+} from '@/redux/thunks/interviewThunk';
+import {
+  Select, SelectContent, SelectItem,
+  SelectTrigger, SelectValue
+} from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
+import { Separator } from '@/components/ui/separator';
 
 interface EditModalProps {
   schedule: any;
@@ -19,10 +35,16 @@ interface EditModalProps {
   mode: 'create' | 'edit';
 }
 
-export const EditScheduleModal: React.FC<EditModalProps> = ({ schedule, open, onOpenChange, mode }) => {
+export const EditScheduleModal: React.FC<EditModalProps> = ({
+  schedule,
+  open,
+  onOpenChange,
+  mode
+}) => {
   const dispatch = useDispatch<AppDispatch>();
   const { companies, jobs } = useSelector((state: RootState) => state.company);
-  
+  const isCreate = mode === 'create';
+
   const [formData, setFormData] = useState({
     title: "",
     companyId: "",
@@ -30,7 +52,7 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({ schedule, open, on
     venue: "",
     startTime: "",
     endTime: "",
-    rejectionReason: ""
+    message: ""
   });
 
   useEffect(() => {
@@ -44,11 +66,10 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({ schedule, open, on
           venue: schedule.venue || "",
           startTime: schedule.startTime ? new Date(schedule.startTime).toISOString().slice(0, 16) : "",
           endTime: schedule.endTime ? new Date(schedule.endTime).toISOString().slice(0, 16) : "",
-          rejectionReason: schedule.rejectionReason || ""
+          message: ""
         });
-
         if (schedule.companyId) {
-          dispatch(fetchJobsByCompanyId({ id: schedule.companyId }));
+          dispatch(fetchJobsByCompanyId(schedule.companyId));
         }
       }
     }
@@ -56,13 +77,13 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({ schedule, open, on
 
   const handleCompanyChange = (value: string) => {
     setFormData(prev => ({ ...prev, companyId: value, jobIds: [] }));
-    dispatch(fetchJobsByCompanyId({ id: Number(value) }));
+dispatch(fetchJobsByCompanyId(Number(value)));
   };
 
   const handleJobToggle = (jobId: number) => {
     setFormData(prev => ({
       ...prev,
-      jobIds: prev.jobIds.includes(jobId) 
+      jobIds: prev.jobIds.includes(jobId)
         ? prev.jobIds.filter(id => id !== jobId)
         : [...prev.jobIds, jobId]
     }));
@@ -70,20 +91,29 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({ schedule, open, on
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    const payload = {
-      ...formData,
-      companyId: Number(formData.companyId),
-      startTime: new Date(formData.startTime).toISOString(),
-      endTime: new Date(formData.endTime).toISOString(),
-    };
-
     try {
-      if (mode === 'create') {
-        await dispatch(createSchedule(payload)).unwrap();
+      if (isCreate) {
+        const payload = {
+          ...formData,
+          companyId: Number(formData.companyId),
+          startTime: new Date(formData.startTime).toISOString(),
+          endTime: new Date(formData.endTime).toISOString(),
+        };
+        const res = await dispatch(createSchedule(payload)).unwrap();
+        if (formData.message.trim()) {
+          await dispatch(sendScheduleMessage({ id: res.data.id, message: formData.message }));
+        }
         toast.success("Schedule created successfully");
       } else {
+        const payload = {
+          startTime: new Date(formData.startTime).toISOString(),
+          endTime: new Date(formData.endTime).toISOString(),
+          venue: formData.venue,
+        };
         await dispatch(updateSchedule({ id: schedule.id, scheduleData: payload })).unwrap();
+        if (formData.message.trim()) {
+          await dispatch(sendScheduleMessage({ id: schedule.id, message: formData.message }));
+        }
         toast.success("Schedule updated successfully");
       }
       onOpenChange(false);
@@ -92,148 +122,160 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({ schedule, open, on
     }
   };
 
-  if (!schedule && mode === 'edit') return null;
-
-  const isCreate = mode === 'create';
+  if (!schedule && !isCreate) return null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] overflow-hidden p-0 rounded-[32px] border-none shadow-2xl bg-white">
-        <DialogHeader className="p-8 pb-0">
-          <DialogTitle className="flex items-center gap-2 text-2xl font-bold text-slate-900">
-            <div className="p-2 bg-primary/10 rounded-full">
-              {isCreate ? <PlusCircle className="w-5 h-5 text-primary" /> : <Edit3 className="w-5 h-5 text-primary" />}
+      <DialogContent className="sm:max-w-[650px] p-0 overflow-hidden border-none shadow-2xl">
+        {/* Header with Background Accent */}
+        <div className="bg-slate-50/50 border-b p-8">
+          <DialogHeader>
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm">
+                {isCreate ? <PlusCircle className="h-6 w-6" /> : <Edit3 className="h-6 w-6" />}
+              </div>
+              <div>
+                <DialogTitle className="text-2xl font-bold tracking-tight">
+                  {isCreate ? "Schedule New Drive" : "Edit Interview Drive"}
+                </DialogTitle>
+                <DialogDescription className="text-slate-500 font-medium">
+                  {isCreate ? "Set up a new recruitment session" : `Modifying schedule for ${schedule?.company?.name}`}
+                </DialogDescription>
+              </div>
             </div>
-            {isCreate ? "Schedule New Drive" : "Edit Drive Details"}
-          </DialogTitle>
-          <DialogDescription className="text-slate-500 text-base mt-2">
-            {isCreate ? "Fill in the details to propose a new interview date." : `Modify schedule for ${schedule.company?.name}`}
-          </DialogDescription>
-        </DialogHeader>
+          </DialogHeader>
+        </div>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
-          <div className="space-y-2">
-            <label className="text-[11px] font-black uppercase text-slate-400 tracking-wider ml-1">Event Title</label>
-            <Input 
-              placeholder="e.g. Technical Round 1" 
-              value={formData.title} 
-              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              className="h-14 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-primary transition-all text-base" 
-              required
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
+          {/* Main Info Section */}
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2 col-span-2">
+                <label className="text-sm font-semibold flex items-center gap-2 text-slate-700">
+                   Title
+                </label>
+                <Input
+                  placeholder="e.g. Campus Recruitment 2024"
+                  value={formData.title}
+                  disabled={!isCreate}
+                  className="bg-slate-50/50 focus-visible:ring-primary"
+                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                />
+              </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[11px] font-black uppercase text-slate-400 tracking-wider ml-1">Company</label>
-              <Select value={formData.companyId} onValueChange={handleCompanyChange}>
-                <SelectTrigger className="h-14 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-primary transition-all text-base">
-                  <SelectValue placeholder="Select Company" />
-                </SelectTrigger>
-                <SelectContent>
-                  {companies.map((c) => (
-                    <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[11px] font-black uppercase text-slate-400 tracking-wider ml-1">Venue</label>
-              <div className="relative">
-                <MapPin className="absolute left-4 top-4 w-5 h-5 text-slate-400" />
-                <Input 
-                  placeholder="Location"
-                  value={formData.venue} 
+              <div className="space-y-2">
+                <label className="text-sm font-semibold flex items-center gap-2 text-slate-700">
+                  <Building2 className="w-4 h-4 text-slate-400" /> Company
+                </label>
+                <Select value={formData.companyId} onValueChange={handleCompanyChange} disabled={!isCreate}>
+                  <SelectTrigger className="bg-slate-50/50">
+                    <SelectValue placeholder="Select Company" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {companies.map((c) => (
+                      <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-semibold flex items-center gap-2 text-slate-700">
+                  <MapPin className="w-4 h-4 text-slate-400" /> Venue
+                </label>
+                <Input
+                  placeholder="Office location or Link"
+                  value={formData.venue}
+                  className="bg-slate-50/50"
                   onChange={(e) => setFormData(prev => ({ ...prev, venue: e.target.value }))}
-                  className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-primary transition-all text-base" 
-                  required
                 />
               </div>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[11px] font-black uppercase text-slate-400 tracking-wider ml-1">Target Jobs</label>
-            <div className="grid grid-cols-2 gap-2 p-4 bg-slate-50 rounded-2xl border border-slate-100 max-h-40 overflow-y-auto">
+          <Separator className="bg-slate-100" />
+
+          {/* Jobs Selection - Card style */}
+          <div className="space-y-3">
+            <label className="text-sm font-semibold flex items-center gap-2 text-slate-700">
+              <Briefcase className="w-4 h-4 text-slate-400" /> Target Job Roles
+            </label>
+            <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border bg-slate-50/30">
               {jobs.length > 0 ? jobs.map((job) => (
-                <div key={job.id} className="flex items-center space-x-2 p-2 hover:bg-white rounded-lg transition-colors">
-                  <Checkbox 
-                    id={`job-${job.id}`} 
-                    checked={formData.jobIds.includes(job.id)} 
+                <div key={job.id} className="flex items-center space-x-3 p-2 rounded-lg transition-colors hover:bg-white">
+                  <Checkbox
+                    id={`job-${job.id}`}
+                    checked={formData.jobIds.includes(job.id)}
+                    disabled={!isCreate}
                     onCheckedChange={() => handleJobToggle(job.id)}
                   />
-                  <label htmlFor={`job-${job.id}`} className="text-sm font-medium leading-none cursor-pointer truncate">
+                  <label htmlFor={`job-${job.id}`} className="text-sm font-medium leading-none cursor-pointer">
                     {job.title}
                   </label>
                 </div>
               )) : (
-                <p className="col-span-2 text-center text-slate-400 text-xs py-4">Select a company first to see jobs</p>
+                <p className="col-span-2 text-xs text-center text-slate-400 py-2 italic">Select a company to see available jobs</p>
               )}
             </div>
           </div>
 
+          {/* Time Management */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <label className="text-[11px] font-black uppercase text-slate-400 tracking-wider ml-1">Start Date & Time</label>
-              <div className="relative">
-                <CalendarIcon className="absolute left-4 top-4 w-5 h-5 text-slate-400" />
-                <Input 
-                  type="datetime-local"
-                  value={formData.startTime} 
-                  onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
-                  className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-primary transition-all text-base" 
-                  required
-                />
-              </div>
+              <label className="text-sm font-semibold flex items-center gap-2 text-slate-700">
+                <CalendarIcon className="w-4 h-4 text-slate-400" /> Start Time
+              </label>
+              <Input
+                type="datetime-local"
+                value={formData.startTime}
+                className="bg-slate-50/50"
+                onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
+              />
             </div>
             <div className="space-y-2">
-              <label className="text-[11px] font-black uppercase text-slate-400 tracking-wider ml-1">End Date & Time</label>
-              <div className="relative">
-                <Clock className="absolute left-4 top-4 w-5 h-5 text-slate-400" />
-                <Input 
-                  type="datetime-local"
-                  value={formData.endTime} 
-                  onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
-                  className="pl-12 h-14 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:border-primary transition-all text-base" 
-                  required
-                />
-              </div>
+              <label className="text-sm font-semibold flex items-center gap-2 text-slate-700">
+                <Clock className="w-4 h-4 text-slate-400" /> End Time
+              </label>
+              <Input
+                type="datetime-local"
+                value={formData.endTime}
+                className="bg-slate-50/50"
+                onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
+              />
             </div>
           </div>
 
-          {!isCreate && (
-            <div className="space-y-3 p-4 bg-amber-50/50 rounded-2xl border border-amber-100">
-              <div className="flex items-center gap-2 text-amber-700">
-                <AlertCircle size={18} />
-                <span className="text-xs font-bold uppercase tracking-wide">Approval Notes</span>
-              </div>
-              <Textarea 
-                value={formData.rejectionReason}
-                onChange={(e) => setFormData(prev => ({ ...prev, rejectionReason: e.target.value }))}
-                placeholder="Internal notes..."
-                className="bg-white resize-none rounded-xl border-amber-200 focus:ring-amber-500 min-h-[80px]"
-              />
-            </div>
-          )}
-        </form>
+          {/* Message Area */}
+          <div className="space-y-2">
+            <label className="text-sm font-semibold flex items-center gap-2 text-slate-700">
+              <MessageSquare className="w-4 h-4 text-slate-400" /> Custom Instructions
+            </label>
+            <Textarea
+              placeholder="Add any specific details or requirements for the company..."
+              value={formData.message}
+              className="min-h-[100px] bg-slate-50/50 resize-none"
+              onChange={(e) => setFormData(prev => ({ ...prev, message: e.target.value }))}
+            />
+          </div>
 
-        <DialogFooter className="bg-slate-50/80 p-6 flex items-center justify-end gap-3 border-t border-slate-100">
-          <Button 
-            variant="ghost" 
-            type="button"
-            onClick={() => onOpenChange(false)} 
-            className="rounded-2xl font-bold text-slate-600 hover:bg-slate-200 h-12 px-6"
-          >
-            Cancel
-          </Button>
-          <Button 
-            onClick={handleSubmit}
-            className="rounded-2xl font-bold px-8 h-12 shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 transition-all text-white"
-          >
-            {isCreate ? "Create Schedule" : "Update Schedule"}
-          </Button>
-        </DialogFooter>
+          <div className="flex justify-end gap-3 pt-4">
+            <Button 
+              type="button" 
+              variant="ghost" 
+              onClick={() => onOpenChange(false)}
+              className="px-6 rounded-xl"
+            >
+              Cancel
+            </Button>
+            <Button 
+              type="submit" 
+              className="px-8 rounded-xl bg-primary shadow-lg shadow-primary/20 hover:shadow-none transition-all"
+            >
+              {isCreate ? "Create Schedule" : "Save Changes"}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
-};
+};
