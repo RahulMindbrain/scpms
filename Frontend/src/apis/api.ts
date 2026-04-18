@@ -47,7 +47,7 @@ api.interceptors.response.use(
             !originalRequest._retry &&
             originalRequest.url !== "/auth/refresh"
         ) {
-            
+
             // If we are already refreshing, queue this request
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
@@ -68,23 +68,23 @@ api.interceptors.response.use(
                 // Call the refresh endpoint
                 // The backend handles cookies automatically due to withCredentials: true
                 await api.post("/auth/refresh");
-                
+
                 isRefreshing = false;
                 processQueue(null);
-                
+
                 // Retry the original request
                 return api(originalRequest);
             } catch (refreshError) {
                 isRefreshing = false;
                 processQueue(refreshError);
-                
+
                 // If refresh fails, clear auth state
                 setAuthToken(null);
                 localStorage.removeItem("scpms_user");
-                
+
                 // Optional: redirect to login
                 // window.location.href = "/signin";
-                
+
                 return Promise.reject(refreshError);
             }
         }

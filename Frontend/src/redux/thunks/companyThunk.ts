@@ -120,3 +120,16 @@ export const updateJobApplicationStatus = createAsyncThunk(
         }
     }
 );
+
+export const fetchJobsByCompanyId = createAsyncThunk(
+    "company/fetchJobsByCompanyId",
+    async ({ id, params }: { id: number; params: any }, { rejectWithValue }) => {
+        try {
+            const response = await getAPI<any>(`/admin/get-jobs-company/${id}`, params);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to fetch jobs for company");
+        }
+    }
+);
+

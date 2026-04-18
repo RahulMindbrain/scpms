@@ -9,7 +9,8 @@ import {
   postJob,
   fetchCompanyJobs,
   fetchJobApplications,
-  updateJobApplicationStatus
+  updateJobApplicationStatus,
+  fetchJobsByCompanyId
 } from "../thunks/companyThunk";
 
 interface CompanyState {
@@ -180,6 +181,20 @@ const companySlice = createSlice({
             app.id === updatedApp.id ? { ...app, status: updatedApp.status } : app
           );
         }
+      })
+      // Fetch Jobs By Company ID
+      .addCase(fetchJobsByCompanyId.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchJobsByCompanyId.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.jobs = action.payload.data.data;
+        state.meta = action.payload.data.meta;
+      })
+      .addCase(fetchJobsByCompanyId.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });

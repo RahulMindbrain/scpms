@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button.tsx';
 import { toast } from 'sonner';
 import { Modal } from '@/components/ui/modal.tsx';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCompanies, fetchInactiveCompanies, activateCompanies } from '@/redux/thunks/companyThunk';
+import { fetchCompanies, fetchInactiveCompanies, activateCompanies, fetchJobsByCompanyId } from '@/redux/thunks/companyThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 
@@ -29,6 +29,7 @@ interface Company {
   approval: 'Approved' | 'Pending';
   logo?: string;
   email?: string;
+  description?: string;
 }
 
 const CompanyManagement: React.FC = () => {
@@ -46,6 +47,11 @@ const CompanyManagement: React.FC = () => {
     description: ''
   });
 
+  const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null);
+  const [isJobsModalOpen, setIsJobsModalOpen] = useState(false);
+  const { jobs: companyJobs, meta: jobsMeta } = useSelector((state: RootState) => state.company);
+  const [jobsStatusFilter, setJobsStatusFilter] = useState('APPROVED');
+
   useEffect(() => {
     dispatch(fetchCompanies({}));
     dispatch(fetchInactiveCompanies({}));
@@ -53,8 +59,8 @@ const CompanyManagement: React.FC = () => {
 
   const companies = useMemo<Company[]>(() => {
     const active = reduxCompanies.map((c: any): Company => ({
-      id: c.id,
-      userId: c.user?.id || c.userId,
+      id: c.id, // This is companyId from company table
+      userId: c.user?.id, // This is userId from user table
       name: c.name || 'N/A',
       sector: 'Technology',
       location: 'Multiple',
@@ -63,13 +69,14 @@ const CompanyManagement: React.FC = () => {
       status: 'active',
       approval: 'Approved',
       logo: undefined,
-      email: c.user?.email || 'N/A'
+      email: c.user?.email || 'N/A',
+      description: c.description || ''
     }));
 
     const inactive = reduxInactiveCompanies.map((c: any): Company => ({
-      id: c.id,
-      userId: c.id, // Inactive list returns User records, so id is userId
-      name: c.firstname || 'N/A', // Firstname is used as name for User records
+      id: c.id, // For inactive, id is userId
+      userId: c.id,
+      name: c.firstname || 'N/A',
       sector: 'Technology',
       location: 'Multiple',
       avgPackage: 'N/A',
@@ -77,7 +84,8 @@ const CompanyManagement: React.FC = () => {
       status: 'inactive',
       approval: 'Pending',
       logo: undefined,
-      email: c.email || 'N/A'
+      email: c.email || 'N/A',
+      description: ''
     }));
 
     return [...active, ...inactive];
@@ -113,7 +121,13 @@ const CompanyManagement: React.FC = () => {
       toast.info("Deactivation is coming soon.");
     }
   };
-//@ts-ignore
+
+  const handleViewJobs = (companyId: number) => {
+    setSelectedCompanyId(companyId);
+    setIsJobsModalOpen(true);
+    dispatch(fetchJobsByCompanyId({ id: companyId, params: { page: 1, limit: 10, status: 'APPROVED' } }));
+  };
+  //@ts-ignore
   const deleteCompany = (id: number) => {
     toast.info("Integration for deleting companies is coming soon.");
   };
@@ -128,7 +142,7 @@ const CompanyManagement: React.FC = () => {
 
   if (error) {
     return (
- <div className="max-w-7xl mx-auto px-4 space-y-8 animate-in mt-2">
+      <div className="max-w-7xl mx-auto px-4 space-y-8 animate-in mt-2">
         <p className="text-rose-500 font-black uppercase tracking-widest">{error}</p>
         <Button onClick={() => dispatch(fetchCompanies({}))}>Retry</Button>
       </div>
@@ -136,21 +150,21 @@ const CompanyManagement: React.FC = () => {
   }
 
   return (
-  <div className="max-w-7xl mx-auto px-6 space-y-8 animate-in mt-2">
+    <div className="max-w-7xl mx-auto px-6 space-y-8 animate-in mt-2">
       {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 px-1">
-        
-<div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="relative group flex-1 sm:flex-none">
+
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+          <div className="relative group flex-1 sm:flex-none">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
             <input
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Filter by name..."
-className="w-full sm:w-72 pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200"/>
+              className="w-full sm:w-72 pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-slate-200" />
           </div>
-         
+
         </div>
       </div>
 
@@ -189,16 +203,21 @@ className="w-full sm:w-72 pl-11 pr-4 py-3 bg-white border border-slate-200 round
                   <Building2 className="text-slate-400 group-hover:text-slate-700 transition-colors" />
                 </div>
                 <div>
-                <h3 className="text-lg font-semibold text-slate-900 group-hover:text-slate-700 transition-colors">{company.name}</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 group-hover:text-slate-700 transition-colors">{company.name}</h3>
                   <div className="flex items-center gap-2 mt-1">
                     <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></div>
                     <span className="text-xs text-slate-500 ">{company.sector}</span>
                   </div>
+                  {company.description && (
+                    <p className="text-[10px] text-slate-400 mt-2 line-clamp-2 leading-relaxed">
+                      {company.description}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex flex-col gap-2">
                 <button onClick={() => deleteCompany(company.id)} className="p-2 text-slate-200 hover:text-rose-500 transition-colors"><Trash2 size={16} /></button>
-                <button className="p-2 text-slate-200 hover:text-blue-500 transition-colors"><ExternalLink size={16} /></button>
+                <button onClick={() => handleViewJobs(company.id)} className="p-2 text-slate-200 hover:text-blue-500 transition-colors"><ExternalLink size={16} /></button>
               </div>
             </div>
 
@@ -206,7 +225,7 @@ className="w-full sm:w-72 pl-11 pr-4 py-3 bg-white border border-slate-200 round
               <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-100/50">
                 <div className="flex items-center gap-3">
                   <MapPin className="w-4 h-4 text-slate-300" />
-                <span className="text-sm text-slate-600">{company.location}</span>
+                  <span className="text-sm text-slate-600">{company.location}</span>
                 </div>
                 <Badge variant="outline" className="text-[9px] border-slate-200">Global Hub</Badge>
               </div>
@@ -322,6 +341,94 @@ className="w-full sm:w-72 pl-11 pr-4 py-3 bg-white border border-slate-200 round
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Jobs Modal */}
+      <Modal
+        isOpen={isJobsModalOpen}
+        onClose={() => setIsJobsModalOpen(false)}
+        title="Company Jobs"
+        subtitle="List of jobs posted by this company"
+      >
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            {['PENDING', 'APPROVED', 'REJECTED'].map((status) => (
+              <button
+                key={status}
+                onClick={() => {
+                  setJobsStatusFilter(status);
+                  if (selectedCompanyId) {
+                    dispatch(fetchJobsByCompanyId({ id: selectedCompanyId, params: { page: 1, limit: 10, status } }));
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${jobsStatusFilter === status ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-500'}`}
+              >
+                {status}
+              </button>
+            ))}
+          </div>
+
+          {loading ? (
+            <div className="flex justify-center p-8">
+              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : companyJobs.length > 0 ? (
+            <div className="space-y-3">
+              {companyJobs.map((job: any) => (
+                <div key={job.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-bold text-slate-900">{job.title}</h4>
+                      <p className="text-xs text-slate-500">{job.category} • {job.jobType}</p>
+                    </div>
+                    <Badge variant={job.status === 'APPROVED' ? 'success' : job.status === 'REJECTED' ? 'destructive' : 'secondary'} className="text-[10px]">
+                      {job.status}
+                    </Badge>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div>
+                        <p className="text-[8px] font-black text-slate-400 uppercase">Package</p>
+                        <p className="text-xs font-bold text-emerald-600">₹{job.salaryRange || 'N/A'}</p>
+                      </div>
+                      <div>
+                        <p className="text-[8px] font-black text-slate-400 uppercase">Deadline</p>
+                        <p className="text-xs font-bold text-slate-700">{job.deadline ? new Date(job.deadline).toLocaleDateString() : 'N/A'}</p>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm" className="h-8 text-[10px] font-black uppercase tracking-widest">
+                      Details
+                    </Button>
+                  </div>
+                </div>
+              ))}
+
+              {jobsMeta && jobsMeta.totalPages > 1 && (
+                <div className="flex justify-center gap-2 mt-4">
+                  <Button
+                    disabled={jobsMeta.page === 1}
+                    onClick={() => dispatch(fetchJobsByCompanyId({ id: selectedCompanyId!, params: { page: jobsMeta.page - 1, limit: 10, status: jobsStatusFilter } }))}
+                    variant="outline" size="sm"
+                  >
+                    Prev
+                  </Button>
+                  <span className="text-xs flex items-center">{jobsMeta.page} / {jobsMeta.totalPages}</span>
+                  <Button
+                    disabled={jobsMeta.page === jobsMeta.totalPages}
+                    onClick={() => dispatch(fetchJobsByCompanyId({ id: selectedCompanyId!, params: { page: jobsMeta.page + 1, limit: 10, status: jobsStatusFilter } }))}
+                    variant="outline" size="sm"
+                  >
+                    Next
+                  </Button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center p-8 bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+              <p className="text-sm text-slate-500">No jobs found for this status.</p>
+            </div>
+          )}
+        </div>
       </Modal>
     </div>
   );
