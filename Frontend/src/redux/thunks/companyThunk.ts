@@ -133,3 +133,14 @@ export const fetchJobsByCompanyId = createAsyncThunk(
     }
 );
 
+export const sendBulkMail = createAsyncThunk(
+    "admin/sendBulkMail",
+    async (data: { companyId: number; jobIds: number[]; subject?: string; message?: string; }, { rejectWithValue }) => {
+        try {
+            const response = await postAPI<any>("/admin/send-mails", data);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to send bulk emails");
+        }
+    }
+);

@@ -10,7 +10,8 @@ import {
   fetchCompanyJobs,
   fetchJobApplications,
   updateJobApplicationStatus,
-  fetchJobsByCompanyId
+  fetchJobsByCompanyId,
+  sendBulkMail
 } from "../thunks/companyThunk";
 
 interface CompanyState {
@@ -193,6 +194,18 @@ const companySlice = createSlice({
         state.meta = action.payload.data.meta;
       })
       .addCase(fetchJobsByCompanyId.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Send Bulk Mail
+      .addCase(sendBulkMail.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(sendBulkMail.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(sendBulkMail.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

@@ -14,23 +14,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
-import api from '@/apis/api';
-// import { api } from '@/lib/api'; 
-
-interface Job {
-  id: number;
-  title: string;
-}
-
-interface Company {
-  id: number;
-  name: string;
-}
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCompanies, fetchJobsByCompanyId, sendBulkMail } from '@/redux/thunks/companyThunk';
+import type { AppDispatch } from '@/redux/store/store';
+import type { RootState } from '@/redux/reducers/rootReducer';
 
 const BulkEmail: React.FC = () => {
-  // Data State
-  const [companies, setCompanies] = useState<Company[]>([]);
-  const [availableJobs, setAvailableJobs] = useState<Job[]>([]);
+  const dispatch = useDispatch<AppDispatch>();
+  
+  // Redux State
+  const { companies: reduxCompanies, jobs: reduxJobs, loading: reduxLoading, error: reduxError } = useSelector((state: RootState) => state.company);
   
   // Selection State
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
@@ -39,44 +32,26 @@ const BulkEmail: React.FC = () => {
   const [message, setMessage] = useState('');
   
   // UI State
-  const [loadingJobs, setLoadingJobs] = useState(false);
-  const [isSending, setIsSending] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   // 1. Fetch Companies on Mount
   useEffect(() => {
-    const fetchCompanies = async () => {
-      try {
-        const res = await api.get('/companies'); // Adjust endpoint
-        setCompanies(res.data);
-      } catch (err) {
-        toast.error("Failed to load companies");
-      }
-    };
-    fetchCompanies();
-  }, []);
+    dispatch(fetchCompanies({}));
+  }, [dispatch]);
 
   // 2. Fetch Jobs when Company changes
   useEffect(() => {
     if (!selectedCompanyId) {
-      setAvailableJobs([]);
+      setSelectedJobIds([]);
       return;
     }
 
-    const fetchJobs = async () => {
-      setLoadingJobs(true);
-      try {
-        const res = await api.get(`/companies/${selectedCompanyId}/jobs`);
-        setAvailableJobs(res.data);
-        setSelectedJobIds([]); // Reset selection
-      } catch (err) {
-        toast.error("Failed to fetch jobs for this company");
-      } finally {
-        setLoadingJobs(false);
-      }
-    };
-    fetchJobs();
-  }, [selectedCompanyId]);
+    dispatch(fetchJobsByCompanyId({ 
+      id: Number(selectedCompanyId), 
+      params: { status: 'APPROVED' } 
+    }));
+    setSelectedJobIds([]); // Reset selection
+  }, [selectedCompanyId, dispatch]);
 
   const toggleJob = (id: number) => {
     setSelectedJobIds(prev => 
@@ -90,25 +65,22 @@ const BulkEmail: React.FC = () => {
       return;
     }
 
-    setIsSending(true);
     const loadingToast = toast.loading("Dispatching bulk emails...");
 
     try {
-      await api.post('/admin/send-bulk-mail', {
+      await dispatch(sendBulkMail({
         companyId: Number(selectedCompanyId),
         jobIds: selectedJobIds,
-        subject: subject || undefined, // Send undefined to use backend default
+        subject: subject || undefined,
         message: message || undefined
-      });
+      })).unwrap();
       
       toast.success("Bulk mail sent successfully!", { id: loadingToast });
       setSubject('');
       setMessage('');
       setSelectedJobIds([]);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to send mail", { id: loadingToast });
-    } finally {
-      setIsSending(false);
+      toast.error(error || "Failed to send mail", { id: loadingToast });
     }
   };
 
@@ -132,7 +104,11 @@ const BulkEmail: React.FC = () => {
               className="w-full pl-4 pr-10 py-4 bg-slate-50 border border-slate-200 rounded-2xl appearance-none font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/5 transition-all"
             >
               <option value="">Choose a company...</option>
-              {companies.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              {reduxCompanies.map((c: any) => (
+                <option key={c.id} value={c.id}>
+                  {c.name}
+                </option>
+              ))}
             </select>
             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
           </div>
@@ -144,11 +120,11 @@ const BulkEmail: React.FC = () => {
             <Briefcase className="w-4 h-4" /> 02. Select Jobs
           </label>
           
-          {loadingJobs ? (
+          {reduxLoading && !reduxCompanies.length ? (
             <div className="flex justify-center py-4"><Loader2 className="animate-spin text-indigo-500" /></div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {availableJobs.map(job => (
+              {(reduxJobs || []).map((job: any) => (
                 <div 
                   key={job.id}
                   onClick={() => toggleJob(job.id)}
@@ -158,7 +134,9 @@ const BulkEmail: React.FC = () => {
                   <span className="text-sm font-bold text-slate-700">{job.title}</span>
                 </div>
               ))}
-              {availableJobs.length === 0 && selectedCompanyId && <p className="text-xs text-slate-400 italic">No active jobs found for this company.</p>}
+              {(!reduxJobs || reduxJobs.length === 0) && selectedCompanyId && !reduxLoading && (
+                <p className="text-xs text-slate-400 italic">No approved jobs found for this company.</p>
+              )}
             </div>
           )}
         </section>
@@ -195,10 +173,10 @@ const BulkEmail: React.FC = () => {
           </Button>
           <Button
             onClick={handleSendMail}
-            disabled={isSending || !selectedCompanyId || selectedJobIds.length === 0}
+            disabled={reduxLoading || !selectedCompanyId || selectedJobIds.length === 0}
             className="flex-[2] rounded-2xl bg-indigo-600 py-7 font-black uppercase tracking-widest text-xs shadow-xl shadow-indigo-100"
           >
-            {isSending ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
+            {reduxLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
             Send to Eligible Students
           </Button>
         </div>
@@ -221,4 +199,4 @@ const BulkEmail: React.FC = () => {
   );
 };
 
-export default BulkEmail;
+export default BulkEmail;
