@@ -16,7 +16,8 @@ const ApplicationsManagement: React.FC = () => {
 
   const filteredApplications = applications.filter((app: any) =>
     app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase())
+    app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    app.department?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getStatusStyle = (status: string) => {
@@ -88,7 +89,7 @@ const ApplicationsManagement: React.FC = () => {
                       </td>
                       <td className="px-6 py-4 text-sm text-slate-600">{app.jobTitle}</td>
                       <td className="px-6 py-4">
-                        <span className="text-sm text-slate-600">Dept - {app.departmentId}</span>
+                        <span className="text-sm text-slate-600">{app.department?.name}</span>
                       </td>
                       <td className="px-6 py-4 text-right">
                         <span className={`inline-flex px-3 py-1 rounded-full text-xs font-bold border ${getStatusStyle(app.status)}`}>
@@ -127,7 +128,7 @@ const ApplicationsManagement: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-2 text-slate-600">
                       <Building2 size={14} className="text-slate-400" />
-                      <span className="text-xs font-medium">Dept {app.departmentId}</span>
+                      <span className="text-xs font-medium">{app.department?.name}</span>
                     </div>
                   </div>
                 </div>
