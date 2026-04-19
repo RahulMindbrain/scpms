@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { fetchSchedules, createSchedule, updateSchedule, deleteSchedule, fetchSchedulesByCompany } from "../thunks/interviewThunk";
+import { fetchSchedules, createSchedule, updateSchedule, deleteSchedule, fetchSchedulesByCompany, approveSchedule, fetchScheduleMessages, sendScheduleMessage, fetchScheduleApplications } from "../thunks/interviewThunk";
 
 interface InterviewState {
   schedules: any[];
@@ -78,13 +78,48 @@ const interviewSlice = createSlice({
         state.loading = false;
         state.error = typeof action.payload === 'string' ? action.payload : "Failed to update schedule";
       })
+      // Approve Schedule
+      .addCase(approveSchedule.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        const updated = action.payload.data;
+        state.schedules = state.schedules.map((s) =>
+          s.id === updated.id ? { ...s, ...updated } : s
+        );
+      })
+      .addCase(approveSchedule.rejected, (state, action) => {
+        state.loading = false;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to update approval status";
+      })
       // Delete Schedule
+
       .addCase(deleteSchedule.fulfilled, (state, action) => {
         state.schedules = state.schedules.filter((s) => s.id !== action.payload.id);
+      })
+      // Fetch Messages
+      .addCase(fetchScheduleMessages.fulfilled, (state, action: PayloadAction<any>) => {
+        const { id, messages } = action.payload;
+        state.schedules = state.schedules.map((s) =>
+          s.id === id ? { ...s, messages } : s
+        );
+      })
+      // Send Message
+      .addCase(sendScheduleMessage.fulfilled, (state, action: PayloadAction<any>) => {
+        const { id, raw } = action.payload;
+        const newMessage = raw.data || raw;
+        state.schedules = state.schedules.map((s) =>
+          s.id === id ? { ...s, messages: [...(s.messages || []), newMessage] } : s
+        );
+      })
+      // Fetch Applications
+      .addCase(fetchScheduleApplications.fulfilled, (state, action: PayloadAction<any>) => {
+        const { id, applications } = action.payload;
+        state.schedules = state.schedules.map((s) =>
+          s.id === id ? { ...s, applications } : s
+        );
       });
   },
-  
 });
+
 
 export const { clearError } = interviewSlice.actions;
 export default interviewSlice.reducer;

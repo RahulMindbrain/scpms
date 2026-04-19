@@ -87,14 +87,58 @@ export const sendScheduleMessage = createAsyncThunk(
   }
 );
 
+export const approveSchedule = createAsyncThunk(
+  "interview/approveSchedule",
+  async (
+    { id, status, reason }: { id: number; status: "APPROVED" | "REJECTED"; reason?: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await putAPI<any>(`/interview-schedule/${id}/approval`, {
+        status,
+        reason,
+      });
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to update approval status");
+    }
+  }
+);
+
 export const fetchSchedulesByCompany = createAsyncThunk(
   "interview/fetchSchedulesByCompany",
-  async (companyId: number, { rejectWithValue }) => {
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await getAPI<any>(`/interview-schedule/by-company-id?companyId=${companyId}`);
+      const response = await getAPI<any>(`/interview-schedule/by-company-id`);
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch schedules by company");
     }
   }
 );
+
+export const fetchScheduleMessages = createAsyncThunk(
+  "interview/fetchMessages",
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const response = await getAPI<any>(`/interview-schedule/${id}/messages`);
+      return { id, messages: response.data || response }; // Handle both structured and raw response
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch messages");
+    }
+  }
+);
+
+export const fetchScheduleApplications = createAsyncThunk(
+  "interview/fetchApplications",
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const response = await getAPI<any>(`/interview-schedule/${id}/applications`);
+      return { id, applications: response.data || response };
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch applications");
+    }
+  }
+);
+
+

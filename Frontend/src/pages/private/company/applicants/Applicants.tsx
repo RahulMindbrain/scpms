@@ -1,6 +1,5 @@
 import React from 'react';
 import { Search, Filter, Download } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobApplications, updateJobApplicationStatus } from '@/redux/thunks/companyThunk';
@@ -18,13 +17,13 @@ import type { RootState } from '@/redux/reducers/rootReducer';
 const Applicants: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { applications, loading } = useSelector((state: RootState) => state.company);
-  
+
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedStatus, setSelectedStatus] = React.useState('ALL');
   const [selectedJob, setSelectedJob] = React.useState('All Jobs');
 
   React.useEffect(() => {
-    const params: {status?: string; page?: number; limit?: number} = {};
+    const params: { status?: string; page?: number; limit?: number } = {};
     if (selectedStatus !== 'ALL') {
       params.status = selectedStatus;
     }
@@ -63,40 +62,40 @@ const Applicants: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-1 group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
-            <input 
-              type="text" 
-              placeholder="Search by name..." 
+            <input
+              type="text"
+              placeholder="Search by name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-800"
             />
           </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
-                <Filter className="w-4 h-4 text-slate-400" />
-                <select 
-                  value={selectedJob}
-                  onChange={(e) => setSelectedJob(e.target.value)}
-                  className="bg-transparent text-sm font-bold text-slate-600 focus:outline-none cursor-pointer"
-                >
-                  <option>All Jobs</option>
-                  {uniqueJobs.map((job) => (
-                    <option key={job as string} value={job as string}>{job as string}</option>
-                  ))}
-                </select>
-              </div>
-              <select 
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="px-4 py-2 bg-slate-50 rounded-xl border border-slate-100 text-sm font-bold text-slate-600 focus:outline-none cursor-pointer"
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
+              <Filter className="w-4 h-4 text-slate-400" />
+              <select
+                value={selectedJob}
+                onChange={(e) => setSelectedJob(e.target.value)}
+                className="bg-transparent text-sm font-bold text-slate-600 focus:outline-none cursor-pointer"
               >
-                <option value="ALL">All Status</option>
-                <option value="APPLIED">Applied</option>
-                <option value="SHORTLISTED">Shortlisted</option>
-                <option value="SELECTED">Selected</option>
-                <option value="REJECTED">Rejected</option>
+                <option>All Jobs</option>
+                {uniqueJobs.map((job) => (
+                  <option key={job as string} value={job as string}>{job as string}</option>
+                ))}
               </select>
             </div>
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              className="px-4 py-2 bg-slate-50 rounded-xl border border-slate-100 text-sm font-bold text-slate-600 focus:outline-none cursor-pointer"
+            >
+              <option value="ALL">All Status</option>
+              <option value="APPLIED">Applied</option>
+              <option value="SHORTLISTED">Shortlisted</option>
+              <option value="SELECTED">Selected</option>
+              <option value="REJECTED">Rejected</option>
+            </select>
+          </div>
         </div>
 
         <div className="overflow-x-auto -mx-2">
@@ -116,8 +115,8 @@ const Applicants: React.FC = () => {
                 <tr>
                   <td colSpan={6} className="px-4 py-10 text-center">
                     <div className="flex flex-col items-center gap-2">
-                       <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                       <p className="text-sm font-medium text-slate-500">Loading applicants...</p>
+                      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+                      <p className="text-sm font-medium text-slate-500">Loading applicants...</p>
                     </div>
                   </td>
                 </tr>
@@ -137,17 +136,17 @@ const Applicants: React.FC = () => {
                     <td className="px-4 py-5 text-sm font-black text-slate-700">{app.student?.cgpa || 'N/A'}</td>
                     <td className="px-4 py-5 text-sm font-medium text-slate-600">{app.job?.title || 'N/A'}</td>
                     <td className="px-4 py-5 font-bold">
-                      <Select 
-                        value={app.status} 
+                      <Select
+                        value={app.status}
                         onValueChange={(value) => handleStatusUpdate(app.id, value)}
                       >
                         <SelectTrigger className="w-[140px] h-9 border-slate-100 bg-slate-50/50 rounded-xl hover:bg-slate-100 transition-colors">
                           <SelectValue>
                             <Badge variant={
-                              app.status === 'SELECTED' ? 'success' : 
-                              app.status === 'REJECTED' ? 'danger' : 
-                              app.status === 'SHORTLISTED' ? 'default' : 
-                              app.status === 'INTERVIEW' ? 'warning' : 'outline'
+                              app.status === 'SELECTED' ? 'success' :
+                                app.status === 'REJECTED' ? 'danger' :
+                                  app.status === 'SHORTLISTED' ? 'default' :
+                                    app.status === 'INTERVIEW' ? 'warning' : 'outline'
                             }>
                               {app.status}
                             </Badge>
@@ -164,9 +163,9 @@ const Applicants: React.FC = () => {
                     </td>
                     <td className="px-4 py-5 text-right">
                       {app.student?.resumeUrl ? (
-                         <a 
-                          href={app.student.resumeUrl} 
-                          target="_blank" 
+                        <a
+                          href={app.student.resumeUrl}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-blue-600 transition-colors px-3 py-2 rounded-lg hover:bg-blue-50"
                         >

@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Filter, ArrowRight, User, GraduationCap } from 'lucide-react';
+import { Search, Filter, GraduationCap } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchApplications } from '@/redux/thunks/applicationThunk';
 import type { RootState, AppDispatch } from '@/redux/store/store';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 
 const Shortlist: React.FC = () => {
@@ -17,17 +16,13 @@ const Shortlist: React.FC = () => {
     dispatch(fetchApplications(1));
   }, [dispatch]);
 
-  const departmentMap: Record<number, string> = {
-    1: "CSE",
-    6: "IT",
-  };
 
   // Transform and Filter Data
   const filteredData = applications
     ?.filter((app: any) => app.status === "SHORTLISTED")
     ?.map((app: any) => ({
       ...app,
-      branch: departmentMap[app.departmentId] || "Other",
+      branch: app.department?.name || "Other",
     }))
     ?.filter((item: any) => {
       return (
@@ -35,6 +30,16 @@ const Shortlist: React.FC = () => {
         (branchFilter === "All" || item.branch === branchFilter)
       );
     });
+
+  // Get unique branches for filter
+  const uniqueBranches = Array.from(
+    new Set(
+      applications
+        ?.filter((app: any) => app.status === "SHORTLISTED")
+        ?.map((app: any) => app.department?.name)
+        .filter(Boolean)
+    )
+  );
 
   if (loading) {
     return (
@@ -46,14 +51,14 @@ const Shortlist: React.FC = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
-      
+
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Shortlisted Candidates</h1>
           <p className="text-sm text-gray-500">Manage and move candidates to the next stage.</p>
         </div>
-        
+
       </div>
 
       {/* Filters Card */}
@@ -78,8 +83,9 @@ const Shortlist: React.FC = () => {
               className="bg-gray-50 border-none px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 min-w-[120px]"
             >
               <option value="All">All Departments</option>
-              <option value="CSE">CSE</option>
-              <option value="IT">IT</option>
+              {uniqueBranches.map((branch: any) => (
+                <option key={branch} value={branch}>{branch}</option>
+              ))}
             </select>
           </div>
         </div>
@@ -144,7 +150,7 @@ const Shortlist: React.FC = () => {
                 <p className="text-xs text-gray-500">{item.email}</p>
               </div>
             </div>
-            
+
             <div className="flex justify-between items-center pt-2 border-t border-gray-50">
               <div className="flex items-center gap-2 text-sm text-gray-600">
                 <GraduationCap className="w-4 h-4" />

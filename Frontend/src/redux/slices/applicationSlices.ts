@@ -26,7 +26,10 @@ const applicationsSlice = createSlice({
       })
       .addCase(fetchApplications.fulfilled, (state, action) => {
         state.loading = false;
-        state.applications = action.payload?.data || [];
+        // Handle both paginated (action.payload.data) and non-paginated (action.payload as array) responses
+        state.applications = Array.isArray(action.payload) 
+          ? action.payload 
+          : (action.payload?.data || []);
       })
       .addCase(fetchApplications.rejected, (state, action) => {
         state.loading = false;
