@@ -128,15 +128,23 @@ export const updateApplicationService = async (id: number, status: any) => {
   return application;
 };
 
-export const deleteApplicationService = async (id: number) => {
-  return deleteApplication(id);
-};
+export const getScheduleApplicationsService = async (
+  scheduleId: number,
+  page?: number,
+  limit?: number,
+) => {
+  const applications = await getApplicationsBySchedule(scheduleId, page, limit);
 
-export const getScheduleApplicationsService = async (scheduleId: number) => {
-  const applications = await getApplicationsBySchedule(scheduleId);
-
-  if (!applications.length) {
-    throw new Error("No applications found for this schedule");
+  // ✅ handle both cases safely
+  if (Array.isArray(applications)) {
+    if (applications.length === 0) {
+      throw new Error("No applications found for this schedule");
+    }
+  } else {
+    if (applications.data.length === 0) {
+      // ❗ DO NOT THROW for paginated
+      return applications;
+    }
   }
 
   return applications;

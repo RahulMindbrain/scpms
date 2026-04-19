@@ -94,7 +94,10 @@ export const getScheduleApplicationsController = async (req, res) => {
       return sendError(res, 400, "Invalid schedule id");
     }
 
-    const data = await getScheduleApplicationsService(scheduleId);
+    const page = req.query.page ? Number(req.query.page) : undefined;
+    const limit = req.query.limit ? Number(req.query.limit) : undefined;
+
+    const data = await getScheduleApplicationsService(scheduleId, page, limit);
 
     return sendSuccess(res, 200, "Applications fetched", data);
   } catch (err: any) {

@@ -222,56 +222,119 @@ export const withdrawOtherApplications = async (
   });
 };
 
-export const getApplicationsBySchedule = async (scheduleId: number) => {
-  const applications = await prisma.application.findMany({
-    where: {
-      job: {
-        interviewScheduleId: scheduleId,
-      },
+export const getApplicationsBySchedule = async (
+  scheduleId: number,
+  page?: number,
+  limit?: number,
+) => {
+  const isPaginated =
+    typeof page === "number" &&
+    typeof limit === "number" &&
+    page > 0 &&
+    limit > 0;
+
+  const where = {
+    job: {
+      interviewScheduleId: scheduleId,
     },
-    select: {
-      id: true,
-      status: true,
+  };
+  if (!isPaginated) {
+    const applications = await prisma.application.findMany({
+      where,
+      orderBy: { createdAt: "asc" },
 
-      job: {
-        select: {
-          id: true,
-          title: true,
-        },
-      },
-
-      student: {
-        select: {
-          id: true,
-          departmentId: true,
-          user: {
-            select: {
-              id: true,
-              firstname: true,
-              lastname: true,
-              email: true,
+      select: {
+        id: true,
+        status: true,
+        job: { select: { id: true, title: true } },
+        student: {
+          select: {
+            id: true,
+            departmentId: true,
+            department: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            user: {
+              select: {
+                firstname: true,
+                lastname: true,
+                email: true,
+              },
             },
           },
         },
       },
-    },
-    orderBy: {
-      createdAt: "asc",
-    },
-  });
+    });
 
-  // 🔥 flatten for frontend
-  return applications.map((app) => ({
+    return applications.map((app) => ({
+      applicationId: app.id,
+      status: app.status,
+      jobId: app.job.id,
+      jobTitle: app.job.title,
+      studentId: app.student.id,
+      // departmentId: app.student.departmentId,
+      department: app.student.department,
+      name: `${app.student.user.firstname} ${app.student.user.lastname}`,
+      email: app.student.user.email,
+    }));
+  }
+
+  // 🔹 PAGINATED → return data + meta
+  const skip = (page - 1) * limit;
+
+  const [applications, total] = await Promise.all([
+    prisma.application.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { createdAt: "asc" },
+
+      select: {
+        id: true,
+        status: true,
+        job: { select: { id: true, title: true } },
+        student: {
+          select: {
+            id: true,
+            // departmentId: true,
+            department: true,
+            user: {
+              select: {
+                firstname: true,
+                lastname: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    }),
+
+    prisma.application.count({ where }),
+  ]);
+
+  const mapped = applications.map((app) => ({
     applicationId: app.id,
     status: app.status,
-
     jobId: app.job.id,
     jobTitle: app.job.title,
-
     studentId: app.student.id,
-    departmentId: app.student.departmentId,
-
+    // departmentId: app.student.departmentId,
+    department: app.student.department,
     name: `${app.student.user.firstname} ${app.student.user.lastname}`,
     email: app.student.user.email,
   }));
+
+  return {
+    data: mapped,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
