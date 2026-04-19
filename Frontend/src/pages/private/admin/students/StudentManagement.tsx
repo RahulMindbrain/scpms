@@ -98,19 +98,18 @@ const StudentManagement: React.FC = () => {
 
   const students = useMemo(() => {
     const currentList = activeTab === 'active' ? reduxStudents : reduxInactiveStudents;
-    return currentList.map((s: any) => ({
-      id: s.id,
-      name: s.firstname ? `${s.firstname} ${s.lastname || ''}` : 'Unknown',
-      dept: s.student?.branch || 'N/A',
-      deptId: s.student?.deptId || 2,
-      cgpa: s.student?.cgpa || 0,
-      backlogs: s.student?.backlogs || 0,
-      status: s.status.toLowerCase(),
-      verified: s.status === 'ACTIVE',
-      company: s.student?.placedAt || '-',
-      package: s.student?.salary || '-',
-    }));
-  }, [reduxStudents, reduxInactiveStudents, activeTab]);
+    return currentList.map((s: any) => {
+      const deptObj = departments.find((d: any) => d.id === s.student?.deptId);
+      return {
+        id: s.id,
+        name: s.firstname ? `${s.firstname} ${s.lastname || ''}` : 'Unknown',
+        dept: deptObj?.name || s.student?.branch || 'N/A',
+        deptId: s.student?.deptId,
+        verified: s.status === 'ACTIVE',
+        status: s.status.toLowerCase(),
+      };
+    });
+  }, [reduxStudents, reduxInactiveStudents, activeTab, departments]);
 
   const filteredStudents = useMemo(() => {
     return students.filter(student => {
@@ -402,12 +401,7 @@ const StudentManagement: React.FC = () => {
               <TableRow className="hover:bg-transparent">
                 <TableHead className="font-semibold text-slate-500 py-4 pl-6">Name</TableHead>
                 <TableHead className="font-semibold text-slate-500 text-center">Department</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-center">CGPA</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-center">Backlogs</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-center">Status</TableHead>
                 <TableHead className="font-semibold text-slate-500 text-center">Verified</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-center">Company</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-center">Package</TableHead>
                 <TableHead className="font-semibold text-slate-500 text-right pr-6">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -416,17 +410,6 @@ const StudentManagement: React.FC = () => {
                 <TableRow key={student.id} className="bg-white hover:bg-slate-50/50 border-b border-slate-100/60 transition-colors">
                   <TableCell className="font-bold text-slate-800 py-4 pl-6">{student.name}</TableCell>
                   <TableCell className="text-slate-600 font-medium text-center">{student.dept}</TableCell>
-                  <TableCell className="text-slate-600 text-center">{student.cgpa}</TableCell>
-                  <TableCell className="text-slate-600 text-center">{student.backlogs}</TableCell>
-                  <TableCell className="text-center">
-                    {student.status === 'placed' ? (
-                      <span className="px-3 py-1 rounded-full bg-blue-600 text-white text-[11px] font-medium tracking-wide">placed</span>
-                    ) : student.status === 'in-process' ? (
-                      <span className="px-3 py-1 rounded-full bg-teal-500 text-white text-[11px] font-medium tracking-wide">in-process</span>
-                    ) : (
-                      <span className="px-3 py-1 rounded-full border border-slate-200 text-slate-600 text-[11px] font-medium tracking-wide bg-white shadow-sm">eligible</span>
-                    )}
-                  </TableCell>
                   <TableCell className="text-center">
                     <button onClick={() => toggleVerification(student.id)} className="transition-transform hover:scale-105 active:scale-95">
                       {student.verified ? (
@@ -440,31 +423,15 @@ const StudentManagement: React.FC = () => {
                       )}
                     </button>
                   </TableCell>
-                  <TableCell className="text-slate-600 text-sm whitespace-nowrap text-center">{student.company}</TableCell>
-                  <TableCell className="text-slate-600 text-sm whitespace-nowrap text-center">{student.package}</TableCell>
                   <TableCell className="text-right pr-6">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-slate-400 hover:text-slate-900"
-                        >
-                          <MoreHorizontal className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="w-40 rounded-xl shadow-lg border border-slate-100 p-1">
-                        <DropdownMenuItem 
-                          className="font-medium text-slate-700 cursor-pointer rounded-lg px-3 py-2"
-                          onClick={() => handleViewProfile(student)}
-                        >
-                          <Eye className="w-[18px] h-[18px] mr-2 text-slate-700" /> <span className="text-[13px]">View Profile</span>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="font-medium text-red-600 focus:text-red-700 focus:bg-red-50 cursor-pointer rounded-lg px-3 py-2 mt-0.5">
-                          <XCircle className="w-[18px] h-[18px] mr-2" /> <span className="text-[13px]">Reject</span>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-9 w-9 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors rounded-lg"
+                      onClick={() => handleViewProfile(student)}
+                    >
+                      <Eye className="w-5 h-5" />
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
@@ -567,26 +534,6 @@ const StudentManagement: React.FC = () => {
                       </span>
                     )
                   ) : null}
-                </div>
-              </div>
-              <div>
-                <p className="text-[13px] text-slate-500 mb-1">CGPA</p>
-                <p className="font-semibold text-slate-900 text-sm">{viewingStudent.cgpa}</p>
-              </div>
-              <div>
-                <p className="text-[13px] text-slate-500 mb-1">Backlogs</p>
-                <p className="font-semibold text-slate-900 text-sm">{viewingStudent.backlogs}</p>
-              </div>
-              <div>
-                <p className="text-[13px] text-slate-500 mb-1">Status</p>
-                <div>
-                  {viewingStudent.status === 'placed' ? (
-                    <span className="px-3 py-1 rounded-full bg-blue-600 text-white text-[11px] font-medium tracking-wide inline-block mt-0.5 shadow-sm">placed</span>
-                  ) : viewingStudent.status === 'in-process' ? (
-                    <span className="px-3 py-1 rounded-full bg-teal-500 text-white text-[11px] font-medium tracking-wide inline-block mt-0.5 shadow-sm">in-process</span>
-                  ) : (
-                    <span className="px-3 py-1 rounded-full border border-slate-200 text-slate-600 text-[11px] font-medium tracking-wide bg-white shadow-sm inline-block mt-0.5">eligible</span>
-                  )}
                 </div>
               </div>
               <div>

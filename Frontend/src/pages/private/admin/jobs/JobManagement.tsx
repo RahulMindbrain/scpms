@@ -111,7 +111,7 @@ const AdminJobManagement: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
-        
+
         {/* Top Header Section */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
@@ -136,11 +136,10 @@ const AdminJobManagement: React.FC = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`relative flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                  activeTab === tab
+                className={`relative flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${activeTab === tab
                     ? 'bg-white text-indigo-600 shadow-sm'
                     : 'text-slate-500 hover:text-slate-700'
-                }`}
+                  }`}
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
                   {tab === 'PENDING' && <Clock className="w-4 h-4" />}
@@ -306,16 +305,15 @@ const JobCard = ({ job, isSelected, onSelect, onStatusUpdate, activeTab }: any) 
       exit={{ opacity: 0, scale: 0.95 }}
       whileHover={{ y: -4 }}
       transition={{ duration: 0.3 }}
-      className={`group relative bg-white rounded-[20px] border p-5 transition-all duration-300 ${
-        isSelected 
-          ? 'border-indigo-500 ring-4 ring-indigo-500/5 shadow-lg' 
+      className={`group relative bg-white rounded-[20px] border p-5 transition-all duration-300 ${isSelected
+          ? 'border-indigo-500 ring-4 ring-indigo-500/5 shadow-lg'
           : 'border-slate-200 hover:shadow-xl hover:shadow-slate-200/50'
-      }`}
+        }`}
     >
       {/* Top Controls */}
       <div className="absolute top-4 right-4 flex items-center gap-2">
-        <Checkbox 
-          checked={isSelected} 
+        <Checkbox
+          checked={isSelected}
           onCheckedChange={onSelect}
           className="rounded-md border-slate-300 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
         />
@@ -381,7 +379,7 @@ const JobCard = ({ job, isSelected, onSelect, onStatusUpdate, activeTab }: any) 
         <div className="pt-4 flex items-center gap-3 border-t border-slate-100">
           {activeTab === 'PENDING' ? (
             <>
-              <Button 
+              <Button
                 className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl h-10 shadow-sm"
                 onClick={(e) => {
                   e.stopPropagation();
@@ -390,7 +388,7 @@ const JobCard = ({ job, isSelected, onSelect, onStatusUpdate, activeTab }: any) 
               >
                 <CheckCircle className="w-4 h-4 mr-2" /> Approve
               </Button>
-              <Button 
+              <Button
                 variant="outline"
                 className="flex-1 border-rose-100 text-rose-600 hover:bg-rose-50 rounded-xl h-10"
                 onClick={(e) => {
@@ -402,7 +400,7 @@ const JobCard = ({ job, isSelected, onSelect, onStatusUpdate, activeTab }: any) 
               </Button>
             </>
           ) : (
-            <Button 
+            <Button
               className="w-full bg-slate-900 hover:bg-slate-800 text-white rounded-xl h-10 shadow-sm flex items-center justify-center gap-2 group/btn"
               onClick={(e) => e.stopPropagation()}
             >
@@ -457,8 +455,8 @@ const EmptyState = ({ onReset }: { onReset: () => void }) => (
     <p className="text-slate-500 max-w-xs mb-8">
       We couldn't find any job listings matching your current criteria. Try adjusting your filters.
     </p>
-    <Button 
-      variant="outline" 
+    <Button
+      variant="outline"
       onClick={onReset}
       className="rounded-xl px-8 border-slate-200"
     >

@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   Building2,
   Plus,
-  CheckCircle2,
-  XCircle,
   Loader2,
   Search,
 } from 'lucide-react';
@@ -136,23 +134,11 @@ const DepartmentManagement: React.FC = () => {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="shadow-sm border border-slate-200/60 rounded-xl">
+      <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
+        <Card className="shadow-sm border border-slate-200/60 rounded-xl max-w-sm mx-auto sm:mx-0">
           <CardContent className="p-6 flex flex-col items-center justify-center">
             <span className="text-[28px] font-bold text-slate-800">{departments.length}</span>
             <span className="text-[13px] text-slate-500 mt-1">Total Departments</span>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm border border-slate-200/60 rounded-xl">
-          <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-[28px] font-bold text-green-500">{activeCount}</span>
-            <span className="text-[13px] text-slate-500 mt-1">Active</span>
-          </CardContent>
-        </Card>
-        <Card className="shadow-sm border border-slate-200/60 rounded-xl">
-          <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-[28px] font-bold text-orange-400">{inactiveCount}</span>
-            <span className="text-[13px] text-slate-500 mt-1">Inactive</span>
           </CardContent>
         </Card>
       </div>
@@ -176,14 +162,13 @@ const DepartmentManagement: React.FC = () => {
               <TableRow className="hover:bg-transparent">
                 <TableHead className="font-semibold text-slate-500 py-4 pl-6">#</TableHead>
                 <TableHead className="font-semibold text-slate-500">Department Name</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-center">Status</TableHead>
                 <TableHead className="font-semibold text-slate-500 text-center">ID</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="py-20 text-center">
+                  <TableCell colSpan={3} className="py-20 text-center">
                     <div className="flex flex-col items-center gap-3 text-slate-400">
                       <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
                       <span className="text-sm font-medium">Loading departments...</span>
@@ -192,7 +177,7 @@ const DepartmentManagement: React.FC = () => {
                 </TableRow>
               ) : filtered.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="py-20 text-center">
+                  <TableCell colSpan={3} className="py-20 text-center">
                     <div className="flex flex-col items-center gap-2 text-slate-400">
                       <Building2 className="w-10 h-10 opacity-20" />
                       <span className="text-sm font-medium">No departments found</span>
@@ -208,17 +193,6 @@ const DepartmentManagement: React.FC = () => {
                     <TableCell className="font-medium text-slate-400 py-4 pl-6">{index + 1}</TableCell>
                     <TableCell className="font-semibold text-slate-800">
                       {dept.name || dept.deptName || '—'}
-                    </TableCell>
-                    <TableCell className="text-center">
-                      {dept.isActive ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px] font-semibold shadow-sm">
-                          <CheckCircle2 className="w-3 h-3" /> Active
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-50 border border-red-200 text-red-600 text-[11px] font-semibold shadow-sm">
-                          <XCircle className="w-3 h-3" /> Inactive
-                        </span>
-                      )}
                     </TableCell>
                     <TableCell className="text-center text-slate-400 text-sm font-mono">
                       {dept.id}
