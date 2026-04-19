@@ -86,3 +86,15 @@ export const sendScheduleMessage = createAsyncThunk(
     }
   }
 );
+
+export const fetchSchedulesByCompany = createAsyncThunk(
+  "interview/fetchSchedulesByCompany",
+  async (companyId: number, { rejectWithValue }) => {
+    try {
+      const response = await getAPI<any>(`/interview-schedule/by-company-id?companyId=${companyId}`);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch schedules by company");
+    }
+  }
+);

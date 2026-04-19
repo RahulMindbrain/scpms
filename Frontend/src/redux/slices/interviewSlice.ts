@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { fetchSchedules, createSchedule, updateSchedule, deleteSchedule } from "../thunks/interviewThunk";
+import { fetchSchedules, createSchedule, updateSchedule, deleteSchedule, fetchSchedulesByCompany } from "../thunks/interviewThunk";
 
 interface InterviewState {
   schedules: any[];
@@ -34,7 +34,20 @@ const interviewSlice = createSlice({
       })
       .addCase(fetchSchedules.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch schedules";
+      })
+      // Fetch Schedules By Company
+      .addCase(fetchSchedulesByCompany.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchSchedulesByCompany.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.schedules = action.payload.data;
+      })
+      .addCase(fetchSchedulesByCompany.rejected, (state, action) => {
+        state.loading = false;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch schedules by company";
       })
       // Create Schedule
       .addCase(createSchedule.pending, (state) => {
@@ -47,7 +60,7 @@ const interviewSlice = createSlice({
       })
       .addCase(createSchedule.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to create schedule";
       })
       // Update Schedule
     .addCase(updateSchedule.fulfilled, (state, action: PayloadAction<any>) => {
@@ -63,7 +76,7 @@ const interviewSlice = createSlice({
 })
       .addCase(updateSchedule.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to update schedule";
       })
       // Delete Schedule
       .addCase(deleteSchedule.fulfilled, (state, action) => {

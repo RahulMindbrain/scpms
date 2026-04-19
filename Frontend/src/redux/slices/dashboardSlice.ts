@@ -43,7 +43,7 @@ const dashboardSlice = createSlice({
             })
             .addCase(fetchDashboardStats.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.payload as string;
+                state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch dashboard stats";
             });
     },
 });

@@ -61,7 +61,7 @@ const companySlice = createSlice({
       })
       .addCase(fetchCompanies.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch companies";
       })
       // Fetch Inactive Companies
       .addCase(fetchInactiveCompanies.pending, (state) => {
@@ -78,7 +78,7 @@ const companySlice = createSlice({
       })
       .addCase(fetchInactiveCompanies.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch inactive companies";
       })
       // Activate Companies
       .addCase(activateCompanies.pending, (state) => {
@@ -92,7 +92,7 @@ const companySlice = createSlice({
       })
       .addCase(activateCompanies.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to activate companies";
       })
       // Fetch Company Profile
       .addCase(fetchCompanyProfile.pending, (state) => {
@@ -105,7 +105,7 @@ const companySlice = createSlice({
       })
       .addCase(fetchCompanyProfile.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch company profile";
       })
       // Create Company Profile
       .addCase(createCompanyProfile.pending, (state) => {
@@ -118,7 +118,7 @@ const companySlice = createSlice({
       })
       .addCase(createCompanyProfile.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to create company profile";
       })
       // Update Company Profile
       .addCase(updateCompanyProfile.pending, (state) => {
@@ -131,7 +131,7 @@ const companySlice = createSlice({
       })
       .addCase(updateCompanyProfile.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to update company profile";
       })
       // Post Job
       .addCase(postJob.pending, (state) => {
@@ -143,7 +143,7 @@ const companySlice = createSlice({
       })
       .addCase(postJob.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to post job";
       })
       // Fetch Company Jobs
       .addCase(fetchCompanyJobs.pending, (state) => {
@@ -157,7 +157,7 @@ const companySlice = createSlice({
       })
       .addCase(fetchCompanyJobs.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch company jobs";
       })
       // Fetch Job Applications
       .addCase(fetchJobApplications.pending, (state) => {
@@ -172,7 +172,7 @@ const companySlice = createSlice({
       })
       .addCase(fetchJobApplications.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch job applications";
       })
       // Update Job Application Status
       .addCase(updateJobApplicationStatus.fulfilled, (state, action: PayloadAction<any>) => {
@@ -195,7 +195,7 @@ const companySlice = createSlice({
       })
       .addCase(fetchJobsByCompanyId.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch jobs for company";
       })
       // Send Bulk Mail
       .addCase(sendBulkMail.pending, (state) => {
@@ -207,8 +207,8 @@ const companySlice = createSlice({
       })
       .addCase(sendBulkMail.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload as string;
-      });
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to send bulk emails";
+      })
   },
 });
 

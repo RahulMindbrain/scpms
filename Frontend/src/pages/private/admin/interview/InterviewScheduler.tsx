@@ -14,23 +14,35 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { EditScheduleModal } from './components/EditScheduleModal';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/redux/store/store';
-import { fetchSchedules, deleteSchedule } from '@/redux/thunks/interviewThunk';
+import { fetchSchedules, deleteSchedule, fetchSchedulesByCompany } from '@/redux/thunks/interviewThunk';
+import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import { toast } from 'sonner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const InterviewSchedulerPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { schedules, loading } = useSelector((state: RootState) => state.interview);
+  const { companies } = useSelector((state: RootState) => state.company);
 
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('all');
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
   const [mode, setMode] = useState<'create' | 'edit'>('edit');
 
   useEffect(() => {
-    dispatch(fetchSchedules());
+    dispatch(fetchCompanies({ page: 1, limit: 100 }));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (selectedCompanyId === 'all') {
+      dispatch(fetchSchedules());
+    } else {
+      dispatch(fetchSchedulesByCompany(Number(selectedCompanyId)));
+    }
+  }, [dispatch, selectedCompanyId]);
 
   const toggleExpand = (id: string) => {
     setExpandedId(expandedId === id ? null : id);
@@ -98,11 +110,26 @@ const InterviewSchedulerPage: React.FC = () => {
             <p className="text-slate-500 text-sm sm:text-base font-medium">Manage recruitment drives efficiently</p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center gap-2">
+              <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
+                <SelectTrigger className="w-full sm:w-[180px] border-none bg-white shadow-sm ring-1 ring-slate-200 rounded-xl h-11">
+                  <SelectValue placeholder="All Companies" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Companies</SelectItem>
+                  {companies.map((company) => (
+                    <SelectItem key={company.id} value={company.id.toString()}>
+                      {company.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <Input 
                 placeholder="Search drives..." 
-                className="pl-10 w-full sm:w-[250px] md:w-[300px] border-none bg-white shadow-sm ring-1 ring-slate-200 focus:ring-primary/40 rounded-xl h-11"
+                className="pl-10 w-full sm:w-[200px] md:w-[250px] border-none bg-white shadow-sm ring-1 ring-slate-200 focus:ring-primary/40 rounded-xl h-11"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />

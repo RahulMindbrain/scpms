@@ -118,7 +118,7 @@ dispatch(fetchJobsByCompanyId(Number(value)));
       }
       onOpenChange(false);
     } catch (error: any) {
-      toast.error(error || "Something went wrong");
+      toast.error(error?.message || error?.toString() || "Something went wrong");
     }
   };
 
