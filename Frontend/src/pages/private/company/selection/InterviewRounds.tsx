@@ -1,17 +1,13 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Calendar, Clock, MapPin, MessageSquareQuote,
-  CheckCircle2, XCircle, Send,
-  Info, Bell, User, Search, Filter,
-  ChevronRight, ArrowRight, Loader2,
-  Check, X, MessageSquare
+  Calendar, Clock, MapPin, Info, User, Search, ChevronRight, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchSchedulesByCompany, approveSchedule, fetchScheduleMessages, sendScheduleMessage } from '@/redux/thunks/interviewThunk';
+import { fetchSchedulesByCompany, approveSchedule, fetchScheduleApplications } from '@/redux/thunks/interviewThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 
@@ -36,6 +32,7 @@ interface InterviewSchedule {
   adminName: string;
   jobTitle: string;
   messages: ScheduleMessage[];
+  applications?: any[];
 }
 
 const CompanyInterviewManager: React.FC = () => {
@@ -43,16 +40,16 @@ const CompanyInterviewManager: React.FC = () => {
   const { schedules, loading } = useSelector((state: RootState) => state.interview);
 
   const [selectedSchedule, setSelectedSchedule] = useState<InterviewSchedule | null>(null);
-  const [isNoteDrawerOpen, setIsNoteDrawerOpen] = useState(false);
+  const [isApplicationsModalOpen, setIsApplicationsModalOpen] = useState(false);
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [declineReason, setDeclineReason] = useState('');
-  const [replyMessage, setReplyMessage] = useState('');
   const [filterType, setFilterType] = useState<'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [statusLoading, setStatusLoading] = useState<number | null>(null);
+  const [appsLoading, setAppsLoading] = useState<number | null>(null);
 
   // Sync selected schedule with redux state to reflect new messages
-  const activeSchedule = useMemo(() => 
+  const activeSchedule = useMemo(() =>
     schedules.find(s => s.id === selectedSchedule?.id) || selectedSchedule,
     [schedules, selectedSchedule]
   );
@@ -75,27 +72,24 @@ const CompanyInterviewManager: React.FC = () => {
     }
   };
 
-  const handleOpenDrawer = (schedule: InterviewSchedule) => {
+  const handleOpenApplications = async (schedule: InterviewSchedule) => {
     setSelectedSchedule(schedule);
-    setIsNoteDrawerOpen(true);
-    dispatch(fetchScheduleMessages(schedule.id));
-  };
-
-  const handleSendMessage = async () => {
-    if (!activeSchedule || !replyMessage.trim()) return;
+    setIsApplicationsModalOpen(true);
+    setAppsLoading(schedule.id);
     try {
-      await dispatch(sendScheduleMessage({ id: activeSchedule.id, message: replyMessage })).unwrap();
-      setReplyMessage('');
+      await dispatch(fetchScheduleApplications(schedule.id)).unwrap();
     } catch (error: any) {
-      toast.error(error || "Failed to send message");
+      toast.error(error || "Failed to load candidates");
+    } finally {
+      setAppsLoading(null);
     }
   };
 
   const filteredSchedules = useMemo(() => {
     return schedules.filter(s => {
       const matchesFilter = filterType === 'ALL' || s.companyApprovalStatus === filterType;
-      const matchesSearch = s.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                           s.jobTitle.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        s.jobTitle.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesFilter && matchesSearch;
     });
   }, [schedules, filterType, searchQuery]);
@@ -103,12 +97,12 @@ const CompanyInterviewManager: React.FC = () => {
   const stats = useMemo(() => ({
     total: schedules.length,
     pending: schedules.filter(s => s.companyApprovalStatus === 'PENDING').length,
-    activeStudents: 145, // Mock or calculate if data available
+    activeCandidates: schedules.reduce((acc, s) => acc + (s.applications?.length || 0), 0),
   }), [schedules]);
 
   return (
     <div className="min-h-screen bg-[#FDFDFE] p-6 lg:p-12 space-y-12 font-sans selection:bg-indigo-100 selection:text-indigo-900">
-      
+
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
         <div className="space-y-4">
@@ -149,7 +143,7 @@ const CompanyInterviewManager: React.FC = () => {
         {[
           { label: 'Total Drives', value: stats.total, color: 'indigo' },
           { label: 'Pending Approvals', value: stats.pending, color: 'amber' },
-          { label: 'Active Students', value: stats.activeStudents, color: 'emerald' }
+          { label: 'Total Candidates', value: stats.activeCandidates, color: 'emerald' }
         ].map((stat, idx) => (
           <div key={idx} className="group relative">
             <div className="absolute -inset-1 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -178,11 +172,10 @@ const CompanyInterviewManager: React.FC = () => {
               <button
                 key={type}
                 onClick={() => setFilterType(type as any)}
-                className={`px-6 py-2.5 rounded-xl text-xs font-black tracking-widest transition-all duration-300 whitespace-nowrap ${
-                  filterType === type 
-                    ? 'bg-white text-slate-900 shadow-lg shadow-slate-200/50 scale-[1.02]' 
+                className={`px-6 py-2.5 rounded-xl text-xs font-black tracking-widest transition-all duration-300 whitespace-nowrap ${filterType === type
+                    ? 'bg-white text-slate-900 shadow-lg shadow-slate-200/50 scale-[1.02]'
                     : 'text-slate-400 hover:text-slate-600'
-                }`}
+                  }`}
               >
                 {type}
               </button>
@@ -217,7 +210,7 @@ const CompanyInterviewManager: React.FC = () => {
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-[3rem] opacity-0 group-hover:opacity-10 blur-2xl transition duration-700 pointer-events-none" />
 
                 <div className="relative bg-white border border-slate-100 rounded-[3rem] p-8 lg:p-10 flex flex-col lg:flex-row items-center gap-10 lg:gap-14 shadow-2xl shadow-slate-200/40 hover:shadow-indigo-200/20 transition-all duration-500">
-                  
+
                   {/* Left Side: Date Block */}
                   <div className="flex flex-col items-center justify-center bg-slate-50 rounded-[2.5rem] min-w-[130px] h-[130px] text-center p-6 border border-slate-100 ring-4 ring-slate-50/50">
                     <span className="text-4xl font-black text-indigo-600 mb-1">
@@ -267,81 +260,22 @@ const CompanyInterviewManager: React.FC = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-center lg:justify-start gap-3 pt-2">
-                       <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-100">
-                          <User className="w-3.5 h-3.5 text-slate-400" />
-                          <span className="text-xs font-bold text-slate-500">By Admin: {schedule.adminName || 'Lead Coordinator'}</span>
-                       </div>
-                    </div>
-                  </div>
-
-                  {/* Right Side: Action Panel */}
-                  <div className="w-full lg:w-[320px] lg:pl-10 lg:border-l border-slate-100 flex flex-col gap-5 pt-8 lg:pt-0">
-                    
-                    {/* Status Tracking */}
-                    <div className="flex items-center justify-between px-2">
-                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Current Status</span>
-                      <button 
-                        onClick={() => handleOpenDrawer(schedule)}
-                        className="relative p-2 text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors"
+                    <div className="flex items-center justify-center lg:justify-start gap-4 pt-2">
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-100">
+                        <User className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-xs font-bold text-slate-500">Admin: {schedule.adminName || 'Coordinator'}</span>
+                      </div>
+                      <button
+                        onClick={() => handleOpenApplications(schedule)}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50/50 hover:bg-indigo-100/50 border border-indigo-100/30 transition-colors group/btn"
                       >
-                         <MessageSquare className="w-5 h-5" />
-                         {(schedule.messages?.length || 0) > 0 && (
-                           <span className="absolute -top-1 -right-1 w-4 h-4 bg-indigo-600 text-white text-[9px] font-black rounded-full flex items-center justify-center ring-2 ring-white">
-                             {schedule.messages.length}
-                           </span>
-                         )}
+                        <User className="w-3.5 h-3.5 text-indigo-500 group-hover/btn:scale-110 transition-transform" />
+                        <span className="text-xs font-bold text-indigo-600">
+                          {schedule.applications?.length || 0} Candidates
+                        </span>
                       </button>
                     </div>
-
-                    {schedule.companyApprovalStatus === 'PENDING' ? (
-                      <div className="space-y-3">
-                        <Button
-                          disabled={statusLoading === schedule.id}
-                          onClick={() => handleUpdateStatus(schedule.id, 'APPROVED')}
-                          className="w-full py-7 bg-slate-900 hover:bg-black text-white rounded-[1.5rem] font-black text-sm uppercase tracking-widest shadow-xl shadow-slate-200"
-                        >
-                          {statusLoading === schedule.id ? <Loader2 className="animate-spin" /> : (
-                            <div className="flex items-center gap-3">
-                              <CheckCircle2 className="w-5 h-5 text-indigo-400" />
-                              Approve Schedule
-                            </div>
-                          )}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          disabled={statusLoading === schedule.id}
-                          onClick={() => { setSelectedSchedule(schedule); setIsRejectModalOpen(true); }}
-                          className="w-full py-7 border-slate-200 text-slate-400 hover:border-indigo-200 hover:text-indigo-600 hover:bg-indigo-50/50 rounded-[1.5rem] font-black text-sm uppercase tracking-widest transition-all"
-                        >
-                          Request Change
-                        </Button>
-                      </div>
-                    ) : schedule.companyApprovalStatus === 'APPROVED' ? (
-                      <div className="space-y-4">
-                        <div className="flex flex-col items-center gap-2 p-6 bg-emerald-50/50 rounded-[2rem] border border-emerald-100 text-emerald-700">
-                          <Check className="w-8 h-8 text-emerald-500 mb-1" />
-                          <span className="text-sm font-black uppercase tracking-widest">Approved</span>
-                          <span className="text-[10px] font-bold text-emerald-600/70">Confirmed by you</span>
-                        </div>
-                        <p className="text-center text-[11px] font-bold text-slate-400">
-                          This schedule is now confirmed and synced with student calendars.
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="space-y-4">
-                        <div className="flex flex-col items-center gap-2 p-6 bg-rose-50/50 rounded-[2rem] border border-rose-100 text-rose-700">
-                          <X className="w-8 h-8 text-rose-500 mb-1" />
-                          <span className="text-sm font-black uppercase tracking-widest">Rejected</span>
-                          <span className="text-[10px] font-bold text-rose-600/70">Wait for admin update</span>
-                        </div>
-                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                           <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Reason:</p>
-                           <p className="text-xs font-medium text-slate-600 italic">"{schedule.rejectionReason || 'Requires rescheduling'}"</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+                  </div> 
                 </div>
               </div>
             ))
@@ -354,8 +288,8 @@ const CompanyInterviewManager: React.FC = () => {
               <p className="text-slate-400 font-bold max-w-sm mx-auto">
                 We couldn't find any interview schedules matching your current filters or search query.
               </p>
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 onClick={() => { setFilterType('ALL'); setSearchQuery(''); }}
                 className="mt-8 text-indigo-600 font-black uppercase tracking-widest text-xs py-6 px-8 rounded-2xl hover:bg-indigo-50"
               >
@@ -368,94 +302,61 @@ const CompanyInterviewManager: React.FC = () => {
 
       {/* --- MODALS & DRAWERS --- */}
 
-      {/* Communication Drawer */}
-      {isNoteDrawerOpen && (
-        <div className="fixed inset-0 z-[100] flex justify-end">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity duration-500" onClick={() => setIsNoteDrawerOpen(false)} />
-          <div className="relative w-full max-w-lg bg-white shadow-2xl animate-in slide-in-from-right duration-500 flex flex-col rounded-l-[3rem] overflow-hidden">
-            
-            {/* Drawer Header */}
-            <div className="p-10 border-b border-slate-50 bg-white/80 backdrop-blur-md sticky top-0 z-10">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-600 flex items-center justify-center shadow-lg shadow-indigo-200">
-                    <MessageSquareQuote className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-black text-slate-800 tracking-tight">Messaging Hub</h2>
-                    <p className="text-slate-400 text-[10px] font-black uppercase tracking-widest">Direct communication with Admin</p>
-                  </div>
-                </div>
-                <button onClick={() => setIsNoteDrawerOpen(false)} className="p-3 bg-slate-50 hover:bg-slate-100 rounded-2xl transition-colors">
-                  <X className="w-5 h-5 text-slate-400" />
-                </button>
-              </div>
-              <div className="mt-6 flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                <div className="p-2 bg-white rounded-xl shadow-sm">
-                  <Calendar className="w-4 h-4 text-indigo-600" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-[10px] font-black text-slate-400 uppercase leading-none mb-1">Context</p>
-                  <p className="text-sm font-black text-slate-800 truncate">{activeSchedule?.title}</p>
-                </div>
-              </div>
-            </div>
 
-            {/* Chat Body */}
-            <div className="flex-1 overflow-y-auto p-10 space-y-10 scrollbar-hide">
-              {activeSchedule?.messages && activeSchedule.messages.length > 0 ? activeSchedule.messages.map((msg: any) => (
-                <div key={msg.id} className={`flex flex-col ${msg.isAdmin ? 'items-start' : 'items-end'} space-y-3`}>
-                  <div className={`flex items-center gap-2 ${msg.isAdmin ? 'flex-row' : 'flex-row-reverse'}`}>
-                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center text-[10px] text-white font-black ${msg.isAdmin ? 'bg-indigo-600 shadow-indigo-100' : 'bg-slate-900 shadow-slate-100'} shadow-lg`}>
-                      {msg.isAdmin ? 'A' : 'C'}
+
+      {/* Candidates Modal */}
+      <Modal
+        isOpen={isApplicationsModalOpen}
+        onClose={() => setIsApplicationsModalOpen(false)}
+        title="Candidate List"
+        subtitle={`Viewing all students scheduled for ${activeSchedule?.title}`}
+      >
+        <div className="space-y-6 pt-4 min-h-[400px]">
+          {appsLoading === activeSchedule?.id ? (
+            <div className="flex flex-col items-center justify-center py-20 space-y-4">
+              <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
+              <p className="text-slate-400 font-bold tracking-widest text-xs uppercase">Fetching Candidates...</p>
+            </div>
+          ) : activeSchedule?.applications && activeSchedule.applications.length > 0 ? (
+            <div className="space-y-3">
+              {activeSchedule.applications.map((app: any) => (
+                <div key={app.id} className="flex items-center justify-between p-5 bg-slate-50/50 border border-slate-100 rounded-3xl hover:bg-white hover:shadow-lg hover:shadow-slate-100 transition-all group">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-colors">
+                      <User className="w-6 h-6 text-slate-400 group-hover:text-indigo-600" />
                     </div>
-                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{msg.senderName}</span>
+                    <div>
+                      <p className="font-black text-slate-800">{app.student?.user?.name || app.studentName || 'Candidate'}</p>
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                        {app.student?.rollNumber || 'ID: #' + app.studentId} • {app.student?.department?.name || 'General'}
+                      </p>
+                    </div>
                   </div>
-                  
-                  <div className={`relative max-w-[85%] p-6 rounded-[2rem] shadow-sm border ${
-                    msg.isAdmin 
-                      ? 'bg-slate-50 border-slate-100 rounded-tl-none text-slate-700' 
-                      : 'bg-indigo-600 border-indigo-500 rounded-tr-none text-white'
-                  }`}>
-                    <p className="font-medium leading-relaxed">{msg.message}</p>
-                  </div>
-                  
-                  <span className="text-[9px] font-black text-slate-300 uppercase tracking-widest">
-                    {new Date(msg.createdAt).toLocaleString([], { hour: '2-digit', minute: '2-digit', day: '2-digit', month: 'short' })}
-                  </span>
+                  <Badge className="bg-white text-slate-600 border-slate-100 px-3 py-1 rounded-lg">
+                    {app.status || 'Scheduled'}
+                  </Badge>
                 </div>
-              )) : (
-                <div className="h-full flex flex-col items-center justify-center text-slate-200 gap-6 opacity-50 py-20">
-                  <div className="w-20 h-20 rounded-full border-4 border-dashed border-slate-100 flex items-center justify-center">
-                    <MessageSquare className="w-10 h-10" />
-                  </div>
-                  <p className="font-black text-sm uppercase tracking-widest">No messages exchanged yet</p>
-                </div>
-              )}
+              ))}
             </div>
-
-            {/* Input Area */}
-            <div className="p-8 bg-white border-t border-slate-50">
-              <div className="flex items-center gap-4 bg-slate-50 p-2.5 rounded-[2rem] border border-slate-100 focus-within:border-indigo-200 focus-within:ring-4 focus-within:ring-indigo-100/50 transition-all">
-                <input
-                  className="flex-1 bg-transparent px-6 py-4 outline-none text-sm font-bold text-slate-700 placeholder:text-slate-300"
-                  placeholder="Type your message to Admin..."
-                  value={replyMessage}
-                  onChange={(e) => setReplyMessage(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                />
-                <Button
-                  onClick={handleSendMessage}
-                  disabled={!replyMessage.trim()}
-                  className="bg-indigo-600 hover:bg-black w-14 h-14 rounded-full shadow-xl shadow-indigo-100 disabled:opacity-30 disabled:shadow-none transition-all"
-                >
-                  <Send className="w-5 h-5" />
-                </Button>
+          ) : (
+            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100">
+                <User className="w-8 h-8 text-slate-200" />
               </div>
+              <p className="text-slate-500 font-bold">No candidates found for this round.</p>
             </div>
+          )}
+
+          <div className="pt-6">
+            <Button
+              onClick={() => setIsApplicationsModalOpen(false)}
+              className="w-full py-7 bg-slate-900 hover:bg-black text-white rounded-[1.5rem] font-black text-sm uppercase tracking-widest"
+            >
+              Close View
+            </Button>
           </div>
         </div>
-      )}
+      </Modal>
 
       {/* Decline/Reschedule Modal */}
       <Modal
@@ -473,15 +374,15 @@ const CompanyInterviewManager: React.FC = () => {
               Rescheduling may impact overall timeline. Please provide a clear reasoning or preferred alternate slots.
             </p>
           </div>
-          
+
           <div className="space-y-3">
-             <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-2">Rejection Reason / Notes</label>
-             <textarea
-               className="w-full p-8 rounded-[2rem] border border-slate-100 bg-slate-50/50 focus:ring-4 focus:ring-indigo-500/10 min-h-[160px] outline-none transition-all font-bold text-slate-700 placeholder:text-slate-200 lg:text-lg"
-               placeholder="e.g., We need to shift this to 2 PM as our interviewers are coming from another campus..."
-               value={declineReason}
-               onChange={(e) => setDeclineReason(e.target.value)}
-             />
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-2">Rejection Reason / Notes</label>
+            <textarea
+              className="w-full p-8 rounded-[2rem] border border-slate-100 bg-slate-50/50 focus:ring-4 focus:ring-indigo-500/10 min-h-[160px] outline-none transition-all font-bold text-slate-700 placeholder:text-slate-200 lg:text-lg"
+              placeholder="e.g., We need to shift this to 2 PM as our interviewers are coming from another campus..."
+              value={declineReason}
+              onChange={(e) => setDeclineReason(e.target.value)}
+            />
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4 pt-2">
