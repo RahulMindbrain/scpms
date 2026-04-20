@@ -21,9 +21,9 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // This allows requests from localhost:5173
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allow certain methods
-    credentials: true, // Allow sending cookies (if needed)
+    origin: "http://localhost:5173", 
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true, 
   }),
 );
 
