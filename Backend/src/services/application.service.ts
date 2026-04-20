@@ -2,6 +2,7 @@ import prisma from "../config/db";
 import {
   createApplication,
   deleteApplication,
+  getApplicationById,
   getApplications,
   getApplicationsBySchedule,
   updateApplicationStatus,
@@ -39,9 +40,6 @@ export const createApplicationService = async (
 
   let application;
 
-  // =========================
-  // NOT ELIGIBLE CASE
-  // =========================
   if (job.minCgpa && student.cgpa && student.cgpa < job.minCgpa) {
     application = await createApplication({
       studentId: student.id,
@@ -50,25 +48,21 @@ export const createApplicationService = async (
       reason: "CGPA below requirement",
     });
 
-    return application; // ❌ no need to notify company
+    return application;
   }
 
-  // =========================
-  // NORMAL APPLY
-  // =========================
   application = await createApplication({
     studentId: student.id,
     jobId,
   });
 
-  // =========================
-  // 🔥 SOCKET EMIT (to company)
-  // =========================
   emitToUser(job.company.userId, SOCKET_EVENTS.NEW_APPLICATION, {
     applicationId: application.id,
     jobId,
     studentId: student.id,
-    studentName: student.user?.name, // if available
+    studentName: student.user
+      ? `${student.user.firstname} ${student.user.lastname ?? ""}`.trim()
+      : "Unknown",
   });
 
   return application;
@@ -100,7 +94,6 @@ export const getApplicationsService = async (
         throw new Error("Student not found");
       }
 
-      // ✅ FIX: assign properly
       enrichedUser.studentId = student.id;
     }
 
@@ -135,17 +128,31 @@ export const getScheduleApplicationsService = async (
 ) => {
   const applications = await getApplicationsBySchedule(scheduleId, page, limit);
 
-  // ✅ handle both cases safely
   if (Array.isArray(applications)) {
     if (applications.length === 0) {
       throw new Error("No applications found for this schedule");
     }
   } else {
     if (applications.data.length === 0) {
-      // ❗ DO NOT THROW for paginated
       return applications;
     }
   }
 
   return applications;
+};
+
+export const deleteApplicationService = async (id: number) => {
+  if (!id || isNaN(id)) {
+    throw new Error("Invalid application id");
+  }
+
+  const existing = await getApplicationById(id);
+
+  if (!existing) {
+    throw new Error("Application not found");
+  }
+
+  await deleteApplication(id);
+
+  return { deleted: true };
 };

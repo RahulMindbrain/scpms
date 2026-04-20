@@ -16,9 +16,6 @@ import {
 import { sendSuccess, sendError } from "../utils/response";
 import { getSchedulesByCompanyIdRepo } from "../repository/schedule.repository";
 
-// =======================================================
-// CREATE
-// =======================================================
 export const createScheduleController = async (req: Request, res: Response) => {
   try {
     const user = res.locals.user;
@@ -32,15 +29,16 @@ export const createScheduleController = async (req: Request, res: Response) => {
       createdBy: user.id,
     });
 
+    if (!schedule) {
+      return sendError(res, 400, "Failed to create schedule");
+    }
+
     return sendSuccess(res, 201, "Schedule created", schedule);
   } catch (error: any) {
     return sendError(res, 400, error.message);
   }
 };
 
-// =======================================================
-// GET ALL (ADMIN)
-// =======================================================
 export const getAllSchedulesController = async (
   _req: Request,
   res: Response,
@@ -53,9 +51,6 @@ export const getAllSchedulesController = async (
   }
 };
 
-// =======================================================
-// GET BY ID
-// =======================================================
 export const getScheduleByIdController = async (
   req: Request,
   res: Response,
@@ -71,9 +66,6 @@ export const getScheduleByIdController = async (
   }
 };
 
-// =======================================================
-// COMPANY SCHEDULES
-// =======================================================
 export const getCompanySchedulesController = async (
   req: Request,
   res: Response,
@@ -89,9 +81,6 @@ export const getCompanySchedulesController = async (
   }
 };
 
-// =======================================================
-// UPDATE
-// =======================================================
 export const updateScheduleController = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -104,9 +93,6 @@ export const updateScheduleController = async (req: Request, res: Response) => {
   }
 };
 
-// =======================================================
-// DELETE
-// =======================================================
 export const deleteScheduleController = async (req: Request, res: Response) => {
   try {
     const id = Number(req.params.id);
@@ -119,9 +105,6 @@ export const deleteScheduleController = async (req: Request, res: Response) => {
   }
 };
 
-// =======================================================
-// ADD JOBS
-// =======================================================
 export const addJobsController = async (req: Request, res: Response) => {
   try {
     const scheduleId = Number(req.params.id);
@@ -135,9 +118,6 @@ export const addJobsController = async (req: Request, res: Response) => {
   }
 };
 
-// =======================================================
-// REMOVE JOBS
-// =======================================================
 export const removeJobsController = async (req: Request, res: Response) => {
   try {
     const { jobIds } = req.body;

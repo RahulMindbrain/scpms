@@ -1,4 +1,4 @@
-import { JobStatus } from "@prisma/client";
+import { JobStatus, Prisma, Role } from "@prisma/client";
 import prisma from "../config/db";
 
 export const getAdminCount = async () => {
@@ -123,7 +123,7 @@ export const getJobs = async (params: {
 
   const where = {
     ...(status && { status }),
-    ...(companyId && { companyId }), // ✅ THIS WAS MISSING
+    ...(companyId && { companyId }),
   };
 
   const [data, total] = await Promise.all([
@@ -158,7 +158,7 @@ export const getStudents = async (params: {
   const skip = (safePage - 1) * safeLimit;
 
   const where = {
-    role: "STUDENT",
+    role: Role.STUDENT,
     ...(status && { status }),
   };
 
@@ -179,6 +179,12 @@ export const getStudents = async (params: {
             cgpa: true,
             year: true,
             passingYear: true,
+            department: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
       },
@@ -209,7 +215,7 @@ export const getCompanies = async (params: {
   const skip = (safePage - 1) * safeLimit;
 
   const where = {
-    role: "COMPANY",
+    role: Role.COMPANY,
     ...(status && { status }),
   };
 

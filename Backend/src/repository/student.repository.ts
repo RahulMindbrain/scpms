@@ -85,15 +85,22 @@ export const getStudentByUserId = async (userId: number) => {
       year: true,
       passingYear: true,
       resumeUrl: true,
-
+      projects: true,
+      isPlaced: true,
+      user: {
+        select: {
+          id: true,
+          firstname: true,
+          lastname: true,
+          email: true,
+        },
+      },
       department: {
         select: {
           id: true,
           name: true,
         },
       },
-
-      // ✅ ADD THESE
 
       skills: {
         select: {
@@ -134,21 +141,17 @@ export const getStudentByUserId = async (userId: number) => {
 
 export const updateStudent = async (userId: number, data: any) => {
   const {
-    // skills
     addSkillIds,
     removeSkillIds,
 
-    // experiences
     addExperiences,
     updateExperiences,
     deleteExperienceIds,
 
-    // projects
     addProjects,
     updateProjects,
     deleteProjectIds,
 
-    // certificates
     addCertificates,
     updateCertificates,
     deleteCertificateIds,
@@ -156,9 +159,6 @@ export const updateStudent = async (userId: number, data: any) => {
     ...rest
   } = data;
 
-  // =========================
-  // EXPERIENCE OPS
-  // =========================
   const experienceOps: any = {};
 
   if (addExperiences?.length) {
@@ -188,9 +188,6 @@ export const updateStudent = async (userId: number, data: any) => {
     };
   }
 
-  // =========================
-  // PROJECT OPS
-  // =========================
   const projectOps: any = {};
 
   if (addProjects?.length) {
@@ -216,9 +213,6 @@ export const updateStudent = async (userId: number, data: any) => {
     };
   }
 
-  // =========================
-  // CERTIFICATE OPS
-  // =========================
   const certificateOps: any = {};
 
   if (addCertificates?.length) {
@@ -254,14 +248,8 @@ export const updateStudent = async (userId: number, data: any) => {
     where: { userId },
 
     data: {
-      // =========================
-      // SCALAR (OVERWRITE)
-      // =========================
       ...rest,
 
-      // =========================
-      // SKILLS
-      // =========================
       ...(addSkillIds && {
         skills: {
           connect: addSkillIds.map((id: number) => ({ id })),
@@ -274,23 +262,14 @@ export const updateStudent = async (userId: number, data: any) => {
         },
       }),
 
-      // =========================
-      // EXPERIENCES
-      // =========================
       ...(Object.keys(experienceOps).length && {
         experiences: experienceOps,
       }),
 
-      // =========================
-      // PROJECTS
-      // =========================
       ...(Object.keys(projectOps).length && {
         projects: projectOps,
       }),
 
-      // =========================
-      // CERTIFICATES
-      // =========================
       ...(Object.keys(certificateOps).length && {
         certificates: certificateOps,
       }),
@@ -389,7 +368,6 @@ export const getInactiveStudentUsers = async (params: {
         status: true,
         createdAt: true,
 
-        // ✅ include student if exists
         student: {
           select: {
             id: true,
@@ -540,15 +518,12 @@ export const getEligibleUnplacedStudents = async (jobId: number) => {
 
   return prisma.student.findMany({
     where: {
-      // ✅ only unplaced
       isPlaced: false,
 
-      // ✅ department filter
       departmentId: {
         in: deptIds,
       },
 
-      // ✅ CGPA filter
       ...(job.minCgpa !== null && {
         cgpa: {
           gte: job.minCgpa,
@@ -561,7 +536,6 @@ export const getEligibleUnplacedStudents = async (jobId: number) => {
         },
       }),
 
-      // ✅ backlog filter
       ...(job.maxBacklogs !== null && {
         activeBacklogs: {
           lte: job.maxBacklogs,
@@ -587,11 +561,10 @@ export const markStudentPlaced = async (studentId: number) => {
 export const getEligibleUnplacedStudentsForJobs = async (jobIds: number[]) => {
   if (!jobIds.length) return [];
 
-  // 1. Fetch job eligibility data
   const jobs = await prisma.job.findMany({
     where: {
       id: { in: jobIds },
-      status: "APPROVED", // safety
+      status: "APPROVED",
     },
     select: {
       id: true,
@@ -605,7 +578,6 @@ export const getEligibleUnplacedStudentsForJobs = async (jobIds: number[]) => {
     throw new Error("No valid jobs found");
   }
 
-  // 2. Collect unique department IDs
   const departmentIds = [
     ...new Set(jobs.flatMap((job) => job.eligibleDepartments.map((d) => d.id))),
   ];
@@ -614,7 +586,6 @@ export const getEligibleUnplacedStudentsForJobs = async (jobIds: number[]) => {
     return [];
   }
 
-  // 3. Fetch students
   return prisma.student.findMany({
     where: {
       isPlaced: false,

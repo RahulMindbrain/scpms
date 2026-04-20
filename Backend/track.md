@@ -1,194 +1,346 @@
-==============================
-🚨 TYPESCRIPT ERROR REPORT
-==============================
+# 🚀 SCPMS BACKEND — COMPLETE ERROR FIX TRACKER
 
-TOTAL ERRORS: 64
+## 📊 SUMMARY
 
----
-
-## 📂 src/cloudinaryUploads/cloudinary.ts : 🟢
-
-- TS2769 → Invalid cloudinary config (env vars possibly undefined)
-- TS7006 → req implicitly has 'any'
-- TS7006 → res implicitly has 'any'
-- TS2345 → CLOUDINARY_API_SECRET possibly undefined
+- Total Errors: **68**
+- Goal: **0 errors**
+- Mode: Fix + tick ✅
 
 ---
 
-## 📂 src/controllers/admin.controller.ts :
+# ✅ LEGEND
 
-- TS2379 → page/limit/year/... undefined mismatch (5 occurrences)
-- TS2339 → updatedJobs.status does not exist (BatchPayload issue)
-- TS2339 → updatedJobs.id does not exist
-
----
-
-## 📂 src/controllers/job.controller.ts
-
-- TS18048 → parsedLimit possibly undefined
-- TS2379 → limit undefined mismatch in service call
+- [ ] Not done
+- [✅] Done
+- 🔥 Critical
+- ⚠️ Important
 
 ---
 
-## 📂 src/controllers/notification.controller.ts
+# 📁 1. AUTH SERVICE (1)
 
-- TS2304 → sendError not found
-- TS18046 → error (e) is of type unknown
+### src/auth/auth.service.ts
 
----
+- [✅ ] Fix Date comparison 🔥
 
-## 📂 src/controllers/schedule.controller.ts
-
-- TS2345 → schedule can be null but expected object
-
----
-
-## 📂 src/middlewares/queryLogger.ts
-
-- TS2345 → prisma.$on("query") invalid type
-- TS2339 → prisma.$off does not exist
+```ts
+now.getTime() < new Date(user.otpExpiry).getTime();
+```
 
 ---
 
-## 📂 src/middlewares/validate.ts
+# 📁 2. APPLICATION CONTROLLER (3)
 
-- TS2724 → AnyZodObject not found (Zod v4 issue)
-- TS7006 → e implicitly any
+### src/controllers/application.controller.ts
 
----
+- [ ✅ ] Remove wrong import `deleteApplicationService`
+- [ ✅ ] Add types to req/res 🔥
 
-## 📂 src/repository/admin.repository.ts
+```ts
+import { Request, Response } from "express";
+```
 
-- TS2304 → JobStatus not found
-- TS2375 → role: string not assignable to Prisma enum (4 occurrences)
-- TS2503 → Prisma namespace not found
-
----
-
-## 📂 src/repository/company.repository.ts
-
-- TS2375 → description: string | undefined not assignable to string | null
-- TS2503 → Prisma namespace not found
+- [✅ ] Fix controller signature
 
 ---
 
-## 📂 src/repository/schedule.repository.ts
+# 📁 3. JOB CONTROLLER (2)
 
-- TS2375 → status: string not assignable to ScheduleStatus enum
+### src/controllers/job.controller.ts
 
----
+- [✅ ] Handle undefined limit
 
-## 📂 src/repository/user.repository.ts
+```ts
+const safeLimit = parsedLimit ?? 10;
+```
 
-- TS2375 → lastname: string | undefined not assignable to string | null
-
----
-
-## 📂 src/services/admin.service.ts
-
-- TS2724 → getInactiveStudents not exported
-- TS2379 → year/passingYear undefined mismatch
-- TS2379 → status undefined mismatch
-- TS2345 → JobStatus mismatch (PENDING not allowed)
-- TS2345 → jobIds[0] possibly undefined
+- [✅ ] Fix param type mismatch ⚠️
 
 ---
 
-## 📂 src/services/application.service.ts
+# 📁 4. NOTIFICATION CONTROLLER (2)
 
-- TS2339 → student.user does not exist
+### src/controllers/notification.controller.ts
 
----
+- [ ✅] Import `sendError`
+- [ ✅] Fix catch type
 
-## 📂 src/services/job.service.ts
-
-- TS2379 → status undefined mismatch
-
----
-
-## 📂 src/services/mail.service.ts
-
-- TS2353 → fromName not allowed in MailOptions (2 occurrences)
+```ts
+catch (e: any)
+```
 
 ---
 
-## 📂 src/services/notification.service.ts
+# 📁 5. SCHEDULE CONTROLLER (1)
 
-- TS2305 → getJobBasicDetails not exported
-- TS2305 → getUnplacedStudents not exported
-- TS2339 → SOCKET_EVENTS.NEW_JOB does not exist
+### src/controllers/schedule.controller.ts
 
----
+- [✅ ] Handle null response
 
-## 📂 src/services/schedule.service.ts
-
-- TS2379 → venue: string | undefined not assignable to string
+```ts
+if (!schedule) return sendError(res, 404, "Not found");
+```
 
 ---
 
-## 📂 src/services/student.service.ts
+# 📁 6. SCHEDULE MESSAGE CONTROLLER (1)
 
-- TS7006 → id implicitly any (2 occurrences)
-- TS2339 → student.isPlaced does not exist
+### src/controllers/schedule.message.controller.ts
 
----
-
-## 📂 src/utils/parseTTL.ts
-
-- TS2532 → match[2] possibly undefined
+- [ ✅] Fix wrong import name
 
 ---
 
-## 📂 src/utils/tokenGeneration.ts
+# 📁 7. QUERY LOGGER (2)
 
-- TS2769 → jwt.sign overload mismatch (2 occurrences)
-- TS2412 → expiresIn undefined issue (2 occurrences)
+### src/middlewares/queryLogger.ts
 
----
+- [ ✅ ] Fix Prisma `$on` typing
 
-## 📂 src/validators/auth.validator.ts
+```ts
+(prisma as any).$on("query", handler);
+```
 
-- TS2769 → required_error not valid (Zod v4) (4 occurrences)
-
----
-
-## 📂 src/validators/company.validators.ts
-
-- TS2769 → required_error not valid
+- [ ✅] Remove/ignore `$off`
 
 ---
 
-## 📂 src/validators/job.validator.ts
+# 📁 8. VALIDATE MIDDLEWARE (2)
 
-- TS2769 → required_error not valid (3 occurrences)
-- TS2353 → invalid_type_error not valid (5 occurrences)
+### src/middlewares/validate.ts
 
-==================================
-🧠 ROOT CAUSES (IMPORTANT)
-==================================
+- [✅ ] Replace import
 
-1. exactOptionalPropertyTypes = true → causing majority errors
-2. Zod v4 breaking changes → all validator errors
-3. Prisma strict typing (null vs undefined, enums)
-4. Missing imports / wrong exports
-5. ENV variables not validated (string | undefined issues)
+```ts
+import { ZodObject } from "zod";
+```
 
-==================================
-🚨 IMPACT
-==================================
+- [ ✅ ] Fix implicit any in map
 
-❌ Build is NOT reliable  
-❌ dist output may be broken/incomplete  
-❌ Runtime crashes likely
+---
 
-==================================
-✅ PRIORITY FIX ORDER
-==================================
+# 📁 9. ADMIN REPOSITORY (6)
 
-1. Disable exactOptionalPropertyTypes OR fix undefined handling
-2. Fix Zod validators (remove required_error, invalid_type_error)
-3. Fix Prisma enum + null issues
-4. Fix missing imports/exports
-5. Fix ENV variable typing
+### src/repository/admin.repository.ts
 
-==================================
+- [ ✅ ] Replace string role with enum 🔥
+- [✅ ] Fix where type mismatch
+- [✅ ] Import Prisma
+
+```ts
+import { Prisma } from "@prisma/client";
+```
+
+- [ ✅ ] Fix all 4 occurrences of role mismatch
+
+---
+
+# 📁 10. COMPANY REPOSITORY (2)
+
+### src/repository/company.repository.ts
+
+- [✅ ] Fix undefined → null 🔥
+
+```ts
+description: description ?? null;
+```
+
+- [✅ ] Import Prisma namespace
+
+---
+
+# 📁 11. SCHEDULE REPOSITORY (1)
+
+### src/repository/schedule.repository.ts
+
+- [ ✅] Fix enum type mismatch
+
+---
+
+# 📁 12. USER REPOSITORY (1)
+
+### src/repository/user.repository.ts
+
+- [✅ ] Fix undefined → null
+
+```ts
+lastname: lastname ?? null;
+```
+
+---
+
+# 📁 13. ADMIN SERVICE (6)
+
+### src/services/admin.service.ts
+
+- [ ✅ ] Fix wrong import
+- [ ✅ ] Handle undefined params (3 places) 🔥
+- [ ✅ ] Fix enum mismatch
+- [ ✅ ] Fix undefined id
+
+---
+
+# 📁 14. APPLICATION SERVICE (1)
+
+### src/services/application.service.ts
+
+- [ ✅ ] Fix `student.user` access
+  👉 either include in select OR remove
+
+---
+
+# 📁 15. JOB SERVICE (1)
+
+### src/services/job.service.ts
+
+- [✅ ] Fix optional param mismatch
+
+---
+
+# 📁 16. MAIL SERVICE (2)
+
+### src/services/mail/mail.service.ts
+
+- [✅ ] Remove `fromName` OR extend type (2 places)
+
+---
+
+# 📁 17. NOTIFICATION SERVICE (2)
+
+### src/services/notification.service.ts
+
+- [ ✅] Fix missing export (job repo)
+- [✅ ] Fix missing export (student repo)
+
+---
+
+# 📁 18. SCHEDULE MESSAGE SERVICE (1)
+
+### src/services/schedule.message.service.ts
+
+- [ ✅ ] Fix union type mismatch
+
+---
+
+# 📁 19. SCHEDULE SERVICE (4)
+
+### src/services/schedule.service.ts
+
+- [✅ ] Add type to `data` (2 places)
+- [ ✅] Fix invalid property
+- [ ✅] Fix null assignment
+
+---
+
+# 📁 20. STUDENT SERVICE (3)
+
+### src/services/student.service.ts
+
+- [✅ ] Fix implicit any (2)
+- [ ✅ ] Fix missing `isPlaced`
+
+---
+
+# 📁 21. MAIL UTILS (6)
+
+### src/utils/mails/\*
+
+- [✅ ] Add types to all params (5+ places)
+- [ ✅] Fix invalid property (`to`)
+
+---
+
+# 📁 22. PARSE TTL (1)
+
+### src/utils/parseTTL.ts
+
+- [✅ ] Fix possibly undefined
+
+```ts
+if (!match) return null;
+```
+
+---
+
+# 📁 23. TOKEN GENERATION (4)
+
+### src/utils/tokenGeneration.ts
+
+- [ ✅] Fix JWT typing (2)
+- [ ✅] Fix expiresIn (2) 🔥
+
+```ts
+expiresIn: process.env.JWT_ACCESS_TTL as string;
+```
+
+---
+
+# 📁 24. VALIDATORS (15 🔥🔥🔥)
+
+### src/validators/\*
+
+- [✅ ] Replace ALL required_error
+
+```ts
+.string().min(1, "Required")
+```
+
+- [ ✅] Replace invalid_type_error
+
+```ts
+.number()
+```
+
+- [✅ ] Fix all validator files
+
+---
+
+# 📊 CATEGORY PROGRESS
+
+| Category      | Status |
+| ------------- | ------ |
+| Auth          | [ ]    |
+| Controllers   | [ ]    |
+| Middleware    | [ ]    |
+| Repositories  | [ ]    |
+| Services      | [ ]    |
+| Utils         | [ ]    |
+| Validators 🔥 | [ ]    |
+
+---
+
+# 🎯 FINAL CHECKLIST
+
+- [ ] Errors = 0
+- [ ] Server runs
+- [ ] Prisma queries working
+- [ ] OTP flow working
+- [ ] Pagination working
+
+---
+
+# 📈 PROGRESS TRACKER
+
+- Completed: \_\_\_ / 68
+- Remaining: \_\_\_
+- Last Updated: \***\*\_\_\*\***
+
+---
+
+# 🧠 RULES (DON’T BREAK THESE)
+
+- ❗ Prisma → use `null`, NOT `undefined`
+- ❗ Collections → NEVER throw errors
+- ❗ Always type `req, res`
+- ❗ Use enums, NOT strings
+- ❗ Fix validators first (removes ~15 errors instantly)
+
+---
+
+# 🏁 STATUS
+
+👉 Project Health: ⬜ Broken / ⬜ Partial / ⬜ Stable / ⬜ Production Ready
+
+---
+
+35 remaining

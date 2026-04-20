@@ -1,6 +1,10 @@
 import { sendEmailService } from "../../services/mail/mail.service";
 
-export const triggerScheduleEmail = async (schedule, senderId, message) => {
+export const triggerScheduleEmail = async (
+  schedule: any,
+  senderId: number,
+  message: string,
+) => {
   const isAdmin = schedule.createdBy === senderId;
 
   const recipient = isAdmin
@@ -8,8 +12,8 @@ export const triggerScheduleEmail = async (schedule, senderId, message) => {
     : schedule.admin.user.email;
 
   await sendEmailService({
-    to: recipient,
+    recipients: recipient,
     subject: `Schedule Discussion: ${schedule.title}`,
-    body: message,
+    message,
   });
 };

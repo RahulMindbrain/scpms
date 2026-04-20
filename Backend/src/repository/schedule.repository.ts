@@ -1,8 +1,6 @@
+import { ScheduleStatus } from "@prisma/client";
 import prisma from "../config/db";
 
-// =======================================================
-// 🔹 BASE INCLUDE (REUSABLE)
-// =======================================================
 const baseScheduleInclude = {
   company: {
     select: {
@@ -126,7 +124,7 @@ export const updateSchedule = async (
     startTime: Date;
     endTime: Date;
     venue: string;
-    status: string;
+    status: ScheduleStatus;
   }>,
 ) => {
   return prisma.interviewSchedule.update({
@@ -261,7 +259,7 @@ export const updateScheduleApprovalStatus = async (
     companyApprovalStatus: "APPROVED" | "REJECTED";
     approvedAt?: Date;
     rejectedAt?: Date;
-    rejectionReason?: string;
+    rejectionReason?: string | null;
   },
 ) => {
   return prisma.interviewSchedule.update({

@@ -1,5 +1,5 @@
 import {
-  getJobBasicDetails,
+  //getJobBasicDetails,
   getJobDisplayDetails,
 } from "../repository/job.repository";
 import {
@@ -10,7 +10,7 @@ import {
 } from "../repository/notification.repository";
 import {
   getEligibleUnplacedStudents,
-  getUnplacedStudents,
+  //getUnplacedStudents,
 } from "../repository/student.repository";
 import { emitToUsers } from "../socket";
 import { SOCKET_EVENTS } from "../socket.event";
@@ -38,7 +38,6 @@ export const notifyEligibleStudentsForJob = async (
   customSubject?: string,
   customMessage?: string,
 ) => {
-  // ✅ 1. fetch eligible students
   const students = await getEligibleUnplacedStudents(jobId);
 
   if (!students.length) return 0;
@@ -46,7 +45,6 @@ export const notifyEligibleStudentsForJob = async (
   const emails = students.map((s) => s.user.email);
   const userIds = students.map((s) => s.userId);
 
-  // ✅ 2. fetch job details
   const job = await getJobDisplayDetails(jobId);
 
   const subject =
@@ -62,9 +60,6 @@ export const notifyEligibleStudentsForJob = async (
       <p>Login to your dashboard and apply now.</p>
     `;
 
-  // =========================
-  // 🔥 SOCKET (REAL-TIME)
-  // =========================
   emitToUsers(userIds, SOCKET_EVENTS.NEW_JOB, {
     jobId,
     title: job?.title,
@@ -72,9 +67,6 @@ export const notifyEligibleStudentsForJob = async (
     location: job?.location,
   });
 
-  // =========================
-  // 📧 EMAIL (FALLBACK)
-  // =========================
   await sendEmailService({
     recipients: emails,
     subject,

@@ -1,4 +1,41 @@
-export const resolveParticipants = (schedule) => {
+type Participants = {
+  adminId: number;
+  adminEmail: string;
+  adminName: string;
+
+  companyUserId: number;
+  companyEmail: string;
+  companyName: string;
+};
+
+type SenderRole = "ADMIN" | "COMPANY";
+
+type DirectionResult = {
+  senderRole: SenderRole;
+  senderName: string;
+  recipientEmail: string;
+};
+
+type ScheduleWithParticipants = {
+  createdBy: number;
+  admin: {
+    user: {
+      email: string;
+      firstname: string;
+    };
+  };
+  company: {
+    userId: number;
+    user: {
+      email: string;
+    };
+    name: string;
+  };
+};
+
+export const resolveParticipants = (
+  schedule: ScheduleWithParticipants,
+): Participants => {
   return {
     adminId: schedule.createdBy,
     adminEmail: schedule.admin.user.email,
@@ -10,7 +47,10 @@ export const resolveParticipants = (schedule) => {
   };
 };
 
-export const resolveDirection = (senderId, participants) => {
+export const resolveDirection = (
+  senderId: number,
+  participants: Participants,
+): DirectionResult => {
   if (senderId === participants.adminId) {
     return {
       senderRole: "ADMIN",

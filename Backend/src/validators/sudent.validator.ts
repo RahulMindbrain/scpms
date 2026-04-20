@@ -73,15 +73,9 @@ export const updateStudentSchema = z
     githubUrl: z.string().url().nullable().optional(),
     portfolioUrl: z.string().url().nullable().optional(),
 
-    // =========================
-    // SKILLS
-    // =========================
     addSkillIds: z.array(z.number().int().positive()).optional(),
     removeSkillIds: z.array(z.number().int().positive()).optional(),
 
-    // =========================
-    // EXPERIENCES
-    // =========================
     addExperiences: z
       .array(
         z.object({
@@ -109,9 +103,6 @@ export const updateStudentSchema = z
 
     deleteExperienceIds: z.array(z.number().int().positive()).optional(),
 
-    // =========================
-    // PROJECTS
-    // =========================
     addProjects: z
       .array(
         z.object({
@@ -139,9 +130,6 @@ export const updateStudentSchema = z
 
     deleteProjectIds: z.array(z.number().int().positive()).optional(),
 
-    // =========================
-    // CERTIFICATES
-    // =========================
     addCertificates: z
       .array(
         z.object({
@@ -185,3 +173,7 @@ export const updateStudentSchema = z
       });
     }
   });
+
+export type UpdateStudentInput = z.infer<typeof updateStudentSchema>;
+
+export type CreateStudentInput = z.infer<typeof createStudentSchema>;

@@ -17,11 +17,9 @@ export const attachQueryLogger = (
     console.log("Duration:", e.duration, "ms");
   };
 
-  prisma.$on("query", handler);
+  (prisma as any).$on("query", handler);
 
   res.on("finish", () => {
-    prisma.$off("query", handler);
-
     console.log(`🧠 Total DB queries: ${queryCount}`);
   });
 

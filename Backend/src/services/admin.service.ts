@@ -14,7 +14,7 @@ import {
 import { hashPassword } from "../utils/hashPassword";
 import {
   getDeptWiseStats,
-  getInactiveStudents,
+  // getInactiveStudents,
   getInactiveStudentUsers,
   getSalaryDataRepo,
   getTotalPlacedStudentsRepo,
@@ -142,17 +142,25 @@ export const getActiveStudentsService = async (params: {
   if (finalLimit < 1) finalLimit = DEFAULT_LIMIT;
   if (finalLimit > MAX_LIMIT) finalLimit = MAX_LIMIT;
 
-  // ✅ optional rule (recommended)
-  if (params.year === undefined && params.passingYear === undefined) {
-    throw new Error("Either year or passingYear must be provided");
-  }
-
-  return getActiveStudentsByYear({
+  const query: {
+    page: number;
+    limit: number;
+    year?: number;
+    passingYear?: number;
+  } = {
     page: finalPage,
     limit: finalLimit,
-    year: params.year,
-    passingYear: params.passingYear,
-  });
+  };
+
+  if (params.year !== undefined) {
+    query.year = params.year;
+  }
+
+  if (params.passingYear !== undefined) {
+    query.passingYear = params.passingYear;
+  }
+
+  return getActiveStudentsByYear(query);
 };
 
 export const getInactiveStudentsService = async (params: {
@@ -191,11 +199,20 @@ export const getCompaniesService = async (params: {
   if (limit < 1) limit = DEFAULT_LIMIT;
   if (limit > MAX_LIMIT) limit = MAX_LIMIT;
 
-  return getCompanies({
+  const query: {
+    page: number;
+    limit: number;
+    status?: "ACTIVE" | "INACTIVE";
+  } = {
     page,
     limit,
-    status: params.status,
-  });
+  };
+
+  if (params.status !== undefined) {
+    query.status = params.status;
+  }
+
+  return getCompanies(query);
 };
 
 export const activateUsersService = async (userIds: number[]) => {
@@ -255,19 +272,18 @@ export const updateJobStatusByAdminService = async (
   status: JobStatus,
   adminId: number,
 ) => {
-  // ✅ Validate status
-  if (![JobStatus.APPROVED, JobStatus.REJECTED].includes(status)) {
+  if (
+    !([JobStatus.APPROVED, JobStatus.REJECTED] as JobStatus[]).includes(status)
+  ) {
     throw new Error("Invalid status. Only APPROVED or REJECTED allowed");
   }
 
-  // ✅ Fetch jobs via repository
   const jobs = await getJobsByIds(jobIds);
 
   if (!jobs.length) {
     throw new Error("No jobs found");
   }
 
-  // ✅ Validate all are PENDING
   const invalidJobs = jobs.filter((job) => job.status !== JobStatus.PENDING);
 
   if (invalidJobs.length) {
@@ -276,12 +292,10 @@ export const updateJobStatusByAdminService = async (
     );
   }
 
-  // ✅ Single vs Bulk handling
   if (jobIds.length === 1) {
-    return updateJobStatus(jobIds[0], status, adminId);
+    return updateJobStatus(jobIds[0]!, status, adminId);
   }
 
-  // ✅ Bulk
   return updateJobStatusBulk(jobIds, status, adminId);
 };
 
@@ -404,13 +418,22 @@ export const getJobsByCompanyIdServices = async (params: {
   status?: JobStatus;
 }) => {
   try {
-    const jobs = await getJobs({
+    const query: {
+      page: number;
+      limit: number;
+      status?: JobStatus;
+      companyId: number;
+    } = {
       page: params.page,
       limit: params.limit,
-      status: params.status,
       companyId: params.companyId,
-    });
+    };
 
+    if (params.status !== undefined) {
+      query.status = params.status;
+    }
+
+    const jobs = await getJobs(query);
     return jobs;
   } catch (error: any) {
     console.log(error);

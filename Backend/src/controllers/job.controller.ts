@@ -43,27 +43,20 @@ export const getJobsController = async (req: Request, res: Response) => {
       return sendError(res, 401, "Unauthorized");
     }
 
-    // ✅ SAFE DESTRUCTURING
     const { page, limit, status, companyId: queryCompanyId } = req.query || {};
     const bodyCompanyId = req.body?.companyId;
 
     let companyId: number | undefined;
 
-    // 🔥 COMPANY USER → force own company
     if (user.role === "COMPANY") {
       const company = await getCompanyByUserId(user.id);
-      console.log("company", company);
 
       if (!company) {
         return sendError(res, 404, "Company not found");
       }
 
       companyId = company.id;
-      console.log("companyId", companyId);
-    }
-
-    // 🔥 ADMIN → can pass companyId (query OR body)
-    else if (user.role === "ADMIN") {
+    } else if (user.role === "ADMIN") {
       const incomingCompanyId = queryCompanyId || bodyCompanyId;
 
       if (incomingCompanyId) {
@@ -74,11 +67,9 @@ export const getJobsController = async (req: Request, res: Response) => {
         }
 
         companyId = company.id;
-        console.log("companyId", companyId);
       }
     }
 
-    // ✅ Pagination parsing
     const parsedPage = page === undefined ? 1 : Number(page);
 
     if (!Number.isFinite(parsedPage) || parsedPage < 1) {
@@ -88,27 +79,41 @@ export const getJobsController = async (req: Request, res: Response) => {
     const parsedLimit = limit === undefined ? undefined : Number(limit);
 
     if (
-      limit !== undefined &&
+      parsedLimit !== undefined &&
       (!Number.isFinite(parsedLimit) || parsedLimit < 1)
     ) {
       return sendError(res, 400, "Invalid limit");
     }
 
-    companyId;
-    const data = await getJobsService({
+    const params: {
+      page?: number;
+      limit?: number;
+      status?: "PENDING" | "APPROVED" | "REJECTED";
+      companyId?: number;
+    } = {
       page: parsedPage,
-      limit: parsedLimit,
-      status: status as any,
-      companyId,
-    });
-    console.log(data);
+    };
+
+    if (parsedLimit !== undefined) {
+      const safeLimit = parsedLimit;
+      params.limit = safeLimit;
+    }
+
+    if (status) {
+      params.status = status as "PENDING" | "APPROVED" | "REJECTED";
+    }
+
+    if (companyId !== undefined) {
+      params.companyId = companyId;
+    }
+
+    const data = await getJobsService(params);
 
     return sendSuccess(res, 200, "Jobs fetched", data);
   } catch (error: any) {
     return sendError(res, 400, error.message);
   }
 };
-
 export const updateJobController = async (req: Request, res: Response) => {
   const { id } = req.params;
   const data = await updateJobService(Number(id), req.body);

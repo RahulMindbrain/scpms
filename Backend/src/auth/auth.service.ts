@@ -108,7 +108,6 @@ export const forgotPasswordService = async (email: string) => {
 
   const now = new Date();
 
-  // block resend if still valid
   if (
     user.otp &&
     user.otpExpiry &&
@@ -125,7 +124,6 @@ export const forgotPasswordService = async (email: string) => {
 
   const updated = await storeOtpByUserId(user.id, hashedOtp, OTP_EXPIRY);
 
-  // ✅ send email
   await sendOtpEmail(user.email, otp);
 
   return {
@@ -140,7 +138,11 @@ export const resendOtpService = async (email: string) => {
 
   const now = new Date();
 
-  if (user.otp && user.otpExpiry && now.getTime() < user.otpExpiry) {
+  if (
+    user.otp &&
+    user.otpExpiry &&
+    now.getTime() < new Date(user.otpExpiry).getTime()
+  ) {
     throw new Error("OTP still valid. Cannot resend yet.");
   }
 
@@ -152,7 +154,7 @@ export const resendOtpService = async (email: string) => {
 
   const updated = await storeOtpByUserId(user.id, hashedOtp, OTP_EXPIRY);
 
-  // TODO: send email with `otp`
+  await sendOtpEmail(user.email, otp);
 
   return {
     message: "OTP resent",
@@ -171,7 +173,6 @@ export const verifyOtpService = async (email: string, inputOtp: string) => {
     throw new Error("OTP not found");
   }
 
-  // 👇 force correct type (cleanest minimal fix)
   const expiry = new Date(otpExpiry);
 
   if (Date.now() > expiry.getTime()) {
@@ -202,7 +203,7 @@ export const resetPasswordService = async (
   const hashedPassword = await bcrypt.hash(newPassword, 10);
 
   await updatePasswordById(user.id, hashedPassword);
-  await clearOtp(user.id); // clears otp + resets counters
+  await clearOtp(user.id);
 
   return { message: "Password reset successful" };
 };

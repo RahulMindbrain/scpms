@@ -18,25 +18,25 @@ export const adminSchema = z.object({
 
 export const loginSchema = z.object({
   email: z
-    .string({ required_error: "Email is required" })
+    .string({ message: "Email is required" })
     .email("Invalid email format")
     .trim()
     .toLowerCase(),
 
   password: z
-    .string({ required_error: "Password is required" })
+    .string({ message: "Password is required" })
     .min(6, "Password must be at least 6 characters"),
 });
 
 export const updateUserSchema = z
   .object({
     firstname: z
-      .string({ required_error: "Firstname is required" })
+      .string({ message: "Firstname is required" })
       .min(2, "Firstname must be at least 2 characters")
       .optional(),
 
     lastname: z
-      .string({ required_error: "Lastname is required" })
+      .string({ message: "Lastname is required" })
       .min(2, "Lastname must be at least 2 characters")
       .optional(),
   })

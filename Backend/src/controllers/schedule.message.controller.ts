@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { sendError, sendSuccess } from "../utils/response";
 import {
   getScheduleMessagesService,
-  getScheduleMessagesServices,
   sendScheduleMessageService,
 } from "../services/schedule.message.service";
 

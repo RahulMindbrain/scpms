@@ -51,7 +51,6 @@ export const getApplicationsController = async (
       status: req.query.status as any,
     };
 
-    // ✅ Pagination params
     const page = req.query.page ? Number(req.query.page) : 1;
     const limit = req.query.limit ? Number(req.query.limit) : 10;
 
@@ -86,7 +85,10 @@ export const deleteApplicationController = async (
   return sendSuccess(res, 200, "Application deleted");
 };
 
-export const getScheduleApplicationsController = async (req, res) => {
+export const getScheduleApplicationsController = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     const scheduleId = Number(req.params.id);
 
