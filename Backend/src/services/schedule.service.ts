@@ -21,7 +21,11 @@ import { getJobsByIds } from "../repository/job.repository";
 import { sendInterviewNotificationEmail } from "./mail/mail.notify.service";
 import { getAppliedStudentsForJobs } from "../repository/student.repository";
 import { sendScheduleDiscussionEmail } from "./mail/mail.schedule.service";
-import { ScheduleStatus } from "@prisma/client";
+import { NotificationType, ScheduleStatus } from "@prisma/client";
+import { createManyNotifications } from "../repository/notification.repository";
+import { runInBackground } from "../utils/Background.task";
+import { emitToUsers } from "../socket";
+import { SOCKET_EVENTS } from "../socket.event";
 
 type CreateInterviewScheduleInput = {
   title: string;
@@ -64,10 +68,9 @@ export const createInterviewScheduleService = async (
   }
 
   const conflict = await checkScheduleConflict(start, end, companyId, venue);
-
   if (conflict) throw new Error("Schedule conflict");
 
-  return createScheduleWithJobs(
+  const schedule = await createScheduleWithJobs(
     {
       title: data.title,
       companyId,
@@ -75,11 +78,44 @@ export const createInterviewScheduleService = async (
       endTime: end,
       ...(venue && { venue }),
       createdBy,
-      //status: ScheduleStatus.SCHEDULED,
-      //companyApprovalStatus: "PENDING",
     },
     jobIds,
   );
+
+  if (!schedule) {
+    throw new Error("Failed to create schedule");
+  }
+
+  runInBackground(async () => {
+    try {
+      const applications = await getAppliedStudentsForJobs(jobIds);
+
+      const userIds = [
+        ...new Set(applications.map((app) => app.student.user.id)),
+      ];
+
+      if (!userIds.length) return;
+
+      emitToUsers(userIds, SOCKET_EVENTS.SCHEDULE_CREATED, {
+        scheduleId: schedule.id,
+        title: schedule.title,
+        startTime: schedule.startTime,
+      });
+
+      await createManyNotifications(
+        userIds.map((userId) => ({
+          userId,
+          title: "Interview Scheduled",
+          message: `Interview scheduled for ${schedule.title}`,
+          type: NotificationType.SCHEDULE_CREATED,
+        })),
+      );
+    } catch (err) {
+      console.error("Schedule notification failed", err);
+    }
+  });
+
+  return schedule;
 };
 
 export const getAllSchedulesService = async () => {
@@ -300,6 +336,7 @@ export const updateScheduleApprovalService = async (
         map.set(email, {
           email,
           firstname: student.user.firstname,
+          userId: student.user.id,
         });
       }
     }
@@ -312,6 +349,29 @@ export const updateScheduleApprovalService = async (
       rejectionReason: null,
     });
 
+    runInBackground(async () => {
+      try {
+        const userIds = students.map((s) => s.userId);
+
+        if (!userIds.length) return;
+
+        emitToUsers(userIds, SOCKET_EVENTS.SCHEDULE_APPROVED, {
+          scheduleId,
+          title: schedule.title,
+        });
+
+        await createManyNotifications(
+          userIds.map((userId) => ({
+            userId,
+            title: "Schedule Approved",
+            message: `Interview schedule approved for ${schedule.title}`,
+            type: NotificationType.SCHEDULE_APPROVED,
+          })),
+        );
+      } catch (err) {
+        console.error("Schedule approval notification failed", err);
+      }
+    });
     if (students.length) {
       sendInterviewNotificationEmail({
         students,
@@ -341,9 +401,6 @@ export const getSchedulesForUserService = async (
 ) => {
   let companyId: number;
 
-  // =========================
-  // COMPANY FLOW
-  // =========================
   if (role === "COMPANY") {
     const company = await getCompanyByUserId(userId);
 
@@ -352,12 +409,7 @@ export const getSchedulesForUserService = async (
     }
 
     companyId = company.id;
-  }
-
-  // =========================
-  // ADMIN FLOW
-  // =========================
-  else if (role === "ADMIN") {
+  } else if (role === "ADMIN") {
     if (!companyIdFromQuery) {
       throw new Error("companyId is required for admin");
     }
@@ -369,7 +421,6 @@ export const getSchedulesForUserService = async (
 
   const schedules = await getSchedulesByCompanyIdRepo(companyId);
 
-  // 🔥 format for frontend
   return schedules.map((s) => ({
     id: s.id,
     title: s.title,

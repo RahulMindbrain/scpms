@@ -1,3 +1,4 @@
+import { NotificationType } from "@prisma/client";
 import prisma from "../config/db";
 import {
   createApplication,
@@ -15,6 +16,7 @@ import {
 import { getStudentByUserId } from "../repository/student.repository";
 import { emitToUser } from "../socket";
 import { SOCKET_EVENTS } from "../socket.event";
+import { createNotification } from "../repository/notification.repository";
 
 export const createApplicationService = async (
   userId: number,
@@ -63,6 +65,15 @@ export const createApplicationService = async (
     studentName: student.user
       ? `${student.user.firstname} ${student.user.lastname ?? ""}`.trim()
       : "Unknown",
+  });
+
+  await createNotification({
+    userId: job.company.userId,
+    title: "New Application",
+    message: `New application received for ${job.title}`,
+    type: NotificationType.APPLICATION_SUBMITTED,
+    // entityId: application.id,
+    //entityType: "APPLICATION",
   });
 
   return application;
@@ -117,6 +128,28 @@ export const updateApplicationService = async (id: number, status: any) => {
       jobTitle: application.job.title,
     },
   );
+
+  try {
+    if (status === "SELECTED") {
+      await createNotification({
+        userId: application.student.userId,
+        title: "Application Selected",
+        message: `You have been shortlisted for ${application.job.title}`,
+        type: NotificationType.APPLICATION_SELECTED,
+      });
+    }
+
+    if (status === "REJECTED") {
+      await createNotification({
+        userId: application.student.userId,
+        title: "Application Update",
+        message: `Your application was not selected for ${application.job.title}`,
+        type: NotificationType.APPLICATION_REJECTED,
+      });
+    }
+  } catch (err) {
+    console.error("Notification failed", err);
+  }
 
   return application;
 };

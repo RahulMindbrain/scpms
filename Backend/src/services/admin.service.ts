@@ -1,7 +1,13 @@
 // services/admin.service.ts
 
 import bcrypt from "bcrypt";
-import { JobStatus, Role } from "@prisma/client";
+import {
+  Company,
+  Job,
+  JobStatus,
+  NotificationType,
+  Role,
+} from "@prisma/client";
 import { createUser, getUsersByIds } from "../repository/user.repository";
 import {
   activateUsers,
@@ -14,6 +20,7 @@ import {
 import { hashPassword } from "../utils/hashPassword";
 import {
   getDeptWiseStats,
+  getEligibleUnplacedStudents,
   // getInactiveStudents,
   getInactiveStudentUsers,
   getSalaryDataRepo,
@@ -32,6 +39,11 @@ import {
   updateJobStatus,
   updateJobStatusBulk,
 } from "../repository/job.repository";
+import { sendEmailService } from "./mail/mail.service";
+import { emitToUsers } from "../socket";
+import { SOCKET_EVENTS } from "../socket.event";
+import { createManyNotifications } from "../repository/notification.repository";
+import { runInBackground } from "../utils/Background.task";
 
 export const createAdminService = async (
   firstname: string,
@@ -278,7 +290,11 @@ export const updateJobStatusByAdminService = async (
     throw new Error("Invalid status. Only APPROVED or REJECTED allowed");
   }
 
-  const jobs = await getJobsByIds(jobIds);
+  const jobs = (await getJobsByIds(jobIds, {
+    include: {
+      company: true,
+    },
+  })) as (Job & { company: Company })[];
 
   if (!jobs.length) {
     throw new Error("No jobs found");
@@ -292,11 +308,56 @@ export const updateJobStatusByAdminService = async (
     );
   }
 
-  if (jobIds.length === 1) {
-    return updateJobStatus(jobIds[0]!, status, adminId);
+  const result =
+    jobIds.length === 1
+      ? await updateJobStatus(jobIds[0]!, status, adminId)
+      : await updateJobStatusBulk(jobIds, status, adminId);
+
+  if (status === JobStatus.APPROVED) {
+    runInBackground(async () => {
+      await Promise.all(
+        jobs.map(async (job) => {
+          try {
+            const students = await getEligibleUnplacedStudents(job.id);
+
+            if (!students.length) return;
+
+            const userIds = students.map((s) => s.userId);
+            const emails = students.map((s) => s.user.email);
+
+            emitToUsers(userIds, SOCKET_EVENTS.NEW_JOB, {
+              jobId: job.id,
+              title: job.title,
+              company: job.company.name,
+              location: job.location,
+            });
+
+            await sendEmailService({
+              recipients: emails,
+              subject: `New Job Opportunity: ${job.title}`,
+              html: `
+                <p>A new job has been posted.</p>
+                <p><strong>${job.title}</strong> at ${job.company.name}</p>
+              `,
+            });
+
+            await createManyNotifications(
+              userIds.map((userId) => ({
+                userId,
+                title: "New Job Posted",
+                message: `New job: ${job.title} at ${job.company.name}`,
+                type: NotificationType.JOB_POSTED,
+              })),
+            );
+          } catch (err) {
+            console.error(`Notification failed for job ${job.id}`, err);
+          }
+        }),
+      );
+    });
   }
 
-  return updateJobStatusBulk(jobIds, status, adminId);
+  return result;
 };
 
 export const activateCompaniesService = async (userIds: number[]) => {

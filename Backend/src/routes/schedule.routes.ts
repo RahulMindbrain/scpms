@@ -24,10 +24,6 @@ import { getScheduleApplicationsController } from "../controllers/application.co
 
 const scheduleRoute = Router();
 
-// =======================================================
-// 🔹 ADMIN ROUTES
-// =======================================================
-
 scheduleRoute.post(
   "/",
   authenticateUser,
@@ -70,10 +66,6 @@ scheduleRoute.delete(
   removeJobsController,
 );
 
-// =======================================================
-// 🔹 COMPANY ROUTES
-// =======================================================
-
 scheduleRoute.get(
   "/company",
   authenticateUser,
@@ -81,11 +73,6 @@ scheduleRoute.get(
   getCompanySchedulesController,
 );
 
-// =======================================================
-// 🔹 SPECIFIC ROUTES (VERY IMPORTANT ORDER)
-// =======================================================
-
-// 🔹 Get applications for a schedule
 scheduleRoute.get(
   "/:id/applications",
   authenticateUser,
@@ -93,7 +80,6 @@ scheduleRoute.get(
   getScheduleApplicationsController,
 );
 
-// 🔹 Messages
 scheduleRoute.post(
   "/:id/messages",
   authenticateUser,
@@ -108,7 +94,6 @@ scheduleRoute.get(
   getScheduleMessagesController,
 );
 
-// 🔹 Approval
 scheduleRoute.put(
   "/:id/approval",
   authenticateUser,
@@ -116,17 +101,12 @@ scheduleRoute.put(
   updateScheduleApprovalController,
 );
 
-// 🔹 Custom route (must come before /:id)
 scheduleRoute.get(
   "/by-company-id",
   authenticateUser,
   authorizeRoles("ADMIN", "COMPANY"),
   getSchedulesForUserController,
 );
-
-// =======================================================
-// 🔹 GENERIC ROUTE (ALWAYS LAST)
-// =======================================================
 
 scheduleRoute.get(
   "/:id",

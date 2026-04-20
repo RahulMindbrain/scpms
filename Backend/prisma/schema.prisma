@@ -19,9 +19,9 @@ enum Role {
 }
 
 enum CompanyApprovalStatus {
-  PENDING 
-  APPROVED 
-  REJECTED 
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum JobStatus {
@@ -53,8 +53,27 @@ enum ScheduleMode {
 }
 
 enum NotificationType {
-  APPLICATION_UPDATE
+  
+  APPLICATION_SUBMITTED
+  APPLICATION_SELECTED
+  APPLICATION_REJECTED
+  APPLICATION_WITHDRAWN
+
+  
+  JOB_POSTED
+  JOB_UPDATED
   JOB_ALERT
+
+  
+  SCHEDULE_CREATED
+  SCHEDULE_UPDATED
+  SCHEDULE_APPROVED
+
+  
+  OFFER_ACCEPTED
+  OFFER_REJECTED
+
+  
   SYSTEM
 }
 
@@ -72,10 +91,10 @@ model User {
   company Company?
   admin   Admin?
 
-  otp             String?
-  otpExpiry       DateTime?
-  otpAttempts     Int @default(0)   // wrong attempts
-  otpGenerations  Int @default(0)   // how many times OTP generated
+  otp            String?
+  otpExpiry      DateTime?
+  otpAttempts    Int       @default(0) 
+  otpGenerations Int       @default(0) 
 
   tokens        Token[]
   notifications Notification[]
@@ -123,7 +142,7 @@ model Skill {
   id   Int    @id @default(autoincrement())
   name String @unique
 
-  students Student[] // many-to-many
+  students Student[]
   jobs     Job[]
 
   createdAt DateTime @default(now())
@@ -174,7 +193,7 @@ model Project {
 
   title       String
   description String?
-  techStack   String? // or separate relation later
+  techStack   String? 
 
   githubUrl String?
   liveUrl   String?
@@ -300,10 +319,8 @@ model InterviewSchedule {
 
   venue String?
 
-  
   status ScheduleStatus @default(SCHEDULED)
 
-  
   companyApprovalStatus CompanyApprovalStatus @default(PENDING)
 
   approvedAt      DateTime?
@@ -318,13 +335,12 @@ model InterviewSchedule {
 
   jobs Job[]
 
-  
   messages ScheduleMessage[]
 
   @@index([startTime, endTime])
   @@index([companyId])
-  @@index([status]) 
-  @@index([companyApprovalStatus]) 
+  @@index([status])
+  @@index([companyApprovalStatus])
 }
 
 model ScheduleMessage {
@@ -353,7 +369,11 @@ model Notification {
   message String
 
   type NotificationType
-  read Boolean          @default(false)
+  read Boolean @default(false)
+
+  
+  //entityId   Int?
+  //entityType String?
 
   createdAt DateTime @default(now())
 
