@@ -2,6 +2,7 @@ import {
   createApplicationService,
   deleteApplicationService,
   getApplicationsService,
+  getScheduleApplicationsService,
   updateApplicationService,
 } from "../services/application.service";
 import { sendError, sendSuccess } from "../utils/response";
@@ -50,7 +51,6 @@ export const getApplicationsController = async (
       status: req.query.status as any,
     };
 
-    // ✅ Pagination params
     const page = req.query.page ? Number(req.query.page) : 1;
     const limit = req.query.limit ? Number(req.query.limit) : 10;
 
@@ -83,4 +83,26 @@ export const deleteApplicationController = async (
   const { id } = req.params;
   await deleteApplicationService(Number(id));
   return sendSuccess(res, 200, "Application deleted");
+};
+
+export const getScheduleApplicationsController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const scheduleId = Number(req.params.id);
+
+    if (isNaN(scheduleId)) {
+      return sendError(res, 400, "Invalid schedule id");
+    }
+
+    const page = req.query.page ? Number(req.query.page) : undefined;
+    const limit = req.query.limit ? Number(req.query.limit) : undefined;
+
+    const data = await getScheduleApplicationsService(scheduleId, page, limit);
+
+    return sendSuccess(res, 200, "Applications fetched", data);
+  } catch (err: any) {
+    return sendError(res, 400, err.message);
+  }
 };

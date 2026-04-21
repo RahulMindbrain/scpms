@@ -3,31 +3,23 @@ import { Server as HTTPServer } from "http";
 
 let io: Server;
 
-// =========================
-// TYPES
-// =========================
 type JoinPayload = {
   userId: number;
   role: "STUDENT" | "COMPANY" | "ADMIN";
 };
 
-// =========================
-// INITIALIZE SOCKET
-// =========================
 export const initializeSocket = (server: HTTPServer): void => {
   io = new Server(server, {
     cors: {
       origin: "*",
       methods: ["GET", "POST"],
+      credentials: true,
     },
   });
 
   io.on("connection", (socket: Socket) => {
     console.log(`🔌 Client connected: ${socket.id}`);
 
-    // =========================
-    // JOIN ROOMS
-    // =========================
     socket.on("join", (data: JoinPayload) => {
       try {
         const { userId, role } = data;
@@ -54,9 +46,6 @@ export const initializeSocket = (server: HTTPServer): void => {
   });
 };
 
-// =========================
-// SAFE IO ACCESSOR
-// =========================
 const getIO = (): Server => {
   if (!io) {
     throw new Error("Socket.io not initialized");
@@ -64,9 +53,6 @@ const getIO = (): Server => {
   return io;
 };
 
-// =========================
-// GENERIC EMITTERS
-// =========================
 export const emitToUser = (
   userId: number,
   event: string,

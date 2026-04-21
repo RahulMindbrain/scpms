@@ -8,13 +8,16 @@ import {
   createAdminService,
   getActiveStudentsService,
   getCompaniesService,
+  getJobsByCompanyIdServices,
   getDashboardStatsService,
   getInactiveCompaniesService,
   getInactiveStudentsService,
   getStudentsService,
   updateJobStatusByAdminService,
 } from "../services/admin.service";
-import { notifyUnplacedStudentsForJob } from "../services/notification.service";
+import { notifyEligibleStudentsForJob } from "../services/notification.service";
+import { runInBackground } from "../utils/Background.task";
+import { send } from "node:process";
 
 export const createAdminController = async (req: Request, res: Response) => {
   try {
@@ -48,16 +51,44 @@ export const getStudentsController = async (req: Request, res: Response) => {
     const { page, limit, passingYear, year, minCgpa, maxCgpa, departmentId } =
       req.query;
 
-    const students = await getStudentsService({
-      page: page !== undefined ? Number(page) : undefined,
-      limit: limit !== undefined ? Number(limit) : undefined,
-      passingYear: passingYear !== undefined ? Number(passingYear) : undefined,
-      year: year !== undefined ? Number(year) : undefined,
-      minCgpa: minCgpa !== undefined ? Number(minCgpa) : undefined,
-      maxCgpa: maxCgpa !== undefined ? Number(maxCgpa) : undefined,
-      departmentId:
-        departmentId !== undefined ? Number(departmentId) : undefined,
-    });
+    const parseNumber = (value: any) => {
+      if (value === undefined) return undefined;
+      const num = Number(value);
+      return Number.isFinite(num) ? num : undefined;
+    };
+
+    const parsedPage = parseNumber(page) ?? 1;
+    const parsedLimit = parseNumber(limit);
+
+    if (parsedPage < 1) {
+      return sendError(res, 400, "Invalid page");
+    }
+
+    if (parsedLimit !== undefined && parsedLimit < 1) {
+      return sendError(res, 400, "Invalid limit");
+    }
+
+    const params: any = {
+      page: parsedPage,
+      ...(parsedLimit !== undefined && { limit: parsedLimit }),
+      ...(parseNumber(passingYear) !== undefined && {
+        passingYear: parseNumber(passingYear),
+      }),
+      ...(parseNumber(year) !== undefined && {
+        year: parseNumber(year),
+      }),
+      ...(parseNumber(minCgpa) !== undefined && {
+        minCgpa: parseNumber(minCgpa),
+      }),
+      ...(parseNumber(maxCgpa) !== undefined && {
+        maxCgpa: parseNumber(maxCgpa),
+      }),
+      ...(parseNumber(departmentId) !== undefined && {
+        departmentId: parseNumber(departmentId),
+      }),
+    };
+
+    const students = await getStudentsService(params);
 
     return sendSuccess(res, 200, "Students fetched", students);
   } catch (error: any) {
@@ -69,10 +100,21 @@ export const getCompaniesController = async (req: Request, res: Response) => {
   try {
     const { page, limit } = req.query;
 
-    const result = await getCompaniesService({
-      page: page ? Number(page) : undefined,
-      limit: limit ? Number(limit) : undefined,
-    });
+    const parseNumber = (value: any) => {
+      if (value === undefined) return undefined;
+      const num = Number(value);
+      return Number.isFinite(num) ? num : undefined;
+    };
+
+    const parsedPage = parseNumber(page);
+    const parsedLimit = parseNumber(limit);
+
+    const params = {
+      ...(parsedPage !== undefined && { page: parsedPage }),
+      ...(parsedLimit !== undefined && { limit: parsedLimit }),
+    };
+
+    const result = await getCompaniesService(params);
 
     return sendSuccess(res, 200, "Companies fetched", result);
   } catch (error: any) {
@@ -87,12 +129,35 @@ export const getActiveStudentsController = async (
   try {
     const { page, limit, year, passingYear } = req.query;
 
-    const students = await getActiveStudentsService({
-      page: page !== undefined ? Number(page) : undefined,
-      limit: limit !== undefined ? Number(limit) : undefined,
-      year: year !== undefined ? Number(year) : undefined,
-      passingYear: passingYear !== undefined ? Number(passingYear) : undefined,
-    });
+    const parseNumber = (value: any) => {
+      if (value === undefined) return undefined;
+      const num = Number(value);
+      return Number.isFinite(num) ? num : undefined;
+    };
+
+    const parsedPage = parseNumber(page);
+    const parsedLimit = parseNumber(limit);
+    const parsedYear = parseNumber(year);
+    const parsedPassingYear = parseNumber(passingYear);
+
+    if (parsedPage !== undefined && parsedPage < 1) {
+      return sendError(res, 400, "Invalid page");
+    }
+
+    if (parsedLimit !== undefined && parsedLimit < 1) {
+      return sendError(res, 400, "Invalid limit");
+    }
+
+    const params = {
+      ...(parsedPage !== undefined && { page: parsedPage }),
+      ...(parsedLimit !== undefined && { limit: parsedLimit }),
+      ...(parsedYear !== undefined && { year: parsedYear }),
+      ...(parsedPassingYear !== undefined && {
+        passingYear: parsedPassingYear,
+      }),
+    };
+
+    const students = await getActiveStudentsService(params);
 
     return sendSuccess(res, 200, "Active students fetched", students);
   } catch (error: any) {
@@ -107,11 +172,33 @@ export const getInactiveStudentsController = async (
   try {
     const { page, limit, passingYearFrom } = req.query;
 
-    const result = await getInactiveStudentsService({
-      page: page ? Number(page) : undefined,
-      limit: limit ? Number(limit) : undefined,
-      passingYearFrom: passingYearFrom ? Number(passingYearFrom) : undefined,
-    });
+    const parseNumber = (value: any) => {
+      if (value === undefined) return undefined;
+      const num = Number(value);
+      return Number.isFinite(num) ? num : undefined;
+    };
+
+    const parsedPage = parseNumber(page);
+    const parsedLimit = parseNumber(limit);
+    const parsedPassingYearFrom = parseNumber(passingYearFrom);
+
+    if (parsedPage !== undefined && parsedPage < 1) {
+      return sendError(res, 400, "Invalid page");
+    }
+
+    if (parsedLimit !== undefined && parsedLimit < 1) {
+      return sendError(res, 400, "Invalid limit");
+    }
+
+    const params = {
+      ...(parsedPage !== undefined && { page: parsedPage }),
+      ...(parsedLimit !== undefined && { limit: parsedLimit }),
+      ...(parsedPassingYearFrom !== undefined && {
+        passingYearFrom: parsedPassingYearFrom,
+      }),
+    };
+
+    const result = await getInactiveStudentsService(params);
 
     return sendSuccess(res, 200, "Inactive students fetched", result);
   } catch (error: any) {
@@ -164,9 +251,19 @@ export const getInactiveCompaniesController = async (
   try {
     const { page, limit } = req.query;
 
+    const parsedPage =
+      page !== undefined && Number.isFinite(Number(page))
+        ? Number(page)
+        : undefined;
+
+    const parsedLimit =
+      limit !== undefined && Number.isFinite(Number(limit))
+        ? Number(limit)
+        : undefined;
+
     const result = await getInactiveCompaniesService({
-      page: page ? Number(page) : undefined,
-      limit: limit ? Number(limit) : undefined,
+      ...(parsedPage !== undefined && { page: parsedPage }),
+      ...(parsedLimit !== undefined && { limit: parsedLimit }),
     });
 
     return sendSuccess(res, 200, "Inactive companies fetched", result);
@@ -195,7 +292,6 @@ export const updateJobStatusByAdminController = async (
       return sendError(res, 400, "status is required");
     }
 
-    // ✅ Normalize to array
     const ids = jobIds ?? (jobId ? [jobId] : []);
 
     if (!ids.length) {
@@ -207,12 +303,6 @@ export const updateJobStatusByAdminController = async (
       status as JobStatus,
       user.id,
     );
-
-    // console.log(updatedJobs);
-
-    if (updatedJobs.status === "APPROVED") {
-      notifyUnplacedStudentsForJob(updatedJobs.id);
-    }
 
     return sendSuccess(
       res,
@@ -238,3 +328,48 @@ export const getDashboardStatsController = async (
     return sendError(res, 500, "Failed to fetch dashboard stats");
   }
 };
+
+export const getJobsByCompanyIdController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { id } = req.params;
+
+    const page = req.query.page !== undefined ? Number(req.query.page) : 1;
+
+    const limit =
+      req.query.limit !== undefined
+        ? Number(req.query.limit)
+        : Number(process.env.DEFAULT_LIMIT) || 10;
+
+    const status = req.query.status as JobStatus;
+
+    const data = await getJobsByCompanyIdServices({
+      companyId: Number(id),
+      page,
+      limit,
+      status,
+    });
+
+    return sendSuccess(res, 200, "Company Jobs Fetched", data);
+  } catch (error: any) {
+    console.log(error);
+    return sendError(res, 500, "Failed");
+  }
+};
+
+// export const getJobsByCompanyController = async(req:Request, res:Response)=>{
+//   try{
+
+//     const {id:companyId} = req.body;
+
+//     if(!)
+
+//     if()
+
+//   }catch(error:any){
+//     console.log(error);
+//     return sendError(res,500,"Failed to fetch jobs by company");
+//   }
+// }

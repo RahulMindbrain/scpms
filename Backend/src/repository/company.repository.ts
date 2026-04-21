@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../config/db";
 
 export const createCompany = async (
@@ -17,7 +18,7 @@ export const createCompany = async (
     data: {
       userId,
       name,
-      description,
+      description: description ?? null,
     },
   });
 };
@@ -114,6 +115,12 @@ export const getCompanyDetails = async (userId: number) => {
         },
       },
     },
+  });
+};
+
+export const getCompanyById = async (id: number) => {
+  return prisma.company.findUnique({
+    where: { id },
   });
 };
 

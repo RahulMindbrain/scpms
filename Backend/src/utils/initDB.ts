@@ -24,7 +24,6 @@ export const ensureDatabaseExists = async () => {
     console.log(`Creating DB: ${DB_NAME}`);
     await client.query(`CREATE DATABASE "${DB_NAME}"`);
 
-    // ✅ IMPORTANT: wait for DB to be ready
     await new Promise((resolve) => setTimeout(resolve, 1500));
   } else {
     console.log(`DB exists: ${DB_NAME}`);

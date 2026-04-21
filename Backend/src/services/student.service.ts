@@ -12,6 +12,10 @@ import {
   markStudentPlaced,
   updateStudent,
 } from "../repository/student.repository";
+import {
+  CreateStudentInput,
+  UpdateStudentInput,
+} from "../validators/sudent.validator";
 
 // export const createStudentService = async (
 //   userId: number,
@@ -35,7 +39,10 @@ import {
 //   return createStudent(userId, departmentId, year, passingYear, cgpa);
 // };
 
-export const createStudentService = async (userId: number, data: any) => {
+export const createStudentService = async (
+  userId: number,
+  data: CreateStudentInput,
+) => {
   const existing = await getStudentByUserId(userId);
   if (existing) throw new Error("Student profile already exists");
 
@@ -63,16 +70,91 @@ export const getStudentProfileService = async (userId: number) => {
   return student;
 };
 
-export const updateStudentService = async (userId: number, data: any) => {
+export const updateStudentService = async (
+  userId: number,
+  data: UpdateStudentInput,
+) => {
   const existing = await getStudentByUserId(userId);
   if (!existing) throw new Error("Student profile not found");
 
-  if (data.skillIds?.length) {
-    const skills = await getSkillsByIds(data.skillIds);
+  const addSkillIds = data.addSkillIds ?? [];
+  const removeSkillIds = data.removeSkillIds ?? [];
+  const allSkillIds = [...addSkillIds, ...removeSkillIds];
+
+  if (allSkillIds.length) {
+    const skills = await getSkillsByIds(allSkillIds);
     const foundIds = skills.map((s) => s.id);
-    const missing = data.skillIds.filter((id) => !foundIds.includes(id));
-    if (missing.length)
+
+    const missing = allSkillIds.filter((id) => !foundIds.includes(id));
+    if (missing.length) {
       throw new Error(`Invalid skill IDs: ${missing.join(", ")}`);
+    }
+  }
+
+  if (data.updateExperiences?.length) {
+    const existingIds = existing.experiences.map((e) => e.id);
+    const invalid = data.updateExperiences
+      .map((e) => e.id)
+      .filter((id) => !existingIds.includes(id));
+
+    if (invalid.length) {
+      throw new Error(`Invalid experience IDs: ${invalid.join(", ")}`);
+    }
+  }
+
+  if (data.deleteExperienceIds?.length) {
+    const existingIds = existing.experiences.map((e) => e.id);
+    const invalid = data.deleteExperienceIds.filter(
+      (id) => !existingIds.includes(id),
+    );
+
+    if (invalid.length) {
+      throw new Error(`Invalid deleteExperienceIds: ${invalid.join(", ")}`);
+    }
+  }
+
+  if (data.updateProjects?.length) {
+    const existingIds = existing.projects.map((p) => p.id);
+    const invalid = data.updateProjects
+      .map((p) => p.id)
+      .filter((id) => !existingIds.includes(id));
+
+    if (invalid.length) {
+      throw new Error(`Invalid project IDs: ${invalid.join(", ")}`);
+    }
+  }
+
+  if (data.deleteProjectIds?.length) {
+    const existingIds = existing.projects.map((p) => p.id);
+    const invalid = data.deleteProjectIds.filter(
+      (id) => !existingIds.includes(id),
+    );
+
+    if (invalid.length) {
+      throw new Error(`Invalid deleteProjectIds: ${invalid.join(", ")}`);
+    }
+  }
+
+  if (data.updateCertificates?.length) {
+    const existingIds = existing.certificates.map((c) => c.id);
+    const invalid = data.updateCertificates
+      .map((c) => c.id)
+      .filter((id) => !existingIds.includes(id));
+
+    if (invalid.length) {
+      throw new Error(`Invalid certificate IDs: ${invalid.join(", ")}`);
+    }
+  }
+
+  if (data.deleteCertificateIds?.length) {
+    const existingIds = existing.certificates.map((c) => c.id);
+    const invalid = data.deleteCertificateIds.filter(
+      (id) => !existingIds.includes(id),
+    );
+
+    if (invalid.length) {
+      throw new Error(`Invalid deleteCertificateIds: ${invalid.join(", ")}`);
+    }
   }
 
   return updateStudent(userId, data);

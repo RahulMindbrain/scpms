@@ -1,8 +1,11 @@
+import { NotificationType } from "@prisma/client";
 import prisma from "../config/db";
 import {
   createApplication,
   deleteApplication,
+  getApplicationById,
   getApplications,
+  getApplicationsBySchedule,
   updateApplicationStatus,
 } from "../repository/application.repository";
 import { getCompanyByUserId } from "../repository/company.repository";
@@ -13,6 +16,7 @@ import {
 import { getStudentByUserId } from "../repository/student.repository";
 import { emitToUser } from "../socket";
 import { SOCKET_EVENTS } from "../socket.event";
+import { createNotification } from "../repository/notification.repository";
 
 export const createApplicationService = async (
   userId: number,
@@ -38,9 +42,6 @@ export const createApplicationService = async (
 
   let application;
 
-  // =========================
-  // NOT ELIGIBLE CASE
-  // =========================
   if (job.minCgpa && student.cgpa && student.cgpa < job.minCgpa) {
     application = await createApplication({
       studentId: student.id,
@@ -49,25 +50,30 @@ export const createApplicationService = async (
       reason: "CGPA below requirement",
     });
 
-    return application; // ❌ no need to notify company
+    return application;
   }
 
-  // =========================
-  // NORMAL APPLY
-  // =========================
   application = await createApplication({
     studentId: student.id,
     jobId,
   });
 
-  // =========================
-  // 🔥 SOCKET EMIT (to company)
-  // =========================
   emitToUser(job.company.userId, SOCKET_EVENTS.NEW_APPLICATION, {
     applicationId: application.id,
     jobId,
     studentId: student.id,
-    studentName: student.user?.name, // if available
+    studentName: student.user
+      ? `${student.user.firstname} ${student.user.lastname ?? ""}`.trim()
+      : "Unknown",
+  });
+
+  await createNotification({
+    userId: job.company.userId,
+    title: "New Application",
+    message: `New application received for ${job.title}`,
+    type: NotificationType.APPLICATION_SUBMITTED,
+    // entityId: application.id,
+    //entityType: "APPLICATION",
   });
 
   return application;
@@ -99,7 +105,6 @@ export const getApplicationsService = async (
         throw new Error("Student not found");
       }
 
-      // ✅ FIX: assign properly
       enrichedUser.studentId = student.id;
     }
 
@@ -124,9 +129,63 @@ export const updateApplicationService = async (id: number, status: any) => {
     },
   );
 
+  try {
+    if (status === "SELECTED") {
+      await createNotification({
+        userId: application.student.userId,
+        title: "Application Selected",
+        message: `You have been shortlisted for ${application.job.title}`,
+        type: NotificationType.APPLICATION_SELECTED,
+      });
+    }
+
+    if (status === "REJECTED") {
+      await createNotification({
+        userId: application.student.userId,
+        title: "Application Update",
+        message: `Your application was not selected for ${application.job.title}`,
+        type: NotificationType.APPLICATION_REJECTED,
+      });
+    }
+  } catch (err) {
+    console.error("Notification failed", err);
+  }
+
   return application;
 };
 
+export const getScheduleApplicationsService = async (
+  scheduleId: number,
+  page?: number,
+  limit?: number,
+) => {
+  const applications = await getApplicationsBySchedule(scheduleId, page, limit);
+
+  if (Array.isArray(applications)) {
+    if (applications.length === 0) {
+      throw new Error("No applications found for this schedule");
+    }
+  } else {
+    if (applications.data.length === 0) {
+      return applications;
+    }
+  }
+
+  return applications;
+};
+
 export const deleteApplicationService = async (id: number) => {
-  return deleteApplication(id);
+  if (!id || isNaN(id)) {
+    throw new Error("Invalid application id");
+  }
+
+  const existing = await getApplicationById(id);
+
+  if (!existing) {
+    throw new Error("Application not found");
+  }
+
+  await deleteApplication(id);
+
+  return { deleted: true };
 };

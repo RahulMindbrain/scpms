@@ -1,22 +1,29 @@
+import { NotificationType } from "@prisma/client";
 import {
-  getJobBasicDetails,
+  //getJobBasicDetails,
   getJobDisplayDetails,
 } from "../repository/job.repository";
 import {
+  createManyNotifications,
   createNotification,
   deleteNotification,
+  getNotificationById,
   getNotifications,
+  getNotificationsPaginated,
+  getUnreadCount,
+  markAllAsRead,
   markAsRead,
 } from "../repository/notification.repository";
 import {
   getEligibleUnplacedStudents,
-  getUnplacedStudents,
+  getStudentByUserId,
+  //getUnplacedStudents,
 } from "../repository/student.repository";
 import { emitToUsers } from "../socket";
 import { SOCKET_EVENTS } from "../socket.event";
-import { sendEmailService } from "./mail.service";
+import { sendEmailService } from "./mail/mail.service";
+import { getUpcomingSchedulesForStudent } from "../repository/schedule.repository";
 
-// notification.service.ts
 export const createNotificationService = async (data: any) => {
   return createNotification(data);
 };
@@ -29,16 +36,11 @@ export const markAsReadService = async (id: number) => {
   return markAsRead(id);
 };
 
-export const deleteNotificationService = async (id: number) => {
-  return deleteNotification(id);
-};
-
 export const notifyEligibleStudentsForJob = async (
   jobId: number,
   customSubject?: string,
   customMessage?: string,
 ) => {
-  // ✅ 1. fetch eligible students
   const students = await getEligibleUnplacedStudents(jobId);
 
   if (!students.length) return 0;
@@ -46,7 +48,6 @@ export const notifyEligibleStudentsForJob = async (
   const emails = students.map((s) => s.user.email);
   const userIds = students.map((s) => s.userId);
 
-  // ✅ 2. fetch job details
   const job = await getJobDisplayDetails(jobId);
 
   const subject =
@@ -62,9 +63,6 @@ export const notifyEligibleStudentsForJob = async (
       <p>Login to your dashboard and apply now.</p>
     `;
 
-  // =========================
-  // 🔥 SOCKET (REAL-TIME)
-  // =========================
   emitToUsers(userIds, SOCKET_EVENTS.NEW_JOB, {
     jobId,
     title: job?.title,
@@ -72,14 +70,103 @@ export const notifyEligibleStudentsForJob = async (
     location: job?.location,
   });
 
-  // =========================
-  // 📧 EMAIL (FALLBACK)
-  // =========================
   await sendEmailService({
     recipients: emails,
     subject,
     html: message,
   });
 
+  await createManyNotifications(
+    userIds.map((userId) => ({
+      userId,
+      title: "New Job Posted",
+      message: `New job: ${job?.title || "Apply Now"} at ${job?.company?.name || ""}`,
+      type: NotificationType.JOB_POSTED,
+      entityId: jobId,
+      entityType: "JOB",
+    })),
+  );
+
   return students.length;
+};
+
+export const getUnreadCountService = async (userId: number) => {
+  if (!userId) throw new Error("User ID required");
+
+  return getUnreadCount(userId);
+};
+
+export const markAllAsReadService = async (userId: number) => {
+  if (!userId) throw new Error("User ID required");
+
+  const result = await markAllAsRead(userId);
+
+  return {
+    updatedCount: result.count,
+  };
+};
+
+export const getNotificationsPaginatedService = async (
+  userId: number,
+  page: number = 1,
+  limit: number = 10,
+) => {
+  if (!userId) throw new Error("User ID required");
+
+  if (page < 1) page = 1;
+  if (limit < 1 || limit > 50) limit = 10;
+
+  return getNotificationsPaginated(userId, page, limit);
+};
+
+export const markNotificationAsReadService = async (
+  notificationId: number,
+  userId: number,
+) => {
+  if (!notificationId) throw new Error("Notification ID required");
+
+  const notification = await getNotificationById(notificationId);
+
+  if (!notification) {
+    throw new Error("Notification not found");
+  }
+
+  if (notification.userId !== userId) {
+    throw new Error("Unauthorized");
+  }
+
+  return markAsRead(notificationId);
+};
+
+export const deleteNotificationService = async (
+  notificationId: number,
+  userId: number,
+) => {
+  const notification = await getNotificationById(notificationId);
+
+  if (!notification) {
+    throw new Error("Notification not found");
+  }
+
+  if (notification.userId !== userId) {
+    throw new Error("Unauthorized");
+  }
+
+  return await deleteNotification(notificationId);
+};
+
+export const getUpcomingEventsService = async (userId: number) => {
+  const student = await getStudentByUserId(userId);
+  if (!student) throw new Error("Student not found");
+
+  const schedules = await getUpcomingSchedulesForStudent(student.id);
+
+  return schedules.map((s) => ({
+    id: s.id,
+    title: s.title,
+    company: s.company.name,
+    startTime: s.startTime,
+    endTime: s.endTime,
+    venue: s.venue,
+  }));
 };

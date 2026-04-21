@@ -1,3 +1,4 @@
+import { JobStatus, Prisma, Role } from "@prisma/client";
 import prisma from "../config/db";
 
 export const getAdminCount = async () => {
@@ -111,39 +112,29 @@ export const getUsers = async (params: {
 };
 
 export const getJobs = async (params: {
-  page?: number;
-  limit?: number;
-  status?: "PENDING" | "APPROVED" | "REJECTED";
+  page: number;
+  limit: number;
+  status?: JobStatus;
+  companyId?: number;
 }) => {
-  const { page, limit, status } = params;
+  const { page, limit, status, companyId } = params;
 
-  const safePage = Math.max(1, page ?? 1);
-  const safeLimit = Math.max(1, limit ?? 1);
-  const skip = (safePage - 1) * safeLimit;
+  const skip = (page - 1) * limit;
 
   const where = {
     ...(status && { status }),
+    ...(companyId && { companyId }),
   };
 
   const [data, total] = await Promise.all([
     prisma.job.findMany({
       where,
       skip,
-      take: safeLimit,
+      take: limit,
       orderBy: { createdAt: "desc" },
-      select: {
-        id: true,
-        title: true,
-        status: true,
-        salary: true,
-        location: true,
-        createdAt: true,
-        company: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+      include: {
+        company: true,
+        eligibleDepartments: true,
       },
     }),
     prisma.job.count({ where }),
@@ -151,12 +142,7 @@ export const getJobs = async (params: {
 
   return {
     data,
-    meta: {
-      total,
-      page: safePage,
-      limit: safeLimit,
-      totalPages: safeLimit ? Math.ceil(total / safeLimit) : 0,
-    },
+    meta: { total, page, limit, totalPages: Math.ceil(total / limit) },
   };
 };
 
@@ -172,7 +158,7 @@ export const getStudents = async (params: {
   const skip = (safePage - 1) * safeLimit;
 
   const where = {
-    role: "STUDENT",
+    role: Role.STUDENT,
     ...(status && { status }),
   };
 
@@ -193,6 +179,12 @@ export const getStudents = async (params: {
             cgpa: true,
             year: true,
             passingYear: true,
+            department: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
           },
         },
       },
@@ -223,7 +215,7 @@ export const getCompanies = async (params: {
   const skip = (safePage - 1) * safeLimit;
 
   const where = {
-    role: "COMPANY",
+    role: Role.COMPANY,
     ...(status && { status }),
   };
 

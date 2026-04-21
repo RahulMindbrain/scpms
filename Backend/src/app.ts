@@ -12,14 +12,18 @@ import AuthRoutes from "./routes/auth.routes.js";
 import StudentRoutes from "./routes/student.routes.js";
 import DepartmentRoutes from "./routes/department.routes.js";
 import cloudinaryRoute from "./routes/cloudinary.routes.js";
+import Skillsroute from "./routes/skills.routes.js";
+import scheduleRoute from "./routes/schedule.routes.js";
+import { attachQueryLogger } from "./middlewares/queryLogger.js";
+import notificationRouter from "./routes/notification.routes.js";
 
 const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173", // This allows requests from localhost:5173
-    methods: ["GET", "POST", "PUT", "DELETE"], // Allow certain methods
-    credentials: true, // Allow sending cookies (if needed)
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
   }),
 );
 
@@ -46,5 +50,10 @@ app.use("/company", CompanyRoutes);
 app.use("/student", StudentRoutes);
 app.use("/dept", DepartmentRoutes);
 app.use("/cloudinary", cloudinaryRoute);
+app.use("/skills", Skillsroute);
+app.use("/interview-schedule", scheduleRoute);
+app.use("/notification", notificationRouter);
+
+app.use(attachQueryLogger);
 
 export default app;

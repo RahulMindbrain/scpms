@@ -1,9 +1,13 @@
 import jwt from "jsonwebtoken";
 import { Request, Response } from "express";
 import {
+  forgotPasswordService,
   generateAccessService,
   loginService,
   logoutService,
+  resendOtpService,
+  resetPasswordService,
+  verifyOtpService,
 } from "./auth.service";
 import { parseTTLToMs } from "../utils/parseTTL";
 import { sendError, sendSuccess } from "../utils/response";
@@ -116,5 +120,73 @@ export const logoutController = async (req: Request, res: Response) => {
     sendSuccess(res, 200, "Logout successful");
   } catch {
     sendError(res, 401, "Invalid token");
+  }
+};
+
+export const forgotPasswordController = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      sendError(res, 400, "Email is required");
+      return;
+    }
+
+    const data = await forgotPasswordService(email);
+
+    sendSuccess(res, 200, "OTP sent successfully", data);
+  } catch (error: any) {
+    sendError(res, 400, error.message || "Failed to send OTP");
+  }
+};
+
+export const resendOtpController = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      sendError(res, 400, "Email is required");
+      return;
+    }
+
+    const data = await resendOtpService(email);
+
+    sendSuccess(res, 200, "OTP resent successfully", data);
+  } catch (error: any) {
+    sendError(res, 400, error.message || "Failed to resend OTP");
+  }
+};
+
+export const verifyOtpController = async (req: Request, res: Response) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      sendError(res, 400, "Email and OTP are required");
+      return;
+    }
+
+    const data = await verifyOtpService(email, otp);
+
+    sendSuccess(res, 200, "OTP verified successfully", data);
+  } catch (error: any) {
+    sendError(res, 400, error.message || "OTP verification failed");
+  }
+};
+
+export const resetPasswordController = async (req: Request, res: Response) => {
+  try {
+    const { email, newpassword } = req.body;
+
+    if (!email || !newpassword) {
+      sendError(res, 400, "Email and new password are required");
+      return;
+    }
+
+    const data = await resetPasswordService(email, newpassword);
+
+    sendSuccess(res, 200, "Password reset successful", data);
+  } catch (error: any) {
+    sendError(res, 400, error.message || "Password reset failed");
   }
 };

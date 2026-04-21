@@ -64,12 +64,53 @@ export const getApplications = async (
         skip,
         take: limit,
         orderBy: { createdAt: "desc" },
-        include: {
-          job: true,
-          student: true,
+
+        // ✅ FIXED SELECT
+        select: {
+          id: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+
+          job: {
+            select: {
+              id: true,
+              title: true,
+              location: true,
+              status: true,
+              companyId: true,
+            },
+          },
+
+          student: {
+            select: {
+              id: true,
+
+              user: {
+                select: {
+                  firstname: true,
+                  lastname: true,
+                  email: true,
+                },
+              },
+
+              department: {
+                select: {
+                  id: true,
+                  name: true, // ✅ THIS IS WHAT YOU WANTED
+                },
+              },
+
+              cgpa: true,
+              activeBacklogs: true,
+              isPlaced: true,
+            },
+          },
         },
       }),
+
       prisma.application.count({ where }),
+
       prisma.application.groupBy({
         by: ["status"],
         _count: { status: true },
@@ -177,6 +218,148 @@ export const withdrawOtherApplications = async (
     },
     data: {
       status: "WITHDRAWN",
+    },
+  });
+};
+
+export const getApplicationsBySchedule = async (
+  scheduleId: number,
+  page?: number,
+  limit?: number,
+) => {
+  const isPaginated =
+    typeof page === "number" &&
+    typeof limit === "number" &&
+    page > 0 &&
+    limit > 0;
+
+  const where = {
+    job: {
+      interviewScheduleId: scheduleId,
+    },
+  };
+  if (!isPaginated) {
+    const applications = await prisma.application.findMany({
+      where,
+      orderBy: { createdAt: "asc" },
+
+      select: {
+        id: true,
+        status: true,
+        job: { select: { id: true, title: true } },
+        student: {
+          select: {
+            id: true,
+            departmentId: true,
+            department: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+            user: {
+              select: {
+                firstname: true,
+                lastname: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    return applications.map((app) => ({
+      applicationId: app.id,
+      status: app.status,
+      jobId: app.job.id,
+      jobTitle: app.job.title,
+      studentId: app.student.id,
+      // departmentId: app.student.departmentId,
+      department: app.student.department,
+      name: `${app.student.user.firstname} ${app.student.user.lastname}`,
+      email: app.student.user.email,
+    }));
+  }
+
+  // 🔹 PAGINATED → return data + meta
+  const skip = (page - 1) * limit;
+
+  const [applications, total] = await Promise.all([
+    prisma.application.findMany({
+      where,
+      skip,
+      take: limit,
+      orderBy: { createdAt: "asc" },
+
+      select: {
+        id: true,
+        status: true,
+        job: { select: { id: true, title: true } },
+        student: {
+          select: {
+            id: true,
+            // departmentId: true,
+            department: true,
+            user: {
+              select: {
+                firstname: true,
+                lastname: true,
+                email: true,
+              },
+            },
+          },
+        },
+      },
+    }),
+
+    prisma.application.count({ where }),
+  ]);
+
+  const mapped = applications.map((app) => ({
+    applicationId: app.id,
+    status: app.status,
+    jobId: app.job.id,
+    jobTitle: app.job.title,
+    studentId: app.student.id,
+    // departmentId: app.student.departmentId,
+    department: app.student.department,
+    name: `${app.student.user.firstname} ${app.student.user.lastname}`,
+    email: app.student.user.email,
+  }));
+
+  return {
+    data: mapped,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+
+export const getScheduleJobsDetails = async (scheduleId: number) => {
+  return prisma.interviewSchedule.findUnique({
+    where: { id: scheduleId },
+    include: {
+      company: {
+        select: {
+          name: true,
+        },
+      },
+      jobs: {
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          _count: {
+            select: {
+              applications: true,
+            },
+          },
+        },
+      },
     },
   });
 };

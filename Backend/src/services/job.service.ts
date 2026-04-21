@@ -1,7 +1,11 @@
-import { getJobs } from "../repository/admin.repository";
 import { getCompanyByUserId } from "../repository/company.repository";
 import { getDepartmentsByIds } from "../repository/department.repository";
-import { createJob, deleteJob, updateJob } from "../repository/job.repository";
+import {
+  createJob,
+  deleteJob,
+  getJobs,
+  updateJob,
+} from "../repository/job.repository";
 import { getSkillsByIds } from "../repository/skill.repostiory";
 
 export const createJobService = async (data: any, userId: number) => {
@@ -13,7 +17,6 @@ export const createJobService = async (data: any, userId: number) => {
     throw new Error("Company profile not found");
   }
 
-  // ✅ Department validation (existing)
   if (eligibleDepartmentIds?.length) {
     const departments = await getDepartmentsByIds(eligibleDepartmentIds);
 
@@ -28,7 +31,6 @@ export const createJobService = async (data: any, userId: number) => {
     }
   }
 
-  // ✅ NEW: Skill validation
   if (skillIds?.length) {
     const skills = await getSkillsByIds(skillIds);
 
@@ -51,6 +53,7 @@ export const getJobsService = async (params: {
   page?: number;
   limit?: number;
   status?: "PENDING" | "APPROVED" | "REJECTED";
+  companyId?: number;
 }) => {
   const page = params.page ?? 1;
 
@@ -58,11 +61,25 @@ export const getJobsService = async (params: {
   const finalLimit =
     params.limit ?? (Number.isFinite(envLimit) && envLimit > 0 ? envLimit : 10);
 
-  return getJobs({
+  const query: {
+    page: number;
+    limit: number;
+    status?: "PENDING" | "APPROVED" | "REJECTED";
+    companyId?: number;
+  } = {
     page,
     limit: finalLimit,
-    status: params.status,
-  });
+  };
+
+  if (params.status !== undefined) {
+    query.status = params.status;
+  }
+
+  if (params.companyId !== undefined) {
+    query.companyId = params.companyId;
+  }
+
+  return getJobs(query);
 };
 
 export const updateJobService = async (id: number, data: any) => {

@@ -22,7 +22,7 @@ DepartmentRoutes.get("/", getDepartmentsController);
 
 DepartmentRoutes.get("/:id", getDepartmentByIdController);
 
-DepartmentRoutes.patch(
+DepartmentRoutes.put(
   "/:id",
   authenticateUser,
   authorizeRoles("ADMIN"),
