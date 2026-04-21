@@ -338,3 +338,28 @@ export const getApplicationsBySchedule = async (
     },
   };
 };
+
+export const getScheduleJobsDetails = async (scheduleId: number) => {
+  return prisma.interviewSchedule.findUnique({
+    where: { id: scheduleId },
+    include: {
+      company: {
+        select: {
+          name: true,
+        },
+      },
+      jobs: {
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          _count: {
+            select: {
+              applications: true,
+            },
+          },
+        },
+      },
+    },
+  });
+};

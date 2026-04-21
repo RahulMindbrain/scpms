@@ -275,12 +275,7 @@ export const getSchedulesByCompanyIdRepo = async (companyId: number) => {
       companyApprovalStatus: "APPROVED",
     },
     include: {
-      jobs: {
-        select: {
-          id: true,
-          title: true,
-        },
-      },
+      jobs: true,
       company: {
         select: {
           id: true,

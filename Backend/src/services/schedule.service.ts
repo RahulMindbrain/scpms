@@ -429,5 +429,6 @@ export const getSchedulesForUserService = async (
     venue: s.venue,
     companyName: s.company.name,
     jobCount: s.jobs.length,
+    jobs: s.jobs,
   }));
 };
