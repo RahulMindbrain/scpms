@@ -21,14 +21,38 @@ import { getJobsByIds } from "../repository/job.repository";
 import { sendInterviewNotificationEmail } from "./mail/mail.notify.service";
 import { getAppliedStudentsForJobs } from "../repository/student.repository";
 import { sendScheduleDiscussionEmail } from "./mail/mail.schedule.service";
+import { NotificationType, ScheduleStatus } from "@prisma/client";
+import { createManyNotifications } from "../repository/notification.repository";
+import { runInBackground } from "../utils/Background.task";
+import { emitToUsers } from "../socket";
+import { SOCKET_EVENTS } from "../socket.event";
 
-// =======================================================
-// 🔹 CREATE SCHEDULE (CRITICAL)
-// =======================================================
-export const createInterviewScheduleService = async (data) => {
+type CreateInterviewScheduleInput = {
+  title: string;
+  companyId: number;
+  jobIds: number[];
+  startTime: Date | string;
+  endTime: Date | string;
+  venue?: string;
+  createdBy: number;
+};
+
+type UpdateScheduleInput = {
+  title?: string;
+  startTime?: Date | string;
+  endTime?: Date | string;
+  venue?: string;
+};
+
+export const createInterviewScheduleService = async (
+  data: CreateInterviewScheduleInput,
+) => {
   const { companyId, jobIds, startTime, endTime, venue, createdBy } = data;
 
-  if (new Date(startTime) >= new Date(endTime)) {
+  const start = new Date(startTime);
+  const end = new Date(endTime);
+
+  if (start >= end) {
     throw new Error("Invalid time range");
   }
 
@@ -43,40 +67,61 @@ export const createInterviewScheduleService = async (data) => {
     if (job.interviewScheduleId) throw new Error("Already scheduled");
   }
 
-  const conflict = await checkScheduleConflict(
-    startTime,
-    endTime,
-    companyId,
-    venue,
-  );
-
+  const conflict = await checkScheduleConflict(start, end, companyId, venue);
   if (conflict) throw new Error("Schedule conflict");
 
-  return createScheduleWithJobs(
+  const schedule = await createScheduleWithJobs(
     {
       title: data.title,
       companyId,
-      startTime,
-      endTime,
-      venue,
+      startTime: start,
+      endTime: end,
+      ...(venue && { venue }),
       createdBy,
-      status: "SCHEDULED",
-      companyApprovalStatus: "PENDING",
     },
     jobIds,
   );
+
+  if (!schedule) {
+    throw new Error("Failed to create schedule");
+  }
+
+  runInBackground(async () => {
+    try {
+      const applications = await getAppliedStudentsForJobs(jobIds);
+
+      const userIds = [
+        ...new Set(applications.map((app) => app.student.user.id)),
+      ];
+
+      if (!userIds.length) return;
+
+      emitToUsers(userIds, SOCKET_EVENTS.SCHEDULE_CREATED, {
+        scheduleId: schedule.id,
+        title: schedule.title,
+        startTime: schedule.startTime,
+      });
+
+      await createManyNotifications(
+        userIds.map((userId) => ({
+          userId,
+          title: "Interview Scheduled",
+          message: `Interview scheduled for ${schedule.title}`,
+          type: NotificationType.SCHEDULE_CREATED,
+        })),
+      );
+    } catch (err) {
+      console.error("Schedule notification failed", err);
+    }
+  });
+
+  return schedule;
 };
 
-// =======================================================
-// 🔹 GET ALL (ADMIN)
-// =======================================================
 export const getAllSchedulesService = async () => {
   return getAllSchedules();
 };
 
-// =======================================================
-// 🔹 GET BY ID
-// =======================================================
 export const getScheduleByIdService = async (id: number) => {
   const schedule = await getScheduleById(id);
 
@@ -85,37 +130,46 @@ export const getScheduleByIdService = async (id: number) => {
   return schedule;
 };
 
-// =======================================================
-// 🔹 GET COMPANY SCHEDULES
-// =======================================================
 export const getCompanySchedulesService = async (companyId: number) => {
   return getSchedulesByCompany(companyId);
 };
 
-// =======================================================
-// 🔹 UPDATE SCHEDULE (SAFE)
-// =======================================================
-export const updateScheduleService = async (id: number, data) => {
+export const updateScheduleService = async (
+  id: number,
+  data: UpdateScheduleInput,
+) => {
   const existing = await getScheduleById(id);
   if (!existing) throw new Error("Schedule not found");
 
-  if (data.startTime || data.endTime) {
-    const start = data.startTime || existing.startTime;
-    const end = data.endTime || existing.endTime;
+  const start = data.startTime ? new Date(data.startTime) : existing.startTime;
 
-    const conflict = await checkScheduleConflict(
-      start,
-      end,
-      existing.companyId,
-      data.venue || existing.venue || undefined,
-    );
+  const end = data.endTime ? new Date(data.endTime) : existing.endTime;
 
-    if (conflict && conflict.id !== id) {
-      throw new Error("Schedule conflict detected");
-    }
+  if (start >= end) {
+    throw new Error("Invalid time range");
   }
 
-  // 🔥 decide if approval needs reset
+  const venue =
+    data.venue !== undefined ? data.venue : (existing.venue ?? undefined);
+
+  const conflict = await checkScheduleConflict(
+    start,
+    end,
+    existing.companyId,
+    venue,
+  );
+
+  if (conflict && conflict.id !== id) {
+    throw new Error("Schedule conflict detected");
+  }
+
+  const updatePayload = {
+    ...(data.title !== undefined && { title: data.title }),
+    ...(data.startTime !== undefined && { startTime: start }),
+    ...(data.endTime !== undefined && { endTime: end }),
+    ...(data.venue !== undefined && { venue: data.venue }),
+  };
+
   const shouldReset =
     data.title !== undefined ||
     data.startTime !== undefined ||
@@ -123,7 +177,7 @@ export const updateScheduleService = async (id: number, data) => {
     data.venue !== undefined;
 
   return updateSchedule(id, {
-    ...data,
+    ...updatePayload,
     ...(shouldReset && {
       companyApprovalStatus: "PENDING",
       approvedAt: null,
@@ -133,14 +187,10 @@ export const updateScheduleService = async (id: number, data) => {
   });
 };
 
-// =======================================================
-// 🔹 DELETE SCHEDULE (SAFE)
-// =======================================================
 export const deleteScheduleService = async (id: number) => {
   const existing = await getScheduleById(id);
   if (!existing) throw new Error("Schedule not found");
 
-  // detach jobs first (important)
   if (existing.jobs?.length) {
     const jobIds = existing.jobs.map((j) => j.id);
     await detachJobsFromSchedule(jobIds);
@@ -149,9 +199,6 @@ export const deleteScheduleService = async (id: number) => {
   return deleteSchedule(id);
 };
 
-// =======================================================
-// 🔹 ADD JOBS TO EXISTING SCHEDULE
-// =======================================================
 export const addJobsToScheduleService = async (
   scheduleId: number,
   jobIds: number[],
@@ -178,9 +225,6 @@ export const addJobsToScheduleService = async (
   return attachJobsToSchedule(scheduleId, jobIds);
 };
 
-// =======================================================
-// 🔹 REMOVE JOBS FROM SCHEDULE
-// =======================================================
 export const removeJobsFromScheduleService = async (jobIds: number[]) => {
   return detachJobsFromSchedule(jobIds);
 };
@@ -189,28 +233,22 @@ export const approveScheduleService = async (
   scheduleId: number,
   companyUserId: number,
 ) => {
-  // 1. fetch schedule
   const schedule = await getScheduleWithJobsAndApplications(scheduleId);
 
   if (!schedule) throw new Error("Schedule not found");
 
-  // 2. auth
   if (schedule.company.userId !== companyUserId) {
     throw new Error("Unauthorized");
   }
 
-  // 3. status
   if (schedule.companyApprovalStatus !== "PENDING") {
     throw new Error("Already processed");
   }
 
-  // 4. get jobIds
   const jobIds = schedule.jobs.map((j) => j.id);
 
-  // 5. fetch students via repo (✅ clean)
   const applications = await getAppliedStudentsForJobs(jobIds);
 
-  // 6. dedupe
   const uniqueStudentsMap = new Map();
 
   for (const app of applications) {
@@ -227,13 +265,11 @@ export const approveScheduleService = async (
 
   const students = Array.from(uniqueStudentsMap.values());
 
-  // 7. update
   const updated = await updateScheduleApprovalStatus(scheduleId, {
     companyApprovalStatus: "APPROVED",
     approvedAt: new Date(),
   });
 
-  // 8. notify
   if (students.length) {
     sendInterviewNotificationEmail({
       students,
@@ -251,24 +287,18 @@ export const updateScheduleApprovalService = async (
   status: "APPROVED" | "REJECTED",
   rejectionReason?: string,
 ) => {
-  // 1. fetch
   const schedule = await getScheduleById(scheduleId);
 
   if (!schedule) throw new Error("Schedule not found");
 
-  // 2. auth
   if (schedule.company.userId !== companyUserId) {
     throw new Error("Unauthorized");
   }
 
-  // 3. prevent double approval
   if (schedule.companyApprovalStatus === "APPROVED") {
     throw new Error("Already approved");
   }
 
-  // =========================
-  // REJECT FLOW
-  // =========================
   if (status === "REJECTED") {
     if (!rejectionReason?.trim()) {
       throw new Error("Rejection reason required");
@@ -280,7 +310,6 @@ export const updateScheduleApprovalService = async (
       rejectionReason,
     });
 
-    // 🔥 notify admin
     sendScheduleDiscussionEmail({
       schedule,
       senderRole: "COMPANY",
@@ -292,9 +321,6 @@ export const updateScheduleApprovalService = async (
     return updated;
   }
 
-  // =========================
-  // APPROVE FLOW
-  // =========================
   if (status === "APPROVED") {
     const jobIds = schedule.jobs.map((j) => j.id);
 
@@ -310,6 +336,7 @@ export const updateScheduleApprovalService = async (
         map.set(email, {
           email,
           firstname: student.user.firstname,
+          userId: student.user.id,
         });
       }
     }
@@ -322,7 +349,29 @@ export const updateScheduleApprovalService = async (
       rejectionReason: null,
     });
 
-    // 🔥 notify students
+    runInBackground(async () => {
+      try {
+        const userIds = students.map((s) => s.userId);
+
+        if (!userIds.length) return;
+
+        emitToUsers(userIds, SOCKET_EVENTS.SCHEDULE_APPROVED, {
+          scheduleId,
+          title: schedule.title,
+        });
+
+        await createManyNotifications(
+          userIds.map((userId) => ({
+            userId,
+            title: "Schedule Approved",
+            message: `Interview schedule approved for ${schedule.title}`,
+            type: NotificationType.SCHEDULE_APPROVED,
+          })),
+        );
+      } catch (err) {
+        console.error("Schedule approval notification failed", err);
+      }
+    });
     if (students.length) {
       sendInterviewNotificationEmail({
         students,
@@ -331,7 +380,6 @@ export const updateScheduleApprovalService = async (
       }).catch(console.error);
     }
 
-    // 🔥 OPTIONAL: notify admin
     sendScheduleDiscussionEmail({
       schedule,
       senderRole: "COMPANY",
@@ -353,9 +401,6 @@ export const getSchedulesForUserService = async (
 ) => {
   let companyId: number;
 
-  // =========================
-  // COMPANY FLOW
-  // =========================
   if (role === "COMPANY") {
     const company = await getCompanyByUserId(userId);
 
@@ -364,12 +409,7 @@ export const getSchedulesForUserService = async (
     }
 
     companyId = company.id;
-  }
-
-  // =========================
-  // ADMIN FLOW
-  // =========================
-  else if (role === "ADMIN") {
+  } else if (role === "ADMIN") {
     if (!companyIdFromQuery) {
       throw new Error("companyId is required for admin");
     }
@@ -381,7 +421,6 @@ export const getSchedulesForUserService = async (
 
   const schedules = await getSchedulesByCompanyIdRepo(companyId);
 
-  // 🔥 format for frontend
   return schedules.map((s) => ({
     id: s.id,
     title: s.title,
@@ -390,5 +429,6 @@ export const getSchedulesForUserService = async (
     venue: s.venue,
     companyName: s.company.name,
     jobCount: s.jobs.length,
+    jobs: s.jobs,
   }));
 };

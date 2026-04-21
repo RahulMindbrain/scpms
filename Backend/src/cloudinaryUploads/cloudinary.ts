@@ -1,12 +1,10 @@
 import { v2 as cloudinary } from "cloudinary";
 import { Request, Response } from "express";
 
-// 🔥 Extract + assert once
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME!;
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY!;
 const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET!;
 
-// 🔥 Runtime safety
 if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
   throw new Error("Missing Cloudinary environment variables");
 }
@@ -31,7 +29,7 @@ export const getCloudinarySignatureController = async (
         timestamp,
         folder,
       },
-      CLOUDINARY_API_SECRET, // ✅ FIXED
+      CLOUDINARY_API_SECRET,
     );
 
     return res.json({

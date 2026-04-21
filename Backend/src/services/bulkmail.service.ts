@@ -14,10 +14,8 @@ export const sendBulkMailByCompanyService = async ({
   subject?: string;
   message?: string;
 }) => {
-  // 1. Fetch active jobs
   const jobs = await getActiveJobsByCompanyId(companyId);
 
-  // 2. Validate selected jobs
   const selectedJobs = jobs.filter((j) => jobIds.includes(j.id));
 
   if (!selectedJobs.length) {
@@ -26,7 +24,6 @@ export const sendBulkMailByCompanyService = async ({
 
   const validJobIds = selectedJobs.map((j) => j.id);
 
-  // 3. Get eligible students
   const students = await getEligibleUnplacedStudentsForJobs(validJobIds);
 
   if (!students.length) {
@@ -35,7 +32,6 @@ export const sendBulkMailByCompanyService = async ({
 
   const emails = students.map((s) => s.user.email);
 
-  // 4. Prepare content
   const jobTitles = selectedJobs.map((j) => j.title).join(", ");
 
   const finalSubject = subject || `New Opportunities Available`;
@@ -48,7 +44,6 @@ export const sendBulkMailByCompanyService = async ({
       <p>Please login and apply.</p>
     `;
 
-  // 5. Send mail
   await sendMail({
     to: emails,
     subject: finalSubject,

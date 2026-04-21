@@ -25,3 +25,9 @@ node_modules/
 # Ignore build outputs
 dist/
 build/
+
+#Ignore .md files !Readme
+# Ignore all markdown files
+*.md
+
+!README.md

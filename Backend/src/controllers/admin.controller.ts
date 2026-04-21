@@ -68,7 +68,6 @@ export const getStudentsController = async (req: Request, res: Response) => {
       return sendError(res, 400, "Invalid limit");
     }
 
-    // 🔥 BUILD OBJECT SAFELY (KEY FIX)
     const params: any = {
       page: parsedPage,
       ...(parsedLimit !== undefined && { limit: parsedLimit }),
@@ -141,7 +140,6 @@ export const getActiveStudentsController = async (
     const parsedYear = parseNumber(year);
     const parsedPassingYear = parseNumber(passingYear);
 
-    // optional: basic validation
     if (parsedPage !== undefined && parsedPage < 1) {
       return sendError(res, 400, "Invalid page");
     }
@@ -150,7 +148,6 @@ export const getActiveStudentsController = async (
       return sendError(res, 400, "Invalid limit");
     }
 
-    // 🔥 KEY FIX: omit undefined fields
     const params = {
       ...(parsedPage !== undefined && { page: parsedPage }),
       ...(parsedLimit !== undefined && { limit: parsedLimit }),
@@ -185,7 +182,6 @@ export const getInactiveStudentsController = async (
     const parsedLimit = parseNumber(limit);
     const parsedPassingYearFrom = parseNumber(passingYearFrom);
 
-    // optional validation
     if (parsedPage !== undefined && parsedPage < 1) {
       return sendError(res, 400, "Invalid page");
     }
@@ -194,7 +190,6 @@ export const getInactiveStudentsController = async (
       return sendError(res, 400, "Invalid limit");
     }
 
-    // 🔥 KEY FIX: omit undefined
     const params = {
       ...(parsedPage !== undefined && { page: parsedPage }),
       ...(parsedLimit !== undefined && { limit: parsedLimit }),
@@ -297,7 +292,6 @@ export const updateJobStatusByAdminController = async (
       return sendError(res, 400, "status is required");
     }
 
-    // ✅ Normalize to array
     const ids = jobIds ?? (jobId ? [jobId] : []);
 
     if (!ids.length) {
@@ -309,14 +303,6 @@ export const updateJobStatusByAdminController = async (
       status as JobStatus,
       user.id,
     );
-
-    console.log(updatedJobs);
-
-    if (status === "APPROVED") {
-      runInBackground(() =>
-        Promise.all(ids.map((id: number) => notifyEligibleStudentsForJob(id))),
-      );
-    }
 
     return sendSuccess(
       res,

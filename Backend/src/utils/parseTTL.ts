@@ -16,6 +16,8 @@ export const parseTTLToMs = (ttl: string): number => {
   const matches = ttl.matchAll(regex);
 
   for (const match of matches) {
+    if (!match[1] || !match[2]) continue;
+
     const value = Number(match[1]);
     const unit = match[2].toLowerCase();
 
