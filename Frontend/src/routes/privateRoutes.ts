@@ -21,6 +21,7 @@ import BulkEmail from "@/pages/private/admin/email/BulkEmail";
 import DocumentManagement from "@/pages/private/admin/documents/DocumentManagement";
 import AdminJobManagement from "@/pages/private/admin/jobs/JobManagement";
 import DepartmentManagement from "@/pages/private/admin/department/DepartmentManagement";
+import SkillManagement from "@/pages/private/admin/skills/SkillManagement";
 import CompanyDashboard from "@/pages/private/company/dashboard/Dashboard";
 import PostJob from "@/pages/private/company/jobs/PostJob";
 import ManageJobs from "@/pages/private/company/jobs/ManageJobs";
@@ -91,6 +92,10 @@ export const PrivateRoutes: RouteOptions<any>[] = [
     {
         path: "/admin/departments",
         component: DepartmentManagement,
+    },
+    {
+        path: "/admin/skills",
+        component: SkillManagement,
     },
 
 

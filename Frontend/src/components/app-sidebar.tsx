@@ -18,6 +18,7 @@ import {
   PlusCircle,
   FileEdit,
   GraduationCap,
+  Wrench,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -50,6 +51,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           { title: "Applications", url: "/admin/applications", icon: <FileText /> },
           // { title: "Shortlisting", url: "/admin/shortlisting", icon: <ListChecks /> },
           { title: "Interview Scheduler", url: "/admin/event-management", icon: <Calendar /> },
+          { title: "Skills", url: "/admin/skills", icon: <Wrench /> },
         ],
         secondary: [
           // { title: "Analytics", url: "/admin/report", icon: <BarChart3 /> },

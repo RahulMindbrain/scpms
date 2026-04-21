@@ -18,12 +18,7 @@ import { toast } from "sonner";
 import { z } from "zod";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-
-const allSkillsList = [
-  "React", "Node.js", "Java", "Python", "C++", "JavaScript", "TypeScript",
-  "Express", "MongoDB", "PostgreSQL", "Docker", "AWS", "Git", "Next.js",
-  "Tailwind CSS", "Redux", "SQL", "Spring Boot", "Machine Learning"
-];
+import { getAPI } from "@/apis/api";
 
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
@@ -37,15 +32,27 @@ const profileSchema = z.object({
     passingYear: z.coerce.number().min(2000, "Invalid year").max(2100, "Invalid year"),
     departmentId: z.coerce.number().min(1, "Required"),
     activeBacklogs: z.coerce.number().min(0, "Cannot be negative"),
-    resumeUrl: z.string().optional().nullable(),
-  })
+  }),
+  resumeUrl: z.string().url("Invalid Resume URL").or(z.literal("")).nullable(),
 });
+
+type SkillOption = {
+  id: number;
+  name: string;
+};
+
+type ApiResponse<T> = {
+  success: boolean;
+  message: string;
+  data: T;
+};
 
 const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any) => {
   const [formData, setFormData] = useState<any>(profile);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isUploading, setIsUploading] = useState(false);
   const [skillInput, setSkillInput] = useState("");
+  const [allSkillsList, setAllSkillsList] = useState<string[]>([]);
 
   const { upload } = useCloudinaryUpload();
 
@@ -63,12 +70,30 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
           year: profile.stats?.year || profile.year || 1,
           passingYear: profile.stats?.passingYear || profile.passingYear || 2026,
           departmentId: profile.stats?.departmentId || profile.departmentId || 1,
-          resumeUrl: profile.stats?.resumeUrl || profile.resumeUrl || "",
-        }
+        },
+        resumeUrl: profile.resumeUrl || ""
       });
       setErrors({});
     }
   }, [profile, isOpen]);
+
+  useEffect(() => {
+    const fetchSkills = async () => {
+      try {
+        const response = await getAPI<ApiResponse<SkillOption[]>>("/skills/get-all");
+        const skillNames = Array.isArray(response?.data)
+          ? response.data.map((skill) => skill.name)
+          : [];
+        setAllSkillsList(skillNames);
+      } catch (error) {
+        setAllSkillsList([]);
+      }
+    };
+
+    if (isOpen) {
+      void fetchSkills();
+    }
+  }, [isOpen]);
 
   const updateField = (field: string, value: any) => {
     setFormData((prev: any) => ({ ...prev, [field]: value }));
@@ -394,53 +419,42 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                 <FileText className="h-4 w-4 text-blue-600" />
                 Resume Document
               </Label>
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1 space-y-2">
-                  <Input
-                    placeholder="https://cloudinary.com/..."
-                    value={formData.stats?.resumeUrl || ""}
-                    onChange={(e) => updateStat("resumeUrl", e.target.value)}
-                    className="h-11 rounded-xl border-slate-200 bg-slate-50 text-slate-500 border-dashed"
-                    readOnly
-                  />
-                </div>
-                <div className="shrink-0">
-                  <input
-                    type="file"
-                    id="resume-upload"
-                    accept=".pdf"
-                    className="hidden"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
+              <div className="shrink-0">
+                <input
+                  type="file"
+                  id="resume-upload"
+                  accept=".pdf"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
 
-                      setIsUploading(true);
-                      try {
-                        const url = await upload(file, "resumes");
-                        if (url) {
-                          updateStat("resumeUrl", url);
-                          toast.success("Resume uploaded successfully");
-                        }
-                      } catch (error) {
-                        toast.error("Failed to upload resume");
-                      } finally {
-                        setIsUploading(false);
+                    setIsUploading(true);
+                    try {
+                      const url = await upload(file, "resumes");
+                      if (url) {
+                        updateField("resumeUrl", url);
+                        toast.success("Resume uploaded successfully");
                       }
-                    }}
-                  />
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="h-11 rounded-xl border-blue-200 text-blue-600 hover:bg-blue-50 gap-2 px-6"
-                    onClick={() => document.getElementById('resume-upload')?.click()}
-                    disabled={isUploading}
-                  >
-                    {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                    {formData.stats?.resumeUrl ? "Change Resume" : "Upload PDF Resume"}
-                  </Button>
-                </div>
+                    } catch (error) {
+                      toast.error("Failed to upload resume");
+                    } finally {
+                      setIsUploading(false);
+                    }
+                  }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-11 rounded-xl border-blue-200 text-blue-600 hover:bg-blue-50 gap-2 px-6"
+                  onClick={() => document.getElementById('resume-upload')?.click()}
+                  disabled={isUploading}
+                >
+                  {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  {formData.resumeUrl ? "Change Resume" : "Upload PDF Resume"}
+                </Button>
               </div>
-              {formData.stats?.resumeUrl && (
+              {formData.resumeUrl && (
                 <div className="flex items-center gap-2 text-xs text-green-600 font-medium bg-green-50 px-3 py-2 rounded-lg border border-green-100 w-fit">
                   <Badge className="h-2 w-2 rounded-full bg-green-500 p-0" />
                   Resume linked successfully

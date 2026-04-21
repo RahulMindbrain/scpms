@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Github, Globe } from "lucide-react";
+import { Globe, Code2 } from "lucide-react";
 
 type ProjectModalProps = {
   isOpen: boolean;
@@ -88,7 +88,7 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
             <div className="space-y-2">
               <Label htmlFor="githubUrl" className="text-xs font-black uppercase tracking-widest text-slate-500">GitHub Link</Label>
               <div className="relative">
-                <Github className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
+                <Code2 className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
                 <Input
                   id="githubUrl"
                   placeholder="https://github.com..."

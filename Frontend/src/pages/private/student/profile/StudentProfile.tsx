@@ -2,7 +2,7 @@ import {
   Mail, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
   Briefcase, Loader2, FileText, Calendar, Building2,
-  Lightbulb, Globe, Eye
+  Lightbulb, Globe, Eye, Upload
 } from 'lucide-react';
 import {
   Dialog,
