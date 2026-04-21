@@ -2,12 +2,7 @@ import React from 'react';
 import {
   Calendar,
   Clock, MapPin,
-  LayoutDashboard,
-  History,
-  ChevronRight,
-  ExternalLink,
-  MoreVertical,
-  Search
+  ExternalLink
 } from 'lucide-react';
 
 interface Interview {

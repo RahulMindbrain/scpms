@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   Dialog, DialogContent, DialogDescription,
-  DialogHeader, DialogTitle, DialogFooter
+  DialogHeader, DialogTitle
 } from "@/components/ui/dialog";
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -69,7 +69,7 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
           message: ""
         });
         if (schedule.companyId) {
-          dispatch(fetchJobsByCompanyId(schedule.companyId));
+          dispatch(fetchJobsByCompanyId({ id: schedule.companyId }));
         }
       }
     }
@@ -77,7 +77,7 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
 
   const handleCompanyChange = (value: string) => {
     setFormData(prev => ({ ...prev, companyId: value, jobIds: [] }));
-dispatch(fetchJobsByCompanyId(Number(value)));
+dispatch(fetchJobsByCompanyId({ id: Number(value) }));
   };
 
   const handleJobToggle = (jobId: number) => {

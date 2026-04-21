@@ -2,27 +2,14 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Search,
-  Download,
-  Plus, CheckCircle2,
-  Clock, UserPlus,
-  Trash2,
-  Edit2,
-  UserX,
+  CheckCircle2,
   UserCheck,
   Eye,
-  MoreHorizontal,
   XCircle
 } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
 import {
   Table,
   TableBody,
@@ -43,9 +30,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import {
   Select,
@@ -54,13 +38,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-
 import { fetchStudents, fetchInactiveStudents, activateStudents } from '@/redux/thunks/studentThunk';
 import { fetchDepartments } from '@/redux/thunks/departmentThunk';
 import type { AppDispatch } from '@/redux/store/store';
@@ -77,12 +54,6 @@ const StudentManagement: React.FC = () => {
   const [selectedDept, setSelectedDept] = useState('All Depts');
   const [selectedStatus, setSelectedStatus] = useState('All Status');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isExporting, setIsExporting] = useState(false);
-
-  // Viewing Department State
-  const [isViewDeptModalOpen, setIsViewDeptModalOpen] = useState(false);
-  const [viewingDeptData, setViewingDeptData] = useState<any>(null);
-  const [isViewLoading, setIsViewLoading] = useState(false);
 
   // Viewing Student Profile State
   const [isViewProfileModalOpen, setIsViewProfileModalOpen] = useState(false);
@@ -120,33 +91,10 @@ const StudentManagement: React.FC = () => {
     });
   }, [students, searchTerm, selectedDept, selectedStatus]);
 
-  const handleExport = async () => {
-    setIsExporting(true);
-    const toastId = toast.loading("Generating student database export...");
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    toast.success("Student records exported successfully!", { id: toastId });
-    setIsExporting(false);
-  };
-
   const handleAddStudent = (e: React.FormEvent) => {
     e.preventDefault();
     toast.success(" add new student records.");
     setIsAddModalOpen(false);
-  };
-
-  const handleViewDept = async (deptId: number) => {
-    setIsViewLoading(true);
-    setIsViewDeptModalOpen(true);
-    try {
-      // Using the exact API pattern provided by user
-      const data = await getAPI<any>(`/dept/${deptId}`);
-      setViewingDeptData(data);
-    } catch (err: any) {
-      toast.error("Failed to fetch department details");
-      setIsViewDeptModalOpen(false);
-    } finally {
-      setIsViewLoading(false);
-    }
   };
 
   const handleViewProfile = async (student: any) => {
@@ -446,59 +394,6 @@ const StudentManagement: React.FC = () => {
         )}
       </Card>
       
-      {/* Department View Modal */}
-      <Dialog open={isViewDeptModalOpen} onOpenChange={setIsViewDeptModalOpen}>
-        <DialogContent className="sm:max-w-[425px] overflow-hidden p-0 border-none bg-transparent">
-          <Card className="border-none shadow-2xl bg-white overflow-hidden">
-            <CardHeader className="bg-primary text-primary-foreground pb-8">
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-2xl font-black mb-1">Department Details</CardTitle>
-                  <CardDescription className="text-primary-foreground/70 font-medium">
-                    Detailed information about the academic branch
-                  </CardDescription>
-                </div>
-                <div className="p-3 bg-white/20 rounded-2xl backdrop-blur-md">
-                  <Eye className="w-6 h-6" />
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-6 relative">
-              {isViewLoading ? (
-                <div className="flex flex-col items-center justify-center py-12 space-y-4">
-                  <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground animate-pulse">Fetching records...</p>
-                </div>
-              ) : viewingDeptData?.data ? (
-                <div className="space-y-6">
-                  <div className="p-6 rounded-2xl bg-slate-50 border border-slate-100 flex flex-col items-center justify-center space-y-4">
-                    <Badge className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 border-none px-4 py-1 text-xs font-black uppercase tracking-widest">
-                      Active Department
-                    </Badge>
-                    
-                    <div className="text-center">
-                      <p className="text-[10px] font-black uppercase text-slate-400 tracking-tighter mb-1">Department Name</p>
-                      <p className="font-bold text-slate-900 text-lg">
-                        {viewingDeptData.data.name || viewingDeptData.data.deptName || 'N/A'}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground font-bold">No data found</p>
-                </div>
-              )}
-            </CardContent>
-            <DialogFooter className="p-6 pt-0">
-              <Button onClick={() => setIsViewDeptModalOpen(false)} className="w-full h-12 rounded-xl font-bold uppercase tracking-widest text-xs">
-                Close View
-              </Button>
-            </DialogFooter>
-          </Card>
-        </DialogContent>
-      </Dialog>
-
       {/* Student Profile Modal */}
       <Dialog open={isViewProfileModalOpen} onOpenChange={setIsViewProfileModalOpen}>
         <DialogContent className="sm:max-w-[425px] bg-[#f8fafc] border-none shadow-xl rounded-xl">

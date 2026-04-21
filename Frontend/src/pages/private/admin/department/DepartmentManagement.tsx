@@ -69,9 +69,6 @@ const DepartmentManagement: React.FC = () => {
     (d.name || d.deptName || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const activeCount = departments.filter((d: any) => d.isActive).length;
-  const inactiveCount = departments.filter((d: any) => !d.isActive).length;
-
   return (
     <div className="p-4 md:p-8 space-y-6 bg-[#f8fafc] min-h-screen">
       {/* Top Bar */}

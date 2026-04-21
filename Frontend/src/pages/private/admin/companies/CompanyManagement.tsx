@@ -9,7 +9,6 @@ import {
   XCircle,
   ExternalLink,
   Globe,
-  Plus,
   ArrowUpRight,
   Briefcase,
   Users,
@@ -115,7 +114,7 @@ const CompanyManagement: React.FC = () => {
     setNewCompany({ name: '', sector: '', location: '', email: '', description: '' });
   };
 
-  const toggleApproval = async (id: number, userId: number, currentStatus: string) => {
+  const toggleApproval = async (_id: number, userId: number, currentStatus: string) => {
     if (currentStatus === 'Pending') {
       try {
         await dispatch(activateCompanies([userId])).unwrap();
@@ -136,7 +135,7 @@ const CompanyManagement: React.FC = () => {
     dispatch(fetchJobsByCompanyId({ id: companyId, params: { page: 1, limit: 10, status: 'APPROVED' } }));
   };
 
-  const deleteCompany = (id: number) => {
+  const deleteCompany = (_id: number) => {
     toast.info("Integration for deleting companies is coming soon.");
   };
 

@@ -123,10 +123,11 @@ export const updateJobApplicationStatus = createAsyncThunk(
 
 export const fetchJobsByCompanyId = createAsyncThunk(
   "company/fetchJobsByCompanyId",
-  async (id: number, { rejectWithValue }) => {
+  async ({ id, params }: { id: number; params?: { page?: number; limit?: number; status?: string } }, { rejectWithValue }) => {
     try {
       const response = await getAPI<any>(
-        `/admin/get-jobs-company/${id}`
+        `/admin/get-jobs-company/${id}`,
+        params
       );
       return response;
     } catch (error: any) {

@@ -10,7 +10,6 @@ import {
   CheckSquare,
   Square
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import { Modal } from '@/components/ui/modal';
 import { Button } from '@/components/ui/button';
@@ -23,7 +22,7 @@ const BulkEmail: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   
   // Redux State
-  const { companies: reduxCompanies, jobs: reduxJobs, loading: reduxLoading, error: reduxError } = useSelector((state: RootState) => state.company);
+  const { companies: reduxCompanies, jobs: reduxJobs, loading: reduxLoading } = useSelector((state: RootState) => state.company);
   
   // Selection State
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');

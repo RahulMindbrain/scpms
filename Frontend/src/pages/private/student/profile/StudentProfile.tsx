@@ -2,7 +2,7 @@ import {
   Mail, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
   Briefcase, Loader2, FileText, Calendar, Building2,
-  Lightbulb, Globe, Eye, Upload
+  Lightbulb, Globe, Upload
 } from 'lucide-react';
 import {
   Dialog,
@@ -14,8 +14,8 @@ import ProjectModal from './modal/ProjectModal';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchStudentProfile, createStudentProfile, updateStudentProfile } from '../../../../redux/thunks/studentThunk';
-import { useEffect, useState, useRef } from 'react';
+import { fetchStudentProfile, updateStudentProfile } from '../../../../redux/thunks/studentThunk';
+import { useEffect, useState } from 'react';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import ExperienceModal from './modal/ExperienceModal';

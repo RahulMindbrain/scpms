@@ -6,9 +6,7 @@ import {
   BriefcaseBusiness,
   ChevronRight,
   IndianRupee,
-  Calendar,
-  Building2,
-  Filter
+  Calendar
 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';

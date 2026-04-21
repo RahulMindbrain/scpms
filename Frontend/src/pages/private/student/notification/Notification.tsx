@@ -86,7 +86,7 @@ const Notification = () => {
     }
   };
 
-  const getIcon = (type: string, status: boolean) => {
+  const getIcon = (type: string) => {
     const iconSize = 18;
     switch (type) {
       case 'APPLICATION_SELECTED':
@@ -173,7 +173,7 @@ const Notification = () => {
                 >
                   {/* Icon */}
                   <div className={`mt-0.5 h-10 w-10 shrink-0 rounded-lg flex items-center justify-center border ${getIconStyles(String(notification.type))}`}>
-                    {getIcon(String(notification.type), Boolean(notification.read))}
+                    {getIcon(String(notification.type))}
                   </div>
 
                   {/* Content */}

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, User, Building2, Briefcase, Info } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Search, Building2, Briefcase, Info } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchApplications } from '@/redux/thunks/applicationThunk';
 import type { RootState, AppDispatch } from '@/redux/store/store';

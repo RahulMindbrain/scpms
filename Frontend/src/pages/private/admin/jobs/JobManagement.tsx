@@ -13,10 +13,7 @@ import {
   ArrowUpDown,
   MoreVertical,
   ChevronLeft,
-  ChevronRight,
-  TrendingUp,
-  Globe,
-  Trash2
+  ChevronRight
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobs, updateJobStatus } from '@/redux/thunks/driveThunk';
