@@ -1,15 +1,13 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   CheckCircle2, Circle, Clock, XCircle, Briefcase,
-  ChevronRight, Search, FileText, BarChart3,
+  ChevronRight, Search, 
   ArrowRight, Sparkles, UserCircle,
-  Rocket, TrendingUp, Loader2,
+  Rocket, TrendingUp, 
   Calendar, Building2, ChevronDown,
-  MapPin, DollarSign
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchJobApplications, updateApplicationStatus } from '@/redux/thunks/studentThunk';
-import { toast } from 'sonner';
+import { fetchJobApplications } from '@/redux/thunks/studentThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import { Button } from '@/components/ui/button';
@@ -97,31 +95,13 @@ const CompanyAvatar = ({ name }: { name: string }) => {
 /* ─── Tabular Application Row ─── */
 const ApplicationRow = ({
   app,
-  onUpdate,
   isExpanded,
   onToggle
 }: {
   app: any;
-  onUpdate: () => void;
   isExpanded: boolean;
   onToggle: () => void;
 }) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const [updating, setUpdating] = useState<"ACCEPT" | "REJECT" | null>(null);
-
-  const handleAction = async (action: "ACCEPT" | "REJECT") => {
-    setUpdating(action);
-    try {
-      await dispatch(updateApplicationStatus({ id: app.id, action })).unwrap();
-      toast.success(`Application ${action.toLowerCase()}ed successfully`);
-      onUpdate();
-    } catch (error: any) {
-      toast.error(error || `Failed to ${action.toLowerCase()} application`);
-    } finally {
-      setUpdating(null);
-    }
-  };
-
   const status = app.status as Status;
   const isSelected = status === 'SELECTED';
   const isRejected = status === 'REJECTED';
@@ -469,7 +449,6 @@ const ApplicationStatus = () => {
               <ApplicationRow
                 key={app.id}
                 app={app}
-                onUpdate={() => dispatch(fetchJobApplications({}))}
                 isExpanded={expandedId === app.id}
                 onToggle={() => setExpandedId(expandedId === app.id ? null : app.id)}
               />
