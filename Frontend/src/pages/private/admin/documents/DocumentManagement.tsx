@@ -125,7 +125,7 @@ const DocumentManagement: React.FC = () => {
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <div className="relative group flex-1 min-w-[300px] lg:flex-none">
+              <div className="relative group w-full lg:w-auto lg:flex-none lg:min-w-[300px]">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
                 <input
                   type="text"

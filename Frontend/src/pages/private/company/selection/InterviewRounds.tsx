@@ -139,7 +139,7 @@ const CompanyInterviewManager: React.FC = () => {
   }), [schedules]);
 
   return (
-    <div className="min-h-screen bg-[#FDFDFE] p-6 lg:p-12 space-y-12 font-sans selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen bg-[#FDFDFE] p-4 sm:p-6 lg:p-12 space-y-12 font-sans selection:bg-indigo-100 selection:text-indigo-900">
 
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
@@ -220,7 +220,7 @@ const CompanyInterviewManager: React.FC = () => {
             ))}
           </div>
 
-          <div className="flex items-center gap-4 w-full lg:w-auto lg:min-w-[400px]">
+          <div className="flex items-center gap-4 w-full lg:w-auto">
             <div className="relative flex-1">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
@@ -250,7 +250,7 @@ const CompanyInterviewManager: React.FC = () => {
                 <div className="relative bg-white border border-slate-100 rounded-[3rem] p-8 lg:p-10 flex flex-col lg:flex-row items-center gap-10 lg:gap-14 shadow-2xl shadow-slate-200/40 hover:shadow-indigo-200/20 transition-all duration-500">
 
                   {/* Left Side: Date Block */}
-                  <div className="flex flex-col items-center justify-center bg-slate-50 rounded-[2.5rem] min-w-[130px] h-[130px] text-center p-6 border border-slate-100 ring-4 ring-slate-50/50">
+                  <div className="flex flex-col items-center justify-center bg-slate-50 rounded-[2.5rem] min-w-[110px] sm:min-w-[130px] h-[110px] sm:h-[130px] text-center p-4 sm:p-6 border border-slate-100 ring-4 ring-slate-50/50">
                     <span className="text-4xl font-black text-indigo-600 mb-1">
                       {new Date(schedule.startTime).getDate()}
                     </span>
@@ -327,7 +327,7 @@ const CompanyInterviewManager: React.FC = () => {
                   </div>
 
                   {/* Right Side: Approval Actions */}
-                  <div className="flex flex-row lg:flex-col gap-3 min-w-[150px]">
+                  <div className="flex flex-row lg:flex-col gap-3 w-full lg:w-auto lg:min-w-[150px]">
                     {schedule.companyApprovalStatus === 'PENDING' ? (
                       <>
                         <Button 

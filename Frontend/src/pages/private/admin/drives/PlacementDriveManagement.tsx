@@ -173,7 +173,7 @@ const PlacementDriveManagement: React.FC = () => {
           
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             {/* Search Bar */}
-            <div className="relative group min-w-[300px]">
+            <div className="relative group w-full sm:w-auto sm:min-w-[300px]">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
               <input 
                 type="text" 
@@ -375,7 +375,7 @@ const PlacementDriveManagement: React.FC = () => {
                                   </div>
 
                                   {/* Stats & Actions */}
-                                  <div className="flex flex-col sm:flex-row xl:flex-col items-center xl:items-end justify-between xl:justify-center gap-8 xl:min-w-[260px] border-t xl:border-t-0 xl:border-l border-slate-100 pt-8 xl:pt-0 xl:pl-10">
+                                  <div className="flex flex-col sm:flex-row xl:flex-col items-center xl:items-end justify-between xl:justify-center gap-8 w-full xl:w-auto xl:min-w-[260px] border-t xl:border-t-0 xl:border-l border-slate-100 pt-8 xl:pt-0 xl:pl-10">
                                     <div className="text-center xl:text-right space-y-1">
                                       <div className="flex items-center justify-center xl:justify-end gap-3 text-slate-900">
                                         <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">

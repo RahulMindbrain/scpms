@@ -48,7 +48,7 @@ const AnalyticsDashboard: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] p-8">
+    <div className="min-h-screen bg-[#F8FAFC] p-4 sm:p-6 lg:p-8">
       {/* Header */}
       <div className=" mb-10">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -90,7 +90,7 @@ const AnalyticsDashboard: React.FC = () => {
 
         {/* Charts Row (Placeholders) */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
+          <div className="lg:col-span-2 bg-white p-5 sm:p-8 rounded-3xl border border-slate-200 shadow-sm">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-xl font-bold text-slate-900">Placement Distribution</h3>
               <select className="bg-slate-50 border-none text-sm font-bold text-slate-600 rounded-lg px-3 py-1.5 focus:ring-2 focus:ring-indigo-500">
@@ -109,7 +109,7 @@ const AnalyticsDashboard: React.FC = () => {
             </div>
           </div>
 
-          <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
+          <div className="bg-white p-5 sm:p-8 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
             <h3 className="text-xl font-bold text-slate-900 mb-6">Offer Types</h3>
             <div className="flex-1 flex items-center justify-center">
               <div className="relative h-48 w-48 rounded-full border-[16px] border-slate-100 flex items-center justify-center">
@@ -140,7 +140,7 @@ const AnalyticsDashboard: React.FC = () => {
 
         {/* Recent Hires Table */}
         <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden">
-          <div className="p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="p-5 sm:p-8 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
             <h3 className="text-xl font-bold text-slate-900">Latest Selections</h3>
             <div className="flex items-center gap-3">
               <div className="relative">
@@ -148,7 +148,7 @@ const AnalyticsDashboard: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Filter students..."
-                  className="pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm w-64 focus:ring-2 focus:ring-indigo-500 transition-all"
+                  className="pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm w-full sm:w-64 focus:ring-2 focus:ring-indigo-500 transition-all"
                 />
               </div>
               <button className="p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg transition-all">
