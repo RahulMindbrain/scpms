@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  Plus, Calendar, Edit3, Building2, Clock, 
+  Plus, Edit3, Building2, Clock, 
   MapPin, Briefcase, ChevronDown, ChevronUp, 
-  Trash2, Search, Users
+  Trash2, Search, Users, MessageSquare, Send, Loader2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/modal';
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from 'framer-motion';
 
 import { EditScheduleModal } from './components/EditScheduleModal';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/redux/store/store';
-import { fetchSchedules, deleteSchedule, fetchSchedulesByCompany } from '@/redux/thunks/interviewThunk';
+import { fetchSchedules, deleteSchedule, fetchScheduleMessages, sendScheduleMessage } from '@/redux/thunks/interviewThunk';
 import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -24,27 +25,27 @@ const InterviewSchedulerPage: React.FC = () => {
   const { schedules, loading } = useSelector((state: RootState) => state.interview);
   const { companies } = useSelector((state: RootState) => state.company);
 
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('all');
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
   const [mode, setMode] = useState<'create' | 'edit'>('edit');
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
+  const [messageText, setMessageText] = useState('');
+  const [msgLoading, setMsgLoading] = useState<number | null>(null);
+  const [sendingMsg, setSendingMsg] = useState(false);
 
   useEffect(() => {
     dispatch(fetchCompanies({ page: 1, limit: 100 }));
   }, [dispatch]);
 
   useEffect(() => {
-    if (selectedCompanyId === 'all') {
-      dispatch(fetchSchedules());
-    } else {
-      dispatch(fetchSchedulesByCompany(Number(selectedCompanyId)));
-    }
-  }, [dispatch, selectedCompanyId]);
+    dispatch(fetchSchedules());
+  }, [dispatch]);
 
-  const toggleExpand = (id: string) => {
+  const toggleExpand = (id: number) => {
     setExpandedId(expandedId === id ? null : id);
   };
 
@@ -69,7 +70,7 @@ const InterviewSchedulerPage: React.FC = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleDelete = async (e: React.MouseEvent, id: string) => {
+  const handleDelete = async (e: React.MouseEvent, id: number) => {
     e.stopPropagation();
     if (window.confirm("Are you sure you want to delete this schedule?")) {
       try {
@@ -94,10 +95,52 @@ const InterviewSchedulerPage: React.FC = () => {
     return new Date(dateString).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   };
 
-  const filteredSchedules = Array.isArray(schedules) ? schedules.filter(s => 
-    s.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    s.company?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) : [];
+  const activeSchedule = useMemo(
+    () => schedules.find((s: any) => s.id === selectedSchedule?.id) || selectedSchedule,
+    [schedules, selectedSchedule]
+  );
+
+  const handleOpenMessages = async (e: React.MouseEvent, schedule: any) => {
+    e.stopPropagation();
+    setSelectedSchedule(schedule);
+    setIsMessagesOpen(true);
+    setMsgLoading(schedule.id);
+    try {
+      await dispatch(fetchScheduleMessages(schedule.id)).unwrap();
+    } catch (error: any) {
+      toast.error(error || "Failed to load notes");
+    } finally {
+      setMsgLoading(null);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!activeSchedule || !messageText.trim()) return;
+    setSendingMsg(true);
+    try {
+      const formalNote = messageText.trim();
+      await dispatch(sendScheduleMessage({ id: activeSchedule.id, message: formalNote })).unwrap();
+      await dispatch(fetchScheduleMessages(activeSchedule.id)).unwrap();
+      setMessageText('');
+      toast.success("Formal note sent successfully");
+    } catch (error: any) {
+      toast.error(error || "Failed to send note");
+    } finally {
+      setSendingMsg(false);
+    }
+  };
+
+  const filteredSchedules = Array.isArray(schedules)
+    ? schedules.filter((s) => {
+        const matchesCompany =
+          selectedCompanyId === 'all' ||
+          String(s.companyId) === selectedCompanyId;
+        const matchesSearch =
+          s.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          s.company?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+        return matchesCompany && matchesSearch;
+      })
+    : [];
 
   return (
     <div className="min-h-screen bg-slate-50/40 p-4 sm:p-6 md:p-8">
@@ -227,6 +270,9 @@ const InterviewSchedulerPage: React.FC = () => {
                         <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all" onClick={(e) => handleDelete(e, drive.id)}>
                           <Trash2 size={18} />
                         </Button>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all" onClick={(e) => handleOpenMessages(e, drive)}>
+                          <MessageSquare size={18} />
+                        </Button>
                       </div>
                       <div className="w-10 h-10 rounded-xl bg-slate-200/50 flex items-center justify-center text-slate-500">
                          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
@@ -285,6 +331,64 @@ const InterviewSchedulerPage: React.FC = () => {
         onOpenChange={setIsEditModalOpen}
         mode={mode} 
       />
+
+      <Modal
+        isOpen={isMessagesOpen}
+        onClose={() => setIsMessagesOpen(false)}
+        title="Formal Notes"
+        subtitle={`Notes for ${activeSchedule?.title || "selected schedule"}`}
+      >
+        <div className="flex flex-col gap-6 pt-2">
+          <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+            {msgLoading === activeSchedule?.id ? (
+              <div className="flex items-center justify-center py-12 gap-3">
+                <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />
+                <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">Loading notes...</span>
+              </div>
+            ) : activeSchedule?.messages && activeSchedule.messages.length > 0 ? (
+              [...activeSchedule.messages].reverse().map((msg: any) => (
+                <div key={msg.id} className="bg-slate-50 border border-slate-100 rounded-2xl p-5 space-y-2">
+                  <p className="text-xs font-black text-slate-700">
+                    {msg.senderName || (msg.isAdmin ? 'Placement Admin' : 'Company')}
+                  </p>
+                  <p className="text-sm text-slate-600 font-medium leading-relaxed">{msg.message}</p>
+                </div>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
+                <MessageSquare className="w-6 h-6 text-slate-300" />
+                <p className="text-slate-400 text-sm font-bold">No formal notes yet.</p>
+              </div>
+            )}
+          </div>
+
+          <div className="border-t border-slate-100" />
+
+          <div className="space-y-3">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Post a Formal Note
+            </label>
+            <textarea
+              rows={4}
+              placeholder="Write a clear formal note for the company regarding this schedule."
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 placeholder:text-slate-300 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-200 resize-none transition-all"
+            />
+            <Button
+              onClick={handleSendMessage}
+              disabled={!messageText.trim() || sendingMsg}
+              className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest"
+            >
+              {sendingMsg ? (
+                <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</span>
+              ) : (
+                <span className="flex items-center gap-2"><Send className="w-4 h-4" /> Submit Note</span>
+              )}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

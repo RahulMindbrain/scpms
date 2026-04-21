@@ -69,9 +69,14 @@ export const sendScheduleMessage = createAsyncThunk(
     { rejectWithValue }
   ) => {
     try {
+      const trimmedMessage = message.trim();
+      if (!trimmedMessage) {
+        return rejectWithValue("Please enter a formal note before submitting");
+      }
+
       const response = await postAPI<any>(
         `/interview-schedule/${id}/messages`,
-        { message }
+        { message: trimmedMessage }
       );
 
       // ✅ normalize response
@@ -114,6 +119,18 @@ export const fetchSchedulesByCompany = createAsyncThunk(
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch schedules by company");
+    }
+  }
+);
+
+export const fetchCompanySchedules = createAsyncThunk(
+  "interview/fetchCompanySchedules",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAPI<any>("/interview-schedule/company");
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch company schedules");
     }
   }
 );

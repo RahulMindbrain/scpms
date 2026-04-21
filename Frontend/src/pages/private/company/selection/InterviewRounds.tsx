@@ -9,7 +9,7 @@ import { Modal } from '@/components/ui/modal';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchSchedulesByCompany, approveSchedule, fetchScheduleApplications, fetchScheduleMessages, sendScheduleMessage } from '@/redux/thunks/interviewThunk';
+import { fetchCompanySchedules, approveSchedule, fetchScheduleApplications, fetchScheduleMessages, sendScheduleMessage } from '@/redux/thunks/interviewThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 
@@ -61,7 +61,7 @@ const CompanyInterviewManager: React.FC = () => {
   );
 
   useEffect(() => {
-    dispatch(fetchSchedulesByCompany());
+    dispatch(fetchCompanySchedules());
   }, [dispatch]);
 
   const handleUpdateStatus = async (id: number, status: 'APPROVED' | 'REJECTED') => {
@@ -112,7 +112,9 @@ const CompanyInterviewManager: React.FC = () => {
     if (!activeSchedule || !messageText.trim()) return;
     setSendingMsg(true);
     try {
-      await dispatch(sendScheduleMessage({ id: activeSchedule.id, message: messageText })).unwrap();
+      const formalNote = messageText.trim();
+      await dispatch(sendScheduleMessage({ id: activeSchedule.id, message: formalNote })).unwrap();
+      await dispatch(fetchScheduleMessages(activeSchedule.id)).unwrap();
       setMessageText('');
     } catch (error: any) {
       toast.error(error || "Failed to send message");
@@ -540,11 +542,11 @@ const CompanyInterviewManager: React.FC = () => {
           {/* Post New Note */}
           <div className="space-y-3">
             <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Post a Note
+              Post a Formal Note
             </label>
             <textarea
               rows={4}
-              placeholder="Write a formal note to the placement admin regarding this schedule..."
+              placeholder="Write a clear formal note for the placement admin regarding this schedule."
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
               className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 placeholder:text-slate-300 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-200 resize-none transition-all"

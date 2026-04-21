@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { fetchSchedules, createSchedule, updateSchedule, deleteSchedule, fetchSchedulesByCompany, approveSchedule, fetchScheduleMessages, sendScheduleMessage, fetchScheduleApplications } from "../thunks/interviewThunk";
+import { fetchSchedules, createSchedule, updateSchedule, deleteSchedule, fetchSchedulesByCompany, fetchCompanySchedules, approveSchedule, fetchScheduleMessages, sendScheduleMessage, fetchScheduleApplications } from "../thunks/interviewThunk";
 
 interface InterviewState {
   schedules: any[];
@@ -48,6 +48,19 @@ const interviewSlice = createSlice({
       .addCase(fetchSchedulesByCompany.rejected, (state, action) => {
         state.loading = false;
         state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch schedules by company";
+      })
+      // Fetch Company Schedules
+      .addCase(fetchCompanySchedules.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCompanySchedules.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.schedules = action.payload.data;
+      })
+      .addCase(fetchCompanySchedules.rejected, (state, action) => {
+        state.loading = false;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch company schedules";
       })
       // Create Schedule
       .addCase(createSchedule.pending, (state) => {
