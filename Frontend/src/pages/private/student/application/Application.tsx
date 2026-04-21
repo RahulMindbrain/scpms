@@ -182,9 +182,9 @@ const ApplicationRow = ({
       {/* Expanded Details */}
       {isExpanded && (
         <div className="px-4 pb-5 pt-2 border-t border-slate-50 bg-slate-50/30 animate-in slide-in-from-top-2 duration-300">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="w-full">
             {/* Left: Tracker Detail */}
-            <div className="md:col-span-2 space-y-4">
+            <div className="space-y-4">
               <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Application Timeline</h4>
@@ -238,64 +238,6 @@ const ApplicationRow = ({
                     </div>
                   </div>
                 )}
-              </div>
-            </div>
-
-            {/* Right: Quick Stats/Actions */}
-            <div className="space-y-3">
-              <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
-                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-3">Job Details</h4>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500">
-                      <MapPin size={14} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-medium leading-tight">Location</p>
-                      <p className="text-xs font-bold text-slate-700">{app.job?.location || "Remote / On-site"}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-slate-50 flex items-center justify-center text-slate-500">
-                      <DollarSign size={14} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] text-slate-400 font-medium leading-tight">CTC Package</p>
-                      <p className="text-xs font-bold text-slate-700">{app.job?.ctc || "As per industry"}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mt-5 flex flex-col gap-2">
-                  {isSelected ? (
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        onClick={(e) => { e.stopPropagation(); handleAction('REJECT'); }}
-                        disabled={!!updating}
-                        className="flex-1 bg-white hover:bg-red-50 text-red-600 border-red-100 rounded-xl h-9 text-xs font-bold transition-all"
-                      >
-                        {updating === 'REJECT' ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : "Decline"}
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={(e) => { e.stopPropagation(); handleAction('ACCEPT'); }}
-                        disabled={!!updating}
-                        className="flex-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-9 text-xs font-bold shadow-sm shadow-emerald-100 px-6 transition-all"
-                      >
-                        {updating === 'ACCEPT' ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : "Accept Offer"}
-                      </Button>
-                    </div>
-                  ) : (
-                    <Button
-                      variant="outline"
-                      className="w-full rounded-xl h-9 text-xs font-bold border-slate-200 text-slate-600 hover:bg-slate-50 hover:text-blue-600 hover:border-blue-200 transition-all group"
-                      onClick={(e) => { e.stopPropagation(); }}
-                    >
-                      View Full Details <ArrowRight size={12} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                    </Button>
-                  )}
-                </div>
               </div>
             </div>
           </div>
