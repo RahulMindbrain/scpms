@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
-import { fetchJobs, applyJob, fetchStudentProfile } from '@/redux/thunks/studentThunk';
+import { fetchJobs, applyJob, fetchStudentProfile, fetchJobApplications } from '@/redux/thunks/studentThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import { Loader2 } from 'lucide-react';
@@ -43,7 +43,7 @@ interface Job {
 
 const JobListing = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { jobs,   profile } = useSelector((state: RootState) => state.student);
+  const { jobs, profile, applications = [] } = useSelector((state: RootState) => state.student);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
@@ -53,6 +53,7 @@ const JobListing = () => {
 
   useEffect(() => {
     dispatch(fetchJobs({ status: 'APPROVED' }));
+    dispatch(fetchJobApplications({}));
     if (!profile) {
       dispatch(fetchStudentProfile());
     }
@@ -64,10 +65,17 @@ const JobListing = () => {
     return '₹' + salary.toLocaleString('en-IN') + ' / yr';
   };
 
-  const filteredJobs = jobs.filter((job: any) => 
-    job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    job.company.name.toLowerCase().includes(searchQuery.toLowerCase())
+  const appliedJobIds = new Set(
+    applications.map((app: any) => Number(app?.jobId || app?.job?.id)).filter(Boolean)
   );
+
+  const filteredJobs = jobs.filter((job: any) => {
+    const notApplied = !appliedJobIds.has(Number(job.id));
+    const matchesSearch =
+      job.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      job.company.name.toLowerCase().includes(searchQuery.toLowerCase());
+    return notApplied && matchesSearch;
+  });
 
   const checkEligibility = (job: Job) => {
     if (!profile) return true; // Assume eligible if profile not loaded yet or let backend handle it
