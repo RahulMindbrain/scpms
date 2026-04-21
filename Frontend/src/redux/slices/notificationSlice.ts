@@ -5,6 +5,7 @@ import {
   markAllNotificationsAsRead,
   deleteNotification,
   fetchUnreadCount,
+  fetchUpcomingEvents,
 } from "@/redux/thunks/notificationThunks";
 
 interface Notification {
@@ -21,6 +22,14 @@ interface Notification {
 
 interface NotificationState {
   items: Notification[];
+  upcomingEvents: {
+    id: number;
+    title: string;
+    company: string;
+    startTime: string;
+    endTime: string;
+    venue: string;
+  }[];
   unreadCount: number;
   loading: boolean;
   error: string | null;
@@ -34,6 +43,7 @@ interface NotificationState {
 
 const initialState: NotificationState = {
   items: [],
+  upcomingEvents: [],
   unreadCount: 0,
   loading: false,
   error: null,
@@ -73,6 +83,19 @@ const notificationSlice = createSlice({
       // Unread Count
       .addCase(fetchUnreadCount.fulfilled, (state, action) => {
         state.unreadCount = action.payload;
+      })
+
+      // Upcoming Events
+      .addCase(fetchUpcomingEvents.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchUpcomingEvents.fulfilled, (state, action) => {
+        state.loading = false;
+        state.upcomingEvents = action.payload || [];
+      })
+      .addCase(fetchUpcomingEvents.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       })
 
       // Mark as Read

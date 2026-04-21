@@ -66,3 +66,15 @@ export const fetchUnreadCount = createAsyncThunk(
     }
   }
 );
+
+export const fetchUpcomingEvents = createAsyncThunk(
+  "notification/fetchUpcomingEvents",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAPI<ApiResponse<any[]>>("/notification/upcoming-events");
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch upcoming events");
+    }
+  }
+);
