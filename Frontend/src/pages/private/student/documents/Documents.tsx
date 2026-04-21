@@ -1,34 +1,17 @@
 import { useState, useRef, useEffect } from 'react';
 import {
   FileText, Upload, Download, Trash2,
-  Search, FileCheck, FileClock,
-  MoreVertical, ExternalLink
+  Search, FileCheck, FileClock
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
-import { Loader2, Eye } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { Document, Page, pdfjs } from 'react-pdf';
-import 'react-pdf/dist/Page/AnnotationLayer.css';
-import 'react-pdf/dist/Page/TextLayer.css';
-
-// Configure PDF worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+import { Loader2 } from 'lucide-react';
 
 const Documents = () => {
   const [activeTab, setActiveTab] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [documents, setDocuments] = useState<any[]>([]);
   const [isUploading, setIsUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [previewName, setPreviewName] = useState<string>('');
-  const [numPages, setNumPages] = useState<number | null>(null);
-  const [pageNumber, setPageNumber] = useState(1);
 
   const { upload: uploadToCloudinary } = useCloudinaryUpload();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -114,8 +97,8 @@ const Documents = () => {
     toast.success("Document removed");
   };
 
-  // ✅ UNIVERSAL OPEN FUNCTION (VIEW + DOWNLOAD FIX)
-  const openFile = async (url: string, download = false, name = '') => {
+  // ✅ UNIVERSAL DOWNLOAD FUNCTION
+  const downloadFile = async (url: string, name = '') => {
     if (!url) {
       toast.error("Invalid file URL");
       return;
@@ -129,37 +112,27 @@ const Documents = () => {
       finalUrl = finalUrl + '.pdf';
     }
 
-    if (download) {
-      try {
-        const response = await fetch(finalUrl);
-        const blob = await response.blob();
-        const blobUrl = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = name || 'document.pdf';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(blobUrl);
-        toast.success("Download started");
-      } catch (error) {
-        console.error("Download failed:", error);
-        // Fallback to direct link if fetch fails (CORS issue)
-        const link = document.createElement('a');
-        link.href = finalUrl.replace('/upload/', '/upload/fl_attachment/');
-        link.target = '_blank';
-        link.download = name || 'document';
-        link.click();
-      }
-    } else {
-      setPreviewName(name);
-      setPreviewUrl(finalUrl);
-      setPageNumber(1); // Reset to first page
+    try {
+      const response = await fetch(finalUrl);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      link.download = name || 'document.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+      toast.success("Download started");
+    } catch (error) {
+      console.error("Download failed:", error);
+      // Fallback to direct link if fetch fails (CORS issue)
+      const link = document.createElement('a');
+      link.href = finalUrl.replace('/upload/', '/upload/fl_attachment/');
+      link.target = '_blank';
+      link.download = name || 'document';
+      link.click();
     }
-  };
-
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
   };
 
   // ✅ Helper to get thumbnail
@@ -254,15 +227,6 @@ const Documents = () => {
                       <FileText size={48} />
                     </div>
                   )}
-                  
-                  <div className="absolute inset-0 bg-black/5 opacity-0 group-hover/card:opacity-100 transition-opacity flex items-center justify-center">
-                     <button 
-                       onClick={() => openFile(doc.url, false, doc.name)}
-                       className="p-3 bg-white/90 backdrop-blur-sm rounded-full shadow-lg text-blue-600 hover:scale-110 transition-transform"
-                     >
-                       <Eye size={20} />
-                     </button>
-                  </div>
                 </div>
 
                 <div className="flex justify-between mb-1 items-start">
@@ -276,18 +240,9 @@ const Documents = () => {
 
                   <div className="flex items-center gap-2">
 
-                    {/* 👁️ VIEW */}
-                    <button
-                      onClick={() => openFile(doc.url, false, doc.name)}
-                      className="p-2 hover:bg-indigo-50 rounded-lg text-slate-500 hover:text-indigo-600 transition-colors"
-                      title="Preview"
-                    >
-                      <Eye size={16} />
-                    </button>
-
                     {/* ⬇️ DOWNLOAD */}
                     <button
-                      onClick={() => openFile(doc.url, true, doc.name)}
+                      onClick={() => downloadFile(doc.url, doc.name)}
                       className="p-2 hover:bg-blue-50 rounded-lg text-slate-500 hover:text-blue-600 transition-colors"
                       title="Download"
                     >
@@ -317,83 +272,6 @@ const Documents = () => {
 
       </main>
 
-      {/* 📄 PDF Preview Modal */}
-      <Dialog open={!!previewUrl} onOpenChange={(open) => !open && setPreviewUrl(null)}>
-        <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden flex flex-col border-none shadow-2xl">
-          <DialogHeader className="p-4 border-b bg-white shrink-0">
-            <div className="flex items-center justify-between pr-8">
-              <DialogTitle className="text-lg font-bold truncate flex items-center gap-2">
-                <FileText className="text-blue-600" size={18} />
-                {previewName}
-              </DialogTitle>
-              <div className="flex items-center gap-2">
-                  <button 
-                    onClick={() => openFile(previewUrl!, true, previewName)}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                  >
-                    <Download size={14} />
-                    Download
-                  </button>
-                  <button 
-                    onClick={() => window.open(previewUrl!, '_blank')}
-                    className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-slate-50 text-slate-600 rounded-lg hover:bg-slate-100 transition-colors"
-                  >
-                    <ExternalLink size={14} />
-                    Full Screen
-                  </button>
-              </div>
-            </div>
-          </DialogHeader>
-          
-          <div className="flex-1 bg-slate-100 overflow-auto flex justify-center p-4">
-            {previewUrl && (
-              <div className="shadow-lg h-fit">
-                {previewName.toLowerCase().endsWith('.pdf') || previewUrl.toLowerCase().includes('.pdf') ? (
-                  <div className="flex flex-col items-center">
-                    <Document
-                      file={previewUrl}
-                      onLoadSuccess={onDocumentLoadSuccess}
-                      loading={<Loader2 className="animate-spin text-blue-600 m-10" size={40} />}
-                    >
-                      <Page 
-                        pageNumber={pageNumber} 
-                        scale={1.2}
-                        renderAnnotationLayer={false}
-                        renderTextLayer={false}
-                        className="shadow-2xl"
-                      />
-                    </Document>
-                    
-                    {numPages && numPages > 1 && (
-                      <div className="sticky bottom-4 mt-4 flex items-center gap-4 bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-lg border border-slate-200">
-                        <button
-                          disabled={pageNumber <= 1}
-                          onClick={() => setPageNumber(prev => prev - 1)}
-                          className="p-1 disabled:opacity-30"
-                        >
-                          Previous
-                        </button>
-                        <p className="text-sm font-medium">
-                          Page {pageNumber} of {numPages}
-                        </p>
-                        <button
-                          disabled={pageNumber >= numPages}
-                          onClick={() => setPageNumber(prev => prev + 1)}
-                          className="p-1 disabled:opacity-30"
-                        >
-                          Next
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <img src={previewUrl} alt={previewName} className="max-w-full h-auto rounded-lg" />
-                )}
-              </div>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
