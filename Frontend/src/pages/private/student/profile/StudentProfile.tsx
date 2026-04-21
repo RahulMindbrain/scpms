@@ -105,7 +105,7 @@ const handleSave = async (updatedProfile: any) => {
       linkedinUrl: updatedProfile.linkedinUrl || "",
       githubUrl: updatedProfile.githubUrl || "",
       portfolioUrl: updatedProfile.portfolioUrl || "",
-      resumeUrl: updatedProfile.resumes?.[0]?.url || "",
+      resumeUrl: updatedProfile.resumeUrl || updatedProfile.resumes?.[0]?.url || "",
 
     
    addSkillIds: updatedProfile.skills

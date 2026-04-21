@@ -51,6 +51,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
   const [formData, setFormData] = useState<any>(profile);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isUploading, setIsUploading] = useState(false);
+  const [resumeName, setResumeName] = useState("");
   const [skillInput, setSkillInput] = useState("");
   const [allSkillsList, setAllSkillsList] = useState<string[]>([]);
 
@@ -73,6 +74,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
         },
         resumeUrl: profile.resumeUrl || ""
       });
+      setResumeName(profile.resumes?.[0]?.name || (profile.resumeUrl ? "Current Resume" : ""));
       setErrors({});
     }
   }, [profile, isOpen]);
@@ -429,6 +431,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     const file = e.target.files?.[0];
                     if (!file) return;
 
+                    setResumeName(file.name);
                     setIsUploading(true);
                     try {
                       const url = await upload(file, "resumes");
@@ -451,13 +454,19 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                   disabled={isUploading}
                 >
                   {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                  {formData.resumeUrl ? "Change Resume" : "Upload PDF Resume"}
+                  {isUploading ? "Uploading Resume..." : (formData.resumeUrl ? "Change Resume" : "Upload PDF Resume")}
                 </Button>
               </div>
-              {formData.resumeUrl && (
+              {isUploading && (
+                <div className="flex items-center gap-2 text-xs text-blue-600 font-medium bg-blue-50 px-3 py-2 rounded-lg border border-blue-100 w-fit">
+                  <Loader2 className="h-3 w-3 animate-spin" />
+                  Uploading {resumeName}...
+                </div>
+              )}
+              {!isUploading && formData.resumeUrl && (
                 <div className="flex items-center gap-2 text-xs text-green-600 font-medium bg-green-50 px-3 py-2 rounded-lg border border-green-100 w-fit">
                   <Badge className="h-2 w-2 rounded-full bg-green-500 p-0" />
-                  Resume linked successfully
+                  {resumeName || "Resume linked successfully"}
                 </div>
               )}
             </div>
