@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Calendar, Clock, MapPin, Info, User, Search, ChevronRight, Loader2
+  Calendar, Clock, MapPin, Info, User, Search, ChevronRight, Loader2,
+  MessageSquare, Send
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';
+import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchSchedulesByCompany, approveSchedule, fetchScheduleApplications } from '@/redux/thunks/interviewThunk';
+import { fetchSchedulesByCompany, approveSchedule, fetchScheduleApplications, fetchScheduleMessages, sendScheduleMessage } from '@/redux/thunks/interviewThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 
@@ -47,6 +49,10 @@ const CompanyInterviewManager: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusLoading, setStatusLoading] = useState<number | null>(null);
   const [appsLoading, setAppsLoading] = useState<number | null>(null);
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
+  const [messageText, setMessageText] = useState('');
+  const [msgLoading, setMsgLoading] = useState<number | null>(null);
+  const [sendingMsg, setSendingMsg] = useState(false);
 
   // Sync selected schedule with redux state to reflect new messages
   const activeSchedule = useMemo(() =>
@@ -61,7 +67,11 @@ const CompanyInterviewManager: React.FC = () => {
   const handleUpdateStatus = async (id: number, status: 'APPROVED' | 'REJECTED') => {
     setStatusLoading(id);
     try {
-      await dispatch(approveSchedule({ id, status, reason: status === 'REJECTED' ? declineReason : undefined })).unwrap();
+      await dispatch(approveSchedule({ 
+        id, 
+        status, 
+        rejectionReason: status === 'REJECTED' ? declineReason : undefined 
+      })).unwrap();
       toast.success(`Schedule ${status.toLowerCase()} successfully`);
       setIsRejectModalOpen(false);
       setDeclineReason('');
@@ -82,6 +92,32 @@ const CompanyInterviewManager: React.FC = () => {
       toast.error(error || "Failed to load candidates");
     } finally {
       setAppsLoading(null);
+    }
+  };
+
+  const handleOpenMessages = async (schedule: InterviewSchedule) => {
+    setSelectedSchedule(schedule);
+    setIsMessagesOpen(true);
+    setMsgLoading(schedule.id);
+    try {
+      await dispatch(fetchScheduleMessages(schedule.id)).unwrap();
+    } catch (error: any) {
+      toast.error(error || "Failed to load messages");
+    } finally {
+      setMsgLoading(null);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!activeSchedule || !messageText.trim()) return;
+    setSendingMsg(true);
+    try {
+      await dispatch(sendScheduleMessage({ id: activeSchedule.id, message: messageText })).unwrap();
+      setMessageText('');
+    } catch (error: any) {
+      toast.error(error || "Failed to send message");
+    } finally {
+      setSendingMsg(false);
     }
   };
 
@@ -265,6 +301,7 @@ const CompanyInterviewManager: React.FC = () => {
                         <User className="w-3.5 h-3.5 text-slate-400" />
                         <span className="text-xs font-bold text-slate-500">Admin: {schedule.adminName || 'Coordinator'}</span>
                       </div>
+                      
                       <button
                         onClick={() => handleOpenApplications(schedule)}
                         className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50/50 hover:bg-indigo-100/50 border border-indigo-100/30 transition-colors group/btn"
@@ -274,8 +311,47 @@ const CompanyInterviewManager: React.FC = () => {
                           {schedule.applications?.length || 0} Candidates
                         </span>
                       </button>
+
+                      <button
+                        onClick={() => handleOpenMessages(schedule)}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50/50 hover:bg-amber-100/50 border border-amber-100/30 transition-colors group/btn"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5 text-amber-500 group-hover/btn:scale-110 transition-transform" />
+                        <span className="text-xs font-bold text-amber-600">
+                          Discussion {(schedule.messages?.length || 0) > 0 && `(${schedule.messages.length})`}
+                        </span>
+                      </button>
                     </div>
-                  </div> 
+                  </div>
+
+                  {/* Right Side: Approval Actions */}
+                  <div className="flex flex-row lg:flex-col gap-3 min-w-[150px]">
+                    {schedule.companyApprovalStatus === 'PENDING' ? (
+                      <>
+                        <Button 
+                          onClick={() => handleUpdateStatus(schedule.id, 'APPROVED')}
+                          disabled={statusLoading === schedule.id}
+                          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold py-6 shadow-lg shadow-emerald-100 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                        >
+                          {statusLoading === schedule.id ? <Loader2 className="animate-spin" /> : 'Approve'}
+                        </Button>
+                        <Button 
+                          variant="ghost"
+                          onClick={() => { setSelectedSchedule(schedule); setIsRejectModalOpen(true); }}
+                          className="flex-1 text-rose-600 hover:bg-rose-50 rounded-2xl font-bold py-6 transition-all"
+                        >
+                          Decline
+                        </Button>
+                      </>
+                    ) : (
+                      <div className={cn(
+                        "w-full py-4 text-center rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] border",
+                        schedule.companyApprovalStatus === 'APPROVED' ? "bg-emerald-50/50 text-emerald-600 border-emerald-100" : "bg-rose-50/50 text-rose-600 border-rose-100"
+                      )}>
+                        {schedule.companyApprovalStatus}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             ))
@@ -400,6 +476,92 @@ const CompanyInterviewManager: React.FC = () => {
         </div>
       </Modal>
 
+      {/* Notes Modal */}
+      <Modal
+        isOpen={isMessagesOpen}
+        onClose={() => setIsMessagesOpen(false)}
+        title="Schedule Notes"
+        subtitle={`Notes & correspondence for ${activeSchedule?.title}`}
+      >
+        <div className="flex flex-col gap-6 pt-2">
+
+          {/* Notes List */}
+          <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+            {msgLoading === activeSchedule?.id ? (
+              <div className="flex items-center justify-center py-12 gap-3">
+                <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />
+                <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">Loading notes...</span>
+              </div>
+            ) : activeSchedule?.messages && activeSchedule.messages.length > 0 ? (
+              [...activeSchedule.messages].reverse().map((msg: any) => (
+                <div key={msg.id} className="bg-slate-50 border border-slate-100 rounded-2xl p-5 space-y-3">
+                  {/* Note Header */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center shadow-sm">
+                        <User className="w-4 h-4 text-slate-400" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-black text-slate-700">{msg.senderName || (msg.isAdmin ? 'Placement Admin' : 'Your Company')}</p>
+                        <span className={cn(
+                          "text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full",
+                          msg.isAdmin ? "bg-indigo-50 text-indigo-500" : "bg-emerald-50 text-emerald-600"
+                        )}>
+                          {msg.isAdmin ? 'Admin' : 'Company'}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-300">
+                      {new Date(msg.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {' · '}
+                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  {/* Note Body */}
+                  <p className="text-sm text-slate-600 font-medium leading-relaxed pl-10 border-l-2 border-slate-200">
+                    {msg.message}
+                  </p>
+                </div>
+              ))
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
+                <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 border-dashed flex items-center justify-center">
+                  <MessageSquare className="w-6 h-6 text-slate-200" />
+                </div>
+                <p className="text-slate-400 text-sm font-bold">No notes yet.</p>
+                <p className="text-slate-300 text-xs font-medium">Post a formal note below to communicate with the placement admin.</p>
+              </div>
+            )}
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-slate-100" />
+
+          {/* Post New Note */}
+          <div className="space-y-3">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+              Post a Note
+            </label>
+            <textarea
+              rows={4}
+              placeholder="Write a formal note to the placement admin regarding this schedule..."
+              value={messageText}
+              onChange={(e) => setMessageText(e.target.value)}
+              className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 placeholder:text-slate-300 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-200 resize-none transition-all"
+            />
+            <Button
+              onClick={handleSendMessage}
+              disabled={!messageText.trim() || sendingMsg}
+              className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-indigo-100 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {sendingMsg
+                ? <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</span>
+                : <span className="flex items-center gap-2"><Send className="w-4 h-4" /> Submit Note</span>
+              }
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

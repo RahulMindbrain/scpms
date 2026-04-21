@@ -90,13 +90,13 @@ export const sendScheduleMessage = createAsyncThunk(
 export const approveSchedule = createAsyncThunk(
   "interview/approveSchedule",
   async (
-    { id, status, reason }: { id: number; status: "APPROVED" | "REJECTED"; reason?: string },
+    { id, status, rejectionReason }: { id: number; status: "APPROVED" | "REJECTED"; rejectionReason?: string },
     { rejectWithValue }
   ) => {
     try {
       const response = await putAPI<any>(`/interview-schedule/${id}/approval`, {
         status,
-        reason,
+        rejectionReason,
       });
       return response;
     } catch (error: any) {
