@@ -1,12 +1,10 @@
-import { X, Upload } from "lucide-react";
 import { useState } from "react";
-import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
-import { Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Github, Globe } from "lucide-react";
 
 type ProjectModalProps = {
   isOpen: boolean;
@@ -18,28 +16,20 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
   const [project, setProject] = useState({
     title: "",
     description: "",
-    tags: "",
-    image: null as File | null
+    techStack: "",
+    githubUrl: "",
+    liveUrl: ""
   });
-
-  const { upload: uploadToCloudinary, isUploading } = useCloudinaryUpload();
 
   const handleSubmit = async () => {
     if (!project.title.trim()) return;
 
-    let imageUrl = "";
-    if (project.image) {
-      const uploadedUrl = await uploadToCloudinary(project.image, "project_snapshots");
-      if (uploadedUrl) imageUrl = uploadedUrl;
-    }
-
-    const tagsArray = project.tags.split(",").map(tag => tag.trim()).filter(t => t);
-
     onAddProject({
       title: project.title,
       description: project.description,
-      tags: tagsArray,
-      image: imageUrl || project.image // Fallback or handle null
+      techStack: project.techStack,
+      githubUrl: project.githubUrl,
+      liveUrl: project.liveUrl
     });
 
     onClose();
@@ -47,8 +37,9 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
     setProject({
       title: "",
       description: "",
-      tags: "",
-      image: null
+      techStack: "",
+      githubUrl: "",
+      liveUrl: ""
     });
   };
 
@@ -76,43 +67,49 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
             <Textarea
               id="description"
               placeholder="Tell us about your project..."
-              className="rounded-2xl border-slate-200 focus:ring-blue-500/10 min-h-[120px] font-medium"
+              className="rounded-2xl border-slate-200 focus:ring-blue-500/10 min-h-[100px] font-medium"
               value={project.description}
               onChange={(e) => setProject({ ...project, description: e.target.value })}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="tags" className="text-xs font-black uppercase tracking-widest text-slate-500">Tech Stack (Comma separated)</Label>
+            <Label htmlFor="techStack" className="text-xs font-black uppercase tracking-widest text-slate-500">Tech Stack (e.g. React, Nodejs)</Label>
             <Input
-              id="tags"
+              id="techStack"
               placeholder="React, TypeScript, Tailwind"
               className="rounded-2xl border-slate-200 focus:ring-blue-500/10 h-12 font-bold"
-              value={project.tags}
-              onChange={(e) => setProject({ ...project, tags: e.target.value })}
+              value={project.techStack}
+              onChange={(e) => setProject({ ...project, techStack: e.target.value })}
             />
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-xs font-black uppercase tracking-widest text-slate-500">Project Preview Image</Label>
-            <div className="flex items-center gap-4">
-               <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50/50 transition-all group">
-                  <Upload size={18} className="text-slate-400 group-hover:text-blue-500" />
-                  <span className="text-sm font-bold text-slate-500 group-hover:text-blue-700">
-                    {project.image ? project.image.name : 'Choose snapshot'}
-                  </span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e: any) => setProject({ ...project, image: e.target.files[0] })}
-                  />
-               </label>
-               {project.image && (
-                 <Button variant="ghost" className="text-red-500 hover:text-red-700 hover:bg-red-50" onClick={() => setProject({ ...project, image: null })}>
-                   <X size={18} />
-                 </Button>
-               )}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="githubUrl" className="text-xs font-black uppercase tracking-widest text-slate-500">GitHub Link</Label>
+              <div className="relative">
+                <Github className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
+                <Input
+                  id="githubUrl"
+                  placeholder="https://github.com..."
+                  className="rounded-2xl border-slate-200 focus:ring-blue-500/10 h-12 font-bold pl-10"
+                  value={project.githubUrl}
+                  onChange={(e) => setProject({ ...project, githubUrl: e.target.value })}
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="liveUrl" className="text-xs font-black uppercase tracking-widest text-slate-500">Live Demo</Label>
+              <div className="relative">
+                <Globe className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
+                <Input
+                  id="liveUrl"
+                  placeholder="https://project.com..."
+                  className="rounded-2xl border-slate-200 focus:ring-blue-500/10 h-12 font-bold pl-10"
+                  value={project.liveUrl}
+                  onChange={(e) => setProject({ ...project, liveUrl: e.target.value })}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -127,11 +124,9 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={isUploading}
             className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20"
           >
-            {isUploading ? <Loader2 className="h-5 w-5 animate-spin mr-2" /> : null}
-            {isUploading ? "Uploading..." : "Add Project"}
+            Add Project
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -139,4 +134,4 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
   );
 };
 
-export default ProjectModal;
+export default ProjectModal;

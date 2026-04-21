@@ -1,7 +1,7 @@
 import {
-  Mail, Phone, MapPin, GraduationCap,
+  Mail, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
-  Upload, Camera, Briefcase, Loader2, FileText, Calendar, Building2,
+  Briefcase, Loader2, FileText, Calendar, Building2,
   Lightbulb, Globe, Eye
 } from 'lucide-react';
 import {
@@ -42,24 +42,15 @@ const StudentProfile = () => {
   //@ts-ignore
   const [isUploadingResume, setIsUploadingResume] = useState(false);
   const { upload: uploadToCloudinary } = useCloudinaryUpload();
-  const profileImageInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewName, setPreviewName] = useState<string>('');
 
   const [profile, setProfile] = useState<any>({
     name: user ? `${user.firstname} ${user.lastname}` : 'Student Name',
-    profileImage: null,
-    batch: '2026 Batch',
-    branch: 'B.Tech Computer Science',
     email: user?.email || '',
-    phone: '',
-    location: '',
     stats: {
       cgpa: '0.0',
-      tenth: '0%',
-      twelfth: '0%',
       activeBacklogs: 0,
-      rollNo: '',
       department: '',
       year: 1,
       passingYear: 2026,
@@ -93,6 +84,7 @@ const StudentProfile = () => {
           passingYear: backendProfile.passingYear || 2026,
           departmentId: backendProfile.departmentId || 1,
           activeBacklogs: backendProfile.activeBacklogs || 0,
+          department: backendProfile.department?.name || ''
         },
         linkedinUrl: backendProfile.linkedinUrl || '',
         githubUrl: backendProfile.githubUrl || '',
@@ -163,6 +155,29 @@ const handleSave = async (updatedProfile: any) => {
         })),
 
       deleteCertificateIds: [],
+      
+      addProjects: updatedProfile.projects
+        ?.filter((proj: any) => !proj.id)
+        ?.map((proj: any) => ({
+          title: proj.title,
+          description: proj.description,
+          techStack: proj.techStack,
+          githubUrl: proj.githubUrl,
+          liveUrl: proj.liveUrl,
+        })),
+
+      updateProjects: updatedProfile.projects
+        ?.filter((proj: any) => proj.id)
+        ?.map((proj: any) => ({
+          id: proj.id,
+          title: proj.title,
+          description: proj.description,
+          techStack: proj.techStack,
+          githubUrl: proj.githubUrl,
+          liveUrl: proj.liveUrl,
+        })),
+
+      deleteProjectIds: [],
     };
 
     await dispatch(updateStudentProfile(payload)).unwrap();
@@ -172,26 +187,6 @@ const handleSave = async (updatedProfile: any) => {
     toast.error(err || "Update failed");
   }
 };
-  const handleProfileImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    try {
-      const url = await uploadToCloudinary(file, "profile_images");
-      if (url) {
-        const updatedProfile = { ...profile, profileImage: url };
-        setProfile(updatedProfile);
-        // If we want to save immediately:
-        await handleSave(updatedProfile);
-        toast.success("Profile image updated!");
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsUploading(false);
-    }
-  };
 
   const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -239,9 +234,10 @@ const handleSave = async (updatedProfile: any) => {
   const handleAddProject = (project: any) => {
     const updatedProfile = {
       ...profile,
-      projects: [...profile.projects, project]
+      projects: [...(profile.projects || []), project]
     };
     setProfile(updatedProfile);
+    handleSave(updatedProfile);
   };
 
 const handleAddExperience = (exp: any) => {
@@ -268,8 +264,6 @@ const handleAddCertificate = (cert: any) => {
     const fields = [
       { name: 'Name', filled: !!profile.name && profile.name !== 'Student Name' },
       { name: 'Email', filled: !!profile.email },
-      { name: 'Phone', filled: !!profile.phone },
-      { name: 'Location', filled: !!profile.location },
       { name: 'Skills', filled: profile.skills?.length > 0 },
       { name: 'CGPA', filled: !!profile.stats?.cgpa && profile.stats.cgpa !== '0.0' },
       { name: 'Resume', filled: profile.resumes?.length > 0 },
@@ -304,7 +298,7 @@ const handleAddCertificate = (cert: any) => {
                 <div className="absolute inset-0 dot-pattern"></div>
               </div>
               <CardContent className="pt-0 relative px-6 pb-6 text-center">
-                <div className="relative inline-block -mt-12 group cursor-pointer" onClick={() => profileImageInputRef.current?.click()}>
+                <div className="relative inline-block -mt-12 group">
                   <Avatar className="h-24 w-24 border-4 border-background shadow-md">
                     {profile.profileImage ? (
                       <AvatarImage src={profile.profileImage} alt={profile.name} className="object-cover" />
@@ -314,17 +308,13 @@ const handleAddCertificate = (cert: any) => {
                       </AvatarFallback>
                     )}
                   </Avatar>
-                  <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    {isUploading ? <Loader2 className="h-6 w-6 text-white animate-spin" /> : <Camera className="h-6 w-6 text-white" />}
-                  </div>
-                  <input type="file" ref={profileImageInputRef} onChange={handleProfileImageUpload} hidden accept="image/*" />
                 </div>
                 <div className="mt-4">
                   <h2 className="text-xl font-bold">{profile.name}</h2>
-                  <p className="text-sm text-muted-foreground mt-1 font-medium">{profile.branch || 'Branch'}</p>
+                  <p className="text-sm text-muted-foreground mt-1 font-medium">{profile.stats?.department || 'Department'}</p>
                   <div className="flex flex-wrap justify-center gap-2 mt-3 w-full max-w-full">
-                    <Badge variant="secondary" className="font-normal truncate max-w-[120px]" title={profile.batch || 'Batch'}>{profile.batch || 'Batch'}</Badge>
-                    <Badge variant="outline" className="font-normal truncate max-w-[120px]" title={`Roll: ${profile.stats?.rollNo || 'N/A'}`}>Roll: {profile.stats?.rollNo || 'N/A'}</Badge>
+                    <Badge variant="secondary" className="font-normal truncate max-w-[120px]" title={`Year ${profile.stats?.year || '1'}`}>Year {profile.stats?.year || '1'}</Badge>
+                    <Badge variant="outline" className="font-normal truncate max-w-[120px]" title={`Passing: ${profile.stats?.passingYear || 'N/A'}`}>Passing: {profile.stats?.passingYear || 'N/A'}</Badge>
                   </div>
                 </div>
 
@@ -346,7 +336,6 @@ const handleAddCertificate = (cert: any) => {
 
                 <Separator className="my-4" />
 
-                <div className="space-y-3 text-left">
                   <div className="flex items-center gap-3 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
                     <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
                       <Mail className="h-4 w-4" />
@@ -356,25 +345,6 @@ const handleAddCertificate = (cert: any) => {
                       <p className="truncate text-slate-700 font-semibold text-[13px]" title={profile.email}>{profile.email || 'N/A'}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
-                    <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                      <Phone className="h-4 w-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Phone</p>
-                      <p className="truncate text-slate-700 font-semibold text-[13px]" title={profile.phone}>{profile.phone || 'Not provided'}</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
-                    <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                      <MapPin className="h-4 w-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Location</p>
-                      <p className="truncate text-slate-700 font-semibold text-[13px]" title={profile.location}>{profile.location || 'Not provided'}</p>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Social Links */}
                 <div className="mt-6 pt-6 border-t border-slate-100">
@@ -574,35 +544,47 @@ const handleAddCertificate = (cert: any) => {
                   <CardContent className="pt-4">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {profile.projects?.length > 0 ? profile.projects.map((proj: any, i: number) => (
-                        <div key={i} className="rounded-2xl border border-slate-100 bg-white shadow-sm overflow-hidden flex flex-col group hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300">
-                          {proj.image && (
-                            <div className="h-36 overflow-hidden border-b border-slate-50">
-                              <img src={typeof proj.image === 'string' ? proj.image : URL.createObjectURL(proj.image)} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" alt={proj.title} />
-                            </div>
-                          )}
+                        <div key={i} className="rounded-2xl border border-slate-100 bg-white shadow-sm overflow-hidden flex flex-col group hover:border-blue-200 hover:shadow-lg hover:shadow-blue-500/5 transition-all duration-300 relative">
                           <div className="p-4 flex flex-col flex-1">
                             <div className="flex items-start justify-between mb-2 gap-2">
                               <h4 className="font-semibold text-[15px] leading-tight line-clamp-2 text-foreground" title={proj.title}>{proj.title}</h4>
-                              {proj.link && (
-                                <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-blue-600 shrink-0 mt-0.5 transition-colors">
-                                  <ExternalLink className="h-4 w-4" />
-                                </a>
-                              )}
+                              <div className="flex gap-2 shrink-0 mt-0.5">
+                                {proj.githubUrl && (
+                                  <a href={proj.githubUrl} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-slate-900 transition-colors">
+                                    <Code2 className="h-4 w-4" />
+                                  </a>
+                                )}
+                                {proj.liveUrl && (
+                                  <a href={proj.liveUrl} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-blue-600 transition-colors">
+                                    <ExternalLink className="h-4 w-4" />
+                                  </a>
+                                )}
+                              </div>
                             </div>
                             <p className="text-[13px] text-muted-foreground line-clamp-3 mb-4 flex-1 whitespace-pre-line">{proj.description}</p>
                             <div className="flex flex-wrap gap-1.5 mt-auto pt-2">
-                              {proj.tags?.slice(0, 3).map((tag: string) => (
+                              {proj.techStack?.split(',').map((tag: string) => tag.trim()).filter(Boolean).slice(0, 3).map((tag: string) => (
                                 <Badge key={tag} variant="secondary" className="px-2 py-0 h-5 text-[10px] uppercase font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">
                                   {tag}
                                 </Badge>
                               ))}
-                              {proj.tags?.length > 3 && (
-                                <Badge variant="secondary" className="px-2 py-0 h-5 text-[10px] uppercase font-semibold bg-slate-100 text-slate-600 hover:bg-slate-200">
-                                  +{proj.tags.length - 3}
-                                </Badge>
-                              )}
                             </div>
                           </div>
+                          
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-red-50 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all absolute right-2 bottom-2"
+                            onClick={() => {
+                              const projId = profile.projects[i]?.id;
+                              const updated = profile.projects.filter((p: any) => p.id !== projId);
+                              setProfile({ ...profile, projects: updated });
+                              handleSave({
+                                ...profile,
+                                projects: updated,
+                                deleteProjectIds: projId ? [projId] : [],
+                              });
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       )) : (
                         <div className="col-span-full text-center py-8 text-sm text-muted-foreground border-2 border-dashed rounded-lg bg-slate-50/50">

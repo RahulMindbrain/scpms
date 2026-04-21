@@ -66,14 +66,14 @@ const CompanyProfile = () => {
   const onSubmit = async (data: ProfileFormData) => {
     try {
       if (isCreating) {
-        await dispatch(createCompanyProfile(data)).unwrap();
-        toast.success("Profile created successfully!");
+        const response = await dispatch(createCompanyProfile(data)).unwrap();
+        toast.success(response?.message || "Profile created successfully!");
         setIsCreating(false);
         setIsEditing(false);
         dispatch(fetchCompanyProfile());
       } else {
-        await dispatch(updateCompanyProfile(data)).unwrap();
-        toast.success("Profile updated successfully!");
+        const response = await dispatch(updateCompanyProfile(data)).unwrap();
+        toast.success(response?.message || "Profile updated successfully!");
         setIsEditing(false);
         dispatch(fetchCompanyProfile());
       }

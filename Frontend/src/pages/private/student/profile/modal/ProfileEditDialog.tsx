@@ -28,8 +28,6 @@ const allSkillsList = [
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
-  phone: z.string().min(10, "Phone number must be at least 10 digits").or(z.literal("")),
-  location: z.string().optional(),
   linkedinUrl: z.string().url("Invalid LinkedIn URL").or(z.literal("")).nullable(),
   githubUrl: z.string().url("Invalid GitHub URL").or(z.literal("")).nullable(),
   portfolioUrl: z.string().url("Invalid Portfolio URL").or(z.literal("")).nullable(),
@@ -189,28 +187,6 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     {errors.email && <p className="text-xs text-red-500 font-medium ml-1">{errors.email}</p>}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="phone" className="text-sm font-semibold text-slate-700 ml-1">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      placeholder="+91 9876543210"
-                      className={`h-11 rounded-xl ${errors.phone ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
-                      value={formData.phone || ""}
-                      onChange={(e) => updateField("phone", e.target.value)}
-                    />
-                    {errors.phone && <p className="text-xs text-red-500 font-medium ml-1">{errors.phone}</p>}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="location" className="text-sm font-semibold text-slate-700 ml-1">Location</Label>
-                    <Input
-                      id="location"
-                      placeholder="e.g. New York, USA"
-                      className="h-11 rounded-xl border-slate-200"
-                      value={formData.location || ""}
-                      onChange={(e) => updateField("location", e.target.value)}
-                    />
-                  </div>
                 </div>
               </TabsContent>
 

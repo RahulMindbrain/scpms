@@ -86,7 +86,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         secondary: [
           { title: "Shortlist", url: "/company/shortlist", icon: <ListChecks /> },
           { title: "Interview Rounds", url: "/company/interviews", icon: <Calendar /> },
-          { title: "Update Results", url: "/company/results", icon: <FileEdit /> },
+          // { title: "Update Results", url: "/company/results", icon: <FileEdit /> },
         ],
       }
     }
