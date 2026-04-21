@@ -1,6 +1,7 @@
 import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useLocation } from "react-router-dom"
+import { NotificationBell } from "@/components/notification-bell"
 import { 
   LayoutDashboard, Users, Building2, Briefcase, FileText, ListChecks, Calendar, 
   BarChart3, Mail, Folder, Settings, User, CheckCircle, FileSearch, Bell, 
@@ -63,6 +64,9 @@ export function SiteHeader() {
             <PageIcon className="size-4" />
           </div>
           <h1 className="text-base font-semibold">{getTitle()}</h1>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
+          <NotificationBell />
         </div>
       </div>
     </header>
