@@ -5,26 +5,31 @@ import {
   TrendingUp,
   Search,
   User,
-  ChevronRight,
   ArrowUpRight,
-  Globe
+  Globe,
+  Loader2
 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import type { AppDispatch } from '@/redux/store/store';
+import type { RootState } from '@/redux/reducers/rootReducer';
+import { fetchJobApplications, fetchJobs, fetchStudentProfile } from '@/redux/thunks/studentThunk';
+import { useNavigate } from 'react-router-dom';
 
 const Eligibility = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+  const { jobs = [], applications = [], profile, loading } = useSelector((state: RootState) => state.student);
   const [activeFilter, setActiveFilter] = useState<'all' | 'eligible' | 'applied'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const eligibilitySummary = [
-    { label: 'Eligible Opportunities', value: '04', icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    { label: 'Ineligible Roles', value: '01', icon: XCircle, color: 'text-slate-400', bg: 'bg-slate-50' },
-  ];
-
-  const studentProfile = {
-    cgpa: 8.7,
-    branch: 'CSE',
-    backlogs: 'None'
-  };
+  useEffect(() => {
+    dispatch(fetchJobs({ status: 'APPROVED' }));
+    dispatch(fetchJobApplications({}));
+    if (!profile) {
+      dispatch(fetchStudentProfile());
+    }
+  }, [dispatch, profile]);
 
   // Brand color map for company initials
   const companyColors: Record<string, { bg: string; text: string }> = {
@@ -35,15 +40,58 @@ const Eligibility = () => {
     'Apple': { bg: 'bg-slate-800', text: 'text-white' },
   };
 
-  const companies = [
-    { name: 'Google', role: 'SDE Intern', minCGPA: 8.0, branches: ['CSE', 'IT'], status: 'Eligible', active: true, applied: false },
-    { name: 'Microsoft', role: 'Full Stack Dev', minCGPA: 7.5, branches: ['CSE', 'IT', 'ECE'], status: 'Eligible', active: true, applied: true },
-    { name: 'Amazon', role: 'Data Analyst', minCGPA: 8.5, branches: ['CSE'], status: 'Eligible', active: true, applied: false },
-    { name: 'Goldman Sachs', role: 'Quant Analyst', minCGPA: 9.0, branches: ['CSE', 'Math'], status: 'Ineligible', active: false, reason: 'CGPA threshold: 9.0', applied: false },
-    { name: 'Apple', role: 'iOS Developer', minCGPA: 8.0, branches: ['CSE'], status: 'Eligible', active: true, applied: false },
-  ];
+  const studentCgpa = Number(profile?.cgpa || 0);
+  const studentBranch = String(profile?.department?.name || profile?.branch || 'N/A');
+  const studentBacklogs = Number(profile?.activeBacklogs || 0);
 
-  const filteredCompanies = companies.filter(company => {
+  const normalizedApplications = useMemo(
+    () => new Set(applications.map((app: any) => Number(app?.jobId || app?.job?.id)).filter(Boolean)),
+    [applications]
+  );
+
+  const companies = useMemo(
+    () =>
+      jobs.map((job: any) => {
+        const jobBranches =
+          job?.departments?.map((d: any) => d?.name).filter(Boolean) ||
+          job?.branches ||
+          [];
+        const minCGPA = Number(job?.minCgpa || 0);
+        const maxActiveBacklogs = Number(job?.maxActiveBacklogs ?? Number.MAX_SAFE_INTEGER);
+        const branchEligible =
+          jobBranches.length === 0 ||
+          jobBranches.some((b: string) => b.toLowerCase() === studentBranch.toLowerCase());
+        const cgpaEligible = !minCGPA || studentCgpa >= minCGPA;
+        const backlogEligible = studentBacklogs <= maxActiveBacklogs;
+        const active = branchEligible && cgpaEligible && backlogEligible;
+
+        let reason = "";
+        if (!active) {
+          if (!cgpaEligible) {
+            reason = `CGPA required: ${minCGPA}`;
+          } else if (!branchEligible) {
+            reason = "Branch criteria not matched";
+          } else if (!backlogEligible) {
+            reason = `Backlogs allowed: ${maxActiveBacklogs}`;
+          }
+        }
+
+        return {
+          id: job.id,
+          name: job?.company?.name || "Company",
+          role: job?.title || "Role",
+          minCGPA,
+          branches: jobBranches,
+          active,
+          status: active ? "Eligible" : "Ineligible",
+          reason,
+          applied: normalizedApplications.has(Number(job.id)),
+        };
+      }),
+    [jobs, normalizedApplications, studentBacklogs, studentBranch, studentCgpa]
+  );
+
+  const filteredCompanies = companies.filter((company) => {
     const matchesSearch = company.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                           company.role.toLowerCase().includes(searchQuery.toLowerCase());
     if (activeFilter === 'eligible') return matchesSearch && company.active;
@@ -53,8 +101,25 @@ const Eligibility = () => {
 
   const filterTabs = [
     { key: 'all' as const, label: 'All', count: companies.length },
-    { key: 'eligible' as const, label: 'Eligible', count: companies.filter(c => c.active).length },
-    { key: 'applied' as const, label: 'Applied', count: companies.filter(c => c.applied).length },
+    { key: 'eligible' as const, label: 'Eligible', count: companies.filter((c) => c.active).length },
+    { key: 'applied' as const, label: 'Applied', count: companies.filter((c) => c.applied).length },
+  ];
+
+  const eligibilitySummary = [
+    {
+      label: 'Eligible Opportunities',
+      value: String(filterTabs[1].count).padStart(2, "0"),
+      icon: CheckCircle2,
+      color: 'text-emerald-600',
+      bg: 'bg-emerald-50'
+    },
+    {
+      label: 'Ineligible Roles',
+      value: String(Math.max(0, companies.length - filterTabs[1].count)).padStart(2, "0"),
+      icon: XCircle,
+      color: 'text-slate-400',
+      bg: 'bg-slate-50'
+    },
   ];
 
   return (
@@ -77,7 +142,7 @@ const Eligibility = () => {
                 <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                   <p className="text-[11px] font-bold text-slate-400 uppercase mb-2">Current Standing</p>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-black text-slate-900">{studentProfile.cgpa}</span>
+                    <span className="text-2xl font-black text-slate-900">{studentCgpa || 0}</span>
                     <span className="text-slate-400 font-medium text-sm">/ 10.0 CGPA</span>
                   </div>
                 </div>
@@ -85,11 +150,13 @@ const Eligibility = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                     <p className="text-[11px] font-bold text-slate-400 uppercase mb-1">Branch</p>
-                    <p className="font-bold text-slate-800">{studentProfile.branch}</p>
+                    <p className="font-bold text-slate-800">{studentBranch}</p>
                   </div>
                   <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
                     <p className="text-[11px] font-bold text-slate-400 uppercase mb-1">Backlogs</p>
-                    <p className="font-bold text-emerald-600">{studentProfile.backlogs}</p>
+                    <p className={`font-bold ${studentBacklogs > 0 ? "text-amber-600" : "text-emerald-600"}`}>
+                      {studentBacklogs}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -103,6 +170,13 @@ const Eligibility = () => {
                 </div>
               </div>
             </div>
+
+            {loading && companies.length === 0 && (
+              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-center gap-2 text-slate-500">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Loading eligibility data...
+              </div>
+            )}
 
             {/* Quick Stats */}
             <div className="space-y-3">
@@ -213,7 +287,10 @@ const Eligibility = () => {
                           )}
                           
                           {company.active ? (
-                            <button className="flex items-center gap-1 text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform">
+                            <button
+                              onClick={() => navigate('/student/jobs')}
+                              className="flex items-center gap-1 text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform"
+                            >
                               Apply Now <ArrowUpRight className="w-3 h-3" />
                             </button>
                           ) : (
@@ -233,11 +310,6 @@ const Eligibility = () => {
                 )}
               </div>
               
-              <div className="p-4 bg-slate-50 text-center border-t border-slate-100">
-                <button className="text-sm font-semibold text-slate-500 hover:text-blue-600 transition-colors inline-flex items-center gap-1">
-                  View All Companies <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
             </div>
           </div>
         </div>
