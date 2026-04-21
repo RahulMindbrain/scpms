@@ -16,13 +16,14 @@ import {
 } from "../repository/notification.repository";
 import {
   getEligibleUnplacedStudents,
+  getStudentByUserId,
   //getUnplacedStudents,
 } from "../repository/student.repository";
 import { emitToUsers } from "../socket";
 import { SOCKET_EVENTS } from "../socket.event";
 import { sendEmailService } from "./mail/mail.service";
+import { getUpcomingSchedulesForStudent } from "../repository/schedule.repository";
 
-// notification.service.ts
 export const createNotificationService = async (data: any) => {
   return createNotification(data);
 };
@@ -152,4 +153,20 @@ export const deleteNotificationService = async (
   }
 
   return await deleteNotification(notificationId);
+};
+
+export const getUpcomingEventsService = async (userId: number) => {
+  const student = await getStudentByUserId(userId);
+  if (!student) throw new Error("Student not found");
+
+  const schedules = await getUpcomingSchedulesForStudent(student.id);
+
+  return schedules.map((s) => ({
+    id: s.id,
+    title: s.title,
+    company: s.company.name,
+    startTime: s.startTime,
+    endTime: s.endTime,
+    venue: s.venue,
+  }));
 };

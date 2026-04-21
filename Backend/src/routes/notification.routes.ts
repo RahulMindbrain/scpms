@@ -3,10 +3,12 @@ import {
   deleteNotificationController,
   getNotificationsController,
   getUnreadCountController,
+  getUpcomingEventsController,
   markAllAsReadController,
   markAsReadController,
 } from "../controllers/notification.controller";
 import authenticateUser from "../middlewares/authenticateUser";
+import { authorizeRoles } from "../middlewares/verifyRole";
 
 const notificationRouter = Router();
 
@@ -30,6 +32,13 @@ notificationRouter.delete(
   "/:id",
   authenticateUser,
   deleteNotificationController,
+);
+
+notificationRouter.get(
+  "/upcoming-events",
+  authenticateUser,
+  authorizeRoles("STUDENT"),
+  getUpcomingEventsController,
 );
 
 export default notificationRouter;

@@ -1,5 +1,3 @@
-// services/admin.service.ts
-
 import bcrypt from "bcrypt";
 import {
   Company,

@@ -4,6 +4,7 @@ import {
   getNotificationsPaginatedService,
   getNotificationsService,
   getUnreadCountService,
+  getUpcomingEventsService,
   markAllAsReadService,
   markAsReadService,
   markNotificationAsReadService,
@@ -93,6 +94,29 @@ export const markAllAsReadController = async (_req: Request, res: Response) => {
     const data = await markAllAsReadService(user.id);
 
     return sendSuccess(res, 200, "All notifications marked as read", data);
+  } catch (error: any) {
+    return sendError(res, 400, error.message);
+  }
+};
+
+export const getUpcomingEventsController = async (
+  _req: Request,
+  res: Response,
+) => {
+  try {
+    const user = res.locals.user;
+
+    if (!user?.id) {
+      return sendError(res, 401, "Unauthorized");
+    }
+
+    if (user.role !== "STUDENT") {
+      return sendError(res, 403, "Only students can access upcoming events");
+    }
+
+    const data = await getUpcomingEventsService(user.id);
+
+    return sendSuccess(res, 200, "Upcoming events fetched", data);
   } catch (error: any) {
     return sendError(res, 400, error.message);
   }

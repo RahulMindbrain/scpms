@@ -291,3 +291,41 @@ export const getSchedulesByCompanyIdRepo = async (companyId: number) => {
     orderBy: { startTime: "asc" },
   });
 };
+
+export const getUpcomingSchedulesForStudent = async (studentId: number) => {
+  const now = new Date();
+
+  return prisma.interviewSchedule.findMany({
+    where: {
+      startTime: {
+        gte: now,
+      },
+      jobs: {
+        some: {
+          applications: {
+            some: {
+              studentId,
+            },
+          },
+        },
+      },
+    },
+    include: {
+      company: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+      jobs: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+    },
+    orderBy: {
+      startTime: "asc",
+    },
+  });
+};

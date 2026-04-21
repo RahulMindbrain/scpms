@@ -60,9 +60,6 @@ export const createStudentSchema = z
 
 export const updateStudentSchema = z
   .object({
-    // =========================
-    // SCALAR
-    // =========================
     year: z.number().int().min(1).max(4).optional(),
     passingYear: z.number().int().min(2000).max(2100).optional(),
     cgpa: z.number().min(0).max(10).optional(),
