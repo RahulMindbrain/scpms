@@ -117,6 +117,10 @@ export const PrivateRoutes: RouteOptions<any>[] = [
         component: ApplicationStatus
     },
     {
+        path: "/student/application/:id",
+        component: ApplicationStatus
+    },
+    {
         path: "/student/notifications",
         component: Notification
     },

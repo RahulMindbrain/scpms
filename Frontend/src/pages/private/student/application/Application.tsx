@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 type Status = 'APPLIED' | 'SHORTLISTED' | 'TECHNICAL_ROUND' | 'HR_ROUND' | 'SELECTED' | 'REJECTED';
 
@@ -66,14 +66,14 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
   };
 
   return (
-    <div className="bg-white p-6 md:p-8 rounded-2xl shadow-lg shadow-slate-200/40 border border-slate-100 w-full hover:border-blue-200 transition-all duration-300 overflow-hidden">
+    <div className="bg-white p-4 sm:p-6 md:p-8 rounded-2xl shadow-lg shadow-slate-200/40 border border-slate-100 w-full hover:border-blue-200 transition-all duration-300 overflow-hidden">
       {/* Header */}
-      <div className="flex justify-between items-start mb-8">
-        <div>
-          <h3 className="text-xl font-bold text-slate-900 tracking-tight">{companyName}</h3>
-          <p className="text-blue-600 font-semibold text-base mt-0.5">{role}</p>
+      <div className="flex flex-col gap-4 sm:flex-row sm:justify-between sm:items-start mb-6 sm:mb-8">
+        <div className="min-w-0">
+          <h3 className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight wrap-break-word">{companyName}</h3>
+          <p className="text-blue-600 font-semibold text-sm sm:text-base mt-0.5 wrap-break-word">{role}</p>
         </div>
-        <div className="text-right">
+        <div className="text-left sm:text-right">
           <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block mb-1">
             Applied on
           </span>
@@ -84,13 +84,14 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
       </div>
 
       {/* Progress Tracker */}
-      <div className="relative flex justify-between items-start mb-6">
-        <div className="absolute top-5 left-0 w-full h-0.5 bg-slate-100 -z-0" />
-        {stages.map((stage, index) => {
+      <div className="mb-6">
+        <div className="relative flex items-start gap-4 overflow-x-auto pb-2 pr-2">
+          <div className="absolute top-5 left-0 right-0 h-0.5 bg-slate-100 z-0 min-w-[560px] sm:min-w-0" />
+          {stages.map((stage, index) => {
           const isCompleted = (index < currentIndex && currentIndex !== -1) || currentStatus === 'SELECTED';
           const isCurrent = index === currentIndex && !isRejected;
           return (
-            <div key={stage} className="flex flex-col items-center relative z-10 w-full">
+            <div key={stage} className="flex flex-col items-center relative z-10 min-w-[96px] sm:min-w-0 sm:flex-1">
               <div
                 className={`flex items-center justify-center w-10 h-10 rounded-full mb-3 border-2 transition-all duration-500 ${isCompleted
                   ? 'bg-emerald-500 border-emerald-500 text-white shadow-lg shadow-emerald-200'
@@ -106,27 +107,28 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
                 )}
               </div>
               <span
-                className={`text-[9px] font-bold uppercase tracking-widest text-center px-1 ${isCurrent ? 'text-blue-600' : isCompleted ? 'text-emerald-600' : 'text-slate-400'
+                className={`text-[9px] font-bold uppercase tracking-widest text-center px-1 whitespace-nowrap ${isCurrent ? 'text-blue-600' : isCompleted ? 'text-emerald-600' : 'text-slate-400'
                   }`}
               >
                 {statusDisplayMap[stage]}
               </span>
             </div>
           );
-        })}
-        {isRejected && (
-          <div className="flex flex-col items-center relative z-10 w-full text-center">
-            <div className="flex items-center justify-center w-10 h-10 rounded-full mb-3 border-2 bg-red-50 border-red-500 text-red-500 animate-pulse shadow-lg shadow-red-100">
-              <XCircle size={18} strokeWidth={3} />
+          })}
+          {isRejected && (
+            <div className="flex flex-col items-center relative z-10 min-w-[96px] sm:min-w-0 sm:flex-1 text-center">
+              <div className="flex items-center justify-center w-10 h-10 rounded-full mb-3 border-2 bg-red-50 border-red-500 text-red-500 animate-pulse shadow-lg shadow-red-100">
+                <XCircle size={18} strokeWidth={3} />
+              </div>
+              <span className="text-[9px] font-bold uppercase tracking-widest text-red-600 whitespace-nowrap">Rejected</span>
             </div>
-            <span className="text-[9px] font-bold uppercase tracking-widest text-red-600">Rejected</span>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Action Footer */}
       <div
-        className={`p-4 rounded-xl flex items-center justify-between border ${isRejected ? 'bg-red-50/50 border-red-100' : 'bg-blue-50/50 border-blue-100'
+        className={`p-4 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border ${isRejected ? 'bg-red-50/50 border-red-100' : 'bg-blue-50/50 border-blue-100'
           }`}
       >
         <div className="flex items-center gap-3">
@@ -137,7 +139,7 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
             <p className={`text-sm font-bold ${isRejected ? 'text-red-900' : 'text-blue-900'}`}>
               {isRejected ? 'Application Closed' : `Currently: ${statusDisplayMap[currentStatus]}`}
             </p>
-            <p className={`text-xs font-medium ${isRejected ? 'text-red-700/70' : 'text-blue-700/70'}`}>
+            <p className={`text-xs font-medium max-w-xl ${isRejected ? 'text-red-700/70' : 'text-blue-700/70'}`}>
               {isRejected
                 ? reason || 'Your application was not moved forward for this role.'
                 : currentStatus === 'SELECTED'
@@ -148,12 +150,12 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
         </div>
 
         {currentStatus === 'SELECTED' ? (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
             <Button
               size="sm"
               onClick={() => handleAction('REJECT')}
               disabled={!!updating}
-              className="rounded-xl font-bold text-xs bg-white text-red-600 border-red-100 hover:bg-red-50 hover:text-red-700 border"
+              className="rounded-xl font-bold text-xs bg-white text-red-600 border-red-100 hover:bg-red-50 hover:text-red-700 border flex-1 sm:flex-none"
             >
               {updating === 'REJECT' ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
               Reject
@@ -162,7 +164,7 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
               size="sm"
               onClick={() => handleAction('ACCEPT')}
               disabled={!!updating}
-              className="rounded-xl font-bold text-xs bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm shadow-emerald-200"
+              className="rounded-xl font-bold text-xs bg-emerald-600 text-white hover:bg-emerald-700 shadow-sm shadow-emerald-200 flex-1 sm:flex-none"
             >
               {updating === 'ACCEPT' ? <Loader2 className="w-3 h-3 animate-spin mr-1" /> : null}
               Accept Offer
@@ -171,7 +173,7 @@ const ApplicationCard: React.FC<ApplicationProps> = ({
         ) : (
           <Button
             variant="ghost"
-            className="rounded-xl font-semibold text-xs text-slate-400 hover:text-blue-600 hover:bg-white group transition-all"
+            className="rounded-xl font-semibold text-xs text-slate-400 hover:text-blue-600 hover:bg-white group transition-all self-start sm:self-auto"
           >
             Details <ChevronRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
           </Button>
@@ -233,6 +235,7 @@ const QuickActionCard: React.FC<{
 const ApplicationStatus = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const { id: routeApplicationId } = useParams<{ id?: string }>();
   const { applications = [], loading, meta } = useSelector((state: RootState) => state.student);
 
   useEffect(() => {
@@ -243,12 +246,18 @@ const ApplicationStatus = () => {
     (a: any) => !['SELECTED', 'REJECTED'].includes(a.status)
   );
 
+  const parsedApplicationId = routeApplicationId ? Number(routeApplicationId) : null;
+  const hasValidApplicationId = parsedApplicationId !== null && !Number.isNaN(parsedApplicationId);
+  const visibleApplications = hasValidApplicationId
+    ? applications.filter((app: any) => app.id === parsedApplicationId)
+    : applications;
+
 
 
   /* ─── Loading State ─── */
   if (loading && applications.length === 0) {
     return (
-      <div className="p-6 md:p-8 max-w-6xl mx-auto animate-in fade-in duration-700">
+      <div className="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto animate-in fade-in duration-700">
         {/* Skeleton Header */}
         <div className="flex items-center justify-between mb-10">
           <div className="flex items-center gap-4">
@@ -265,21 +274,21 @@ const ApplicationStatus = () => {
   }
 
   return (
-    <div className="p-6 md:p-8 max-w-6xl mx-auto animate-in fade-in duration-700">
+      <div className="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto animate-in fade-in duration-700">
       {/* ─── Header Section ─── */}
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20">
+      <header className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 mb-8">
+        <div className="flex items-center gap-3 sm:gap-4">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-500/20 shrink-0">
             <Briefcase className="w-6 h-6" />
           </div>
-          <div>
-            <h2 className="font-bold text-2xl text-slate-900 tracking-tight">Applied Jobs</h2>
-            <p className="text-slate-500 text-sm font-medium">Track and manage your job applications</p>
+          <div className="min-w-0">
+            <h2 className="font-bold text-xl sm:text-2xl text-slate-900 tracking-tight">Applied Jobs</h2>
+            <p className="text-slate-500 text-xs sm:text-sm font-medium">Track and manage your job applications</p>
           </div>
         </div>
 
         {/* Stat Badges */}
-        <div className="flex items-center gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full lg:w-auto">
           <div className="bg-white pl-4 pr-5 py-2.5 rounded-xl border border-slate-100 shadow-sm flex items-center gap-3 hover:border-blue-200 transition-colors">
             <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
               <Briefcase size={15} className="text-blue-600" />
@@ -302,9 +311,9 @@ const ApplicationStatus = () => {
       </header>
 
       {/* ─── Applications List OR Empty State ─── */}
-      {applications.length > 0 ? (
+      {visibleApplications.length > 0 ? (
         <div className="grid grid-cols-1 gap-6">
-          {applications.map((app: any) => (
+          {visibleApplications.map((app: any) => (
             <ApplicationCard
               key={app.id}
               id={app.id}
@@ -319,8 +328,30 @@ const ApplicationStatus = () => {
         </div>
       ) : (
         <div className="space-y-8">
+          {hasValidApplicationId && applications.length > 0 ? (
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 bg-slate-50 border border-slate-200 rounded-xl">
+              <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
+                <Search size={18} className="text-slate-600" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-slate-900">Application not found</p>
+                <p className="text-xs text-slate-600 mt-0.5">
+                  No application matches ID {parsedApplicationId}. Showing all applications can help you find the right one.
+                </p>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/student/application')}
+                className="sm:shrink-0 font-semibold text-xs rounded-lg self-start sm:self-auto"
+              >
+                View All
+              </Button>
+            </div>
+          ) : null}
+
           {/* Profile Completion Hint Banner */}
-          <div className="flex items-center gap-4 p-4 bg-amber-50 border border-amber-200/60 rounded-xl">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4 p-4 bg-amber-50 border border-amber-200/60 rounded-xl">
             <div className="w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center shrink-0">
               <Sparkles size={18} className="text-amber-600" />
             </div>
@@ -332,7 +363,7 @@ const ApplicationStatus = () => {
               variant="ghost"
               size="sm"
               onClick={() => navigate('/student/profile')}
-              className="shrink-0 text-amber-700 hover:bg-amber-100 hover:text-amber-800 font-semibold text-xs rounded-lg"
+              className="sm:shrink-0 text-amber-700 hover:bg-amber-100 hover:text-amber-800 font-semibold text-xs rounded-lg self-start sm:self-auto"
             >
               Update Profile <ArrowRight size={14} className="ml-1" />
             </Button>
@@ -344,7 +375,7 @@ const ApplicationStatus = () => {
             <div className="absolute top-0 right-0 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
             <div className="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/5 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none" />
 
-            <div className="relative z-10 flex flex-col items-center text-center py-16 px-6">
+            <div className="relative z-10 flex flex-col items-center text-center py-12 sm:py-16 px-4 sm:px-6">
               {/* Illustration */}
               <div className="relative mb-8">
                 <div className="w-24 h-24 bg-blue-50 rounded-3xl flex items-center justify-center border-2 border-blue-100/60">
@@ -362,17 +393,17 @@ const ApplicationStatus = () => {
               </p>
 
               {/* CTAs */}
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
                 <Button
                   onClick={() => navigate('/student/jobs')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-7 py-5 rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:shadow-xl hover:shadow-blue-500/25 gap-2"
+                  className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-7 py-5 rounded-xl shadow-lg shadow-blue-500/20 transition-all hover:shadow-xl hover:shadow-blue-500/25 gap-2 w-full sm:w-auto"
                 >
                   <Rocket size={16} /> Explore Jobs
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => navigate('/student/profile')}
-                  className="font-semibold px-6 py-5 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all gap-2"
+                  className="font-semibold px-6 py-5 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 hover:border-slate-300 transition-all gap-2 w-full sm:w-auto"
                 >
                   <UserCircle size={16} /> Update Profile
                 </Button>
