@@ -21,7 +21,11 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+   origin: [
+      "http://localhost:5173",                 
+      "https://7132f00b.scpms.pages.dev",      
+      "https://scpms.pages.dev",               
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   }),
