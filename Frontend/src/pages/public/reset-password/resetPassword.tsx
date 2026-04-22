@@ -26,7 +26,7 @@ const ResetPassword: React.FC = () => {
             Your password has been successfully reset. You can now log in with your new password.
           </p>
           <Link 
-            to="/login" 
+            to="/Login" 
             className="w-full bg-gradient-to-r from-[#1E40AF] to-[#1A365D] hover:from-[#1A365D] hover:to-[#1E3A8A] text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20 transition-all duration-300 flex items-center justify-center gap-2"
           >
             Go to Login

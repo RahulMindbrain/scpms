@@ -65,7 +65,7 @@ const ForgotPassword: React.FC = () => {
     try {
       await dispatch(resetPassword({ email, newpassword: newPassword })).unwrap();
       toast.success("Password reset successful. Please login with your new password.");
-      navigate('/signin');
+      navigate('/login');
     } catch (error: any) {
       toast.error(error || "Failed to reset password");
     } finally {
