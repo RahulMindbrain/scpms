@@ -123,17 +123,17 @@ export const fetchSchedulesByCompany = createAsyncThunk(
   }
 );
 
-export const fetchCompanySchedules = createAsyncThunk(
-  "interview/fetchCompanySchedules",
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await getAPI<any>("/interview-schedule/by-company-id");
-      return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch company schedules");
-    }
-  }
-);
+// export const fetchCompanySchedules = createAsyncThunk(
+//   "interview/fetchCompanySchedules",
+//   async (_, { rejectWithValue }) => {
+//     try {
+//       const response = await getAPI<any>("/interview-schedule/by-company-id");
+//       return response;
+//     } catch (error: any) {
+//       return rejectWithValue(error.message || "Failed to fetch company schedules");
+//     }
+//   }
+// );
 
 export const fetchScheduleMessages = createAsyncThunk(
   "interview/fetchMessages",
