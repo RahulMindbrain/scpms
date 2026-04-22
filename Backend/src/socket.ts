@@ -11,7 +11,11 @@ type JoinPayload = {
 export const initializeSocket = (server: HTTPServer): void => {
   io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: [
+      "http://localhost:5173",
+      "https://scpms.pages.dev",
+      "https://7132f00b.scpms.pages.dev",
+    ],
       methods: ["GET", "POST"],
       credentials: true,
     },
