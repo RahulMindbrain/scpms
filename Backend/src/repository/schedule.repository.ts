@@ -272,7 +272,7 @@ export const getSchedulesByCompanyIdRepo = async (companyId: number) => {
   return prisma.interviewSchedule.findMany({
     where: {
       companyId,
-      companyApprovalStatus: "APPROVED",
+      //companyApprovalStatus: "APPROVED",
     },
     include: {
       jobs: true,
