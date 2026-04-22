@@ -22,6 +22,7 @@ export const PublicRoutes: RouteOptions<any>[] = [
         path: "/Forgot",
         component: ForgotPassword,
     },
+    
     {
         path: "*",
         component: NotFound,
