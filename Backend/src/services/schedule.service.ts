@@ -421,14 +421,22 @@ export const getSchedulesForUserService = async (
 
   const schedules = await getSchedulesByCompanyIdRepo(companyId);
 
-  return schedules.map((s) => ({
-    id: s.id,
-    title: s.title,
-    startTime: s.startTime,
-    endTime: s.endTime,
-    venue: s.venue,
-    companyName: s.company.name,
-    jobCount: s.jobs.length,
-    jobs: s.jobs,
-  }));
+return schedules.map((s) => ({
+  id: s.id,
+  title: s.title,
+  startTime: s.startTime,
+  endTime: s.endTime,
+  venue: s.venue,
+
+  status: s.status,
+  companyApprovalStatus: s.companyApprovalStatus,
+  approvedAt: s.approvedAt,
+  rejectedAt: s.rejectedAt,
+  rejectionReason: s.rejectionReason,
+  createdAt: s.createdAt,
+
+  companyName: s.company.name,
+  jobCount: s.jobs.length,
+  jobs: s.jobs,
+}));
 };
