@@ -197,20 +197,32 @@ const HomePage: React.FC = () => {
             </h1>
 
             <p className="text-lg md:text-xl text-slate-300 mb-10 leading-relaxed max-w-2xl">
-              A unified digital hub for Admins, students, and COMPANYs.
+              A unified digital hub for Admins, students, and Company.
               Automate drives, track applications, and boost placement rates
               — all from one platform.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
               <button
-                onClick={() => navigate(getDashboardLink())}
+                onClick={() => {
+    if (isAuthenticated) {
+      navigate(getDashboardLink());
+    } else {
+      navigate('/login');
+    }
+  }}
                 className="px-8 py-3.5 bg-gradient-to-br from-blue-700 to-slate-900 text-white rounded-xl font-bold flex items-center gap-2 shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:translate-y-[-2px]">
                 {isAuthenticated ? 'Go to Dashboard' : 'Launch Dashboard'} <ChevronRight size={18} />
               </button>
-              <button className="px-8 py-3.5 bg-white text-slate-900 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition-all">
-                Explore Features
-              </button>
+            <button
+  onClick={() => {
+    const section = document.getElementById('features');
+    section?.scrollIntoView({ behavior: 'smooth' });
+  }}
+  className="px-8 py-3.5 bg-white text-slate-900 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition-all"
+>
+  Explore Features
+</button>
             </div>
           </div>
         </div>
