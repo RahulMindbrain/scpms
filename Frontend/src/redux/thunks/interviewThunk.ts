@@ -127,7 +127,7 @@ export const fetchCompanySchedules = createAsyncThunk(
   "interview/fetchCompanySchedules",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await getAPI<any>("/interview-schedule/company");
+      const response = await getAPI<any>("/interview-schedule/by-company-id");
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch company schedules");
