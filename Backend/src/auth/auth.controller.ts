@@ -33,7 +33,7 @@ export const loginController = async (req: Request, res: Response) => {
     res.cookie("userAccessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "none",,
       maxAge: accessMaxAge,
       path: "/",
     });
@@ -41,7 +41,7 @@ export const loginController = async (req: Request, res: Response) => {
     res.cookie("userRefreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "none",,
       maxAge: refreshMaxAge,
       path: "/",
     });
@@ -71,7 +71,7 @@ export const regenAccessToken = async (req: Request, res: Response) => {
     res.cookie("userAccessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "none",,
       maxAge: accessMaxAge,
       path: "/",
     });
@@ -79,7 +79,7 @@ export const regenAccessToken = async (req: Request, res: Response) => {
     res.cookie("userRefreshToken", newRefreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      sameSite: "none",,
       maxAge: refreshMaxAge,
       path: "/",
     });
@@ -110,7 +110,7 @@ export const logoutController = async (req: Request, res: Response) => {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "lax" as const,
+      sameSite: "none", as const,
       path: "/",
     };
 
