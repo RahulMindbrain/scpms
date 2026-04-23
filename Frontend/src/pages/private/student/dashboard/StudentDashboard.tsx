@@ -15,9 +15,12 @@ import {
 import type { AppDispatch } from "@/redux/store/store"
 import type { RootState } from "@/redux/reducers/rootReducer"
 import { fetchUpcomingEvents, fetchUnreadCount } from "@/redux/thunks/notificationThunks"
+import { useSocket } from "@/socket/SocketProvider"
+import { SOCKET_EVENTS } from "@/socket/socket.events"
 
 export default function StudentDashboard() {
   const dispatch = useDispatch<AppDispatch>()
+  const socket = useSocket()
   const { upcomingEvents = [], unreadCount = 0, loading = false } = useSelector(
     (state: RootState) => state.notification || {}
   )
@@ -28,6 +31,27 @@ export default function StudentDashboard() {
     dispatch(fetchUpcomingEvents())
     dispatch(fetchUnreadCount())
   }, [dispatch])
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleUpdate = () => {
+      dispatch(fetchUpcomingEvents());
+      dispatch(fetchUnreadCount());
+    };
+
+    socket.on(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED, handleUpdate);
+    socket.on(SOCKET_EVENTS.NEW_JOB, handleUpdate);
+    socket.on(SOCKET_EVENTS.SCHEDULE_APPROVED, handleUpdate);
+    socket.on(SOCKET_EVENTS.SCHEDULE_CREATED, handleUpdate);
+
+    return () => {
+      socket.off(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED, handleUpdate);
+      socket.off(SOCKET_EVENTS.NEW_JOB, handleUpdate);
+      socket.off(SOCKET_EVENTS.SCHEDULE_APPROVED, handleUpdate);
+      socket.off(SOCKET_EVENTS.SCHEDULE_CREATED, handleUpdate);
+    };
+  }, [dispatch, socket]);
 
   return (
     <div className="flex flex-1 flex-col bg-linear-to-b from-slate-50 via-blue-50/30 to-indigo-50/40">
