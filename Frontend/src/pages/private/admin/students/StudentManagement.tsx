@@ -350,7 +350,7 @@ const StudentManagement: React.FC = () => {
                 <TableHead className="font-semibold text-slate-500 py-4 pl-6">Name</TableHead>
                 <TableHead className="font-semibold text-slate-500 text-center">Department</TableHead>
                 <TableHead className="font-semibold text-slate-500 text-center">Verified</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-right pr-6">Actions</TableHead>
+                {/* <TableHead className="font-semibold text-slate-500 text-right pr-6">Actions</TableHead> */}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -371,7 +371,7 @@ const StudentManagement: React.FC = () => {
                       )}
                     </button>
                   </TableCell>
-                  <TableCell className="text-right pr-6">
+                  {/* <TableCell className="text-right pr-6">
                     <Button
                       variant="ghost"
                       size="icon"
@@ -380,7 +380,7 @@ const StudentManagement: React.FC = () => {
                     >
                       <Eye className="w-5 h-5" />
                     </Button>
-                  </TableCell>
+                  </TableCell> */}
                 </TableRow>
               ))}
             </TableBody>
