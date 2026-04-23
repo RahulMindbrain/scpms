@@ -74,7 +74,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
         },
         resumeUrl: profile.resumeUrl || ""
       });
-      setResumeName(profile.resumes?.[0]?.name || (profile.resumeUrl ? "Current Resume" : ""));
+      setResumeName(profile.resumeUrl ? "Current Resume" : "");
       setErrors({});
     }
   }, [profile, isOpen]);

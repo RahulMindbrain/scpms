@@ -63,7 +63,7 @@ const StudentProfile = () => {
     projects: [],
     experiences: [],
     certificates: [],
-    resumes: []
+    resumeUrl: ''
   });
 
   useEffect(() => {
@@ -94,7 +94,7 @@ const StudentProfile = () => {
           name: typeof s === 'string' ? s : s.name, 
           color: 'bg-blue-500' 
         })) || [],
-        resumes: backendProfile.resumeUrl ? [{ name: 'Resume', url: backendProfile.resumeUrl, date: 'N/A', size: 'N/A' }] : []
+        resumeUrl: backendProfile.resumeUrl || ''
       }));
     }
   }, [backendProfile, user]);
@@ -109,7 +109,7 @@ const handleSave = async (updatedProfile: any) => {
       linkedinUrl: updatedProfile.linkedinUrl || undefined,
       githubUrl: updatedProfile.githubUrl || undefined,
       portfolioUrl: updatedProfile.portfolioUrl || undefined,
-      resumeUrl: updatedProfile.resumeUrl || updatedProfile.resumes?.[0]?.url || undefined,
+      resumeUrl: updatedProfile.resumeUrl || undefined,
 
     
    addSkillIds: updatedProfile.skills
@@ -213,7 +213,7 @@ const handleSave = async (updatedProfile: any) => {
       if (url) {
         const updatedProfile = {
           ...profile,
-          resumes: [{ name: file.name, url, date: new Date().toLocaleDateString(), size: `${(file.size / 1024 / 1024).toFixed(2)} MB` }]
+          resumeUrl: url
         };
         setProfile(updatedProfile);
         await handleSave(updatedProfile);
@@ -276,7 +276,7 @@ const handleAddCertificate = (cert: any) => {
       { name: 'Email', filled: !!profile.email },
       { name: 'Skills', filled: profile.skills?.length > 0 },
       { name: 'CGPA', filled: !!profile.stats?.cgpa && profile.stats.cgpa !== '0.0' },
-      { name: 'Resume', filled: profile.resumes?.length > 0 },
+      { name: 'Resume', filled: !!profile.resumeUrl },
       { name: 'Experience', filled: profile.experiences?.length > 0 },
     ];
     const filled = fields.filter(f => f.filled).length;
@@ -628,31 +628,31 @@ const handleAddCertificate = (cert: any) => {
                     </label>
                   </CardHeader>
                   <CardContent className="space-y-3 pt-4">
-                    {profile.resumes?.length > 0 ? profile.resumes.map((res: any, i: number) => (
-                      <div key={i} className="flex items-center justify-between p-3.5 border border-border/80 rounded-xl bg-slate-50/30 hover:bg-slate-50 hover:border-border transition-colors">
+                    {profile.resumeUrl ? (
+                      <div className="flex items-center justify-between p-3.5 border border-border/80 rounded-xl bg-slate-50/30 hover:bg-slate-50 hover:border-border transition-colors">
                         <div className="flex items-center gap-3.5 min-w-0">
                           <div className="h-10 w-10 bg-white rounded-lg shadow-sm border border-border flex items-center justify-center text-rose-500 shrink-0">
                             <FileText className="h-5 w-5" />
                           </div>
                           <div className="min-w-0">
-                            <p className="font-semibold text-sm truncate text-foreground">{res.name}</p>
+                            <p className="font-semibold text-sm truncate text-foreground">Uploaded Resume</p>
                             <div className="flex items-center gap-2 text-xs text-muted-foreground mt-0.5">
-                              <span>{res.date}</span>
-                              <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                              <span>{res.size}</span>
+                              <span>PDF Document</span>
                             </div>
                           </div>
                         </div>
                         <Button 
                           variant="secondary" 
                           size="sm" 
-                          onClick={() => openFile(res.url, res.name)}
+                          asChild
                           className="shrink-0 font-semibold px-4 h-9 text-xs ml-4 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors border-none"
                         >
-                          View
+                          <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" download>
+                            Download
+                          </a>
                         </Button>
                       </div>
-                    )) : (
+                    ) : (
                       <div className="text-center py-8 text-sm text-muted-foreground border-2 border-dashed rounded-lg bg-slate-50/50">
                         No resume uploaded yet. Ensure you upload a PDF format.
                       </div>
