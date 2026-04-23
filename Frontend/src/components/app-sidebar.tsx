@@ -69,7 +69,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         secondary: [
           // { title: "Interview Schedule", url: "/student/interview", icon: <Calendar /> },
           { title: "Notifications", url: "/student/notifications", icon: <Bell /> },
-          { title: "Documents", url: "/student/documents", icon: <FileText /> },
+          // { title: "Documents", url: "/student/documents", icon: <FileText /> },
         ],
       }
     } else if (role === "company") {
