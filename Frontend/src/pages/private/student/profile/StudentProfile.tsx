@@ -89,7 +89,11 @@ const StudentProfile = () => {
         linkedinUrl: backendProfile.linkedinUrl || '',
         githubUrl: backendProfile.githubUrl || '',
         portfolioUrl: backendProfile.portfolioUrl || '',
-        skills: backendProfile.skills?.map((s: string) => ({ name: s, color: 'bg-blue-500' })) || [],
+        skills: backendProfile.skills?.map((s: any) => ({ 
+          id: s.id, 
+          name: typeof s === 'string' ? s : s.name, 
+          color: 'bg-blue-500' 
+        })) || [],
         resumes: backendProfile.resumeUrl ? [{ name: 'Resume', url: backendProfile.resumeUrl, date: 'N/A', size: 'N/A' }] : []
       }));
     }
@@ -181,10 +185,11 @@ const handleSave = async (updatedProfile: any) => {
     };
 
     await dispatch(updateStudentProfile(payload)).unwrap();
-
     toast.success("Profile updated successfully");
+    return { success: true };
   } catch (err: any) {
-    toast.error(err || "Update failed");
+    toast.error(err?.message || err?.toString() || "Update failed");
+    return { success: false };
   }
 };
 

@@ -57,7 +57,7 @@ export const createStudentProfile = createAsyncThunk(
             const response = await postAPI<any>("/student/profile", data);
             return response;
         } catch (error: any) {
-            return rejectWithValue(error);
+            return rejectWithValue(error?.message || "Failed to create student profile");
         }
     }
 );
@@ -69,7 +69,7 @@ export const updateStudentProfile = createAsyncThunk(
             const response = await putAPI<any>("/student/profile", data);
             return response;
         } catch (error: any) {
-            return rejectWithValue(error);
+            return rejectWithValue(error?.message || "Failed to update student profile");
         }
     }
 );
