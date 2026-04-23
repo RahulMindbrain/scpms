@@ -17,6 +17,7 @@ interface ModalProps {
   footer?: React.ReactNode;
   className?: string;
   maxWidth?: string;
+  preventOutsideClick?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -28,10 +29,18 @@ export const Modal: React.FC<ModalProps> = ({
   footer,
   className,
   maxWidth = "sm:max-w-lg",
+  preventOutsideClick,
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className={cn(maxWidth, "rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl", className)}>
+      <DialogContent 
+        onInteractOutside={(e) => {
+          if (preventOutsideClick) {
+            e.preventDefault();
+          }
+        }}
+        className={cn(maxWidth, "rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl", className)}
+      >
         {(title || subtitle) && (
           <DialogHeader className="p-8 pb-0 space-y-1">
             {title && (

@@ -433,6 +433,7 @@ const PlacementDriveManagement: React.FC = () => {
         onClose={() => setIsModalOpen(false)}
         title="Launch New Recruitment Drive"
         maxWidth="sm:max-w-2xl"
+        preventOutsideClick={true}
       >
         <div className="px-1 py-4">
           <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
@@ -455,7 +456,11 @@ const PlacementDriveManagement: React.FC = () => {
                 <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Submission Deadline</label>
                 <div className="relative">
                   <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input type="date" className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all" />
+                  <input 
+                    type="date" 
+                    min={new Date().toISOString().split('T')[0]}
+                    className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all" 
+                  />
                 </div>
               </div>
               <div className="space-y-2">
