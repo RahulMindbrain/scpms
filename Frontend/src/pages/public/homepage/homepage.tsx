@@ -119,7 +119,7 @@ const HomePage: React.FC = () => {
         {/* Mobile Navigation Menu */}
         <div className={`md:hidden fixed inset-0 z-40 bg-white transition-all duration-300 ease-in-out ${isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
           }`}>
-          <div className="flex flex-col h-full pt-24 px-8 pb-10">
+         <div className="flex flex-col h-full pt-6 px-8 pb-10">
             <div className="flex flex-col gap-6 mb-auto">
               {['Features', 'Portals', 'Stats'].map((item) => (
                 <a key={item} href={`#${item.toLowerCase()}`}
@@ -408,7 +408,7 @@ const HomePage: React.FC = () => {
             <span className="text-xl font-bold text-slate-900 tracking-tight">Smart CPMS</span>
           </div>
           <p className="text-slate-500 text-sm">
-            © 2026 Smart Campus Placement Management System. All rights reserved.
+        © 2026 Mindbrain Pvt. Ltd. All rights reserved.
           </p>
         </div>
       </footer>
