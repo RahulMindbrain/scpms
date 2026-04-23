@@ -10,8 +10,9 @@ import {
   ChevronLeft,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "../../../redux/store/store";
+import type { RootState } from "../../../redux/reducers/rootReducer";
 import { registerUser } from "../../../redux/thunks/registerThunk";
 import { toast } from "sonner";
 
@@ -24,6 +25,17 @@ const SignUp: React.FC = () => {
   const [activeRole, setActiveRole] = useState<RegisterRole | null>(null);
   const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { isAuthenticated, userType } = useSelector((state: RootState) => state.auth);
+
+  React.useEffect(() => {
+    if (isAuthenticated) {
+      const role = userType?.toLowerCase();
+      if (role === "admin") navigate("/admin/dashboard", { replace: true });
+      else if (role === "student") navigate("/student/dashboard", { replace: true });
+      else if (role === "company") navigate("/company/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, userType, navigate]);
 
   const [form, setForm] = useState({
     fullName: "",

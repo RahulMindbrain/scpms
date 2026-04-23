@@ -4,13 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 import illustration from "../../../assets/img.jpg";
 import camp from "../../../assets/camp.jpg"
 import campp from "../../../assets/campp.jpg";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "../../../redux/store/store";
-import { loginUser } from "../../../redux/thunks/loginThunk";
-import { logoutUser } from "../../../redux/thunks/logoutThunk";
+import type { RootState } from "../../../redux/reducers/rootReducer";
 import { toast } from "sonner";
+import { loginUser } from "@/redux/thunks/loginThunk";
+import { logoutUser } from "@/redux/thunks/logoutThunk";
 
-// Define Roles for type safety
 type UserRole = "student" | "company" | "admin";
 
 interface RoleConfig {
@@ -27,6 +27,17 @@ const SignIn: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const { isAuthenticated, userType } = useSelector((state: RootState) => state.auth);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const role = userType?.toLowerCase();
+      if (role === "admin") navigate("/admin/dashboard", { replace: true });
+      else if (role === "student") navigate("/student/dashboard", { replace: true });
+      else if (role === "company") navigate("/company/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, userType, navigate]);
 
   const roles: RoleConfig[] = [
     { id: "student", label: "Student", icon: <GraduationCap size={16} /> },
@@ -52,7 +63,7 @@ const SignIn: React.FC = () => {
         return;
       }
 
-      toast.success("Welcome back! Signing you in...");
+      toast.success(`Signed in as a ${activeRole}.`);
 
       setTimeout(() => {
         if (user.role === "STUDENT") {
