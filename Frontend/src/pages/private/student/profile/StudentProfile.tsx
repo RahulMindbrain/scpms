@@ -106,10 +106,10 @@ const handleSave = async (updatedProfile: any) => {
       passingYear: parseInt(updatedProfile.stats.passingYear),
       cgpa: parseFloat(updatedProfile.stats.cgpa),
 
-      linkedinUrl: updatedProfile.linkedinUrl || "",
-      githubUrl: updatedProfile.githubUrl || "",
-      portfolioUrl: updatedProfile.portfolioUrl || "",
-      resumeUrl: updatedProfile.resumeUrl || updatedProfile.resumes?.[0]?.url || "",
+      linkedinUrl: updatedProfile.linkedinUrl || undefined,
+      githubUrl: updatedProfile.githubUrl || undefined,
+      portfolioUrl: updatedProfile.portfolioUrl || undefined,
+      resumeUrl: updatedProfile.resumeUrl || updatedProfile.resumes?.[0]?.url || undefined,
 
     
    addSkillIds: updatedProfile.skills
@@ -121,9 +121,9 @@ const handleSave = async (updatedProfile: any) => {
         ?.map((exp: any) => ({
           companyName: exp.companyName,
           role: exp.role,
-          description: exp.description,
+          description: exp.description || undefined,
           startDate: exp.startDate,
-          endDate: exp.endDate,
+          endDate: exp.endDate || undefined,
         })),
 
       updateExperiences: updatedProfile.experiences
@@ -132,20 +132,20 @@ const handleSave = async (updatedProfile: any) => {
           id: exp.id,
           companyName: exp.companyName,
           role: exp.role,
-          description: exp.description,
+          description: exp.description || undefined,
           startDate: exp.startDate,
-          endDate: exp.endDate,
+          endDate: exp.endDate || undefined,
         })),
 
-      deleteExperienceIds: [],
+      deleteExperienceIds: updatedProfile.deleteExperienceIds || [],
 
       addCertificates: updatedProfile.certificates
         ?.filter((cert: any) => !cert.id)
         ?.map((cert: any) => ({
           title: cert.title,
           issuer: cert.issuer,
-          certificateUrl: cert.certificateUrl,
-          issuedDate: cert.issuedDate,
+          certificateUrl: cert.certificateUrl || undefined,
+          issuedDate: cert.issuedDate || undefined,
         })),
 
       updateCertificates: updatedProfile.certificates
@@ -154,20 +154,20 @@ const handleSave = async (updatedProfile: any) => {
           id: cert.id,
           title: cert.title,
           issuer: cert.issuer,
-          certificateUrl: cert.certificateUrl,
-          issuedDate: cert.issuedDate,
+          certificateUrl: cert.certificateUrl || undefined,
+          issuedDate: cert.issuedDate || undefined,
         })),
 
-      deleteCertificateIds: [],
+      deleteCertificateIds: updatedProfile.deleteCertificateIds || [],
       
       addProjects: updatedProfile.projects
         ?.filter((proj: any) => !proj.id)
         ?.map((proj: any) => ({
           title: proj.title,
-          description: proj.description,
-          techStack: proj.techStack,
-          githubUrl: proj.githubUrl,
-          liveUrl: proj.liveUrl,
+          description: proj.description || undefined,
+          techStack: proj.techStack || undefined,
+          githubUrl: proj.githubUrl || undefined,
+          liveUrl: proj.liveUrl || undefined,
         })),
 
       updateProjects: updatedProfile.projects
@@ -175,13 +175,13 @@ const handleSave = async (updatedProfile: any) => {
         ?.map((proj: any) => ({
           id: proj.id,
           title: proj.title,
-          description: proj.description,
-          techStack: proj.techStack,
-          githubUrl: proj.githubUrl,
-          liveUrl: proj.liveUrl,
+          description: proj.description || undefined,
+          techStack: proj.techStack || undefined,
+          githubUrl: proj.githubUrl || undefined,
+          liveUrl: proj.liveUrl || undefined,
         })),
 
-      deleteProjectIds: [],
+      deleteProjectIds: updatedProfile.deleteProjectIds || [],
     };
 
     if (backendProfile) {
