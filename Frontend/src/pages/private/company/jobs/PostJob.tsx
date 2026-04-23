@@ -211,7 +211,7 @@ const PostJob: React.FC = () => {
               "Post Job"
             )}
           </Button>
-          <Button type="button" variant="outline" size="lg" className="px-8 font-bold">Save as Draft</Button>
+          {/* <Button type="button" variant="outline" size="lg" className="px-8 font-bold">Save as Draft</Button> */}
         </div>
       </form>
     </div>
