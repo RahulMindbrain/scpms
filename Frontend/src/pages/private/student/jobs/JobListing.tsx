@@ -257,13 +257,6 @@ const JobListing = () => {
             >
               {isApplying ? <Loader2 className="animate-spin" /> : 'Apply Now'}
             </Button>
-            <Button 
-               variant="outline"
-               className="py-6 rounded-2xl font-bold tracking-wider border-slate-200"
-               onClick={() => setIsModalOpen(false)}
-            >
-              Save for later
-            </Button>
           </div>
         </div>
       </Modal>
