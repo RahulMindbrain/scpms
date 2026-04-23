@@ -4,7 +4,6 @@ import {
   Search,
   CheckCircle2,
   UserCheck,
-  Eye,
   XCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -42,7 +41,7 @@ import { fetchStudents, fetchInactiveStudents, activateStudents } from '@/redux/
 import { fetchDepartments } from '@/redux/thunks/departmentThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
-import { getAPI } from '@/apis/api';
+// import { getAPI } from '@/apis/api';
 
 const StudentManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -56,10 +55,10 @@ const StudentManagement: React.FC = () => {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Viewing Student Profile State
-  const [isViewProfileModalOpen, setIsViewProfileModalOpen] = useState(false);
-  const [viewingStudent, setViewingStudent] = useState<any>(null);
-  const [viewingStudentDept, setViewingStudentDept] = useState<any>(null);
-  const [isProfileDeptLoading, setIsProfileDeptLoading] = useState(false);
+  // const [isViewProfileModalOpen, setIsViewProfileModalOpen] = useState(false);
+  // const [viewingStudent, setViewingStudent] = useState<any>(null);
+  // const [viewingStudentDept, setViewingStudentDept] = useState<any>(null);
+  // const [isProfileDeptLoading, setIsProfileDeptLoading] = useState(false);
 
   useEffect(() => {
     dispatch(fetchStudents({}));
@@ -97,20 +96,20 @@ deptId: s.student?.department?.id || null,
     setIsAddModalOpen(false);
   };
 
-  const handleViewProfile = async (student: any) => {
-    setViewingStudent(student);
-    setViewingStudentDept(null);
-    setIsViewProfileModalOpen(true);
-    setIsProfileDeptLoading(true);
-    try {
-      const data = await getAPI<any>(`/dept/${student.deptId}`);
-      setViewingStudentDept(data?.data || null);
-    } catch {
-      // dept data unavailable, just show student info
-    } finally {
-      setIsProfileDeptLoading(false);
-    }
-  };
+  // const handleViewProfile = async (student: any) => {
+  //   setViewingStudent(student);
+  //   setViewingStudentDept(null);
+  //   setIsViewProfileModalOpen(true);
+  //   setIsProfileDeptLoading(true);
+  //   try {
+  //     const data = await getAPI<any>(`/dept/${student.deptId}`);
+  //     setViewingStudentDept(data?.data || null);
+  //   } catch {
+  //     // dept data unavailable, just show student info
+  //   } finally {
+  //     setIsProfileDeptLoading(false);
+  //   }
+  // };
 
   const toggleVerification = async (id: number) => {
     const student = students.find((s) => s.id === id);
@@ -395,7 +394,7 @@ deptId: s.student?.department?.id || null,
       </Card>
       
       {/* Student Profile Modal */}
-      <Dialog open={isViewProfileModalOpen} onOpenChange={setIsViewProfileModalOpen}>
+      {/* <Dialog open={isViewProfileModalOpen} onOpenChange={setIsViewProfileModalOpen}>
         <DialogContent className="sm:max-w-[425px] bg-[#f8fafc] border-none shadow-xl rounded-xl">
           <DialogHeader className="text-left mb-2">
             <DialogTitle className="text-xl font-semibold text-slate-900">Student Profile</DialogTitle>
@@ -438,7 +437,7 @@ deptId: s.student?.department?.id || null,
             </div>
           )}
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </div>
   );
 };

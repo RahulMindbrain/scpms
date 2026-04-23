@@ -647,9 +647,14 @@ const handleAddCertificate = (cert: any) => {
                           asChild
                           className="shrink-0 font-semibold px-4 h-9 text-xs ml-4 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors border-none"
                         >
-                          <a href={profile.resumeUrl} target="_blank" rel="noopener noreferrer" download>
-                            Download
-                          </a>
+                         <Button
+  variant="secondary"
+  size="sm"
+  onClick={() => openFile(profile.resumeUrl, "Resume.pdf")}
+  className="shrink-0 font-semibold px-4 h-9 text-xs ml-4 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors border-none"
+>
+  Preview
+</Button>
                         </Button>
                       </div>
                     ) : (

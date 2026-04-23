@@ -2,33 +2,27 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getAPI, putAPI, postAPI } from "../../apis/api";
 
 export const fetchStudents = createAsyncThunk(
-  "student/fetchStudents",
-  async (params: any, { rejectWithValue }) => {
-    try {
-      const response = await getAPI<any>("/admin/get-students", params);
-
-      // ✅ FIX HERE
-      return response.data.data;
-
-    } catch (error: any) {
-      return rejectWithValue(error?.message || "Failed to fetch students");
+    "student/fetchStudents",
+    async (params: any, { rejectWithValue }) => {
+        try {
+            const response = await getAPI<any>("/admin/get-students", params);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to fetch students");
+        }
     }
-  }
 );
 
 export const fetchInactiveStudents = createAsyncThunk(
-  "student/fetchInactiveStudents",
-  async (params: any, { rejectWithValue }) => {
-    try {
-      const response = await getAPI<any>("/admin/get-inactive-students", params);
-
-      // ✅ FIX HERE
-      return response.data.data;
-
-    } catch (error: any) {
-      return rejectWithValue(error?.message || "Failed to fetch inactive students");
+    "student/fetchInactiveStudents",
+    async (params: any, { rejectWithValue }) => {
+        try {
+            const response = await getAPI<any>("/admin/get-inactive-students", params);
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to fetch inactive students");
+        }
     }
-  }
 );
 
 export const activateStudents = createAsyncThunk(

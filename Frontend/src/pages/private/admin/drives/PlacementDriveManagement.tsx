@@ -3,7 +3,6 @@ import {
   Calendar,
   MapPin,
   GraduationCap,
-  Plus,
   ChevronDown,
   Building2,
   AlertCircle,
