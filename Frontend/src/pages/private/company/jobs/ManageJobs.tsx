@@ -51,10 +51,10 @@ const ManageJobs: React.FC = () => {
                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Job Title</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Package</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Location</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Applicants</th>
+                {/* <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Applicants</th> */}
                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Deadline</th>
                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                {/* <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th> */}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
