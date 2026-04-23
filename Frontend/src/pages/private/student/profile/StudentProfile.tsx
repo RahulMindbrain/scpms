@@ -14,7 +14,7 @@ import ProjectModal from './modal/ProjectModal';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchStudentProfile, updateStudentProfile } from '../../../../redux/thunks/studentThunk';
+import { fetchStudentProfile, updateStudentProfile, createStudentProfile } from '../../../../redux/thunks/studentThunk';
 import { useEffect, useState } from 'react';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
@@ -184,8 +184,13 @@ const handleSave = async (updatedProfile: any) => {
       deleteProjectIds: [],
     };
 
-    await dispatch(updateStudentProfile(payload)).unwrap();
-    toast.success("Profile updated successfully");
+    if (backendProfile) {
+      await dispatch(updateStudentProfile(payload)).unwrap();
+      toast.success("Profile updated successfully");
+    } else {
+      await dispatch(createStudentProfile(payload)).unwrap();
+      toast.success("Profile created successfully");
+    }
     return { success: true };
   } catch (err: any) {
     toast.error(err?.message || err?.toString() || "Update failed");
