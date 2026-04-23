@@ -225,14 +225,14 @@ const PlacementDriveManagement: React.FC = () => {
                 )}
               </AnimatePresence>
             </div>
-
+{/* 
             <button
               onClick={() => setIsModalOpen(true)}
               className="flex items-center justify-center gap-2 px-8 py-3.5 bg-blue-600 text-white rounded-2xl text-sm font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/25 active:scale-95"
             >
               <Plus className="w-4 h-4" /> 
               <span>Create Drive</span>
-            </button>
+            </button> */}
           </div>
         </div>
 
