@@ -89,114 +89,114 @@ const StudentProfile = () => {
         linkedinUrl: backendProfile.linkedinUrl || '',
         githubUrl: backendProfile.githubUrl || '',
         portfolioUrl: backendProfile.portfolioUrl || '',
-        skills: backendProfile.skills?.map((s: any) => ({ 
-          id: s.id, 
-          name: typeof s === 'string' ? s : s.name, 
-          color: 'bg-blue-500' 
+        skills: backendProfile.skills?.map((s: any) => ({
+          id: s.id,
+          name: typeof s === 'string' ? s : s.name,
+          color: 'bg-blue-500'
         })) || [],
         resumeUrl: backendProfile.resumeUrl || ''
       }));
     }
   }, [backendProfile, user]);
 
-const handleSave = async (updatedProfile: any) => {
-  try {
-    const payload = {
-      year: parseInt(updatedProfile.stats.year),
-      passingYear: parseInt(updatedProfile.stats.passingYear),
-      cgpa: parseFloat(updatedProfile.stats.cgpa),
+  const handleSave = async (updatedProfile: any) => {
+    try {
+      const payload = {
+        year: parseInt(updatedProfile.stats.year),
+        passingYear: parseInt(updatedProfile.stats.passingYear),
+        cgpa: parseFloat(updatedProfile.stats.cgpa),
 
-      linkedinUrl: updatedProfile.linkedinUrl || undefined,
-      githubUrl: updatedProfile.githubUrl || undefined,
-      portfolioUrl: updatedProfile.portfolioUrl || undefined,
-      resumeUrl: updatedProfile.resumeUrl || undefined,
+        linkedinUrl: updatedProfile.linkedinUrl || undefined,
+        githubUrl: updatedProfile.githubUrl || undefined,
+        portfolioUrl: updatedProfile.portfolioUrl || undefined,
+        resumeUrl: updatedProfile.resumeUrl || undefined,
 
-    
-   addSkillIds: updatedProfile.skills
-  ?.map((s: any) => s.id)
-  ?.filter((id: any) => typeof id === "number") || [],
 
-      addExperiences: updatedProfile.experiences
-        ?.filter((exp: any) => !exp.id)
-        ?.map((exp: any) => ({
-          companyName: exp.companyName,
-          role: exp.role,
-          description: exp.description || undefined,
-          startDate: exp.startDate,
-          endDate: exp.endDate || undefined,
-        })),
+        addSkillIds: updatedProfile.skills
+          ?.map((s: any) => s.id)
+          ?.filter((id: any) => typeof id === "number") || [],
 
-      updateExperiences: updatedProfile.experiences
-        ?.filter((exp: any) => exp.id)
-        ?.map((exp: any) => ({
-          id: exp.id,
-          companyName: exp.companyName,
-          role: exp.role,
-          description: exp.description || undefined,
-          startDate: exp.startDate,
-          endDate: exp.endDate || undefined,
-        })),
+        addExperiences: updatedProfile.experiences
+          ?.filter((exp: any) => !exp.id)
+          ?.map((exp: any) => ({
+            companyName: exp.companyName,
+            role: exp.role,
+            description: exp.description || undefined,
+            startDate: exp.startDate,
+            endDate: exp.endDate || undefined,
+          })),
 
-      deleteExperienceIds: updatedProfile.deleteExperienceIds || [],
+        updateExperiences: updatedProfile.experiences
+          ?.filter((exp: any) => exp.id)
+          ?.map((exp: any) => ({
+            id: exp.id,
+            companyName: exp.companyName,
+            role: exp.role,
+            description: exp.description || undefined,
+            startDate: exp.startDate,
+            endDate: exp.endDate || undefined,
+          })),
 
-      addCertificates: updatedProfile.certificates
-        ?.filter((cert: any) => !cert.id)
-        ?.map((cert: any) => ({
-          title: cert.title,
-          issuer: cert.issuer,
-          certificateUrl: cert.certificateUrl || undefined,
-          issuedDate: cert.issuedDate || undefined,
-        })),
+        deleteExperienceIds: updatedProfile.deleteExperienceIds || [],
 
-      updateCertificates: updatedProfile.certificates
-        ?.filter((cert: any) => cert.id)
-        ?.map((cert: any) => ({
-          id: cert.id,
-          title: cert.title,
-          issuer: cert.issuer,
-          certificateUrl: cert.certificateUrl || undefined,
-          issuedDate: cert.issuedDate || undefined,
-        })),
+        addCertificates: updatedProfile.certificates
+          ?.filter((cert: any) => !cert.id)
+          ?.map((cert: any) => ({
+            title: cert.title,
+            issuer: cert.issuer,
+            certificateUrl: cert.certificateUrl || undefined,
+            issuedDate: cert.issuedDate || undefined,
+          })),
 
-      deleteCertificateIds: updatedProfile.deleteCertificateIds || [],
-      
-      addProjects: updatedProfile.projects
-        ?.filter((proj: any) => !proj.id)
-        ?.map((proj: any) => ({
-          title: proj.title,
-          description: proj.description || undefined,
-          techStack: proj.techStack || undefined,
-          githubUrl: proj.githubUrl || undefined,
-          liveUrl: proj.liveUrl || undefined,
-        })),
+        updateCertificates: updatedProfile.certificates
+          ?.filter((cert: any) => cert.id)
+          ?.map((cert: any) => ({
+            id: cert.id,
+            title: cert.title,
+            issuer: cert.issuer,
+            certificateUrl: cert.certificateUrl || undefined,
+            issuedDate: cert.issuedDate || undefined,
+          })),
 
-      updateProjects: updatedProfile.projects
-        ?.filter((proj: any) => proj.id)
-        ?.map((proj: any) => ({
-          id: proj.id,
-          title: proj.title,
-          description: proj.description || undefined,
-          techStack: proj.techStack || undefined,
-          githubUrl: proj.githubUrl || undefined,
-          liveUrl: proj.liveUrl || undefined,
-        })),
+        deleteCertificateIds: updatedProfile.deleteCertificateIds || [],
 
-      deleteProjectIds: updatedProfile.deleteProjectIds || [],
-    };
+        addProjects: updatedProfile.projects
+          ?.filter((proj: any) => !proj.id)
+          ?.map((proj: any) => ({
+            title: proj.title,
+            description: proj.description || undefined,
+            techStack: proj.techStack || undefined,
+            githubUrl: proj.githubUrl || undefined,
+            liveUrl: proj.liveUrl || undefined,
+          })),
 
-    if (backendProfile) {
-      await dispatch(updateStudentProfile(payload)).unwrap();
-      toast.success("Profile updated successfully");
-    } else {
-      await dispatch(createStudentProfile(payload)).unwrap();
-      toast.success("Profile created successfully");
+        updateProjects: updatedProfile.projects
+          ?.filter((proj: any) => proj.id)
+          ?.map((proj: any) => ({
+            id: proj.id,
+            title: proj.title,
+            description: proj.description || undefined,
+            techStack: proj.techStack || undefined,
+            githubUrl: proj.githubUrl || undefined,
+            liveUrl: proj.liveUrl || undefined,
+          })),
+
+        deleteProjectIds: updatedProfile.deleteProjectIds || [],
+      };
+
+      if (backendProfile) {
+        await dispatch(updateStudentProfile(payload)).unwrap();
+        toast.success("Profile updated successfully");
+      } else {
+        await dispatch(createStudentProfile(payload)).unwrap();
+        toast.success("Profile created successfully");
+      }
+      return { success: true };
+    } catch (err: any) {
+      toast.error(err?.message || err?.toString() || "Update failed");
+      return { success: false };
     }
-    return { success: true };
-  } catch (err: any) {
-    toast.error(err?.message || err?.toString() || "Update failed");
-    return { success: false };
-  }
-};
+  };
 
   const handleResumeUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -228,11 +228,11 @@ const handleSave = async (updatedProfile: any) => {
 
   const openFile = (url: string, name = '') => {
     if (!url) return;
-    
+
     // Ensure PDF extension for better browser handling if it's a PDF
     let finalUrl = url;
     const isPdf = name.toLowerCase().endsWith('.pdf') || url.toLowerCase().includes('.pdf');
-    
+
     if (isPdf && !finalUrl.toLowerCase().endsWith('.pdf')) {
       finalUrl = finalUrl + '.pdf';
     }
@@ -250,24 +250,24 @@ const handleSave = async (updatedProfile: any) => {
     handleSave(updatedProfile);
   };
 
-const handleAddExperience = (exp: any) => {
-  const updatedProfile = {
-    ...profile,
-    experiences: [...(profile.experiences || []), exp],
-  };
+  const handleAddExperience = (exp: any) => {
+    const updatedProfile = {
+      ...profile,
+      experiences: [...(profile.experiences || []), exp],
+    };
 
-  setProfile(updatedProfile);
-  handleSave(updatedProfile);
-};
-const handleAddCertificate = (cert: any) => {
-  const updatedProfile = {
-    ...profile,
-    certificates: [...(profile.certificates || []), cert],
+    setProfile(updatedProfile);
+    handleSave(updatedProfile);
   };
+  const handleAddCertificate = (cert: any) => {
+    const updatedProfile = {
+      ...profile,
+      certificates: [...(profile.certificates || []), cert],
+    };
 
-  setProfile(updatedProfile);
-  handleSave(updatedProfile);
-};
+    setProfile(updatedProfile);
+    handleSave(updatedProfile);
+  };
 
   // Profile completion calculation
   const getProfileCompletion = () => {
@@ -346,15 +346,15 @@ const handleAddCertificate = (cert: any) => {
 
                 <Separator className="my-4" />
 
-                  <div className="flex items-center gap-3 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
-                    <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
-                      <Mail className="h-4 w-4" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Email</p>
-                      <p className="truncate text-slate-700 font-semibold text-[13px]" title={profile.email}>{profile.email || 'N/A'}</p>
-                    </div>
+                <div className="flex items-center gap-3 text-sm p-3 rounded-xl bg-slate-50 border border-slate-100/50 hover:bg-white hover:shadow-sm transition-all group">
+                  <div className="h-8 w-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <Mail className="h-4 w-4" />
                   </div>
+                  <div className="min-w-0">
+                    <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider leading-none mb-1">Email</p>
+                    <p className="truncate text-slate-700 font-semibold text-[13px]" title={profile.email}>{profile.email || 'N/A'}</p>
+                  </div>
+                </div>
 
                 {/* Social Links */}
                 <div className="mt-6 pt-6 border-t border-slate-100">
@@ -580,7 +580,7 @@ const handleAddCertificate = (cert: any) => {
                               ))}
                             </div>
                           </div>
-                          
+
                           <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:bg-red-50 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all absolute right-2 bottom-2"
                             onClick={() => {
                               const projId = profile.projects[i]?.id;
@@ -641,20 +641,20 @@ const handleAddCertificate = (cert: any) => {
                             </div>
                           </div>
                         </div>
-                        <Button 
-                          variant="secondary" 
-                          size="sm" 
+                        <Button
+                          variant="secondary"
+                          size="sm"
                           asChild
                           className="shrink-0 font-semibold px-4 h-9 text-xs ml-4 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors border-none"
                         >
-                         <Button
-  variant="secondary"
-  size="sm"
-  onClick={() => openFile(profile.resumeUrl, "Resume.pdf")}
-  className="shrink-0 font-semibold px-4 h-9 text-xs ml-4 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors border-none"
->
-  Preview
-</Button>
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            onClick={() => openFile(profile.resumeUrl, "Resume.pdf")}
+                            className="shrink-0 font-semibold px-4 h-9 text-xs ml-4 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 transition-colors border-none"
+                          >
+                            Preview
+                          </Button>
                         </Button>
                       </div>
                     ) : (
@@ -683,21 +683,21 @@ const handleAddCertificate = (cert: any) => {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                       {profile.certificates?.length > 0 ? profile.certificates.map((cert: any, i: number) => (
                         <div key={i} className="group p-4 border border-border/80 rounded-xl flex flex-col hover:border-blue-200 hover:shadow-sm transition-all bg-card min-h-[110px] relative">
-                          <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:bg-red-50 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all absolute right-2 top-2 shrink-0 z-10" 
-                        
-                        onClick={() => {
-  const certId = profile.certificates[i]?.id;
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:bg-red-50 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-all absolute right-2 top-2 shrink-0 z-10"
 
-  const updated = profile.certificates.filter((c: any) => c.id !== certId);
+                            onClick={() => {
+                              const certId = profile.certificates[i]?.id;
 
-  setProfile({ ...profile, certificates: updated });
+                              const updated = profile.certificates.filter((c: any) => c.id !== certId);
 
-  handleSave({
-    ...profile,
-    certificates: updated,
-    deleteCertificateIds: certId ? [certId] : [],
-  });
-}}>
+                              setProfile({ ...profile, certificates: updated });
+
+                              handleSave({
+                                ...profile,
+                                certificates: updated,
+                                deleteCertificateIds: certId ? [certId] : [],
+                              });
+                            }}>
                             <Trash2 className="h-3.5 w-3.5" />
                           </Button>
 
@@ -758,17 +758,17 @@ const handleAddCertificate = (cert: any) => {
                   {previewName}
                 </DialogTitle>
                 <div className="flex items-center gap-2">
-                    <button 
-                      onClick={() => window.open(previewUrl!, '_blank')}
-                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                    >
-                      <ExternalLink size={14} />
-                      Open in New Tab
-                    </button>
+                  <button
+                    onClick={() => window.open(previewUrl!, '_blank')}
+                    className="flex items-center gap-2 px-3 py-1.5 text-xs font-semibold bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                  >
+                    <ExternalLink size={14} />
+                    Open in New Tab
+                  </button>
                 </div>
               </div>
             </DialogHeader>
-            
+
             <div className="flex-1 bg-slate-100 relative">
               {previewUrl && (
                 <iframe
