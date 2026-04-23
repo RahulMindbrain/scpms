@@ -51,7 +51,7 @@ const HomePage: React.FC = () => {
       {/* Navigation */}
       <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white border-b border-slate-200 py-3 shadow-sm' : 'bg-transparent py-5'
         }`}>
-        <div className=" px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3 group cursor-pointer">
               <div className="p-2 rounded-xl bg-gradient-to-br from-blue-700 to-slate-900 shadow-lg shadow-blue-500/20">
@@ -119,7 +119,7 @@ const HomePage: React.FC = () => {
         {/* Mobile Navigation Menu */}
         <div className={`md:hidden fixed inset-0 z-40 bg-white transition-all duration-300 ease-in-out ${isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
           }`}>
-          <div className="flex flex-col h-full pt-6 px-8 pb-10">
+          <div className="flex flex-col h-full pt-20 px-6 pb-10">
             <div className="flex flex-col gap-6 mb-auto">
               {['Features', 'Portals', 'Stats'].map((item) => (
                 <a key={item} href={`#${item.toLowerCase()}`}
@@ -175,34 +175,34 @@ const HomePage: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <header className="relative min-h-[90vh] flex items-center pt-28 pb-20 md:pt-20">
+      <header className="relative min-h-[90vh] flex items-center pt-24 pb-16 sm:pt-28 sm:pb-20 md:pt-20">
         <div className="absolute inset-0 z-0">
           <img
             src="/hero-bg.png"
             alt="Campus Architecture"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/80 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-slate-900/40"></div>
         </div>
 
-        <div className="relative z-10  px-6 lg:px-8 w-full">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 mb-8">
               <Zap size={14} className="text-blue-400" />
               <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">Next-Gen Placement Platform</span>
             </div>
 
-            <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-[1.1]">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-5 sm:mb-6 leading-[1.1]">
               Placements, <span className="text-blue-400">Simplified</span>
             </h1>
 
-            <p className="text-lg md:text-xl text-slate-300 mb-10 leading-relaxed max-w-2xl">
+            <p className="text-base sm:text-lg md:text-xl text-slate-300 mb-8 sm:mb-10 leading-relaxed max-w-2xl">
               A unified digital hub for Admins, students, and Company.
               Automate drives, track applications, and boost placement rates
               — all from one platform.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="flex flex-col xs:flex-row sm:flex-row gap-3 sm:gap-4 items-stretch xs:items-center sm:items-center">
               <button
                 onClick={() => {
                   if (isAuthenticated) {
@@ -211,7 +211,7 @@ const HomePage: React.FC = () => {
                     navigate('/login');
                   }
                 }}
-                className="px-8 py-3.5 bg-gradient-to-br from-blue-700 to-slate-900 text-white rounded-xl font-bold flex items-center gap-2 shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:translate-y-[-2px]">
+                className="px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-br from-blue-700 to-slate-900 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:translate-y-[-2px]">
                 {isAuthenticated ? 'Go to Dashboard' : 'Launch Dashboard'} <ChevronRight size={18} />
               </button>
               <button
@@ -219,7 +219,7 @@ const HomePage: React.FC = () => {
                   const section = document.getElementById('features');
                   section?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="px-8 py-3.5 bg-white text-slate-900 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition-all"
+                className="px-6 sm:px-8 py-3 sm:py-3.5 bg-white/10 backdrop-blur-sm text-white border border-white/30 rounded-xl font-bold hover:bg-white/20 transition-all text-center"
               >
                 Explore Features
               </button>
@@ -229,28 +229,28 @@ const HomePage: React.FC = () => {
       </header>
 
       {/* Stats Section Overlay */}
-      <section id="stats" className="relative z-20  px-6 lg:px-8 -mt-12 md:-mt-20">
-        <div className="bg-white rounded-[2rem] shadow-2xl shadow-blue-500/5 border border-slate-100 overflow-hidden">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
+      <section id="stats" className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 sm:-mt-12 md:-mt-20">
+        <div className="bg-white rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl shadow-blue-500/5 border border-slate-100 overflow-hidden">
+          <div className="grid grid-cols-2 lg:grid-cols-4">
             <StatItem value="570+" label="Registered Students" />
-            <StatItem value="42" label="Partner Companies" border="md:border-l" />
-            <StatItem value="340+" label="Students Placed" border="lg:border-l border-t md:border-t-0" />
-            <StatItem value="₹8.2L" label="Avg Package" border="md:border-l border-t md:border-t-0 lg:border-t-0" />
+            <StatItem value="42" label="Partner Companies" border="border-l" />
+            <StatItem value="340+" label="Students Placed" border="border-t lg:border-t-0 lg:border-l" />
+            <StatItem value="₹8.2L" label="Avg Package" border="border-l border-t lg:border-t-0" />
           </div>
         </div>
       </section>
 
       {/* "Everything You Need" Feature Grid */}
-      <section id="features" className="py-20 md:py-32">
-        <div className=" px-6 lg:px-8">
-          <div className="text-center mb-20">
-            <h2 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">Everything You Need</h2>
-            <p className="text-lg text-slate-500 max-w-2xl mx-auto">
+      <section id="features" className="py-16 sm:py-20 md:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12 sm:mb-16 md:mb-20">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-4 sm:mb-6">Everything You Need</h2>
+            <p className="text-base sm:text-lg text-slate-500 max-w-2xl mx-auto">
               A complete suite of tools to digitize and automate your campus placement process.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8">
             <FeatureCard
               icon={BarChart3}
               iconBg="bg-blue-50"
@@ -298,16 +298,16 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* "Built for Everyone" Portals Section */}
-      <section id="portals" className="py-24 bg-slate-50/50">
-        <div className=" px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Built for Everyone</h2>
-            <p className="text-slate-500 max-w-2xl mx-auto">
+      <section id="portals" className="py-16 sm:py-20 md:py-24 bg-slate-50/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10 sm:mb-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3 sm:mb-4">Built for Everyone</h2>
+            <p className="text-slate-500 max-w-2xl mx-auto text-sm sm:text-base">
               Dedicated portals tailored for each stakeholder in the placement ecosystem.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-8">
             <PortalCard
               icon={Users}
               iconColor="bg-blue-600"
@@ -337,11 +337,11 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* "Why Go Digital?" Section */}
-      <section className="py-24 bg-white">
-        <div className=" px-6 lg:px-8">
-          <div className="flex flex-col lg:flex-row gap-16 items-center">
-            <div className="flex-1">
-              <h2 className="text-4xl font-bold text-slate-900 mb-8 leading-tight">Why Go Digital?</h2>
+      <section className="py-16 sm:py-20 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col lg:flex-row gap-10 sm:gap-16 items-center">
+            <div className="flex-1 w-full">
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-6 sm:mb-8 leading-tight">Why Go Digital?</h2>
               <ul className="space-y-6">
                 <CheckListItem text="Zero paperwork — from registration to offer letters" />
                 <CheckListItem text="Centralized data prevents duplicate entries & fake records" />
@@ -352,21 +352,21 @@ const HomePage: React.FC = () => {
             </div>
 
             <div className="flex-1 w-full">
-              <div className="bg-[#1e293b] rounded-3xl p-10 md:p-16 text-center text-white shadow-2xl">
-                <div className="space-y-12">
+              <div className="bg-[#1e293b] rounded-2xl sm:rounded-3xl p-8 sm:p-10 md:p-14 text-center text-white shadow-2xl">
+                <div className="space-y-8 sm:space-y-12">
                   <div>
-                    <div className="text-5xl md:text-6xl font-black mb-2 tracking-tight">59.6%</div>
-                    <div className="text-slate-400 font-medium">Overall Placement Rate</div>
+                    <div className="text-4xl sm:text-5xl md:text-6xl font-black mb-2 tracking-tight">59.6%</div>
+                    <div className="text-slate-400 font-medium text-sm sm:text-base">Overall Placement Rate</div>
                   </div>
                   <div className="h-px bg-slate-700/50 w-full"></div>
                   <div>
-                    <div className="text-4xl md:text-5xl font-black text-blue-400 mb-2 tracking-tight">₹24 LPA</div>
-                    <div className="text-slate-400 font-medium">Highest Package This Season</div>
+                    <div className="text-3xl sm:text-4xl md:text-5xl font-black text-blue-400 mb-2 tracking-tight">₹24 LPA</div>
+                    <div className="text-slate-400 font-medium text-sm sm:text-base">Highest Package This Season</div>
                   </div>
                   <div className="h-px bg-slate-700/50 w-full"></div>
                   <div>
-                    <div className="text-4xl md:text-5xl font-black mb-2 tracking-tight">42</div>
-                    <div className="text-slate-400 font-medium">Companies Onboarded</div>
+                    <div className="text-3xl sm:text-4xl md:text-5xl font-black mb-2 tracking-tight">42</div>
+                    <div className="text-slate-400 font-medium text-sm sm:text-base">Companies Onboarded</div>
                   </div>
                 </div>
               </div>
@@ -382,16 +382,16 @@ const HomePage: React.FC = () => {
           <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-500 blur-[120px] rounded-full"></div>
         </div>
 
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-6 leading-tight">
             Ready to Transform Your Placements?
           </h2>
-          <p className="text-slate-400 text-lg mb-10">
+          <p className="text-slate-400 text-base sm:text-lg mb-8 sm:mb-10">
             Join the smart campus revolution. Get started in minutes — no setup complexity.
           </p>
           <Link
             to="/signup"
-            className="bg-gradient-to-br from-blue-700 to-slate-900 text-white px-10 py-4 rounded-xl font-bold text-lg flex items-center gap-2 mx-auto transition-all hover:scale-105 active:scale-95 shadow-xl shadow-teal-500/20"
+            className="bg-gradient-to-br from-blue-700 to-slate-900 text-white px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl font-bold text-base sm:text-lg inline-flex items-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-teal-500/20"
           >
             Get Started Now <ArrowRight size={20} />
           </Link>
@@ -399,8 +399,8 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-slate-50 border-t border-slate-200 py-12">
-        <div className=" px-6 lg:px-8 text-center">
+      <footer className="bg-slate-50 border-t border-slate-200 py-10 sm:py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="flex items-center justify-center gap-2 mb-6">
             <div className="bg-blue-600 p-1 rounded-md">
               <GraduationCap className="text-white" size={20} />
@@ -418,9 +418,9 @@ const HomePage: React.FC = () => {
 
 // Sub-components
 const StatItem = ({ value, label, border }: { value: string, label: string, border?: string }) => (
-  <div className={`p-10 text-center flex flex-col justify-center items-center h-full min-h-[160px] border-slate-100 ${border || ''}`}>
-    <div className="text-4xl font-black text-[#0369a1] mb-2 tracking-tight">{value}</div>
-    <div className="text-slate-500 font-medium text-sm">{label}</div>
+  <div className={`p-6 sm:p-8 md:p-10 text-center flex flex-col justify-center items-center h-full min-h-[120px] sm:min-h-[140px] md:min-h-[160px] border-slate-100 ${border || ''}`}>
+    <div className="text-2xl sm:text-3xl md:text-4xl font-black text-[#0369a1] mb-1 sm:mb-2 tracking-tight">{value}</div>
+    <div className="text-slate-500 font-medium text-xs sm:text-sm">{label}</div>
   </div>
 );
 
@@ -431,11 +431,11 @@ const FeatureCard = ({ icon: Icon, iconBg, iconColor, title, desc }: {
   title: string,
   desc: string
 }) => (
-  <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 group">
-    <div className={`w-12 h-12 ${iconBg} ${iconColor} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-      <Icon size={24} />
+  <div className="bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl hover:translate-y-[-4px] transition-all duration-300 group">
+    <div className={`w-11 h-11 sm:w-12 sm:h-12 ${iconBg} ${iconColor} rounded-xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform`}>
+      <Icon size={22} />
     </div>
-    <h3 className="text-xl font-bold text-slate-900 mb-4">{title}</h3>
+    <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-3 sm:mb-4">{title}</h3>
     <p className="text-slate-500 leading-relaxed text-sm">
       {desc}
     </p>
@@ -470,21 +470,21 @@ const PortalCard = ({
   const navigate = useNavigate();
 
   return (
-    <div className="bg-white p-10 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 text-center flex flex-col items-center">
+    <div className="bg-white p-7 sm:p-10 rounded-2xl sm:rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 text-center flex flex-col items-center">
 
-      <div className={`w-16 h-16 ${iconColor} rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-black/5`}>
-        <Icon size={32} className="text-white" />
+      <div className={`w-14 h-14 sm:w-16 sm:h-16 ${iconColor} rounded-2xl flex items-center justify-center mb-6 sm:mb-8 shadow-lg shadow-black/5`}>
+        <Icon size={28} className="text-white" />
       </div>
 
-      <h3 className="text-2xl font-bold text-slate-900 mb-4">{title}</h3>
+      <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3 sm:mb-4">{title}</h3>
 
-      <p className="text-slate-500 leading-relaxed mb-8 text-sm">
+      <p className="text-slate-500 leading-relaxed mb-6 sm:mb-8 text-sm">
         {desc}
       </p>
 
       <button
         onClick={() => navigate(navigateTo)}
-        className="mt-auto px-6 py-2.5 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-2 group"
+        className="mt-auto px-5 sm:px-6 py-2.5 border border-slate-200 rounded-xl text-sm font-bold text-slate-700 hover:bg-slate-50 hover:border-slate-300 transition-all flex items-center gap-2 group"
       >
         {buttonText}
         <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
