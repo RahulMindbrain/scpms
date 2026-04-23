@@ -74,8 +74,8 @@ const StudentManagement: React.FC = () => {
       return {
         id: s.id,
         name: s.firstname ? `${s.firstname} ${s.lastname || ''}` : 'Unknown',
-        dept: deptObj?.name || s.student?.branch || 'N/A',
-        deptId: s.student?.deptId,
+        dept: deptObj?.name || s.student?.department?.name || s.student?.branch || 'N/A',
+        deptId: s.student?.deptId || s.student?.department?.id,
         verified: s.status === 'ACTIVE',
         status: s.status.toLowerCase(),
       };
