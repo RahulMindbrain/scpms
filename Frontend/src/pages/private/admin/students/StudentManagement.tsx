@@ -70,12 +70,12 @@ const StudentManagement: React.FC = () => {
   const students = useMemo(() => {
     const currentList = activeTab === 'active' ? reduxStudents : reduxInactiveStudents;
     return currentList.map((s: any) => {
-      const deptObj = departments.find((d: any) => d.id === s.student?.deptId);
+   
       return {
         id: s.id,
         name: s.firstname ? `${s.firstname} ${s.lastname || ''}` : 'Unknown',
-        dept: deptObj?.name || s.student?.department?.name || s.student?.branch || 'N/A',
-        deptId: s.student?.deptId || s.student?.department?.id,
+    dept: s.student?.department?.name || 'N/A',
+deptId: s.student?.department?.id || null,
         verified: s.status === 'ACTIVE',
         status: s.status.toLowerCase(),
       };
