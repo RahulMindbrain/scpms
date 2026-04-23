@@ -167,13 +167,13 @@ const SignIn: React.FC = () => {
           </div>
 
           {/* Remember Me */}
-          <label className="flex items-center gap-3 cursor-pointer group">
+          {/* <label className="flex items-center gap-3 cursor-pointer group">
             <input
               type="checkbox"
               className="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500/20 transition-all cursor-pointer"
             />
             <span className="text-sm font-medium text-gray-600 group-hover:text-gray-900 transition-colors">Keep me signed in</span>
-          </label>
+          </label> */}
 
           {/* Submit Button */}
           <button
