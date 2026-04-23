@@ -119,7 +119,7 @@ const HomePage: React.FC = () => {
         {/* Mobile Navigation Menu */}
         <div className={`md:hidden fixed inset-0 z-40 bg-white transition-all duration-300 ease-in-out ${isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
           }`}>
-         <div className="flex flex-col h-full pt-6 px-8 pb-10">
+          <div className="flex flex-col h-full pt-6 px-8 pb-10">
             <div className="flex flex-col gap-6 mb-auto">
               {['Features', 'Portals', 'Stats'].map((item) => (
                 <a key={item} href={`#${item.toLowerCase()}`}
@@ -205,24 +205,24 @@ const HomePage: React.FC = () => {
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
               <button
                 onClick={() => {
-    if (isAuthenticated) {
-      navigate(getDashboardLink());
-    } else {
-      navigate('/login');
-    }
-  }}
+                  if (isAuthenticated) {
+                    navigate(getDashboardLink());
+                  } else {
+                    navigate('/login');
+                  }
+                }}
                 className="px-8 py-3.5 bg-gradient-to-br from-blue-700 to-slate-900 text-white rounded-xl font-bold flex items-center gap-2 shadow-xl shadow-blue-500/20 hover:shadow-blue-500/40 transition-all hover:translate-y-[-2px]">
                 {isAuthenticated ? 'Go to Dashboard' : 'Launch Dashboard'} <ChevronRight size={18} />
               </button>
-            <button
-  onClick={() => {
-    const section = document.getElementById('features');
-    section?.scrollIntoView({ behavior: 'smooth' });
-  }}
-  className="px-8 py-3.5 bg-white text-slate-900 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition-all"
->
-  Explore Features
-</button>
+              <button
+                onClick={() => {
+                  const section = document.getElementById('features');
+                  section?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="px-8 py-3.5 bg-white text-slate-900 border border-slate-200 rounded-xl font-bold hover:bg-slate-50 transition-all"
+              >
+                Explore Features
+              </button>
             </div>
           </div>
         </div>
@@ -311,7 +311,7 @@ const HomePage: React.FC = () => {
             <PortalCard
               icon={Users}
               iconColor="bg-blue-600"
-              title="Admin / Admin"
+              title="Admin"
               desc="Manage drives, approve profiles, monitor analytics, and orchestrate the entire placement lifecycle."
               buttonText="Access Admin Portal"
               navigateTo="/login"
@@ -408,7 +408,7 @@ const HomePage: React.FC = () => {
             <span className="text-xl font-bold text-slate-900 tracking-tight">Smart CPMS</span>
           </div>
           <p className="text-slate-500 text-sm">
-        © 2026 Mindbrain Pvt. Ltd. All rights reserved.
+            © 2026 Mindbrain Pvt. Ltd. All rights reserved.
           </p>
         </div>
       </footer>
