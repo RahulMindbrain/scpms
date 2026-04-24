@@ -119,7 +119,7 @@ const SignUp: React.FC = () => {
             Architect Your <br /> Professional Path
           </h1>
           <p className="text-indigo-100 leading-relaxed mb-8 font-medium">
-            Join the Smart CPMS ecosystem to connect with elite COMPANYs and automate your career trajectory.
+            Join the Smart CPMS ecosystem to connect with elite Company and automate your career trajectory.
           </p>
           <ul className="space-y-4">
             {["Algorithmic Profile Matching", "Real-time Interview Tracking", "Institutional Grade Security"].map((f, i) => (
@@ -184,7 +184,7 @@ const SignUp: React.FC = () => {
 
               <div className="mb-8">
                 <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-                  {activeRole === "STUDENT" ? "Student Registration" : "COMPANY Registration"}
+                  {activeRole === "STUDENT" ? "Student Registration" : "Company Registration"}
                 </h2>
                 <p className="text-slate-500 mt-1">Complete the details below to initialize your profile.</p>
               </div>
