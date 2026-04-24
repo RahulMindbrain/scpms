@@ -23,7 +23,7 @@ const SignUp: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [step, setStep] = useState(1);
   const [activeRole, setActiveRole] = useState<RegisterRole | null>(null);
-  const [agreed, setAgreed] = useState(false);
+  // const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { isAuthenticated, userType } = useSelector((state: RootState) => state.auth);
@@ -56,10 +56,10 @@ const SignUp: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!agreed) {
-      toast.error("Please agree to the Terms and Privacy Policy");
-      return;
-    }
+    // if (!agreed) {
+    //   toast.error("Please agree to the Terms and Privacy Policy");
+    //   return;
+    // }
 
     if (form.password !== form.confirmPassword) {
       toast.error("Passwords do not match");
@@ -208,16 +208,16 @@ const SignUp: React.FC = () => {
                 </div>
               </div>
 
-              <div
+              {/* <div
                 className="flex items-center gap-3 cursor-pointer group select-none"
                 onClick={() => setAgreed(!agreed)}
-              >
+              > */}
                 {/* <div className={`w-6 h-6 border rounded-lg flex items-center justify-center transition-all 
                   ${agreed ? "bg-indigo-600 border-indigo-600" : "border-slate-300 group-hover:border-indigo-400"}`}>
                   {agreed && <Check size={14} className="text-white" />}
                 </div> */}
                 {/* <p className="text-sm text-slate-500">I agree to the <span className="text-indigo-600 font-bold underline cursor-pointer">Terms and Privacy Policy</span></p> */}
-              </div>
+              {/* </div> */}
 
               <button
                 type="submit"
