@@ -51,8 +51,8 @@ const [activeRole, setActiveRole] = useState<UserRole>(
     { id: "admin", label: "Admin", icon: <ShieldCheck size={16} /> },
   ];
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    // e.preventDefault();
     setIsLoading(true);
 
     try {
@@ -63,30 +63,38 @@ const [activeRole, setActiveRole] = useState<UserRole>(
 
       const user = result.data;
 
-      if (user.role.toLowerCase() !== activeRole) {
-        toast.error(`Unauthorized: This account is registered as ${user.role.toLowerCase()}, but you are trying to sign in as ${activeRole}.`);
-        dispatch(logoutUser());
-        return;
-      }
+    if (user.role.toLowerCase() !== activeRole) {
+  toast.error(
+    `Unauthorized: This account is registered as ${user.role.toLowerCase()}, but you are trying to sign in as ${activeRole}.`
+  );
+  setIsLoading(false);
+  return;
+}
 
       toast.success(`Signed in as a ${activeRole}.`);
 
-      setTimeout(() => {
-        if (user.role === "STUDENT") {
-          navigate("/student/dashboard");
-        } else if (user.role === "COMPANY") {
-          navigate("/company/dashboard");
-        } else if (user.role === "ADMIN") {
-          navigate("/admin/dashboard");
-        }
-      }, 1000);
+      // setTimeout(() => {
+      //   if (user.role === "STUDENT") {
+      //     navigate("/student/dashboard");
+      //   } else if (user.role === "COMPANY") {
+      //     navigate("/company/dashboard");
+      //   } else if (user.role === "ADMIN") {
+      //     navigate("/admin/dashboard");
+      //   }
+      // }, 1000);
 
     } catch (error: any) {
-      console.error("Login error:", error);
-      toast.error(error || "Invalid email or password");
-    } finally {
-      setIsLoading(false);
-    }
+  console.error("Login error:", error);
+
+  const message =
+    error?.message ||
+    error?.response?.data?.message ||
+    "Invalid email or password";
+
+  toast.error(message);
+  } finally {
+    setIsLoading(false); 
+  }
   };
   const images = [illustration, camp, campp];
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -136,7 +144,7 @@ const [activeRole, setActiveRole] = useState<UserRole>(
           ))}
         </div>
 
-        <form className="space-y-5" onSubmit={handleSubmit}>
+        <form className="space-y-5">
           {/* Email Address */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -194,8 +202,9 @@ const [activeRole, setActiveRole] = useState<UserRole>(
 
           {/* Submit Button */}
           <button
-            type="submit"
-            disabled={isLoading}
+  type="button"
+  onClick={handleSubmit}
+  disabled={isLoading}
             className={`w-full bg-gradient-to-br from-blue-700 to-slate-900 active:scale-[0.99] transition-all duration-200 text-white font-semibold py-3 sm:py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-indigo-100 mt-2 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             {isLoading ? "Signing in..." : "Sign In to Dashboard"}
