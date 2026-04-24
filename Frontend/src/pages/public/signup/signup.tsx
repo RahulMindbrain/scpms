@@ -212,11 +212,11 @@ const SignUp: React.FC = () => {
                 className="flex items-center gap-3 cursor-pointer group select-none"
                 onClick={() => setAgreed(!agreed)}
               >
-                <div className={`w-6 h-6 border rounded-lg flex items-center justify-center transition-all 
+                {/* <div className={`w-6 h-6 border rounded-lg flex items-center justify-center transition-all 
                   ${agreed ? "bg-indigo-600 border-indigo-600" : "border-slate-300 group-hover:border-indigo-400"}`}>
                   {agreed && <Check size={14} className="text-white" />}
-                </div>
-                <p className="text-sm text-slate-500">I agree to the <span className="text-indigo-600 font-bold underline cursor-pointer">Terms and Privacy Policy</span></p>
+                </div> */}
+                {/* <p className="text-sm text-slate-500">I agree to the <span className="text-indigo-600 font-bold underline cursor-pointer">Terms and Privacy Policy</span></p> */}
               </div>
 
               <button
