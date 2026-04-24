@@ -313,7 +313,7 @@ const HomePage: React.FC = () => {
               iconColor="bg-blue-600"
               title="Admin"
               desc="Manage drives, approve profiles, monitor analytics, and orchestrate the entire placement lifecycle."
-              buttonText="Access Admin Portal"
+              buttonText="Admin Portal"
               navigateTo="/login"
             />
             <PortalCard
