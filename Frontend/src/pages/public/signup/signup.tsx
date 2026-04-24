@@ -8,8 +8,6 @@ import {
   Briefcase,
   Check,
   ChevronLeft,
-  EyeOff,
-  Eye,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,10 +23,8 @@ const SignUp: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [step, setStep] = useState(1);
   const [activeRole, setActiveRole] = useState<RegisterRole | null>(null);
-  const [agreed, setAgreed] = useState(false);
+  // const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { isAuthenticated, userType } = useSelector((state: RootState) => state.auth);
 
@@ -60,10 +56,10 @@ const SignUp: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!agreed) {
-      toast.error("Please agree to the Terms and Privacy Policy");
-      return;
-    }
+    // if (!agreed) {
+    //   toast.error("Please agree to the Terms and Privacy Policy");
+    //   return;
+    // }
 
     if (form.password !== form.confirmPassword) {
       toast.error("Passwords do not match");
@@ -119,7 +115,7 @@ const SignUp: React.FC = () => {
             Architect Your <br /> Professional Path
           </h1>
           <p className="text-indigo-100 leading-relaxed mb-8 font-medium">
-            Join the Smart CPMS ecosystem to connect with elite Company and automate your career trajectory.
+            Join the Smart CPMS ecosystem to connect with elite COMPANYs and automate your career trajectory.
           </p>
           <ul className="space-y-4">
             {["Algorithmic Profile Matching", "Real-time Interview Tracking", "Institutional Grade Security"].map((f, i) => (
@@ -134,7 +130,7 @@ const SignUp: React.FC = () => {
       {/* RIGHT SIDE */}
       <div className="w-full md:w-[60%] flex items-center justify-center px-6 py-12 md:px-12 bg-white">
         <div className="w-full max-w-lg">
-
+       
           {step === 1 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="mb-10 text-center md:text-left">
@@ -184,7 +180,7 @@ const SignUp: React.FC = () => {
 
               <div className="mb-8">
                 <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-                  {activeRole === "STUDENT" ? "Student Registration" : "Company Registration"}
+                  {activeRole === "STUDENT" ? "Student Registration" : "COMPANY Registration"}
                 </h2>
                 <p className="text-slate-500 mt-1">Complete the details below to initialize your profile.</p>
               </div>
@@ -201,47 +197,14 @@ const SignUp: React.FC = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                  {/* PASSWORD */}
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                    <input
-                      name="password"
-                      type={showPassword ? "text" : "password"}
-                      onChange={handleChange}
-                      required
-                      placeholder="Password"
-                      className={inputClasses}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
+                    <input name="password" type="password" onChange={handleChange} required placeholder="Password" className={inputClasses} />
                   </div>
-
-                  {/* CONFIRM PASSWORD */}
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                    <input
-                      name="confirmPassword"
-                      type={showConfirmPassword ? "text" : "password"}
-                      onChange={handleChange}
-                      required
-                      placeholder="Confirm Password"
-                      className={inputClasses}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                    >
-                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                    </button>
+                    <input name="confirmPassword" type="password" onChange={handleChange} required placeholder="Confirm" className={inputClasses} />
                   </div>
-
                 </div>
               </div>
 
