@@ -180,7 +180,7 @@ const SignUp: React.FC = () => {
 
               <div className="mb-8">
                 <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-                  {activeRole === "STUDENT" ? "Student Registration" : "COMPANY Registration"}
+                  {activeRole === "STUDENT" ? "Student Registration" : "Company Registration"}
                 </h2>
                 <p className="text-slate-500 mt-1">Complete the details below to initialize your profile.</p>
               </div>
