@@ -10,7 +10,7 @@ import type { RootState } from "../../../redux/reducers/rootReducer";
 import { toast } from "sonner";
 import { loginUser } from "@/redux/thunks/loginThunk";
 import { logoutUser } from "@/redux/thunks/logoutThunk";
-
+import { useSearchParams } from "react-router-dom";
 type UserRole = "student" | "company" | "admin";
 
 interface RoleConfig {
@@ -23,13 +23,19 @@ const SignIn: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [activeRole, setActiveRole] = useState<UserRole>("student");
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const { isAuthenticated, userType } = useSelector((state: RootState) => state.auth);
+const [searchParams] = useSearchParams();
 
+const roleFromUrl = searchParams.get("role") as UserRole | null;
+
+const [activeRole, setActiveRole] = useState<UserRole>(
+  roleFromUrl || "student"
+);
   useEffect(() => {
     if (isAuthenticated) {
       const role = userType?.toLowerCase();

@@ -308,30 +308,32 @@ const HomePage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-8">
-            <PortalCard
-              icon={Users}
-              iconColor="bg-blue-600"
-              title="Admin"
-              desc="Manage drives, approve profiles, monitor analytics, and orchestrate the entire placement lifecycle."
-              buttonText="Admin Portal"
-              navigateTo="/login"
-            />
-            <PortalCard
-              icon={GraduationCap}
-              iconColor="bg-gradient-to-br from-teal-500 to-emerald-500"
-              title="Students"
-              desc="Build your portfolio, track eligibility, apply to drives, and follow your application status in real time."
-              buttonText="Student Portal"
-              navigateTo="/login"
-            />
-            <PortalCard
-              icon={Building2}
-              iconColor="bg-indigo-700"
-              title="Companies"
-              desc="Post job descriptions, filter candidates by criteria, schedule interviews, and update selection results."
-              buttonText="Company Portal"
-              navigateTo="/login"
-            />
+           <PortalCard
+  icon={Users}
+  iconColor="bg-blue-600"
+  title="Admin"
+  desc="Manage drives, approve profiles, monitor analytics, and orchestrate the entire placement lifecycle."
+  buttonText="Admin Portal"
+  navigateTo="/login?role=admin"
+/>
+
+<PortalCard
+  icon={GraduationCap}
+  iconColor="bg-gradient-to-br from-teal-500 to-emerald-500"
+  title="Students"
+  desc="Build your portfolio, track eligibility, apply to drives, and follow your application status in real time."
+  buttonText="Student Portal"
+  navigateTo="/login?role=student"
+/>
+
+<PortalCard
+  icon={Building2}
+  iconColor="bg-indigo-700"
+  title="Companies"
+  desc="Post job descriptions, filter candidates by criteria, schedule interviews, and update selection results."
+  buttonText="Company Portal"
+  navigateTo="/login?role=company"
+/>
           </div>
         </div>
       </section>
