@@ -9,7 +9,7 @@ import type { AppDispatch } from "../../../redux/store/store";
 import type { RootState } from "../../../redux/reducers/rootReducer";
 import { toast } from "sonner";
 import { loginUser } from "@/redux/thunks/loginThunk";
-import { logoutUser } from "@/redux/thunks/logoutThunk";
+// import { logoutUser } from "@/redux/thunks/logoutThunk";
 import { useSearchParams } from "react-router-dom";
 type UserRole = "student" | "company" | "admin";
 
