@@ -4,11 +4,14 @@ import {
   Search,
   CheckCircle2,
   UserCheck,
-  XCircle
+  XCircle,
+  Check,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
+import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -75,13 +78,13 @@ const StudentManagement: React.FC = () => {
       return {
         id: s.id,
         name: s.firstname ? `${s.firstname} ${s.lastname || ''}` : 'Unknown',
-    dept: s.student?.department?.name || 'N/A',
-deptId: s.student?.department?.id || null,
+        dept: s.student?.department?.name || 'N/A',
+        deptId: s.student?.department?.id || null,
         verified: s.status === 'ACTIVE',
-        status: s.status.toLowerCase(),
+        status: s.status === 'ACTIVE' ? 'approved' : (s.status === 'REJECTED' ? 'rejected' : 'pending'),
       };
     });
-  }, [reduxStudents, reduxInactiveStudents, activeTab, departments]);
+  }, [reduxStudents, reduxInactiveStudents, activeTab]);
 
   const filteredStudents = useMemo(() => {
     return students.filter(student => {
@@ -113,21 +116,20 @@ deptId: s.student?.department?.id || null,
   //   }
   // };
 
-  const toggleVerification = async (id: number) => {
-    const student = students.find((s) => s.id === id);
-    if (!student?.verified) {
-      const toastId = toast.loading("Activating student account...");
-      try {
-        await dispatch(activateStudents([id])).unwrap();
-        toast.success("Student activated successfully!", { id: toastId });
-        dispatch(fetchStudents({}));
-        dispatch(fetchInactiveStudents({}));
-      } catch (err: any) {
-        toast.error(err || "Failed to activate student", { id: toastId });
-      }
-    } else {
-      toast.info("Verification status management is pending for active students.");
+  const handleApprove = async (id: number) => {
+    const toastId = toast.loading("Approving student account...");
+    try {
+      await dispatch(activateStudents([id])).unwrap();
+      toast.success("Student approved successfully!", { id: toastId });
+      dispatch(fetchStudents({}));
+      dispatch(fetchInactiveStudents({}));
+    } catch (err: any) {
+      toast.error(err || "Failed to approve student", { id: toastId });
     }
+  };
+
+  const handleReject = (id: number) => {
+    toast.error("Student rejection functionality is coming soon.");
   };
 
   const handleActivateAll = async () => {
@@ -353,7 +355,7 @@ deptId: s.student?.department?.id || null,
               <TableRow className="hover:bg-transparent">
                 <TableHead className="font-semibold text-slate-500 py-4 pl-6">Name</TableHead>
                 <TableHead className="font-semibold text-slate-500 text-center">Department</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-center">Verified</TableHead>
+                <TableHead className="font-semibold text-slate-500 text-center">Status</TableHead>
                 {/* <TableHead className="font-semibold text-slate-500 text-right pr-6">Actions</TableHead> */}
               </TableRow>
             </TableHeader>
@@ -363,17 +365,35 @@ deptId: s.student?.department?.id || null,
                   <TableCell className="font-bold text-slate-800 py-4 pl-6">{student.name}</TableCell>
                   <TableCell className="text-slate-600 font-medium text-center">{student.dept}</TableCell>
                   <TableCell className="text-center">
-                    <button onClick={() => toggleVerification(student.id)} className="transition-transform hover:scale-105 active:scale-95">
-                      {student.verified ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-green-500 text-white text-[11px] font-medium tracking-wide shadow-sm">
-                          <CheckCircle2 className="w-3 h-3" /> Verified
-                        </span>
+                    <div className="flex items-center justify-center gap-2">
+                      {student.status === 'pending' ? (
+                        <>
+                          <Button
+                            size="sm"
+                            onClick={() => handleApprove(student.id)}
+                            className="h-8 px-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg shadow-sm flex items-center gap-1.5 transition-all duration-200 font-semibold"
+                          >
+                            <Check className="w-3.5 h-3.5" /> Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleReject(student.id)}
+                            className="h-8 px-3 bg-rose-500 hover:bg-rose-600 text-white rounded-lg shadow-sm flex items-center gap-1.5 transition-all duration-200 font-semibold"
+                          >
+                            <X className="w-3.5 h-3.5" /> Reject
+                          </Button>
+                        </>
+                      ) : student.status === 'approved' ? (
+                        <Badge variant="success" className="px-3 py-1 rounded-full gap-1.5 font-bold uppercase tracking-wider">
+                          <CheckCircle2 className="w-3.5 h-3.5" /> Approved
+                        </Badge>
                       ) : (
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-orange-200 text-orange-500 text-[11px] font-medium tracking-wide bg-orange-50/50 shadow-sm">
-                           <XCircle className="w-3 h-3 text-orange-400" /> Pending
-                        </span>
+                        <Badge variant="danger" className="px-3 py-1 rounded-full gap-1.5 font-bold uppercase tracking-wider">
+                          <XCircle className="w-3.5 h-3.5" /> Rejected
+                        </Badge>
                       )}
-                    </button>
+                    </div>
                   </TableCell>
                   {/* <TableCell className="text-right pr-6">
                     <Button
