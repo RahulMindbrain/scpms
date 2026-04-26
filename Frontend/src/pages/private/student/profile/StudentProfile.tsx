@@ -102,56 +102,133 @@ const StudentProfile = () => {
 
   const handleSave = async (updatedProfile: any) => {
     try {
+      const cleanUrl = (url: any) => {
+        const trimmed = typeof url === 'string' ? url.trim() : '';
+        return trimmed ? trimmed : undefined;
+      };
+
       const yearInt = parseInt(updatedProfile.stats.year);
-      const payload = {
+      const commonPayload = {
         year: yearInt,
         passingYear: parseInt(updatedProfile.stats.passingYear),
         cgpa: yearInt === 1 ? undefined : parseFloat(updatedProfile.stats.cgpa),
-        departmentId: parseInt(updatedProfile.stats.departmentId),
-
-        linkedinUrl: updatedProfile.linkedinUrl || undefined,
-        githubUrl: updatedProfile.githubUrl || undefined,
-        portfolioUrl: updatedProfile.portfolioUrl || undefined,
-        resumeUrl: updatedProfile.resumeUrl || undefined,
-
-
-
-        skillIds: updatedProfile.skills
-          ?.map((s: any) => s.id)
-          ?.filter((id: any) => typeof id === "number") || [],
-
-        experiences: updatedProfile.experiences?.map((exp: any) => ({
-          id: exp.id || undefined,
-          companyName: exp.companyName,
-          role: exp.role,
-          description: exp.description || undefined,
-          startDate: exp.startDate,
-          endDate: exp.endDate || undefined,
-        })) || [],
-
-        certificates: updatedProfile.certificates?.map((cert: any) => ({
-          id: cert.id || undefined,
-          title: cert.title,
-          issuer: cert.issuer,
-          certificateUrl: cert.certificateUrl || undefined,
-          issuedDate: cert.issuedDate || undefined,
-        })) || [],
-
-        projects: updatedProfile.projects?.map((proj: any) => ({
-          id: proj.id || undefined,
-          title: proj.title,
-          description: proj.description || undefined,
-          techStack: proj.techStack || undefined,
-          githubUrl: proj.githubUrl || undefined,
-          liveUrl: proj.liveUrl || undefined,
-        })) || [],
+        linkedinUrl: cleanUrl(updatedProfile.linkedinUrl),
+        githubUrl: cleanUrl(updatedProfile.githubUrl),
+        portfolioUrl: cleanUrl(updatedProfile.portfolioUrl),
+        resumeUrl: cleanUrl(updatedProfile.resumeUrl),
       };
 
       if (backendProfile) {
-        await dispatch(updateStudentProfile(payload)).unwrap();
+        // PUT payload (Update Profile)
+        const putPayload = {
+          ...commonPayload,
+          addSkillIds: updatedProfile.skills
+            ?.map((s: any) => s.id)
+            ?.filter((id: any) => typeof id === "number") || [],
+
+          addExperiences: updatedProfile.experiences
+            ?.filter((exp: any) => !exp.id)
+            ?.map((exp: any) => ({
+              companyName: exp.companyName,
+              role: exp.role,
+              description: exp.description || undefined,
+              startDate: exp.startDate,
+              endDate: exp.endDate || undefined,
+            })),
+
+          updateExperiences: updatedProfile.experiences
+            ?.filter((exp: any) => exp.id)
+            ?.map((exp: any) => ({
+              id: exp.id,
+              companyName: exp.companyName,
+              role: exp.role,
+              description: exp.description || undefined,
+              startDate: exp.startDate,
+              endDate: exp.endDate || undefined,
+            })),
+
+          deleteExperienceIds: updatedProfile.deleteExperienceIds || [],
+
+          addCertificates: updatedProfile.certificates
+            ?.filter((cert: any) => !cert.id)
+            ?.map((cert: any) => ({
+              title: cert.title,
+              issuer: cert.issuer,
+              certificateUrl: cleanUrl(cert.certificateUrl),
+              issuedDate: cert.issuedDate || undefined,
+            })),
+
+          updateCertificates: updatedProfile.certificates
+            ?.filter((cert: any) => cert.id)
+            ?.map((cert: any) => ({
+              id: cert.id,
+              title: cert.title,
+              issuer: cert.issuer,
+              certificateUrl: cleanUrl(cert.certificateUrl),
+              issuedDate: cert.issuedDate || undefined,
+            })),
+
+          deleteCertificateIds: updatedProfile.deleteCertificateIds || [],
+
+          addProjects: updatedProfile.projects
+            ?.filter((proj: any) => !proj.id)
+            ?.map((proj: any) => ({
+              title: proj.title,
+              description: proj.description || undefined,
+              techStack: proj.techStack || undefined,
+              githubUrl: cleanUrl(proj.githubUrl),
+              liveUrl: cleanUrl(proj.liveUrl),
+            })),
+
+          updateProjects: updatedProfile.projects
+            ?.filter((proj: any) => proj.id)
+            ?.map((proj: any) => ({
+              id: proj.id,
+              title: proj.title,
+              description: proj.description || undefined,
+              techStack: proj.techStack || undefined,
+              githubUrl: cleanUrl(proj.githubUrl),
+              liveUrl: cleanUrl(proj.liveUrl),
+            })),
+
+          deleteProjectIds: updatedProfile.deleteProjectIds || [],
+        };
+        await dispatch(updateStudentProfile(putPayload)).unwrap();
         toast.success("Profile updated successfully");
       } else {
-        await dispatch(createStudentProfile(payload)).unwrap();
+        // POST payload (Create Profile)
+        const postPayload = {
+          ...commonPayload,
+          departmentId: parseInt(updatedProfile.stats.departmentId),
+          
+          skillIds: updatedProfile.skills
+            ?.map((s: any) => s.id)
+            ?.filter((id: any) => typeof id === "number") || [],
+
+          experiences: updatedProfile.experiences?.map((exp: any) => ({
+            companyName: exp.companyName,
+            role: exp.role,
+            description: exp.description || undefined,
+            startDate: exp.startDate,
+            endDate: exp.endDate || undefined,
+          })) || [],
+
+          certificates: updatedProfile.certificates?.map((cert: any) => ({
+            title: cert.title,
+            issuer: cert.issuer,
+            certificateUrl: cleanUrl(cert.certificateUrl),
+            issuedDate: cert.issuedDate || undefined,
+          })) || [],
+
+          projects: updatedProfile.projects?.map((proj: any) => ({
+            title: proj.title,
+            description: proj.description || undefined,
+            techStack: proj.techStack || undefined,
+            githubUrl: cleanUrl(proj.githubUrl),
+            liveUrl: cleanUrl(proj.liveUrl),
+          })) || [],
+        };
+        await dispatch(createStudentProfile(postPayload)).unwrap();
         toast.success("Profile created successfully");
       }
       return { success: true };
