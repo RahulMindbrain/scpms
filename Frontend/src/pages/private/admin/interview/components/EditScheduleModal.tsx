@@ -228,6 +228,7 @@ dispatch(fetchJobsByCompanyId({ id: Number(value) }));
               <Input
                 type="datetime-local"
                 value={formData.startTime}
+                min={new Date().toISOString().slice(0, 16)}
                 className="bg-slate-50/50"
                 onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
               />
@@ -239,6 +240,7 @@ dispatch(fetchJobsByCompanyId({ id: Number(value) }));
               <Input
                 type="datetime-local"
                 value={formData.endTime}
+                min={formData.startTime || new Date().toISOString().slice(0, 16)}
                 className="bg-slate-50/50"
                 onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
               />
