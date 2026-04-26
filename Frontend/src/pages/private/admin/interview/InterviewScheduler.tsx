@@ -20,6 +20,8 @@ import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
+import Loader from '@/components/Loader';
+
 const InterviewSchedulerPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { schedules, loading } = useSelector((state: RootState) => state.interview);
@@ -186,9 +188,8 @@ const InterviewSchedulerPage: React.FC = () => {
         {/* Drives List */}
         <div className="space-y-4">
           {loading ? (
-             <div className="flex flex-col items-center justify-center py-20 bg-white/50 rounded-3xl border border-white">
-                <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin mb-4" />
-                <p className="text-slate-500 font-bold animate-pulse">Syncing data...</p>
+             <div className="py-20">
+                <Loader text="Syncing data..." />
              </div>
           ) : filteredSchedules.map((drive) => {
             const dateInfo = formatDate(drive.startTime);
@@ -341,9 +342,8 @@ const InterviewSchedulerPage: React.FC = () => {
         <div className="flex flex-col gap-6 pt-2">
           <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
             {msgLoading === activeSchedule?.id ? (
-              <div className="flex items-center justify-center py-12 gap-3">
-                <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />
-                <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">Loading notes...</span>
+              <div className="py-12">
+                <Loader size="sm" text="Loading notes..." />
               </div>
             ) : activeSchedule?.messages && activeSchedule.messages.length > 0 ? (
               [...activeSchedule.messages].reverse().map((msg: any) => (
@@ -381,7 +381,7 @@ const InterviewSchedulerPage: React.FC = () => {
               className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest"
             >
               {sendingMsg ? (
-                <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</span>
+                <span className="flex items-center gap-2"><Loader size="sm" /> Submitting...</span>
               ) : (
                 <span className="flex items-center gap-2"><Send className="w-4 h-4" /> Submit Note</span>
               )}

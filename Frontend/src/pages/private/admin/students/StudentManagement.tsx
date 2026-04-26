@@ -256,7 +256,9 @@ deptId: s.student?.department?.id || null,
                 </div>
                 <DialogFooter>
                   <Button type="submit" disabled={loading} className="w-full">
-                    {loading ? "Creating..." : "Create Record"}
+                    {loading ? (
+                      <span className="flex items-center gap-2"><Loader size="sm" /> Creating...</span>
+                    ) : "Create Record"}
                   </Button>
                 </DialogFooter>
               </form>
@@ -337,7 +339,9 @@ deptId: s.student?.department?.id || null,
             className="h-10 bg-orange-500 hover:bg-orange-600 text-white shadow-sm font-semibold text-[13px] px-5 rounded-xl transition-all"
           >
             <UserCheck className="w-4 h-4 mr-2" />
-            {loading ? "Activating..." : `Activate All (${reduxInactiveStudents.length})`}
+            {loading ? (
+              <span className="flex items-center gap-2"><Loader size="sm" /> Activating...</span>
+            ) : `Activate All (${reduxInactiveStudents.length})`}
           </Button>
         )}
       </div>

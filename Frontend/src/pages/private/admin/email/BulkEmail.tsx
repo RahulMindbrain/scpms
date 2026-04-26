@@ -18,6 +18,8 @@ import { fetchCompanies, fetchJobsByCompanyId, sendBulkMail } from '@/redux/thun
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 
+import Loader from '@/components/Loader';
+
 const BulkEmail: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   
@@ -120,7 +122,7 @@ const BulkEmail: React.FC = () => {
           </label>
           
           {reduxLoading && !reduxCompanies.length ? (
-            <div className="flex justify-center py-4"><Loader2 className="animate-spin text-indigo-500" /></div>
+            <div className="flex justify-center py-4"><Loader size="sm" /></div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {(reduxJobs || []).map((job: any) => (
@@ -175,7 +177,7 @@ const BulkEmail: React.FC = () => {
             disabled={reduxLoading || !selectedCompanyId || selectedJobIds.length === 0}
             className="flex-[2] rounded-2xl bg-indigo-600 py-7 font-black uppercase tracking-widest text-xs shadow-xl shadow-indigo-100"
           >
-            {reduxLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
+            {reduxLoading ? <Loader size="sm" /> : <Send className="w-4 h-4 mr-2" />}
             Send to Eligible Students
           </Button>
         </div>

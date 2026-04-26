@@ -4,6 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchApplications } from '@/redux/thunks/applicationThunk';
 import type { RootState, AppDispatch } from '@/redux/store/store';
 
+import Loader from '@/components/Loader';
+
 const ApplicationsManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const dispatch = useDispatch<AppDispatch>();
@@ -54,8 +56,8 @@ const ApplicationsManagement: React.FC = () => {
 
         {/* Loading State */}
         {loading && (
-          <div className="flex justify-center py-20">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
+          <div className="py-20">
+            <Loader text="Retrieving application records..." />
           </div>
         )}
 

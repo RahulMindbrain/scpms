@@ -39,6 +39,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
+import Loader from '@/components/Loader';
 
 const AdminJobManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -247,7 +248,9 @@ const AdminJobManagement: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <AnimatePresence mode='popLayout'>
             {loading ? (
-              Array(6).fill(0).map((_, i) => <JobCardSkeleton key={i} />)
+              <div className="col-span-full py-20">
+                <Loader text="Retrieving job listings..." />
+              </div>
             ) : filteredAndSortedJobs.length > 0 ? (
               filteredAndSortedJobs.map((job) => (
                 <JobCard
@@ -411,33 +414,6 @@ const JobCard = ({ job, isSelected, onSelect, onStatusUpdate, activeTab }: any) 
   );
 };
 
-const JobCardSkeleton = () => (
-  <div className="bg-white rounded-[20px] border border-slate-200 p-5 space-y-4">
-    <div className="flex items-start gap-4">
-      <Skeleton className="w-12 h-12 rounded-xl" />
-      <div className="space-y-2 flex-1">
-        <Skeleton className="h-5 w-3/4 rounded-md" />
-        <Skeleton className="h-4 w-1/2 rounded-md" />
-      </div>
-    </div>
-    <div className="flex gap-4">
-      <Skeleton className="h-4 w-24 rounded-md" />
-      <Skeleton className="h-4 w-24 rounded-md" />
-    </div>
-    <div className="space-y-2">
-      <Skeleton className="h-4 w-full rounded-md" />
-      <Skeleton className="h-4 w-5/6 rounded-md" />
-    </div>
-    <div className="flex gap-2">
-      <Skeleton className="h-6 w-16 rounded-md" />
-      <Skeleton className="h-6 w-16 rounded-md" />
-    </div>
-    <div className="pt-4 border-t border-slate-50 gap-3 flex">
-      <Skeleton className="h-10 flex-1 rounded-xl" />
-      <Skeleton className="h-10 flex-1 rounded-xl" />
-    </div>
-  </div>
-);
 
 const EmptyState = ({ onReset }: { onReset: () => void }) => (
   <motion.div

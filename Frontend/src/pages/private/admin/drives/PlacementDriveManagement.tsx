@@ -497,7 +497,13 @@ const PlacementDriveManagement: React.FC = () => {
                 disabled={loading}
                 className="px-10 py-3 bg-blue-600 text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Launching..." : "Launch Drive"}
+                {loading ? (
+                  <span className="flex items-center gap-2">
+                    <Loader size="sm" /> Launching...
+                  </span>
+                ) : (
+                  "Launch Drive"
+                )}
               </button>
             </div>
           </form>

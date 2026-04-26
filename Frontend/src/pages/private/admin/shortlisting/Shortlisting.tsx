@@ -7,6 +7,7 @@ import {
 import { motion } from 'framer-motion';
 
 import { toast } from 'sonner';
+import Loader from '@/components/Loader';
 
 interface Applicant {
   id: string;
@@ -92,8 +93,16 @@ const Shortlisting: React.FC = () => {
                disabled={isProcessing || selectedApplicants.length === 0}
                className="w-full md:w-auto px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold border-2 border-indigo-500 shadow-lg shadow-indigo-100 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
              >
-               <ArrowRight className="w-4 h-4" />
-               <span>{isProcessing ? 'Processing...' : `Move ${selectedApplicants.length} to Shortlisted`}</span>
+               {isProcessing ? (
+                 <span className="flex items-center gap-2">
+                   <Loader size="sm" /> Processing...
+                 </span>
+               ) : (
+                 <>
+                   <ArrowRight className="w-4 h-4" />
+                   <span>Move {selectedApplicants.length} to Shortlisted</span>
+                 </>
+               )}
              </button>
           </div>
         </div>

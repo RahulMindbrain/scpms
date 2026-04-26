@@ -32,6 +32,8 @@ import { fetchDepartments, createDepartment } from '@/redux/thunks/departmentThu
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 
+import Loader from '@/components/Loader';
+
 const DepartmentManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { departments, loading } = useSelector((state: RootState) => state.department);
@@ -119,7 +121,7 @@ const DepartmentManagement: React.FC = () => {
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
-                    <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Creating...</>
+                    <><Loader size="sm" /> Creating...</>
                   ) : (
                     <><Plus className="w-4 h-4 mr-2" /> Create</>
                   )}
@@ -166,10 +168,7 @@ const DepartmentManagement: React.FC = () => {
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={3} className="py-20 text-center">
-                    <div className="flex flex-col items-center gap-3 text-slate-400">
-                      <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                      <span className="text-sm font-medium">Loading departments...</span>
-                    </div>
+                    <Loader text="Loading departments..." />
                   </TableCell>
                 </TableRow>
               ) : filtered.length === 0 ? (

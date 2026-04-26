@@ -23,6 +23,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
+import Loader from "@/components/Loader";
+
 type Skill = {
   id: number;
   name: string;
@@ -198,7 +200,7 @@ const SkillManagement = () => {
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Creating...
+                      <Loader size="sm" /> Creating...
                     </>
                   ) : (
                     <>
@@ -246,10 +248,7 @@ const SkillManagement = () => {
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={4} className="py-20 text-center">
-                    <div className="flex flex-col items-center gap-3 text-slate-400">
-                      <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-                      <span className="text-sm font-medium">Loading skills...</span>
-                    </div>
+                    <Loader text="Loading skills..." />
                   </TableCell>
                 </TableRow>
               ) : filteredSkills.length === 0 ? (
@@ -334,7 +333,7 @@ const SkillManagement = () => {
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Updating...
+                    <Loader size="sm" /> Updating...
                   </>
                 ) : (
                   "Update"
