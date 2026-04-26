@@ -21,6 +21,7 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import type { AppDispatch } from "@/redux/store/store"
 import type { RootState } from "@/redux/reducers/rootReducer"
+import Loader from "@/components/Loader"
 
 interface ProfileFormData {
   name: string
@@ -147,8 +148,8 @@ const CompanyProfile = () => {
                     Cancel
                   </Button>
                 )}
-                <Button type="submit" disabled={loading}>
-                  {loading ? "Saving..." : "Save Changes"}
+                <Button type="submit" disabled={loading} className="min-w-[120px]">
+                  {loading ? <Loader size="sm" /> : "Save Changes"}
                 </Button>
               </>
             )}

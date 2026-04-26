@@ -15,7 +15,7 @@ const Loader: React.FC<LoaderProps> = ({ fullScreen = false, size = "md", text }
 
   const containerClasses = fullScreen
     ? "fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm"
-    : "flex flex-col items-center justify-center p-8 w-full h-full min-h-[200px]";
+    : `flex flex-col items-center justify-center ${size === 'sm' ? 'p-2' : 'p-8'} w-full h-full ${size === 'sm' ? '' : 'min-h-[200px]'}`;
 
   return (
     <div className={containerClasses}>

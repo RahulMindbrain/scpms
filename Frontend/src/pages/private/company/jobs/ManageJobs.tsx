@@ -15,6 +15,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import Loader from '@/components/Loader';
 
 const ManageJobs: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -61,10 +62,7 @@ const ManageJobs: React.FC = () => {
               {loading ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-10 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
-                      <p className="text-sm font-medium text-slate-500">Loading your job postings...</p>
-                    </div>
+                    <Loader text="Loading your job postings..." />
                   </td>
                 </tr>
               ) : jobs?.length === 0 ? (

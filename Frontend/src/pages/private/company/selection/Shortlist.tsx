@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchApplications } from '@/redux/thunks/applicationThunk';
 import type { RootState, AppDispatch } from '@/redux/store/store';
 import { Badge } from '@/components/ui/badge';
+import Loader from '@/components/Loader';
 
 const Shortlist: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -42,11 +43,7 @@ const Shortlist: React.FC = () => {
   );
 
   if (loading) {
-    return (
-      <div className="flex h-64 items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    );
+    return <Loader text="Loading shortlisted candidates..." />;
   }
 
   return (

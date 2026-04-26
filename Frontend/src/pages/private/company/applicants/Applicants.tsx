@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select"
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
+import Loader from '@/components/Loader';
 
 const Applicants: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -114,10 +115,7 @@ const Applicants: React.FC = () => {
               {loading ? (
                 <tr>
                   <td colSpan={6} className="px-4 py-10 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
-                      <p className="text-sm font-medium text-slate-500">Loading applicants...</p>
-                    </div>
+                    <Loader text="Loading applicants..." />
                   </td>
                 </tr>
               ) : filteredApplicants.length === 0 ? (

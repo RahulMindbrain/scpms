@@ -23,6 +23,7 @@ import { fetchDepartments } from '@/redux/thunks/departmentThunk';
 import { fetchSkills } from '@/redux/thunks/skillThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
+import Loader from '@/components/Loader';
 
 const PostJob: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -315,9 +316,7 @@ const PostJob: React.FC = () => {
                 <div className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-top-2 duration-200">
                   <div className="max-h-60 overflow-y-auto p-2 space-y-1">
                     {loadingDepts ? (
-                      <div className="p-4 text-center text-slate-400 flex items-center justify-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin" /> Loading...
-                      </div>
+                      <Loader size="sm" text="Loading..." />
                     ) : filteredBranches.length === 0 ? (
                       <div className="p-4 text-center text-slate-400">No branches found</div>
                     ) : (
@@ -391,9 +390,7 @@ const PostJob: React.FC = () => {
                 <div className="absolute z-50 w-full mt-2 bg-white border border-slate-100 rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-top-2 duration-200">
                   <div className="max-h-60 overflow-y-auto p-2 space-y-1">
                     {loadingSkills ? (
-                      <div className="p-4 text-center text-slate-400 flex items-center justify-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin" /> Loading...
-                      </div>
+                      <Loader size="sm" text="Loading..." />
                     ) : filteredSkills.length === 0 ? (
                       <div className="p-4 text-center text-slate-400">No skills found</div>
                     ) : (
@@ -433,7 +430,7 @@ const PostJob: React.FC = () => {
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-6 h-6 animate-spin" />
+                  <Loader size="sm" />
                   Processing...
                 </>
               ) : (

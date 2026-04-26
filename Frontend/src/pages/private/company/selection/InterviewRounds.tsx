@@ -12,6 +12,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchCompanySchedules, approveSchedule, fetchScheduleApplications, fetchScheduleMessages, sendScheduleMessage } from '@/redux/thunks/interviewThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
+import Loader from '@/components/Loader';
 
 // Types aligning with Prisma Schema
 interface ScheduleMessage {
@@ -237,10 +238,7 @@ const CompanyInterviewManager: React.FC = () => {
         {/* Schedule List */}
         <div className="space-y-8">
           {loading ? (
-            <div className="flex flex-col items-center justify-center py-32 space-y-4">
-              <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
-              <p className="text-slate-400 font-bold tracking-widest text-xs uppercase">Loading Pipeline...</p>
-            </div>
+            <Loader text="Loading Pipeline..." />
           ) : filteredSchedules.length > 0 ? (
             filteredSchedules.map((schedule) => (
               <div key={schedule.id} className="group relative">
@@ -335,7 +333,7 @@ const CompanyInterviewManager: React.FC = () => {
                           disabled={statusLoading === schedule.id}
                           className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold py-6 shadow-lg shadow-emerald-100 transition-all hover:scale-[1.02] active:scale-[0.98]"
                         >
-                          {statusLoading === schedule.id ? <Loader2 className="animate-spin" /> : 'Approve'}
+                          {statusLoading === schedule.id ? <Loader size="sm" /> : 'Approve'}
                         </Button>
                         <Button 
                           variant="ghost"
@@ -391,10 +389,7 @@ const CompanyInterviewManager: React.FC = () => {
       >
         <div className="space-y-6 pt-4 min-h-[400px]">
           {appsLoading === activeSchedule?.id ? (
-            <div className="flex flex-col items-center justify-center py-20 space-y-4">
-              <Loader2 className="w-10 h-10 text-indigo-600 animate-spin" />
-              <p className="text-slate-400 font-bold tracking-widest text-xs uppercase">Fetching Candidates...</p>
-            </div>
+            <Loader text="Fetching Candidates..." />
           ) : activeSchedule?.applications && activeSchedule.applications.length > 0 ? (
             <div className="space-y-3">
               {activeSchedule.applications.map((app: any) => (
@@ -472,7 +467,7 @@ const CompanyInterviewManager: React.FC = () => {
               className="flex-1 bg-rose-600 hover:bg-rose-700 py-8 rounded-[1.5rem] font-black uppercase tracking-widest text-xs text-white shadow-2xl shadow-rose-100 transition-all"
               onClick={() => selectedSchedule && handleUpdateStatus(selectedSchedule.id, 'REJECTED')}
             >
-              {statusLoading !== null ? <Loader2 className="animate-spin" /> : 'Confirm Rejection'}
+              {statusLoading !== null ? <Loader size="sm" /> : 'Confirm Rejection'}
             </Button>
           </div>
         </div>
@@ -490,10 +485,7 @@ const CompanyInterviewManager: React.FC = () => {
           {/* Notes List */}
           <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
             {msgLoading === activeSchedule?.id ? (
-              <div className="flex items-center justify-center py-12 gap-3">
-                <Loader2 className="w-5 h-5 text-indigo-400 animate-spin" />
-                <span className="text-slate-400 font-bold text-xs uppercase tracking-widest">Loading notes...</span>
-              </div>
+              <Loader size="sm" text="Loading notes..." />
             ) : activeSchedule?.messages && activeSchedule.messages.length > 0 ? (
               [...activeSchedule.messages].reverse().map((msg: any) => (
                 <div key={msg.id} className="bg-slate-50 border border-slate-100 rounded-2xl p-5 space-y-3">
@@ -557,7 +549,7 @@ const CompanyInterviewManager: React.FC = () => {
               className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-indigo-100 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {sendingMsg
-                ? <span className="flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" /> Submitting...</span>
+                ? <span className="flex items-center gap-2"><Loader size="sm" /> Submitting...</span>
                 : <span className="flex items-center gap-2"><Send className="w-4 h-4" /> Submit Note</span>
               }
             </Button>
