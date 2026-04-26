@@ -1,16 +1,4 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Bell, Loader2, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
-import type { AppDispatch } from "@/redux/store/store";
-import type { RootState } from "@/redux/reducers/rootReducer";
-import {
-  fetchNotifications,
-  fetchUnreadCount,
-  markNotificationAsRead,
-  markAllNotificationsAsRead,
-  deleteNotification,
-} from "@/redux/thunks/notificationThunks";
+import { Bell } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,62 +6,10 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
+import { useSocket } from "@/socket/SocketProvider";
 
 export function NotificationBell() {
-  const dispatch = useDispatch<AppDispatch>();
-  const {
-    items: notifications = [],
-    unreadCount = 0,
-    loading = false,
-  } = useSelector((state: RootState) => state.notification || {});
-  const { userType } = useSelector((state: RootState) => state.auth || {});
-
-  useEffect(() => {
-    if (userType === "ADMIN") return;
-    dispatch(fetchUnreadCount());
-    dispatch(fetchNotifications({ page: 1, limit: 5 }));
-  }, [dispatch, userType]);
-
-  if (userType === "ADMIN") return null;
-
-  const handleMarkAsRead = async (id: number) => {
-    try {
-      await dispatch(markNotificationAsRead(id)).unwrap();
-    } catch (error: any) {
-      toast.error(error?.toString() || "Failed to mark as read");
-    }
-  };
-
-  const handleMarkAllRead = async () => {
-    try {
-      await dispatch(markAllNotificationsAsRead()).unwrap();
-      toast.success("All notifications marked as read");
-    } catch (error: any) {
-      toast.error(error?.toString() || "Failed to mark all as read");
-    }
-  };
-
-  const handleDelete = async (e: React.MouseEvent, id: number) => {
-    e.stopPropagation();
-    try {
-      await dispatch(deleteNotification(id)).unwrap();
-      toast.success("Notification deleted");
-    } catch (error: any) {
-      toast.error(error?.toString() || "Failed to delete notification");
-    }
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diffInSeconds < 60) return "Just now";
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    return date.toLocaleDateString();
-  };
+  const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useSocket();
 
   return (
     <DropdownMenu>
@@ -94,24 +30,32 @@ export function NotificationBell() {
         <div className="flex flex-col">
           <div className="flex items-center justify-between p-4 border-b bg-muted/30">
             <h3 className="font-semibold text-sm">Notifications</h3>
-            {unreadCount > 0 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-8 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50/50 transition-colors"
-                onClick={handleMarkAllRead}
-              >
-                Mark all read
-              </Button>
-            )}
+            <div className="flex gap-2">
+                {notifications.length > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 text-xs font-medium text-red-600 hover:text-red-700 hover:bg-red-50/50 transition-colors"
+                    onClick={clearNotifications}
+                  >
+                    Clear all
+                  </Button>
+                )}
+                {unreadCount > 0 && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50/50 transition-colors"
+                    onClick={markAllAsRead}
+                  >
+                    Mark all read
+                  </Button>
+                )}
+            </div>
           </div>
 
           <div className="max-h-[350px] overflow-y-auto overflow-x-hidden custom-scrollbar">
-            {loading && notifications.length === 0 ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-              </div>
-            ) : notifications.length === 0 ? (
+            {notifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
                 <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-3">
                   <Bell className="h-6 w-6 text-muted-foreground/50" />
@@ -127,7 +71,7 @@ export function NotificationBell() {
                     className={`relative p-4 flex gap-3 hover:bg-muted/50 transition-colors cursor-pointer group ${
                       !notification.read ? "bg-muted/20" : ""
                     }`}
-                    onClick={() => !notification.read && handleMarkAsRead(notification.id)}
+                    onClick={() => !notification.read && markAsRead(notification.id)}
                   >
                     {!notification.read && (
                       <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-500 rounded-full" />
@@ -138,34 +82,21 @@ export function NotificationBell() {
                           {notification.title}
                         </p>
                         <span className="text-[10px] text-muted-foreground whitespace-nowrap shrink-0 mt-0.5 font-medium">
-                          {formatTime(notification.createdAt)}
+                          {notification.timestamp}
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                         {notification.message}
                       </p>
                     </div>
-                    <button
-                      onClick={(e) => handleDelete(e, notification.id)}
-                      className="opacity-0 group-hover:opacity-100 h-7 w-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-red-50 transition-all shrink-0"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
                   </div>
                 ))}
               </div>
             )}
-          </div>
-
-          <div className="p-2 border-t bg-muted/10">
-            <Link to={userType === "COMPANY" ? "/company/dashboard" : "/student/notifications"}>
-              <Button variant="ghost" className="w-full h-8 text-xs font-medium text-muted-foreground hover:text-foreground">
-                See all notifications
-              </Button>
-            </Link>
           </div>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
+

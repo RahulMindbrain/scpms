@@ -1,11 +1,28 @@
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { socket } from "./socket.config";
 import { SOCKET_EVENTS } from "./socket.events";
 import { toast } from "sonner";
 import type { RootState } from "../redux/reducers/rootReducer";
 
-const SocketContext = createContext<typeof socket | null>(null);
+export interface NotificationItem {
+    id: string;
+    title: string;
+    message: string;
+    timestamp: string;
+    read: boolean;
+}
+
+export interface SocketContextProps {
+    socket: typeof socket | null;
+    notifications: NotificationItem[];
+    unreadCount: number;
+    markAsRead: (id: string) => void;
+    markAllAsRead: () => void;
+    clearNotifications: () => void;
+}
+
+const SocketContext = createContext<SocketContextProps | null>(null);
 
 export const useSocket = () => {
     const context = useContext(SocketContext);
@@ -17,90 +34,113 @@ export const useSocket = () => {
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { isAuthenticated, user, userType } = useSelector((state: RootState) => state.auth);
+    const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
-    // useEffect(() => {
-    //     if (isAuthenticated && user) {
-    //         // Establish connection
-    //         socket.connect();
+    const addNotification = useCallback((title: string, message: string) => {
+        const newNotification: NotificationItem = {
+            id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
+            title,
+            message,
+            timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            read: false,
+        };
+        
+        setNotifications((prev) => {
+            const updated = [newNotification, ...prev];
+            return updated.slice(0, 10);
+        });
+    }, []);
 
-    //         // Join user-specific rooms
-    //         socket.emit("join", {
-    //             userId: user.id,
-    //             role: userType,
-    //         });
+    const markAsRead = useCallback((id: string) => {
+        setNotifications((prev) => 
+            prev.map(n => n.id === id ? { ...n, read: true } : n)
+        );
+    }, []);
 
-    //         console.log("🔌 Socket connected and joined rooms for user:", user.id);
-    //     } else {
-    //         if (socket.connected) {
-    //             socket.disconnect();
-    //             console.log("❌ Socket disconnected (user logged out)");
-    //         }
-    //     }
+    const markAllAsRead = useCallback(() => {
+        setNotifications((prev) => 
+            prev.map(n => ({ ...n, read: true }))
+        );
+    }, []);
 
-    //     return () => {
-    //         socket.off("connect");
-    //         socket.off("disconnect");
-    //         socket.off(SOCKET_EVENTS.NEW_APPLICATION);
-    //         socket.off(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED);
-    //         socket.off(SOCKET_EVENTS.OFFER_ACCEPTED);
-    //         socket.off(SOCKET_EVENTS.SYSTEM_ALERT);
-    //     };
-    // }, [isAuthenticated, user, userType]);
-useEffect(() => {
-  if (!isAuthenticated || !user) return;
+    const clearNotifications = useCallback(() => {
+        setNotifications([]);
+    }, []);
 
-  const handleConnect = () => {
-    console.log("✅ Connected:", socket.id);
+    const unreadCount = notifications.filter(n => !n.read).length;
 
-    socket.emit("join", {
-      userId: user.id,
-      role: userType,
-    });
-
-    console.log("🚪 Joined room:", `user:${user.id}`);
-  };
-
-  socket.connect();
-  socket.on("connect", handleConnect);
-
-  return () => {
-    socket.off("connect", handleConnect);
-  };
-}, [isAuthenticated, user, userType]);
     useEffect(() => {
-        // =========================
-        // GLOBAL EVENT LISTENERS
-        // =========================
+        if (!isAuthenticated || !user) {
+            if (socket.connected) {
+                socket.disconnect();
+                console.log("❌ Socket disconnected (user logged out)");
+            }
+            return;
+        }
 
-        socket.on(SOCKET_EVENTS.NEW_APPLICATION, (data) => {
-            console.log("📩 New Application Received:", data);
-            toast.info("New Job Application!", {
-                description: `${data.studentName || 'A student'} applied for a job.`,
-                action: {
-                    label: "View",
-                    onClick: () => console.log("Navigate to application:", data.applicationId),
-                },
+        const handleConnect = () => {
+            console.log("✅ Connected:", socket.id);
+            socket.emit("join", {
+                userId: user.id,
+                role: userType,
             });
-        });
+            console.log("🚪 Joined room:", `user:${user.id}`);
+        };
 
-        socket.on(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED, (data) => {
-            console.log("📝 Application Status Updated:", data);
-            toast.success("Application Update", {
-                description: `Your application for "${data.jobTitle}" is now ${data.status}.`,
+        if (socket.connected) {
+            handleConnect();
+        } else {
+            socket.connect();
+        }
+
+        socket.on("connect", handleConnect);
+
+        return () => {
+            socket.off("connect", handleConnect);
+        };
+    }, [isAuthenticated, user, userType]);
+
+    useEffect(() => {
+        if (!isAuthenticated) return;
+
+        // Role-based listeners
+        if (userType === 'STUDENT') {
+            socket.on(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED, (data) => {
+                const title = "Application Update";
+                const message = `Your application was ${data.status.toLowerCase()}`;
+                toast.success(title, { description: message });
+                addNotification(title, message);
             });
-        });
+        }
+
+        if (userType === 'COMPANY') {
+            socket.on(SOCKET_EVENTS.NEW_APPLICATION, (data) => {
+                const title = "New Job Application!";
+                const message = `${data.studentName || 'A student'} applied for a job`;
+                toast.info(title, { description: message });
+                addNotification(title, message);
+            });
+        }
+
+        if (userType === 'ADMIN') {
+            socket.on(SOCKET_EVENTS.NEW_USER_REGISTERED, (data) => {
+                const title = "New Registration";
+                const message = `New ${data.role ? data.role.toLowerCase() : 'user'} registered`;
+                toast.info(title, { description: message });
+                addNotification(title, message);
+            });
+        }
 
         socket.on(SOCKET_EVENTS.OFFER_ACCEPTED, (data) => {
-            console.log("🎊 Offer Accepted:", data);
-            toast.success("Offer Accepted!", {
-                description: `${data.studentName} has accepted the offer for "${data.jobTitle}".`,
-            });
+            const title = "Offer Accepted!";
+            const message = `${data.studentName} has accepted the offer for "${data.jobTitle}".`;
+            toast.success(title, { description: message });
+            addNotification(title, message);
         });
 
         socket.on(SOCKET_EVENTS.SYSTEM_ALERT, (data) => {
-            toast.warning("System Alert", {
-                description: data.message,
-            });
+            toast.warning("System Alert", { description: data.message });
+            addNotification("System Alert", data.message);
         });
 
         socket.on("connect_error", (err) => {
@@ -108,16 +148,24 @@ useEffect(() => {
         });
 
         return () => {
-            socket.off(SOCKET_EVENTS.NEW_APPLICATION);
             socket.off(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED);
+            socket.off(SOCKET_EVENTS.NEW_APPLICATION);
+            socket.off(SOCKET_EVENTS.NEW_USER_REGISTERED);
             socket.off(SOCKET_EVENTS.OFFER_ACCEPTED);
             socket.off(SOCKET_EVENTS.SYSTEM_ALERT);
             socket.off("connect_error");
         };
-    }, []);
+    }, [userType, addNotification]);
 
     return (
-        <SocketContext.Provider value={socket}>
+        <SocketContext.Provider value={{
+            socket,
+            notifications,
+            unreadCount,
+            markAsRead,
+            markAllAsRead,
+            clearNotifications
+        }}>
             {children}
         </SocketContext.Provider>
     );
