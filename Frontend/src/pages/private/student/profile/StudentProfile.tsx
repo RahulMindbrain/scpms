@@ -1,7 +1,7 @@
 import {
   Mail, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
-  Briefcase, Loader2, FileText, Calendar, Building2,
+  Briefcase, FileText, Calendar, Building2,
   Lightbulb, Globe, Upload
 } from 'lucide-react';
 import {
@@ -22,6 +22,7 @@ import ExperienceModal from './modal/ExperienceModal';
 import CertificateModal from './modal/CertificateModal';
 import ProfileEditDialog from './modal/ProfileEditDialog';
 import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
+import Loader from '@/components/Loader';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -285,6 +286,10 @@ const StudentProfile = () => {
   };
   const completion = getProfileCompletion();
 
+  if (backendLoading && !backendProfile) {
+    return <Loader text="Retrieving your profile details..." fullScreen />;
+  }
+
   return (
     <div className="min-h-screen bg-[#fcfcfd] pb-20">
       <div className="max-w-[1400px] mx-auto space-y-6 animate-in fade-in duration-700 px-4 sm:px-6 lg:px-8 pt-4">
@@ -295,7 +300,7 @@ const StudentProfile = () => {
             disabled={backendLoading}
             className="gap-2 rounded-full h-10 px-6 font-semibold shadow-md hover:shadow-lg transition-all bg-blue-600 hover:bg-blue-700 active:scale-95"
           >
-            {backendLoading ? <Loader2 className="animate-spin h-4 w-4" /> : <Edit3 className="h-4 w-4" />}
+            {backendLoading ? <Loader size="sm" /> : <Edit3 className="h-4 w-4" />}
             Edit Profile
           </Button>
         </div>
@@ -620,7 +625,7 @@ const StudentProfile = () => {
                     <label className="shrink-0">
                       <Button variant="outline" size="sm" asChild className="gap-1.5 cursor-pointer h-9 text-xs rounded-xl font-medium border-blue-100 hover:bg-blue-50 text-blue-600 px-4">
                         <span>
-                          {isUploadingResume ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Upload className="h-4 w-4" />}
+                          {isUploadingResume ? <Loader size="sm" /> : <Upload className="h-4 w-4" />}
                           Upload Resume
                         </span>
                       </Button>

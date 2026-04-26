@@ -12,8 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Loader2, Plus, Upload, Globe, User, FileText, X } from "lucide-react";
+import { Plus, Upload, Globe, User, FileText, X } from "lucide-react";
 import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
+import Loader from "@/components/Loader";
 import { toast } from "sonner";
 import { z } from "zod";
 import { Badge } from "@/components/ui/badge";
@@ -453,13 +454,13 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                   onClick={() => document.getElementById('resume-upload')?.click()}
                   disabled={isUploading}
                 >
-                  {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                  {isUploading ? <Loader size="sm" /> : <Upload className="h-4 w-4" />}
                   {isUploading ? "Uploading Resume..." : (formData.resumeUrl ? "Change Resume" : "Upload PDF Resume")}
                 </Button>
               </div>
               {isUploading && (
                 <div className="flex items-center gap-2 text-xs text-blue-600 font-medium bg-blue-50 px-3 py-2 rounded-lg border border-blue-100 w-fit">
-                  <Loader2 className="h-3 w-3 animate-spin" />
+                  <Loader size="sm" />
                   Uploading {resumeName}...
                 </div>
               )}
@@ -483,7 +484,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader size="sm" />
                   Saving Changes...
                 </>
               ) : "Save Profile Details"}

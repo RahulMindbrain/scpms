@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
-import { Loader2, Upload } from "lucide-react";
+import { Upload } from "lucide-react";
+import Loader from "@/components/Loader";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,7 +90,7 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
             <Label className="text-xs font-black uppercase tracking-widest text-slate-500">Certificate File (Optional)</Label>
             <div className="flex items-center gap-4">
                <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all group">
-                  {isUploading ? <Loader2 size={18} className="animate-spin text-blue-500" /> : <Upload size={18} className="text-slate-400 group-hover:text-blue-500" />}
+                  {isUploading ? <Loader size="sm" /> : <Upload size={18} className="text-slate-400 group-hover:text-blue-500" />}
                   <span className="text-sm font-bold text-slate-500 group-hover:text-blue-700">
                     {file ? file.name : 'Click to upload PDF/Image'}
                   </span>

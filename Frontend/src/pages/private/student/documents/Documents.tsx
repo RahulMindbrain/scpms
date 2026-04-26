@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
-import { Loader2 } from 'lucide-react';
+import Loader from '@/components/Loader';
 
 const Documents = () => {
   const [activeTab, setActiveTab] = useState('All');
@@ -184,7 +184,7 @@ const Documents = () => {
               disabled={isUploading}
               className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl"
             >
-              {isUploading ? <Loader2 className="animate-spin" /> : <Upload size={16} />}
+              {isUploading ? <Loader size="sm" /> : <Upload size={16} />}
               {isUploading ? "Uploading..." : "Upload"}
             </button>
           </div>

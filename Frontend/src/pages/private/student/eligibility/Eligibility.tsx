@@ -6,9 +6,9 @@ import {
   Search,
   User,
   ArrowUpRight,
-  Globe,
-  Loader2
+  Globe
 } from 'lucide-react';
+import Loader from '@/components/Loader';
 import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch } from '@/redux/store/store';
@@ -172,10 +172,7 @@ const Eligibility = () => {
             </div>
 
             {loading && companies.length === 0 && (
-              <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-center gap-2 text-slate-500">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Loading eligibility data...
-              </div>
+              <Loader text="Analyzing eligibility..." />
             )}
 
             {/* Quick Stats */}

@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import Loader from '@/components/Loader';
 
 type Status = 'APPLIED' | 'SHORTLISTED' | 'TECHNICAL_ROUND' | 'HR_ROUND' | 'SELECTED' | 'REJECTED';
 
@@ -312,18 +313,7 @@ const ApplicationStatus = () => {
   const latestApp = activeApps.length > 0 ? activeApps[0] : null;
 
   if (loading && applications.length === 0) {
-    return (
-      <div className="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto space-y-8 animate-in fade-in duration-700">
-        <div className="flex flex-col gap-2">
-          <div className="h-8 w-48 bg-slate-200 rounded-lg animate-pulse" />
-          <div className="h-4 w-64 bg-slate-100 rounded-lg animate-pulse" />
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map(i => <div key={i} className="h-24 bg-white rounded-2xl border border-slate-100 animate-pulse" />)}
-        </div>
-        <ApplicationSkeleton />
-      </div>
-    );
+    return <Loader text="Syncing your application journey..." fullScreen />;
   }
 
   return (
