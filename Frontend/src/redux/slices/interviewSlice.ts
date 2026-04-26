@@ -69,7 +69,9 @@ const interviewSlice = createSlice({
       })
       .addCase(createSchedule.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.schedules.unshift(action.payload.data);
+        if (action.payload.success !== false && action.payload.data) {
+          state.schedules.unshift(action.payload.data);
+        }
       })
       .addCase(createSchedule.rejected, (state, action) => {
         state.loading = false;
@@ -77,16 +79,16 @@ const interviewSlice = createSlice({
       })
       // Update Schedule
     .addCase(updateSchedule.fulfilled, (state, action: PayloadAction<any>) => {
-  state.loading = false;
-
-  const updated = action.payload.data;
-
-  state.schedules = state.schedules.map((s) =>
-    s.id === updated.id
-      ? { ...s, ...updated }   // ✅ THIS LINE IS THE FIX
-      : s
-  );
-})
+      state.loading = false;
+      if (action.payload.success !== false && action.payload.data) {
+        const updated = action.payload.data;
+        state.schedules = state.schedules.map((s) =>
+          s.id === updated.id
+            ? { ...s, ...updated }
+            : s
+        );
+      }
+    })
       .addCase(updateSchedule.rejected, (state, action) => {
         state.loading = false;
         state.error = typeof action.payload === 'string' ? action.payload : "Failed to update schedule";

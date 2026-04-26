@@ -91,6 +91,16 @@ dispatch(fetchJobsByCompanyId({ id: Number(value) }));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.startTime || !formData.endTime) {
+      toast.error("Please select both start and end times");
+      return;
+    }
+
+    if (new Date(formData.endTime) <= new Date(formData.startTime)) {
+      toast.error("End time must be after start time");
+      return;
+    }
+
     try {
       if (isCreate) {
         const payload = {
@@ -100,6 +110,12 @@ dispatch(fetchJobsByCompanyId({ id: Number(value) }));
           endTime: new Date(formData.endTime).toISOString(),
         };
         const res = await dispatch(createSchedule(payload)).unwrap();
+        
+        if (res.success === false) {
+          toast.error(res.message || "Time conflict detected or invalid schedule");
+          return;
+        }
+
         if (formData.message.trim()) {
           await dispatch(sendScheduleMessage({ id: res.data.id, message: formData.message }));
         }
@@ -110,7 +126,13 @@ dispatch(fetchJobsByCompanyId({ id: Number(value) }));
           endTime: new Date(formData.endTime).toISOString(),
           venue: formData.venue,
         };
-        await dispatch(updateSchedule({ id: schedule.id, scheduleData: payload })).unwrap();
+        const res = await dispatch(updateSchedule({ id: schedule.id, scheduleData: payload })).unwrap();
+        
+        if (res.success === false) {
+          toast.error(res.message || "Failed to update schedule");
+          return;
+        }
+
         if (formData.message.trim()) {
           await dispatch(sendScheduleMessage({ id: schedule.id, message: formData.message }));
         }
@@ -228,9 +250,22 @@ dispatch(fetchJobsByCompanyId({ id: Number(value) }));
               <Input
                 type="datetime-local"
                 value={formData.startTime}
-                min={new Date().toISOString().slice(0, 16)}
+                min={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
                 className="bg-slate-50/50"
-                onChange={(e) => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
+                onChange={(e) => {
+                  const newStart = e.target.value;
+                  setFormData(prev => {
+                    const updates: any = { ...prev, startTime: newStart };
+                    
+                    // Automatically suggest an end time (1 hour later) if not set or invalid
+                    if (newStart && (!prev.endTime || prev.endTime <= newStart)) {
+                      const startDate = new Date(newStart);
+                      const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+                      updates.endTime = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                    }
+                    return updates;
+                  });
+                }}
               />
             </div>
             <div className="space-y-2">
@@ -240,7 +275,7 @@ dispatch(fetchJobsByCompanyId({ id: Number(value) }));
               <Input
                 type="datetime-local"
                 value={formData.endTime}
-                min={formData.startTime || new Date().toISOString().slice(0, 16)}
+                min={formData.startTime || new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
                 className="bg-slate-50/50"
                 onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
               />
