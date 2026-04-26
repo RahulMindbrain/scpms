@@ -53,50 +53,38 @@ const [activeRole, setActiveRole] = useState<UserRole>(
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
+    
+    // Custom Validation
+    if (!email) return toast.error("Please enter your email address");
+    if (!password) return toast.error("Please enter your password");
+    
     if (isLoading) return;
     setIsLoading(true);
 
     try {
-      // loginUser now returns full API body: { token, data: { role, ...user } }
       const result = await dispatch(
         loginUser({ email: email.toLowerCase(), password })
       ).unwrap();
 
       const user = result.data;
 
-    if (user.role.toLowerCase() !== activeRole) {
-  toast.error(
-    `Unauthorized: This account is registered as ${user.role.toLowerCase()}, but you are trying to sign in as ${activeRole}.`
-  );
-  setIsLoading(false);
-  return;
-}
+      if (user.role.toLowerCase() !== activeRole) {
+        toast.error(
+          `Unauthorized: This account is registered as ${user.role.toLowerCase()}, but you are trying to sign in as ${activeRole}.`
+        );
+        setIsLoading(false);
+        return;
+      }
 
       toast.success(`Signed in as a ${activeRole}.`);
-
-      // setTimeout(() => {
-      //   if (user.role === "STUDENT") {
-      //     navigate("/student/dashboard");
-      //   } else if (user.role === "COMPANY") {
-      //     navigate("/company/dashboard");
-      //   } else if (user.role === "ADMIN") {
-      //     navigate("/admin/dashboard");
-      //   }
-      // }, 1000);
-
     } catch (error: any) {
-  console.error("Login error:", error);
-
-  const message =
-    error?.message ||
-    error?.response?.data?.message ||
-    error?.error ||
-    "Invalid email or password";
-
-  toast.error(message);
-  } finally {
-    setIsLoading(false); 
-  }
+      console.error("Login error:", error);
+      // error is now a string or has a message property due to our thunk update
+      const message = typeof error === 'string' ? error : (error?.message || "Invalid email or password");
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
   };
   const images = [illustration, camp, campp];
   const [currentIndex, setCurrentIndex] = useState(0);

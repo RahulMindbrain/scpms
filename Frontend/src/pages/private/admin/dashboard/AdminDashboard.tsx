@@ -23,8 +23,16 @@ export default function AdminDashboard() {
 
   if (error) {
     return (
-      <div className="flex flex-1 items-center justify-center text-destructive p-4">
-        Error: {error}
+      <div className="flex flex-1 flex-col items-center justify-center p-8 space-y-4">
+        <div className="text-destructive font-bold uppercase tracking-widest text-sm bg-red-50 px-4 py-2 rounded-lg border border-red-100">
+          Error: {error}
+        </div>
+        <button 
+          onClick={() => dispatch(fetchDashboardStats())}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded-xl shadow-lg transition-all active:scale-95"
+        >
+          Retry Fetching Data
+        </button>
       </div>
     )
   }

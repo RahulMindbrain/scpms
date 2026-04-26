@@ -255,7 +255,9 @@ deptId: s.student?.department?.id || null,
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit" className="w-full">Create Record</Button>
+                  <Button type="submit" disabled={loading} className="w-full">
+                    {loading ? "Creating..." : "Create Record"}
+                  </Button>
                 </DialogFooter>
               </form>
             </DialogContent>
@@ -331,10 +333,11 @@ deptId: s.student?.department?.id || null,
         {activeTab === 'inactive' && reduxInactiveStudents.length > 0 && (
           <Button
             onClick={handleActivateAll}
+            disabled={loading}
             className="h-10 bg-orange-500 hover:bg-orange-600 text-white shadow-sm font-semibold text-[13px] px-5 rounded-xl transition-all"
           >
             <UserCheck className="w-4 h-4 mr-2" />
-            Activate All ({reduxInactiveStudents.length})
+            {loading ? "Activating..." : `Activate All (${reduxInactiveStudents.length})`}
           </Button>
         )}
       </div>

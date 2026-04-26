@@ -24,7 +24,9 @@ export const loginUser = createAsyncThunk(
 
             return response; // full body passed to authSlice
         } catch (error: any) {
-            return rejectWithValue(error?.message || "Login failed");
+            // error is likely the response.data thrown by postAPI
+            const errorMessage = error?.message || error?.error || "Login failed";
+            return rejectWithValue(errorMessage);
         }
     }
 );

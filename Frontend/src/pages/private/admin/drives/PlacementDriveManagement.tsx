@@ -16,6 +16,7 @@ import {
   Clock,
   Info
 } from 'lucide-react';
+import Loader from '@/components/Loader';
 import { Badge } from '@/components/ui/badge';
 import { Modal } from '@/components/ui/modal';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -237,16 +238,27 @@ const PlacementDriveManagement: React.FC = () => {
 
         {/* Status Content */}
         {error && (
-          <div className="p-5 bg-rose-50 border border-rose-100 rounded-[2rem] text-rose-600 text-sm font-semibold flex items-center gap-4 animate-in fade-in">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
-              <AlertCircle className="w-5 h-5" />
+          <div className="flex flex-col items-center justify-center p-12 bg-rose-50 border border-rose-100 rounded-[2rem] text-center space-y-4">
+            <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm mx-auto">
+              <AlertCircle className="w-6 h-6 text-rose-500" />
             </div>
-            {error}
+            <div className="space-y-1">
+              <h3 className="text-rose-900 font-bold uppercase tracking-tight">Data Fetching Failed</h3>
+              <p className="text-rose-600 text-sm font-medium">{error}</p>
+            </div>
+            <button 
+              onClick={() => dispatch(fetchJobs({ status: 'APPROVED' }))}
+              className="px-8 py-3 bg-rose-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-rose-700 transition-all shadow-lg active:scale-95"
+            >
+              Retry Connection
+            </button>
           </div>
         )}
 
         {loading && reduxJobs.length === 0 ? (
-          renderSkeleton()
+          <div className="py-20">
+            <Loader text="Gathering placement drive details..." />
+          </div>
         ) : (
           <div className="space-y-6">
             {processedDrives.length > 0 ? (
@@ -482,9 +494,10 @@ const PlacementDriveManagement: React.FC = () => {
               </button>
               <button 
                 type="submit" 
-                className="px-10 py-3 bg-blue-600 text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20"
+                disabled={loading}
+                className="px-10 py-3 bg-blue-600 text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Launch Drive
+                {loading ? "Launching..." : "Launch Drive"}
               </button>
             </div>
           </form>

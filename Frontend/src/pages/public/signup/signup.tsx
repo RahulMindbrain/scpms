@@ -68,7 +68,11 @@ const SignUp: React.FC = () => {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    if (name === "fullName" && !/^[a-zA-Z\s]*$/.test(value)) {
+    if (name === "fullName" && value !== "" && !/^[a-zA-Z\s]*$/.test(value)) {
+      toast.error("Names can only contain letters and spaces", {
+        id: "name-validation",
+        duration: 2000,
+      });
       return;
     }
     setForm({ ...form, [name]: value });
@@ -82,10 +86,16 @@ const SignUp: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // if (!agreed) {
-    //   toast.error("Please agree to the Terms and Privacy Policy");
-    //   return;
-    // }
+    // Custom Validation
+    if (!form.fullName.trim()) return toast.error("Full name is required");
+    if (!form.email.trim()) return toast.error("Email address is required");
+    if (!form.password) return toast.error("Password is required");
+
+    const names = form.fullName.trim().split(/\s+/);
+    if (names.length < 2) {
+      toast.error("Please enter your full name (First and Last name)");
+      return;
+    }
 
     if (form.password !== form.confirmPassword) {
       toast.error("Passwords do not match");
@@ -97,10 +107,8 @@ const SignUp: React.FC = () => {
       return;
     }
 
-    // Logic to split name into First and Last for the payload
-    const names = form.fullName.trim().split(" ");
     const firstname = names[0];
-    const lastname = names.length > 1 ? names.slice(1).join(" ") : "Jackson"; // Fallback as per your sample
+    const lastname = names.slice(1).join(" ");
 
     const payload = {
       firstname,
@@ -118,7 +126,8 @@ const SignUp: React.FC = () => {
         navigate("/login");
       }, 1500);
     } catch (err: any) {
-      toast.error(err || "Registration failed. Please try again.");
+      const message = typeof err === 'string' ? err : (err?.message || "Registration failed. Please try again.");
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
