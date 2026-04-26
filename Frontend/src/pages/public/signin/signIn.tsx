@@ -51,14 +51,15 @@ const [activeRole, setActiveRole] = useState<UserRole>(
     { id: "admin", label: "Admin", icon: <ShieldCheck size={16} /> },
   ];
 
-  const handleSubmit = async () => {
-    // e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    if (isLoading) return;
     setIsLoading(true);
 
     try {
       // loginUser now returns full API body: { token, data: { role, ...user } }
       const result = await dispatch(
-        loginUser({ email, password })
+        loginUser({ email: email.toLowerCase(), password })
       ).unwrap();
 
       const user = result.data;
@@ -89,6 +90,7 @@ const [activeRole, setActiveRole] = useState<UserRole>(
   const message =
     error?.message ||
     error?.response?.data?.message ||
+    error?.error ||
     "Invalid email or password";
 
   toast.error(message);
@@ -144,7 +146,7 @@ const [activeRole, setActiveRole] = useState<UserRole>(
           ))}
         </div>
 
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleSubmit}>
           {/* Email Address */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -202,9 +204,8 @@ const [activeRole, setActiveRole] = useState<UserRole>(
 
           {/* Submit Button */}
           <button
-  type="button"
-  onClick={handleSubmit}
-  disabled={isLoading}
+            type="submit"
+            disabled={isLoading}
             className={`w-full bg-gradient-to-br from-blue-700 to-slate-900 active:scale-[0.99] transition-all duration-200 text-white font-semibold py-3 sm:py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-indigo-100 mt-2 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
           >
             {isLoading ? "Signing in..." : "Sign In to Dashboard"}

@@ -8,6 +8,8 @@ import {
   Briefcase,
   Check,
   ChevronLeft,
+  EyeOff,
+  Eye,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,6 +27,8 @@ const SignUp: React.FC = () => {
   const [activeRole, setActiveRole] = useState<RegisterRole | null>(null);
   // const [agreed, setAgreed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const { isAuthenticated, userType } = useSelector((state: RootState) => state.auth);
 
@@ -37,6 +41,24 @@ const SignUp: React.FC = () => {
     }
   }, [isAuthenticated, userType, navigate]);
 
+  // Handle back button to go from step 2 to step 1
+  React.useEffect(() => {
+    if (step === 2) {
+      // Push a new state so the back button can be intercepted
+      window.history.pushState({ step: 2 }, "");
+
+      const handlePopState = (e: PopStateEvent) => {
+        // If we popped back, go to step 1
+        setStep(1);
+      };
+
+      window.addEventListener("popstate", handlePopState);
+      return () => {
+        window.removeEventListener("popstate", handlePopState);
+      };
+    }
+  }, [step]);
+
   const [form, setForm] = useState({
     fullName: "",
     email: "",
@@ -45,7 +67,11 @@ const SignUp: React.FC = () => {
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "fullName" && !/^[a-zA-Z\s]*$/.test(value)) {
+      return;
+    }
+    setForm({ ...form, [name]: value });
   };
 
   const handleRoleSelect = (role: RegisterRole) => {
@@ -79,7 +105,7 @@ const SignUp: React.FC = () => {
     const payload = {
       firstname,
       lastname,
-      email: form.email,
+      email: form.email.toLowerCase(),
       password: form.password,
       role: activeRole,
     };
@@ -87,7 +113,7 @@ const SignUp: React.FC = () => {
     setIsSubmitting(true);
     try {
       await dispatch(registerUser(payload)).unwrap();
-      toast.success("Registration successful! Please login to continue.");
+      toast.success("Registration successful! Please sign in to continue.");
       setTimeout(() => {
         navigate("/login");
       }, 1500);
@@ -115,7 +141,7 @@ const SignUp: React.FC = () => {
             Architect Your <br /> Professional Path
           </h1>
           <p className="text-indigo-100 leading-relaxed mb-8 font-medium">
-            Join the Smart CPMS ecosystem to connect with elite COMPANYs and automate your career trajectory.
+            Join the Smart CPMS ecosystem to connect with elite Companies and automate your career trajectory.
           </p>
           <ul className="space-y-4">
             {["Algorithmic Profile Matching", "Real-time Interview Tracking", "Institutional Grade Security"].map((f, i) => (
@@ -130,7 +156,7 @@ const SignUp: React.FC = () => {
       {/* RIGHT SIDE */}
       <div className="w-full md:w-[60%] flex items-center justify-center px-6 py-12 md:px-12 bg-white">
         <div className="w-full max-w-lg">
-       
+
           {step === 1 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="mb-10 text-center md:text-left">
@@ -161,7 +187,7 @@ const SignUp: React.FC = () => {
                     ${activeRole === "COMPANY" ? "bg-indigo-600 text-white scale-110 shadow-lg shadow-indigo-200" : "bg-slate-100 text-slate-400 group-hover:bg-indigo-100 group-hover:text-indigo-600"}`}>
                     <Briefcase size={28} />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900">COMPANY</h3>
+                  <h3 className="text-xl font-bold text-slate-900">Company</h3>
                   <p className="text-sm text-slate-500 mt-2">I am looking to hire the best talent for my organization.</p>
                 </button>
               </div>
@@ -186,38 +212,53 @@ const SignUp: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 gap-4">
-                <div className="relative">
-                  <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                  <input name="fullName" onChange={handleChange} required placeholder="Full Name" className={inputClasses} />
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold text-slate-700 ml-1">Full Name</label>
+                  <div className="relative">
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                    <input name="fullName" value={form.fullName} onChange={handleChange} required placeholder="Enter your full name" className={inputClasses} />
+                  </div>
                 </div>
 
-                <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                  <input name="email" type="email" onChange={handleChange} required placeholder="Email Address" className={inputClasses} />
+                <div className="space-y-1">
+                  <label className="text-sm font-semibold text-slate-700 ml-1">Email Address</label>
+                  <div className="relative">
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                    <input name="email" type="email" value={form.email} onChange={handleChange} required placeholder="name@example.com" className={inputClasses} />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                    <input name="password" type="password" onChange={handleChange} required placeholder="Password" className={inputClasses} />
+                  <div className="space-y-1">
+                    <label className="text-sm font-semibold text-slate-700 ml-1">Password</label>
+                    <div className="relative">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                      <input name="password" type={showPassword ? "text" : "password"} value={form.password} onChange={handleChange} required placeholder="••••••••" className={inputClasses} />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
                   </div>
-                  <div className="relative">
-                    <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                    <input name="confirmPassword" type="password" onChange={handleChange} required placeholder="Confirm" className={inputClasses} />
+                  <div className="space-y-1">
+                    <label className="text-sm font-semibold text-slate-700 ml-1">Confirm Password</label>
+                    <div className="relative">
+                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                      <input name="confirmPassword" type={showConfirmPassword ? "text" : "password"} value={form.confirmPassword} onChange={handleChange} required placeholder="••••••••" className={inputClasses} />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                      >
+                        {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
-
-              {/* <div
-                className="flex items-center gap-3 cursor-pointer group select-none"
-                onClick={() => setAgreed(!agreed)}
-              > */}
-                {/* <div className={`w-6 h-6 border rounded-lg flex items-center justify-center transition-all 
-                  ${agreed ? "bg-indigo-600 border-indigo-600" : "border-slate-300 group-hover:border-indigo-400"}`}>
-                  {agreed && <Check size={14} className="text-white" />}
-                </div> */}
-                {/* <p className="text-sm text-slate-500">I agree to the <span className="text-indigo-600 font-bold underline cursor-pointer">Terms and Privacy Policy</span></p> */}
-              {/* </div> */}
 
               <button
                 type="submit"
