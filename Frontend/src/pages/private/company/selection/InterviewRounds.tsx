@@ -65,6 +65,11 @@ const CompanyInterviewManager: React.FC = () => {
     dispatch(fetchCompanySchedules());
   }, [dispatch]);
 
+  const coordinators = useMemo(() => {
+    const names = Array.from(new Set(schedules.map(s => s.adminName).filter(Boolean)));
+    return names.length > 0 ? names : ['Placement Admin'];
+  }, [schedules]);
+
   const handleUpdateStatus = async (id: number, status: 'APPROVED' | 'REJECTED') => {
     setStatusLoading(id);
     try {
@@ -140,37 +145,37 @@ const CompanyInterviewManager: React.FC = () => {
   }), [schedules]);
 
   return (
-    <div className="min-h-screen bg-[#FDFDFE] p-4 sm:p-6 lg:p-12 space-y-12 font-sans selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="min-h-screen bg-[#FDFDFE] p-4 sm:p-6 lg:p-10 space-y-10 font-sans selection:bg-indigo-100 selection:text-indigo-900">
 
       {/* Header Section */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-8">
-        <div className="space-y-4">
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100/50 shadow-sm">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+        <div className="space-y-3">
+          <div className="inline-flex items-center gap-2.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100/50">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
             </span>
-            <span className="text-[11px] font-bold uppercase tracking-wider">Action Required</span>
+            <span className="text-[10px] font-bold uppercase tracking-wider">Interview Pipeline</span>
           </div>
           <div className="space-y-1">
-            <h1 className="text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">Interview Pipeline</h1>
-            <p className="text-slate-500 font-medium text-lg lg:text-xl">Manage and approve placement drive schedules</p>
+            <h1 className="text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">Interview Scheduler</h1>
+            <p className="text-slate-500 font-medium text-sm lg:text-base">Review and manage your upcoming placement rounds</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-6 bg-white/60 backdrop-blur-md px-6 py-3 rounded-full border border-slate-100 shadow-xl shadow-slate-200/40">
-          <div className="flex -space-x-3">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-indigo-100 flex items-center justify-center ring-2 ring-indigo-50/50">
-                <User className="w-5 h-5 text-indigo-500" />
+        <div className="flex items-center gap-4 bg-white px-5 py-2.5 rounded-2xl border border-slate-100 shadow-sm">
+          <div className="flex -space-x-2">
+            {coordinators.slice(0, 3).map((name, i) => (
+              <div key={i} className="w-9 h-9 rounded-full border-2 border-white bg-indigo-100 flex items-center justify-center ring-1 ring-slate-100" title={name}>
+                <span className="text-[10px] font-bold text-indigo-600">{name.charAt(0)}</span>
               </div>
             ))}
           </div>
-          <div className="h-8 w-px bg-slate-200" />
+          <div className="h-6 w-px bg-slate-200" />
           <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Coordinators</span>
-            <span className="text-sm font-black text-slate-800 flex items-center gap-1.5">
-              3 Active Admins
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Admins</span>
+            <span className="text-xs font-black text-slate-800 flex items-center gap-1">
+              {coordinators.length} Active
               <ChevronRight className="w-3 h-3 text-slate-300" />
             </span>
           </div>
@@ -178,26 +183,26 @@ const CompanyInterviewManager: React.FC = () => {
       </div>
 
       {/* Stats Overview Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
-          { label: 'Total Drives', value: stats.total, color: 'indigo' },
-          { label: 'Pending Approvals', value: stats.pending, color: 'amber' },
-          { label: 'Total Candidates', value: stats.activeCandidates, color: 'emerald' }
+          { label: 'Total Rounds', value: stats.total, color: 'indigo', icon: Calendar },
+          { label: 'Pending', value: stats.pending, color: 'amber', icon: Clock },
+          { label: 'Candidates', value: stats.activeCandidates, color: 'emerald', icon: User }
         ].map((stat, idx) => (
-          <div key={idx} className="group relative">
-            <div className="absolute -inset-1 bg-gradient-to-br from-indigo-500/10 to-transparent rounded-[2.5rem] blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-            <div className="relative bg-white/70 backdrop-blur-2xl border border-white rounded-[2.5rem] p-10 shadow-2xl shadow-slate-200/50 group-hover:bg-white/90 transition-all duration-300">
-              <div className={`w-12 h-12 rounded-2xl bg-${stat.color}-50 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-500`}>
-                {idx === 0 && <Calendar className="w-6 h-6 text-indigo-600" />}
-                {idx === 1 && <Clock className="w-6 h-6 text-amber-600" />}
-                {idx === 2 && <User className="w-6 h-6 text-emerald-600" />}
+          <div key={idx} className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-4">
+              <div className={cn(
+                "w-10 h-10 rounded-xl flex items-center justify-center",
+                stat.color === 'indigo' ? "bg-indigo-50 text-indigo-600" : 
+                stat.color === 'amber' ? "bg-amber-50 text-amber-600" : 
+                "bg-emerald-50 text-emerald-600"
+              )}>
+                <stat.icon className="w-5 h-5" />
               </div>
-              <p className="text-slate-500 font-bold text-sm uppercase tracking-widest mb-2">{stat.label}</p>
-              <p className="text-5xl font-black text-slate-900 flex items-baseline gap-2">
-                {stat.value}
-                <span className="text-sm font-bold text-slate-300">live</span>
-              </p>
+              <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Real-time</span>
             </div>
+            <p className="text-slate-500 font-bold text-xs uppercase tracking-widest mb-1">{stat.label}</p>
+            <p className="text-3xl font-black text-slate-900">{stat.value}</p>
           </div>
         ))}
       </div>
@@ -205,14 +210,14 @@ const CompanyInterviewManager: React.FC = () => {
       {/* Main Content Area */}
       <div className="space-y-8">
         {/* Toolbar & Filters */}
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-6 bg-white/50 p-4 rounded-3xl border border-slate-100 shadow-sm backdrop-blur-sm">
-          <div className="flex items-center gap-2 p-1 bg-slate-100/80 rounded-2xl w-full lg:w-auto overflow-x-auto no-scrollbar">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 bg-white p-2 rounded-2xl border border-slate-100 shadow-sm">
+          <div className="flex items-center gap-1 bg-slate-50 p-1 rounded-xl overflow-x-auto no-scrollbar">
             {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map((type) => (
               <button
                 key={type}
                 onClick={() => setFilterType(type as any)}
-                className={`px-6 py-2.5 rounded-xl text-xs font-black tracking-widest transition-all duration-300 whitespace-nowrap ${filterType === type
-                    ? 'bg-white text-slate-900 shadow-lg shadow-slate-200/50 scale-[1.02]'
+                className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-widest transition-all whitespace-nowrap ${filterType === type
+                    ? 'bg-white text-indigo-600 shadow-sm'
                     : 'text-slate-400 hover:text-slate-600'
                   }`}
               >
@@ -221,38 +226,36 @@ const CompanyInterviewManager: React.FC = () => {
             ))}
           </div>
 
-          <div className="flex items-center gap-4 w-full lg:w-auto">
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Search job title or schedule..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-5 py-3.5 bg-white border border-slate-100 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/5 transition-all font-medium text-slate-600 placeholder:text-slate-300"
-              />
-            </div>
+          <div className="relative flex-1 lg:max-w-xs">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search schedule..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border-none rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all text-xs font-medium text-slate-600 placeholder:text-slate-300"
+            />
           </div>
         </div>
 
         {/* Schedule List */}
-        <div className="space-y-8">
+        <div className="space-y-6">
           {loading ? (
-            <Loader text="Loading Pipeline..." />
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-4" />
+              <p className="text-slate-500 font-bold">Loading Pipeline...</p>
+            </div>
           ) : filteredSchedules.length > 0 ? (
             filteredSchedules.map((schedule) => (
               <div key={schedule.id} className="group relative">
-                {/* Glow Effect on Hover */}
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-[3rem] opacity-0 group-hover:opacity-10 blur-2xl transition duration-700 pointer-events-none" />
-
-                <div className="relative bg-white border border-slate-100 rounded-[3rem] p-8 lg:p-10 flex flex-col lg:flex-row items-center gap-10 lg:gap-14 shadow-2xl shadow-slate-200/40 hover:shadow-indigo-200/20 transition-all duration-500">
-
+                <div className="relative bg-white border border-slate-100 rounded-3xl p-6 lg:p-8 flex flex-col lg:flex-row items-center gap-8 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
+                  
                   {/* Left Side: Date Block */}
-                  <div className="flex flex-col items-center justify-center bg-slate-50 rounded-[2.5rem] min-w-[110px] sm:min-w-[130px] h-[110px] sm:h-[130px] text-center p-4 sm:p-6 border border-slate-100 ring-4 ring-slate-50/50">
-                    <span className="text-4xl font-black text-indigo-600 mb-1">
+                  <div className="flex flex-col items-center justify-center bg-slate-50 rounded-2xl min-w-[100px] h-[100px] text-center p-4 border border-slate-100 group-hover:bg-indigo-50/50 transition-colors">
+                    <span className="text-3xl font-black text-indigo-600 leading-none mb-1">
                       {new Date(schedule.startTime).getDate()}
                     </span>
-                    <span className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 leading-none">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-400">
                       {new Date(schedule.startTime).toLocaleString('default', { month: 'short' })}
                     </span>
                     <span className="text-[10px] font-bold text-slate-300 mt-1">
@@ -261,92 +264,80 @@ const CompanyInterviewManager: React.FC = () => {
                   </div>
 
                   {/* Center Content: Main Info */}
-                  <div className="flex-1 space-y-5 text-center lg:text-left">
-                    <div className="flex flex-wrap justify-center lg:justify-start items-center gap-3">
-                      <Badge className="bg-indigo-50/70 hover:bg-indigo-100 text-indigo-600 border-indigo-100 px-4 py-1.5 rounded-xl font-bold tracking-tight text-xs">
+                  <div className="flex-1 space-y-4 text-center lg:text-left w-full">
+                    <div className="flex flex-wrap justify-center lg:justify-start items-center gap-2">
+                      <Badge className="bg-indigo-50 text-indigo-600 border-indigo-100 px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider">
                         {schedule.jobTitle}
                       </Badge>
-                      <div className="flex items-center gap-1.5 text-slate-300 font-bold text-[10px] uppercase tracking-widest">
-                        <div className="w-1 h-1 rounded-full bg-slate-200" />
-                        RID: #{schedule.id}
-                      </div>
+                      <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">
+                        ID: #{schedule.id}
+                      </span>
                     </div>
 
                     <div className="space-y-2">
-                      <h2 className="text-2xl lg:text-3xl font-black text-slate-800 tracking-tight leading-tight">
+                      <h2 className="text-xl lg:text-2xl font-black text-slate-800 tracking-tight">
                         {schedule.title}
                       </h2>
-                      <div className="flex flex-wrap justify-center lg:justify-start gap-4 lg:gap-8">
-                        <div className="flex items-center gap-2.5 text-slate-500 font-bold text-sm">
-                          <div className="p-2 bg-indigo-50 rounded-lg">
-                            <Clock className="w-4 h-4 text-indigo-500" />
-                          </div>
+                      <div className="flex flex-wrap justify-center lg:justify-start gap-x-6 gap-y-2">
+                        <div className="flex items-center gap-2 text-slate-500 font-bold text-xs">
+                          <Clock className="w-3.5 h-3.5 text-indigo-500" />
                           <span>
-                            {new Date(schedule.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            <span className="mx-2 text-slate-300">–</span>
-                            {new Date(schedule.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(schedule.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {new Date(schedule.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
-                        <div className="flex items-center gap-2.5 text-slate-500 font-bold text-sm">
-                          <div className="p-2 bg-rose-50 rounded-lg">
-                            <MapPin className="w-4 h-4 text-rose-500" />
-                          </div>
-                          <span>{schedule.venue || 'To be announced'}</span>
+                        <div className="flex items-center gap-2 text-slate-500 font-bold text-xs">
+                          <MapPin className="w-3.5 h-3.5 text-rose-500" />
+                          <span>{schedule.venue || 'TBA'}</span>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-center lg:justify-start gap-4 pt-2">
-                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-100">
-                        <User className="w-3.5 h-3.5 text-slate-400" />
-                        <span className="text-xs font-bold text-slate-500">Admin: {schedule.adminName || 'Coordinator'}</span>
-                      </div>
-                      
+                    <div className="flex items-center justify-center lg:justify-start gap-3 pt-1">
                       <button
                         onClick={() => handleOpenApplications(schedule)}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50/50 hover:bg-indigo-100/50 border border-indigo-100/30 transition-colors group/btn"
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 hover:bg-indigo-50 border border-slate-100 transition-colors group/btn"
                       >
-                        <User className="w-3.5 h-3.5 text-indigo-500 group-hover/btn:scale-110 transition-transform" />
-                        <span className="text-xs font-bold text-indigo-600">
+                        <User className="w-3.5 h-3.5 text-slate-400 group-hover/btn:text-indigo-500" />
+                        <span className="text-[11px] font-bold text-slate-600 group-hover/btn:text-indigo-600">
                           {schedule.applications?.length || 0} Candidates
                         </span>
                       </button>
 
                       <button
                         onClick={() => handleOpenMessages(schedule)}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-50/50 hover:bg-amber-100/50 border border-amber-100/30 transition-colors group/btn"
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-50 hover:bg-amber-50 border border-slate-100 transition-colors group/btn"
                       >
-                        <MessageSquare className="w-3.5 h-3.5 text-amber-500 group-hover/btn:scale-110 transition-transform" />
-                        <span className="text-xs font-bold text-amber-600">
-                          Discussion {(schedule.messages?.length || 0) > 0 && `(${schedule.messages.length})`}
+                        <MessageSquare className="w-3.5 h-3.5 text-slate-400 group-hover/btn:text-amber-500" />
+                        <span className="text-[11px] font-bold text-slate-600 group-hover/btn:text-amber-600">
+                          Notes {(schedule.messages?.length || 0) > 0 && `(${schedule.messages.length})`}
                         </span>
                       </button>
                     </div>
                   </div>
 
                   {/* Right Side: Approval Actions */}
-                  <div className="flex flex-row lg:flex-col gap-3 w-full lg:w-auto lg:min-w-[150px]">
+                  <div className="flex flex-row lg:flex-col gap-3 w-full lg:w-[160px]">
                     {schedule.companyApprovalStatus === 'PENDING' ? (
                       <>
                         <Button 
                           onClick={() => handleUpdateStatus(schedule.id, 'APPROVED')}
                           disabled={statusLoading === schedule.id}
-                          className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold py-6 shadow-lg shadow-emerald-100 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                          className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold py-5 text-xs uppercase tracking-widest transition-all"
                         >
-                          {statusLoading === schedule.id ? <Loader size="sm" /> : 'Approve'}
+                          {statusLoading === schedule.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Approve'}
                         </Button>
                         <Button 
                           variant="ghost"
                           onClick={() => { setSelectedSchedule(schedule); setIsRejectModalOpen(true); }}
-                          className="flex-1 text-rose-600 hover:bg-rose-50 rounded-2xl font-bold py-6 transition-all"
+                          className="flex-1 text-rose-600 hover:bg-rose-50 rounded-xl font-bold py-5 text-xs uppercase tracking-widest transition-all"
                         >
                           Decline
                         </Button>
                       </>
                     ) : (
                       <div className={cn(
-                        "w-full py-4 text-center rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] border",
-                        schedule.companyApprovalStatus === 'APPROVED' ? "bg-emerald-50/50 text-emerald-600 border-emerald-100" : "bg-rose-50/50 text-rose-600 border-rose-100"
+                        "w-full py-3 text-center rounded-xl font-black text-[10px] uppercase tracking-[0.2em] border",
+                        schedule.companyApprovalStatus === 'APPROVED' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-rose-50 text-rose-600 border-rose-100"
                       )}>
                         {schedule.companyApprovalStatus}
                       </div>
@@ -356,20 +347,18 @@ const CompanyInterviewManager: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="bg-white rounded-[4rem] p-24 text-center border border-slate-100 shadow-xl shadow-slate-200/40 border-dashed">
-              <div className="bg-slate-50 w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-8 border border-slate-100 ring-8 ring-slate-50/50">
-                <Calendar className="w-10 h-10 text-slate-200" />
-              </div>
-              <p className="text-2xl font-black text-slate-800 mb-2">No results in pipe</p>
-              <p className="text-slate-400 font-bold max-w-sm mx-auto">
-                We couldn't find any interview schedules matching your current filters or search query.
+            <div className="bg-white rounded-3xl p-16 text-center border border-slate-100 border-dashed">
+              <Calendar className="w-12 h-12 text-slate-200 mx-auto mb-4" />
+              <p className="text-xl font-black text-slate-800 mb-2">No schedules found</p>
+              <p className="text-slate-400 font-bold text-sm max-w-sm mx-auto mb-6">
+                Try adjusting your filters or search query to find what you're looking for.
               </p>
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={() => { setFilterType('ALL'); setSearchQuery(''); }}
-                className="mt-8 text-indigo-600 font-black uppercase tracking-widest text-xs py-6 px-8 rounded-2xl hover:bg-indigo-50"
+                className="text-indigo-600 border-indigo-100 hover:bg-indigo-50 rounded-xl"
               >
-                Clear all filters
+                Clear Filters
               </Button>
             </div>
           )}
@@ -385,47 +374,45 @@ const CompanyInterviewManager: React.FC = () => {
         isOpen={isApplicationsModalOpen}
         onClose={() => setIsApplicationsModalOpen(false)}
         title="Candidate List"
-        subtitle={`Viewing all students scheduled for ${activeSchedule?.title}`}
+        subtitle={`Viewing students for ${activeSchedule?.title}`}
       >
-        <div className="space-y-6 pt-4 min-h-[400px]">
+        <div className="space-y-4 pt-4">
           {appsLoading === activeSchedule?.id ? (
             <Loader text="Fetching Candidates..." />
           ) : activeSchedule?.applications && activeSchedule.applications.length > 0 ? (
-            <div className="space-y-3">
+            <div className="max-h-[400px] overflow-y-auto pr-2 space-y-2 no-scrollbar">
               {activeSchedule.applications.map((app: any) => (
-                <div key={app.id} className="flex items-center justify-between p-5 bg-slate-50/50 border border-slate-100 rounded-3xl hover:bg-white hover:shadow-lg hover:shadow-slate-100 transition-all group">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 flex items-center justify-center shadow-sm group-hover:bg-indigo-50 group-hover:border-indigo-100 transition-colors">
-                      <User className="w-6 h-6 text-slate-400 group-hover:text-indigo-600" />
+                <div key={app.id} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl hover:bg-white hover:border-indigo-100 transition-all">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center border border-indigo-100">
+                      <User className="w-5 h-5 text-indigo-600" />
                     </div>
                     <div>
-                      <p className="font-black text-slate-800">{app.student?.user?.name || app.studentName || 'Candidate'}</p>
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                      <p className="text-sm font-bold text-slate-800">{app.student?.user?.name || app.studentName || 'Candidate'}</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
                         {app.student?.rollNumber || 'ID: #' + app.studentId} • {app.student?.department?.name || 'General'}
                       </p>
                     </div>
                   </div>
-                  <Badge className="bg-white text-slate-600 border-slate-100 px-3 py-1 rounded-lg">
+                  <Badge variant="outline" className="text-[10px] border-slate-200">
                     {app.status || 'Scheduled'}
                   </Badge>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-              <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center border border-slate-100">
-                <User className="w-8 h-8 text-slate-200" />
-              </div>
-              <p className="text-slate-500 font-bold">No candidates found for this round.</p>
+            <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
+              <User className="w-10 h-10 text-slate-200" />
+              <p className="text-slate-500 font-bold text-sm">No candidates found for this round.</p>
             </div>
           )}
 
-          <div className="pt-6">
+          <div className="pt-4 border-t border-slate-100">
             <Button
               onClick={() => setIsApplicationsModalOpen(false)}
-              className="w-full py-7 bg-slate-900 hover:bg-black text-white rounded-[1.5rem] font-black text-sm uppercase tracking-widest"
+              className="w-full py-4 bg-slate-900 hover:bg-black text-white rounded-xl font-bold text-xs uppercase tracking-widest"
             >
-              Close View
+              Close
             </Button>
           </div>
         </div>
@@ -436,38 +423,36 @@ const CompanyInterviewManager: React.FC = () => {
         isOpen={isRejectModalOpen}
         onClose={() => setIsRejectModalOpen(false)}
         title="Request Change"
-        subtitle="This note will be sent back to the Placement Admin for review."
+        subtitle="Provide reasoning for rejecting this schedule"
       >
-        <div className="space-y-8 pt-4">
-          <div className="bg-amber-50/50 p-6 rounded-[2rem] border border-amber-100 flex items-start gap-4">
-            <div className="p-2 bg-white rounded-xl">
-              <Info className="text-amber-500 w-5 h-5 shrink-0" />
-            </div>
-            <p className="text-[13px] text-amber-800 font-bold leading-relaxed">
-              Rescheduling may impact overall timeline. Please provide a clear reasoning or preferred alternate slots.
+        <div className="space-y-6 pt-4">
+          <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 flex items-start gap-3">
+            <Info className="text-amber-500 w-4 h-4 shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-800 font-medium leading-relaxed">
+              Rescheduling may impact the placement timeline. Clear reasoning helps the admin find better slots.
             </p>
           </div>
 
-          <div className="space-y-3">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 pl-2">Rejection Reason / Notes</label>
+          <div className="space-y-2">
+            <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-1">Rejection Reason</label>
             <textarea
-              className="w-full p-8 rounded-[2rem] border border-slate-100 bg-slate-50/50 focus:ring-4 focus:ring-indigo-500/10 min-h-[160px] outline-none transition-all font-bold text-slate-700 placeholder:text-slate-200 lg:text-lg"
+              className="w-full p-4 rounded-xl border border-slate-200 bg-slate-50 focus:ring-2 focus:ring-rose-500/10 min-h-[120px] outline-none transition-all text-sm font-medium text-slate-700 placeholder:text-slate-300 resize-none"
               placeholder="e.g., We need to shift this to 2 PM as our interviewers are coming from another campus..."
               value={declineReason}
               onChange={(e) => setDeclineReason(e.target.value)}
             />
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 pt-2">
-            <Button variant="ghost" onClick={() => setIsRejectModalOpen(false)} className="flex-1 py-8 rounded-[1.5rem] font-black uppercase tracking-widest text-xs text-slate-400">
-              Discard
+          <div className="flex gap-3 pt-2">
+            <Button variant="ghost" onClick={() => setIsRejectModalOpen(false)} className="flex-1 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] text-slate-400 hover:bg-slate-100">
+              Cancel
             </Button>
             <Button
               disabled={!declineReason.trim() || statusLoading !== null}
-              className="flex-1 bg-rose-600 hover:bg-rose-700 py-8 rounded-[1.5rem] font-black uppercase tracking-widest text-xs text-white shadow-2xl shadow-rose-100 transition-all"
+              className="flex-1 bg-rose-600 hover:bg-rose-700 py-4 rounded-xl font-bold uppercase tracking-widest text-[10px] text-white shadow-lg shadow-rose-100"
               onClick={() => selectedSchedule && handleUpdateStatus(selectedSchedule.id, 'REJECTED')}
             >
-              {statusLoading !== null ? <Loader size="sm" /> : 'Confirm Rejection'}
+              {statusLoading !== null ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Rejection'}
             </Button>
           </div>
         </div>
@@ -477,81 +462,64 @@ const CompanyInterviewManager: React.FC = () => {
       <Modal
         isOpen={isMessagesOpen}
         onClose={() => setIsMessagesOpen(false)}
-        title="Schedule Notes"
-        subtitle={`Notes & correspondence for ${activeSchedule?.title}`}
+        title="Discussion"
+        subtitle={`Messages for ${activeSchedule?.title}`}
       >
-        <div className="flex flex-col gap-6 pt-2">
+        <div className="flex flex-col gap-4 pt-2">
 
           {/* Notes List */}
-          <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+          <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 no-scrollbar">
             {msgLoading === activeSchedule?.id ? (
-              <Loader size="sm" text="Loading notes..." />
+              <Loader text="Loading discussion..." size="sm" />
             ) : activeSchedule?.messages && activeSchedule.messages.length > 0 ? (
               [...activeSchedule.messages].reverse().map((msg: any) => (
-                <div key={msg.id} className="bg-slate-50 border border-slate-100 rounded-2xl p-5 space-y-3">
-                  {/* Note Header */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-xl bg-white border border-slate-200 flex items-center justify-center shadow-sm">
-                        <User className="w-4 h-4 text-slate-400" />
+                <div key={msg.id} className={cn(
+                  "p-4 rounded-2xl border transition-all",
+                  msg.isAdmin ? "bg-indigo-50/30 border-indigo-100 mr-8" : "bg-white border-slate-100 ml-8"
+                )}>
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <div className={cn(
+                        "w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold",
+                        msg.isAdmin ? "bg-indigo-100 text-indigo-600" : "bg-emerald-100 text-emerald-600"
+                      )}>
+                        {msg.isAdmin ? 'A' : 'C'}
                       </div>
-                      <div>
-                        <p className="text-xs font-black text-slate-700">{msg.senderName || (msg.isAdmin ? 'Placement Admin' : 'Your Company')}</p>
-                        <span className={cn(
-                          "text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full",
-                          msg.isAdmin ? "bg-indigo-50 text-indigo-500" : "bg-emerald-50 text-emerald-600"
-                        )}>
-                          {msg.isAdmin ? 'Admin' : 'Company'}
-                        </span>
-                      </div>
+                      <span className="text-[10px] font-bold text-slate-800">
+                        {msg.isAdmin ? 'Placement Admin' : 'Your Team'}
+                      </span>
                     </div>
-                    <span className="text-[10px] font-bold text-slate-300">
-                      {new Date(msg.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
-                      {' · '}
+                    <span className="text-[9px] font-bold text-slate-400">
                       {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
-                  {/* Note Body */}
-                  <p className="text-sm text-slate-600 font-medium leading-relaxed pl-10 border-l-2 border-slate-200">
+                  <p className="text-xs text-slate-600 leading-relaxed">
                     {msg.message}
                   </p>
                 </div>
               ))
             ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
-                <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 border-dashed flex items-center justify-center">
-                  <MessageSquare className="w-6 h-6 text-slate-200" />
-                </div>
-                <p className="text-slate-400 text-sm font-bold">No notes yet.</p>
-                <p className="text-slate-300 text-xs font-medium">Post a formal note below to communicate with the placement admin.</p>
+              <div className="flex flex-col items-center justify-center py-10 text-center space-y-2">
+                <MessageSquare className="w-8 h-8 text-slate-200" />
+                <p className="text-slate-400 text-xs font-bold">No messages yet.</p>
               </div>
             )}
           </div>
 
-          {/* Divider */}
-          <div className="border-t border-slate-100" />
-
-          {/* Post New Note */}
-          <div className="space-y-3">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
-              Post a Formal Note
-            </label>
+          <div className="border-t border-slate-100 pt-4 space-y-3">
             <textarea
-              rows={4}
-              placeholder="Write a clear formal note for the placement admin regarding this schedule."
+              rows={3}
+              placeholder="Type your message..."
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
-              className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 placeholder:text-slate-300 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-200 resize-none transition-all"
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-xs font-medium text-slate-700 placeholder:text-slate-300 outline-none focus:ring-2 focus:ring-indigo-500/10 resize-none transition-all"
             />
             <Button
               onClick={handleSendMessage}
               disabled={!messageText.trim() || sendingMsg}
-              className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-lg shadow-indigo-100 transition-all hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest shadow-md transition-all"
             >
-              {sendingMsg
-                ? <span className="flex items-center gap-2"><Loader size="sm" /> Submitting...</span>
-                : <span className="flex items-center gap-2"><Send className="w-4 h-4" /> Submit Note</span>
-              }
+              {sendingMsg ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Send Message'}
             </Button>
           </div>
         </div>
