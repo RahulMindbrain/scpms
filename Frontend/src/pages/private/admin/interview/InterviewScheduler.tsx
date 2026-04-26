@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Plus, Edit3, Building2, Clock, 
   MapPin, Briefcase, ChevronDown, ChevronUp, 
-  Trash2, Search, Users, MessageSquare, Send, Loader2
+  Trash2, Search, Users, MessageSquare, Send
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';

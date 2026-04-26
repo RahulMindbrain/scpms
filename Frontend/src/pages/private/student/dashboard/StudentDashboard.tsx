@@ -22,7 +22,7 @@ import Loader from "@/components/Loader"
 
 export default function StudentDashboard() {
   const dispatch = useDispatch<AppDispatch>()
-  const socket = useSocket()
+  const { socket } = useSocket()
   const { upcomingEvents = [], unreadCount = 0, loading = false } = useSelector(
     (state: RootState) => state.notification || {}
   )

@@ -1,9 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
-import { 
-  Loader2, 
+import {
   Briefcase, 
   DollarSign, 
   MapPin, 
@@ -14,7 +12,6 @@ import {
   BookOpen, 
   Code2,
   FileText,
-  Search,
   ChevronDown,
   X
 } from 'lucide-react';

@@ -228,24 +228,6 @@ const ApplicationRow = ({
   );
 };
 
-/* ─── Skeleton Loader ─── */
-const ApplicationSkeleton = () => (
-  <div className="space-y-4">
-    {[1, 2, 3].map((i) => (
-      <div key={i} className="bg-white rounded-2xl border border-slate-100 p-4 h-18 animate-pulse">
-        <div className="flex items-center gap-4">
-          <div className="w-10 h-10 bg-slate-100 rounded-xl" />
-          <div className="flex-1 space-y-2">
-            <div className="h-4 w-32 bg-slate-100 rounded" />
-            <div className="h-3 w-48 bg-slate-50 rounded" />
-          </div>
-          <div className="h-8 w-24 bg-slate-50 rounded-full" />
-          <div className="h-8 w-8 bg-slate-50 rounded-lg" />
-        </div>
-      </div>
-    ))}
-  </div>
-);
 
 /* ─── Quick Stat Card ─── */
 const StatCard = ({ title, value, icon: Icon, colorClass, bgColorClass }: any) => (

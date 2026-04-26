@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { 
   CheckCircle2, Briefcase, Calendar, 
   MoreVertical, Filter, 
-  ArrowRight, Award, Bell, Loader2, Trash2
+  ArrowRight, Award, Bell, Trash2
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch } from '@/redux/store/store';

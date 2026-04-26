@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, Plus, Search, Wrench } from "lucide-react";
+import { Plus, Search, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { getAPI, postAPI, putAPI } from "@/apis/api";
 import { Button } from "@/components/ui/button";

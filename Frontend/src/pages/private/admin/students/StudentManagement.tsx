@@ -128,7 +128,7 @@ const StudentManagement: React.FC = () => {
     }
   };
 
-  const handleReject = (id: number) => {
+  const handleReject = (_id: number) => {
     toast.error("Student rejection functionality is coming soon.");
   };
 

@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   Building2,
   Plus,
-  Loader2,
   Search,
 } from 'lucide-react';
 import { toast } from 'sonner';

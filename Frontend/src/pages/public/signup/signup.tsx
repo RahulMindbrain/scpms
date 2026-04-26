@@ -47,7 +47,7 @@ const SignUp: React.FC = () => {
       // Push a new state so the back button can be intercepted
       window.history.pushState({ step: 2 }, "");
 
-      const handlePopState = (e: PopStateEvent) => {
+      const handlePopState = (_e: PopStateEvent) => {
         // If we popped back, go to step 1
         setStep(1);
       };

@@ -6,7 +6,6 @@ import {
   Send, 
   Eye, 
   ChevronDown, 
-  Loader2,
   CheckSquare,
   Square
 } from 'lucide-react';

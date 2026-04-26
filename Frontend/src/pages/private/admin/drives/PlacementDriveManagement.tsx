@@ -138,27 +138,6 @@ const PlacementDriveManagement: React.FC = () => {
     setIsDetailsOpen(true);
   };
 
-  const renderSkeleton = () => (
-    <div className="space-y-10">
-      {[1, 2].map((i) => (
-        <div key={i} className="space-y-6">
-          <div className="flex flex-col md:flex-row md:items-center gap-6 p-6 bg-white rounded-[2.5rem] border border-slate-100 shadow-sm animate-pulse">
-            <div className="w-20 h-20 bg-slate-100 rounded-3xl" />
-            <div className="flex-1 space-y-3">
-              <div className="h-8 bg-slate-100 rounded-xl w-1/3" />
-              <div className="h-4 bg-slate-100 rounded-lg w-1/2" />
-            </div>
-            <div className="w-12 h-12 bg-slate-100 rounded-2xl" />
-          </div>
-          <div className="grid grid-cols-1 gap-5 pl-0 md:pl-24">
-            {[1, 2].map((j) => (
-              <div key={j} className="h-64 bg-white/50 rounded-[2rem] border border-slate-100 animate-pulse" />
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">

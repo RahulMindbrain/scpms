@@ -17,7 +17,7 @@ import { useEffect } from 'react';
 import { fetchJobs, applyJob, fetchStudentProfile, fetchJobApplications } from '@/redux/thunks/studentThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
-import { Loader2 } from 'lucide-react';
+
 import { Modal } from '@/components/ui/modal';
 
 interface Job {
