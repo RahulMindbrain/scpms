@@ -18,6 +18,8 @@ import { fetchUpcomingEvents, fetchUnreadCount } from "@/redux/thunks/notificati
 import { useSocket } from "@/socket/SocketProvider"
 import { SOCKET_EVENTS } from "@/socket/socket.events"
 
+import Loader from "@/components/Loader"
+
 export default function StudentDashboard() {
   const dispatch = useDispatch<AppDispatch>()
   const socket = useSocket()
@@ -109,7 +111,7 @@ export default function StudentDashboard() {
 
               <div className="mt-4 space-y-3">
                 {loading && upcomingEvents.length === 0 ? (
-                  <p className="text-sm text-slate-500">Loading upcoming events...</p>
+                  <Loader size="sm" text="Loading events..." />
                 ) : upcomingEvents.length === 0 ? (
                   <p className="text-sm text-slate-500">No upcoming events right now.</p>
                 ) : (

@@ -6,6 +6,7 @@ import { SectionCards } from "@/components/section-cards"
 import { fetchDashboardStats } from "@/redux/thunks/dashboardThunk"
 import type { RootState, AppDispatch } from "@/redux/store/store"
 
+import Loader from "@/components/Loader"
 import { DeptStatsTable } from "@/components/dept-stats-table"
 
 export default function AdminDashboard() {
@@ -17,11 +18,7 @@ export default function AdminDashboard() {
   }, [dispatch])
 
   if (loading && !dashboardData) {
-    return (
-      <div className="flex flex-1 items-center justify-center p-20">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-      </div>
-    )
+    return <Loader text="Loading dashboard statistics..." />
   }
 
   if (error) {

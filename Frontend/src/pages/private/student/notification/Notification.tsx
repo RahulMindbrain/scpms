@@ -15,6 +15,8 @@ import {
 } from '@/redux/thunks/notificationThunks';
 import { toast } from 'sonner';
 
+import Loader from '@/components/Loader';
+
 const Notification = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { 
@@ -147,10 +149,7 @@ const Notification = () => {
         {/* Notifications List */}
         <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
           {loading && notifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 bg-white">
-              <Loader2 className="w-10 h-10 text-blue-500 animate-spin mb-4" />
-              <p className="text-slate-500 font-medium">Loading notifications...</p>
-            </div>
+            <Loader text="Syncing your latest updates..." />
           ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 bg-white">
               <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">

@@ -39,9 +39,11 @@ interface Job {
   maxCgpa?: number;
 }
 
+import Loader from '@/components/Loader';
+
 const JobListing = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { jobs, profile, applications = [] } = useSelector((state: RootState) => state.student);
+  const { jobs, profile, applications = [], loading } = useSelector((state: RootState) => state.student);
   
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
@@ -96,6 +98,10 @@ const JobListing = () => {
       setIsApplying(false);
     }
   };
+
+  if (loading && jobs.length === 0) {
+    return <Loader text="Fetching latest career opportunities..." />;
+  }
 
   return (
     <div className="p-8 animate-in fade-in duration-700">
@@ -255,7 +261,7 @@ const JobListing = () => {
               onClick={handleApply}
               disabled={isApplying}
             >
-              {isApplying ? <Loader2 className="animate-spin" /> : 'Apply Now'}
+              {isApplying ? <Loader size="sm" /> : 'Apply Now'}
             </Button>
           </div>
         </div>

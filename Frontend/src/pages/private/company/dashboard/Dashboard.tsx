@@ -7,6 +7,8 @@ import type { RootState } from "@/redux/reducers/rootReducer"
 import type { AppDispatch } from "@/redux/store/store"
 import { fetchCompanyJobs, fetchJobApplications } from "@/redux/thunks/companyThunk"
 
+import Loader from "@/components/Loader"
+
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>()
   const { jobs, applications, loading, error } = useSelector((state: RootState) => state.company)
@@ -67,11 +69,7 @@ export default function Dashboard() {
   }, [applications, jobs])
 
   if (loading && jobs.length === 0 && applications.length === 0) {
-    return (
-      <div className="flex flex-1 items-center justify-center p-20">
-        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-primary"></div>
-      </div>
-    )
+    return <Loader text="Loading dashboard data..." />
   }
 
   if (error) {

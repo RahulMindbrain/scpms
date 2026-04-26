@@ -43,6 +43,8 @@ import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 // import { getAPI } from '@/apis/api';
 
+import Loader from '@/components/Loader';
+
 const StudentManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { students: reduxStudents, inactiveStudents: reduxInactiveStudents, loading, error } = useSelector((state: RootState) => state.student);
@@ -146,11 +148,7 @@ deptId: s.student?.department?.id || null,
   };
 
   if (loading && reduxStudents.length === 0) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+    return <Loader text="Fetching student records..." />;
   }
 
   if (error) {

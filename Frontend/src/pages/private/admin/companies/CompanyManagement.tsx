@@ -40,6 +40,8 @@ interface Company {
   description?: string;
 }
 
+import Loader from '@/components/Loader';
+
 const CompanyManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { companies: reduxCompanies, inactiveCompanies: reduxInactiveCompanies, loading, error } = useSelector((state: RootState) => state.company);
@@ -140,11 +142,7 @@ const CompanyManagement: React.FC = () => {
   };
 
   if (loading && reduxCompanies.length === 0) {
-    return (
-      <div className="flex h-[60vh] items-center justify-center">
-        <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+    return <Loader text="Loading partner network..." />;
   }
 
   if (error) {
@@ -492,9 +490,7 @@ const CompanyManagement: React.FC = () => {
             </div>
 
             {loading ? (
-              <div className="flex justify-center p-12">
-                <div className="w-10 h-10 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-              </div>
+              <Loader text="Retrieving job directives..." />
             ) : companyJobs.length > 0 ? (
               <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200">
                 {companyJobs.map((job: any) => (
