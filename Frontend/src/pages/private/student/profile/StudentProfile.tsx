@@ -50,12 +50,12 @@ const StudentProfile = () => {
     name: user ? `${user.firstname} ${user.lastname}` : 'Student Name',
     email: user?.email || '',
     stats: {
-      cgpa: '0.0',
-      activeBacklogs: 0,
+      cgpa: '',
+      activeBacklogs: '',
       department: '',
-      year: 1,
-      passingYear: 2026,
-      departmentId: 1
+      year: '',
+      passingYear: '',
+      departmentId: ""
     },
     linkedinUrl: '',
     githubUrl: '',
@@ -80,11 +80,11 @@ const StudentProfile = () => {
         email: user?.email || '',
         stats: {
           ...prev.stats,
-          cgpa: backendProfile.cgpa?.toString() || '0.0',
-          year: backendProfile.year || 1,
-          passingYear: backendProfile.passingYear || 2026,
-          departmentId: backendProfile.departmentId || 1,
-          activeBacklogs: backendProfile.activeBacklogs || 0,
+          cgpa: backendProfile.cgpa?.toString() || '',
+          year: backendProfile.year || '',
+          passingYear: backendProfile.passingYear || '',
+          departmentId: backendProfile.departmentId || "",
+          activeBacklogs: backendProfile.activeBacklogs || '',
           department: backendProfile.department?.name || ''
         },
         linkedinUrl: backendProfile.linkedinUrl || '',
@@ -102,10 +102,12 @@ const StudentProfile = () => {
 
   const handleSave = async (updatedProfile: any) => {
     try {
+      const yearInt = parseInt(updatedProfile.stats.year);
       const payload = {
-        year: parseInt(updatedProfile.stats.year),
+        year: yearInt,
         passingYear: parseInt(updatedProfile.stats.passingYear),
-        cgpa: parseFloat(updatedProfile.stats.cgpa),
+        cgpa: yearInt === 1 ? undefined : parseFloat(updatedProfile.stats.cgpa),
+        departmentId: parseInt(updatedProfile.stats.departmentId),
 
         linkedinUrl: updatedProfile.linkedinUrl || undefined,
         githubUrl: updatedProfile.githubUrl || undefined,
@@ -113,76 +115,36 @@ const StudentProfile = () => {
         resumeUrl: updatedProfile.resumeUrl || undefined,
 
 
-        addSkillIds: updatedProfile.skills
+
+        skillIds: updatedProfile.skills
           ?.map((s: any) => s.id)
           ?.filter((id: any) => typeof id === "number") || [],
 
-        addExperiences: updatedProfile.experiences
-          ?.filter((exp: any) => !exp.id)
-          ?.map((exp: any) => ({
-            companyName: exp.companyName,
-            role: exp.role,
-            description: exp.description || undefined,
-            startDate: exp.startDate,
-            endDate: exp.endDate || undefined,
-          })),
+        experiences: updatedProfile.experiences?.map((exp: any) => ({
+          id: exp.id || undefined,
+          companyName: exp.companyName,
+          role: exp.role,
+          description: exp.description || undefined,
+          startDate: exp.startDate,
+          endDate: exp.endDate || undefined,
+        })) || [],
 
-        updateExperiences: updatedProfile.experiences
-          ?.filter((exp: any) => exp.id)
-          ?.map((exp: any) => ({
-            id: exp.id,
-            companyName: exp.companyName,
-            role: exp.role,
-            description: exp.description || undefined,
-            startDate: exp.startDate,
-            endDate: exp.endDate || undefined,
-          })),
+        certificates: updatedProfile.certificates?.map((cert: any) => ({
+          id: cert.id || undefined,
+          title: cert.title,
+          issuer: cert.issuer,
+          certificateUrl: cert.certificateUrl || undefined,
+          issuedDate: cert.issuedDate || undefined,
+        })) || [],
 
-        deleteExperienceIds: updatedProfile.deleteExperienceIds || [],
-
-        addCertificates: updatedProfile.certificates
-          ?.filter((cert: any) => !cert.id)
-          ?.map((cert: any) => ({
-            title: cert.title,
-            issuer: cert.issuer,
-            certificateUrl: cert.certificateUrl || undefined,
-            issuedDate: cert.issuedDate || undefined,
-          })),
-
-        updateCertificates: updatedProfile.certificates
-          ?.filter((cert: any) => cert.id)
-          ?.map((cert: any) => ({
-            id: cert.id,
-            title: cert.title,
-            issuer: cert.issuer,
-            certificateUrl: cert.certificateUrl || undefined,
-            issuedDate: cert.issuedDate || undefined,
-          })),
-
-        deleteCertificateIds: updatedProfile.deleteCertificateIds || [],
-
-        addProjects: updatedProfile.projects
-          ?.filter((proj: any) => !proj.id)
-          ?.map((proj: any) => ({
-            title: proj.title,
-            description: proj.description || undefined,
-            techStack: proj.techStack || undefined,
-            githubUrl: proj.githubUrl || undefined,
-            liveUrl: proj.liveUrl || undefined,
-          })),
-
-        updateProjects: updatedProfile.projects
-          ?.filter((proj: any) => proj.id)
-          ?.map((proj: any) => ({
-            id: proj.id,
-            title: proj.title,
-            description: proj.description || undefined,
-            techStack: proj.techStack || undefined,
-            githubUrl: proj.githubUrl || undefined,
-            liveUrl: proj.liveUrl || undefined,
-          })),
-
-        deleteProjectIds: updatedProfile.deleteProjectIds || [],
+        projects: updatedProfile.projects?.map((proj: any) => ({
+          id: proj.id || undefined,
+          title: proj.title,
+          description: proj.description || undefined,
+          techStack: proj.techStack || undefined,
+          githubUrl: proj.githubUrl || undefined,
+          liveUrl: proj.liveUrl || undefined,
+        })) || [],
       };
 
       if (backendProfile) {

@@ -55,6 +55,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
   const [resumeName, setResumeName] = useState("");
   const [skillInput, setSkillInput] = useState("");
   const [allSkillsList, setAllSkillsList] = useState<string[]>([]);
+  const [allDepartmentsList, setAllDepartmentsList] = useState<any[]>([]);
 
   const { upload } = useCloudinaryUpload();
 
@@ -67,11 +68,11 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
         portfolioUrl: profile.portfolioUrl || "",
         stats: {
           ...profile.stats,
-          activeBacklogs: profile.stats?.activeBacklogs || profile.activeBacklogs || 0,
-          cgpa: profile.stats?.cgpa || profile.cgpa || 0,
-          year: profile.stats?.year || profile.year || 1,
-          passingYear: profile.stats?.passingYear || profile.passingYear || 2026,
-          departmentId: profile.stats?.departmentId || profile.departmentId || 1,
+          activeBacklogs: profile.stats?.activeBacklogs ?? profile.activeBacklogs ?? '',
+          cgpa: profile.stats?.cgpa ?? profile.cgpa ?? '',
+          year: profile.stats?.year ?? profile.year ?? '',
+          passingYear: profile.stats?.passingYear ?? profile.passingYear ?? '',
+          departmentId: profile.stats?.departmentId || profile.departmentId || "",
         },
         resumeUrl: profile.resumeUrl || ""
       });
@@ -81,20 +82,38 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
   }, [profile, isOpen]);
 
   useEffect(() => {
-    const fetchSkills = async () => {
+    const fetchData = async () => {
       try {
-        const response = await getAPI<ApiResponse<SkillOption[]>>("/skills/get-all");
-        const skillNames = Array.isArray(response?.data)
-          ? response.data.map((skill) => skill.name)
-          : [];
-        setAllSkillsList(skillNames);
+        const [skillsRes, deptRes] = await Promise.all([
+          getAPI<ApiResponse<SkillOption[]>>("/skills/get-all").catch(() => null),
+          getAPI<any>("/dept/").catch(() => null)
+        ]);
+
+        if (skillsRes) {
+          const skillNames = Array.isArray(skillsRes.data)
+            ? skillsRes.data.map((skill) => skill.name)
+            : [];
+          setAllSkillsList(skillNames);
+        }
+
+        if (deptRes) {
+          const depts = Array.isArray(deptRes.data?.data)
+            ? deptRes.data.data
+            : Array.isArray(deptRes.data)
+            ? deptRes.data
+            : Array.isArray(deptRes)
+            ? deptRes
+            : [];
+          setAllDepartmentsList(depts);
+        }
       } catch (error) {
         setAllSkillsList([]);
+        setAllDepartmentsList([]);
       }
     };
 
     if (isOpen) {
-      void fetchSkills();
+      void fetchData();
     }
   }, [isOpen]);
 
@@ -275,15 +294,18 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="departmentId" className="text-sm font-semibold text-slate-700 ml-1">Department ID</Label>
-                    <Input
+                    <Label htmlFor="departmentId" className="text-sm font-semibold text-slate-700 ml-1">Department</Label>
+                    <select
                       id="departmentId"
-                      type="number"
-                      placeholder="1"
-                      className={`h-11 rounded-xl ${errors['stats.departmentId'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
+                      className={`flex h-11 w-full rounded-xl border bg-white px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${errors['stats.departmentId'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                       value={formData.stats?.departmentId || ""}
                       onChange={(e) => updateStat("departmentId", e.target.value)}
-                    />
+                    >
+                      <option value="" disabled>Select Department</option>
+                      {allDepartmentsList.map((dept: any) => (
+                        <option key={dept.id} value={dept.id}>{dept.name}</option>
+                      ))}
+                    </select>
                     {errors['stats.departmentId'] && <p className="text-xs text-red-500 font-medium ml-1">{errors['stats.departmentId']}</p>}
                   </div>
                 </div>
