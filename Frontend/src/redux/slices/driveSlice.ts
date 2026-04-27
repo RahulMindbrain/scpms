@@ -3,12 +3,19 @@ import { fetchJobs, updateJobStatus } from "../thunks/driveThunk";
 
 interface DriveState {
     jobs: any[];
+    meta: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    } | null;
     loading: boolean;
     error: string | null;
 }
 
 const initialState: DriveState = {
     jobs: [],
+    meta: null,
     loading: false,
     error: null,
 };
@@ -32,6 +39,7 @@ const driveSlice = createSlice({
                 state.loading = false;
                 // Based on backend structure: { success: true, data: { data: [], meta: {} } }
                 state.jobs = action.payload?.data?.data || [];
+                state.meta = action.payload?.data?.meta || null;
             })
             .addCase(fetchJobs.rejected, (state, action) => {
                 state.loading = false;

@@ -34,7 +34,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
@@ -42,23 +41,30 @@ import Loader from '@/components/Loader';
 
 const AdminJobManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { jobs, loading } = useSelector((state: RootState) => state.drive);
+  const { jobs, meta, loading } = useSelector((state: RootState) => state.drive);
   const [activeTab, setActiveTab] = useState<'PENDING' | 'APPROVED' | 'REJECTED'>('PENDING');
+  const [page, setPage] = useState(1);
+  const PAGE_LIMIT = 10;
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedJobIds, setSelectedJobIds] = useState<number[]>([]);
   const [sortBy, setSortBy] = useState<string>('newest');
-  const [filterType, setFilterType] = useState<string>('all');
+  const [filterDepartment, setFilterDepartment] = useState<string>('all');
   const [filterLocation, setFilterLocation] = useState<string>('all');
 
   useEffect(() => {
-    dispatch(fetchJobs({ status: activeTab }));
-  }, [dispatch, activeTab]);
+    dispatch(fetchJobs({ status: activeTab, page, limit: PAGE_LIMIT }));
+  }, [dispatch, activeTab, page]);
+
+  useEffect(() => {
+    setPage(1);
+    setSelectedJobIds([]);
+  }, [activeTab]);
 
   const handleStatusUpdate = async (jobIds: number[], status: string) => {
     try {
       await dispatch(updateJobStatus({ jobIds, status })).unwrap();
       toast.success(`Job(s) ${status.toLowerCase()} successfully`);
-      dispatch(fetchJobs({ status: activeTab }));
+      dispatch(fetchJobs({ status: activeTab, page, limit: PAGE_LIMIT }));
       setSelectedJobIds([]);
     } catch (error: any) {
       toast.error(error || "Failed to update job status");
@@ -72,13 +78,26 @@ const AdminJobManagement: React.FC = () => {
   };
 
   const filteredAndSortedJobs = useMemo(() => {
+    const getSalaryValue = (salary: unknown): number => {
+      if (typeof salary === 'number') return salary;
+      if (typeof salary === 'string') {
+        const parsed = parseInt(salary.replace(/[^0-9]/g, ''), 10);
+        return Number.isNaN(parsed) ? 0 : parsed;
+      }
+      return 0;
+    };
+
     let result = (Array.isArray(jobs) ? jobs : []).filter(job =>
       job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       job.company?.name?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    if (filterType !== 'all') {
-      result = result.filter(job => job.jobType?.toLowerCase() === filterType.toLowerCase());
+    if (filterDepartment !== 'all') {
+      result = result.filter(job =>
+        (Array.isArray(job.eligibleDepartments) ? job.eligibleDepartments : []).some(
+          (dept: any) => dept?.name?.toLowerCase() === filterDepartment.toLowerCase()
+        )
+      );
     }
 
     if (filterLocation !== 'all') {
@@ -90,19 +109,27 @@ const AdminJobManagement: React.FC = () => {
       if (sortBy === 'newest') return b.id - a.id;
       if (sortBy === 'oldest') return a.id - b.id;
       if (sortBy === 'salary-high') {
-        const salaryA = parseInt(a.salary?.replace(/[^0-9]/g, '') || '0');
-        const salaryB = parseInt(b.salary?.replace(/[^0-9]/g, '') || '0');
+        const salaryA = getSalaryValue(a.salary);
+        const salaryB = getSalaryValue(b.salary);
         return salaryB - salaryA;
       }
       return 0;
     });
 
     return result;
-  }, [jobs, searchTerm, sortBy, filterType, filterLocation]);
+  }, [jobs, searchTerm, sortBy, filterDepartment, filterLocation]);
 
   const locations = useMemo(() => {
     const locs = new Set((Array.isArray(jobs) ? jobs : []).map(j => j.location).filter(Boolean));
     return Array.from(locs);
+  }, [jobs]);
+
+  const departments = useMemo(() => {
+    const allDepartments = (Array.isArray(jobs) ? jobs : []).flatMap(j =>
+      Array.isArray(j.eligibleDepartments) ? j.eligibleDepartments : []
+    );
+    const names = allDepartments.map((dept: any) => dept?.name).filter(Boolean);
+    return Array.from(new Set(names));
   }, [jobs]);
 
   return (
@@ -145,10 +172,8 @@ const AdminJobManagement: React.FC = () => {
                   {tab.charAt(0) + tab.slice(1).toLowerCase()}
                 </span>
                 {activeTab === tab && (
-                  <motion.div
-                    layoutId="activeTab"
+                  <div
                     className="absolute inset-0 bg-white rounded-xl shadow-sm"
-                    transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
                   />
                 )}
               </button>
@@ -168,16 +193,18 @@ const AdminJobManagement: React.FC = () => {
               </SelectContent>
             </Select>
 
-            <Select value={filterType} onValueChange={setFilterType}>
+            <Select value={filterDepartment} onValueChange={setFilterDepartment}>
               <SelectTrigger className="w-[140px] h-10 rounded-xl bg-white border-slate-200">
                 <Filter className="w-3.5 h-3.5 mr-2 text-slate-400" />
-                <SelectValue placeholder="Type" />
+                <SelectValue placeholder="Department" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="full-time">Full-time</SelectItem>
-                <SelectItem value="part-time">Part-time</SelectItem>
-                <SelectItem value="internship">Internship</SelectItem>
+                <SelectItem value="all">All Departments</SelectItem>
+                {departments.map((department) => (
+                  <SelectItem key={department} value={department}>
+                    {department}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
 
@@ -197,94 +224,101 @@ const AdminJobManagement: React.FC = () => {
         </div>
 
         {/* Batch Actions Bar */}
-        <AnimatePresence>
-          {selectedJobIds.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] sm:w-auto max-w-[95vw] bg-slate-900 text-white px-4 sm:px-6 py-4 rounded-2xl shadow-2xl flex flex-wrap items-center justify-center gap-3 sm:gap-6"
-            >
-              <span className="text-sm font-medium">
-                {selectedJobIds.length} items selected
-              </span>
-              <div className="h-4 w-px bg-slate-700" />
-              <div className="flex items-center gap-3">
-                {activeTab !== 'APPROVED' && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/10 rounded-xl"
-                    onClick={() => handleStatusUpdate(selectedJobIds, 'APPROVED')}
-                  >
-                    <CheckCircle className="w-4 h-4 mr-2" /> Approve
-                  </Button>
-                )}
-                {activeTab !== 'REJECTED' && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    className="text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-xl"
-                    onClick={() => handleStatusUpdate(selectedJobIds, 'REJECTED')}
-                  >
-                    <XCircle className="w-4 h-4 mr-2" /> Reject
-                  </Button>
-                )}
+        {selectedJobIds.length > 0 && (
+          <div className="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] sm:w-auto max-w-[95vw] bg-slate-900 text-white px-4 sm:px-6 py-4 rounded-2xl shadow-2xl flex flex-wrap items-center justify-center gap-3 sm:gap-6">
+            <span className="text-sm font-medium">
+              {selectedJobIds.length} items selected
+            </span>
+            <div className="h-4 w-px bg-slate-700" />
+            <div className="flex items-center gap-3">
+              {activeTab !== 'APPROVED' && (
                 <Button
                   size="sm"
                   variant="ghost"
-                  className="text-slate-400 hover:text-white rounded-xl"
-                  onClick={() => setSelectedJobIds([])}
+                  className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/10 rounded-xl"
+                  onClick={() => handleStatusUpdate(selectedJobIds, 'APPROVED')}
                 >
-                  Cancel
+                  <CheckCircle className="w-4 h-4 mr-2" /> Approve
                 </Button>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              )}
+              {activeTab !== 'REJECTED' && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-xl"
+                  onClick={() => handleStatusUpdate(selectedJobIds, 'REJECTED')}
+                >
+                  <XCircle className="w-4 h-4 mr-2" /> Reject
+                </Button>
+              )}
+              <Button
+                size="sm"
+                variant="ghost"
+                className="text-slate-400 hover:text-white rounded-xl"
+                onClick={() => setSelectedJobIds([])}
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        )}
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <AnimatePresence mode='popLayout'>
-            {loading ? (
-              <div className="col-span-full py-20">
-                <Loader text="Retrieving job listings..." />
-              </div>
-            ) : filteredAndSortedJobs.length > 0 ? (
-              filteredAndSortedJobs.map((job) => (
-                <JobCard
-                  key={job.id}
-                  job={job}
-                  isSelected={selectedJobIds.includes(job.id)}
-                  onSelect={() => toggleSelectJob(job.id)}
-                  onStatusUpdate={handleStatusUpdate}
-                  activeTab={activeTab}
-                />
-              ))
-            ) : (
-              <EmptyState onReset={() => {
-                setSearchTerm('');
-                setFilterType('all');
-                setFilterLocation('all');
-              }} />
-            )}
-          </AnimatePresence>
+          {loading ? (
+            <div className="col-span-full py-20">
+              <Loader text="Retrieving job listings..." />
+            </div>
+          ) : filteredAndSortedJobs.length > 0 ? (
+            filteredAndSortedJobs.map((job) => (
+              <JobCard
+                key={job.id}
+                job={job}
+                isSelected={selectedJobIds.includes(job.id)}
+                onSelect={() => toggleSelectJob(job.id)}
+                onStatusUpdate={handleStatusUpdate}
+                activeTab={activeTab}
+              />
+            ))
+          ) : (
+            <EmptyState onReset={() => {
+              setSearchTerm('');
+              setFilterDepartment('all');
+              setFilterLocation('all');
+            }} />
+          )}
         </div>
 
-        {/* Pagination Placeholder */}
+        {/* Pagination */}
         {!loading && filteredAndSortedJobs.length > 0 && (
           <div className="flex items-center justify-between pt-8 border-t border-slate-200">
             <p className="text-sm text-slate-500">
-              Showing <span className="font-medium text-slate-900">{filteredAndSortedJobs.length}</span> results
+              Showing <span className="font-medium text-slate-900">{filteredAndSortedJobs.length}</span> of{' '}
+              <span className="font-medium text-slate-900">{meta?.total ?? filteredAndSortedJobs.length}</span> results
             </p>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" className="rounded-xl h-9 w-9 p-0" disabled>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-xl h-9 w-9 p-0"
+                disabled={(meta?.page ?? page) <= 1}
+                onClick={() => setPage(prev => Math.max(prev - 1, 1))}
+              >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
               <Button variant="outline" size="sm" className="rounded-xl h-9 w-9 p-0 bg-white border-indigo-200 text-indigo-600">
-                1
+                {meta?.page ?? page}
               </Button>
-              <Button variant="outline" size="sm" className="rounded-xl h-9 w-9 p-0 hover:bg-white" disabled>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-xl h-9 w-9 p-0 hover:bg-white"
+                disabled={(meta?.page ?? page) >= (meta?.totalPages ?? page)}
+                onClick={() => setPage(prev => {
+                  const totalPages = meta?.totalPages ?? prev;
+                  return Math.min(prev + 1, totalPages);
+                })}
+              >
                 <ChevronRight className="w-4 h-4" />
               </Button>
             </div>
@@ -297,13 +331,7 @@ const AdminJobManagement: React.FC = () => {
 
 const JobCard = ({ job, isSelected, onSelect, onStatusUpdate, activeTab }: any) => {
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.95 }}
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.3 }}
+    <div
       className={`group relative bg-white rounded-[20px] border p-5 transition-all duration-300 ${isSelected
           ? 'border-indigo-500 ring-4 ring-indigo-500/5 shadow-lg'
           : 'border-slate-200 hover:shadow-xl hover:shadow-slate-200/50'
@@ -323,7 +351,6 @@ const JobCard = ({ job, isSelected, onSelect, onStatusUpdate, activeTab }: any) 
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="rounded-xl">
-            <DropdownMenuItem className="text-sm cursor-pointer">Edit Listing</DropdownMenuItem>
             <DropdownMenuItem className="text-sm cursor-pointer text-rose-600">Delete Job</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -351,7 +378,7 @@ const JobCard = ({ job, isSelected, onSelect, onStatusUpdate, activeTab }: any) 
         <div className="flex flex-wrap items-center gap-y-2 gap-x-4">
           <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
             <MapPin className="w-3.5 h-3.5 text-slate-400" />
-            {job.location || 'Remote'}
+            {job.location || '-'}
           </div>
           <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg">
             <DollarSign className="w-3.5 h-3.5" />
@@ -361,17 +388,20 @@ const JobCard = ({ job, isSelected, onSelect, onStatusUpdate, activeTab }: any) 
 
         {/* Description */}
         <p className="text-sm text-slate-600 leading-relaxed line-clamp-2 min-h-[40px]">
-          {job.description || 'Join our team as a professional developer and help us build the next generation of software products.'}
+          {job.description || '-'}
         </p>
 
         {/* Tags */}
         <div className="flex flex-wrap gap-2">
-          <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-none font-semibold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md">
-            {job.jobType || 'Full-time'}
-          </Badge>
-          <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-none font-semibold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md">
-            {job.experience || 'Entry-level'}
-          </Badge>
+          {(Array.isArray(job.eligibleDepartments) ? job.eligibleDepartments : []).slice(0, 2).map((dept: any) => (
+            <Badge
+              key={dept.id}
+              variant="secondary"
+              className="bg-slate-100 text-slate-600 border-none font-semibold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md"
+            >
+              {dept.name}
+            </Badge>
+          ))}
         </div>
 
         {/* Footer Actions */}
@@ -409,17 +439,13 @@ const JobCard = ({ job, isSelected, onSelect, onStatusUpdate, activeTab }: any) 
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 
 
 const EmptyState = ({ onReset }: { onReset: () => void }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.95 }}
-    animate={{ opacity: 1, scale: 1 }}
-    className="col-span-full py-20 flex flex-col items-center justify-center bg-white rounded-[32px] border border-dashed border-slate-200 text-center px-6"
-  >
+  <div className="col-span-full py-20 flex flex-col items-center justify-center bg-white rounded-[32px] border border-dashed border-slate-200 text-center px-6">
     <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
       <Briefcase className="w-10 h-10 text-indigo-200" />
     </div>
@@ -434,7 +460,7 @@ const EmptyState = ({ onReset }: { onReset: () => void }) => (
     >
       Clear all filters
     </Button>
-  </motion.div>
+  </div>
 );
 
 export default AdminJobManagement;

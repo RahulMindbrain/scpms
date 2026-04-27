@@ -3,7 +3,7 @@ import { getAPI, putAPI } from "../../apis/api";
 
 export const fetchJobs = createAsyncThunk(
     "drive/fetchJobs",
-    async (params: { status?: string }, { rejectWithValue }) => {
+    async (params: { status?: string; page?: number; limit?: number }, { rejectWithValue }) => {
         try {
             const response = await getAPI<any>("/admin/get-jobs", params);
             return response;
