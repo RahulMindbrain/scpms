@@ -20,7 +20,6 @@ import { fetchJobs, updateJobStatus } from '@/redux/thunks/driveThunk';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -39,6 +38,27 @@ import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import Loader from '@/components/Loader';
 
+const STATUS_STYLES = {
+  PENDING: {
+    tabActive: 'bg-amber-50 text-amber-700 shadow-sm ring-1 ring-amber-200',
+    tabInactive: 'text-amber-700/70 hover:text-amber-700 hover:bg-amber-50/70',
+    icon: 'text-amber-600',
+    badge: 'bg-amber-50 text-amber-700 border-amber-200',
+  },
+  APPROVED: {
+    tabActive: 'bg-emerald-50 text-emerald-700 shadow-sm ring-1 ring-emerald-200',
+    tabInactive: 'text-emerald-700/70 hover:text-emerald-700 hover:bg-emerald-50/70',
+    icon: 'text-emerald-600',
+    badge: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  },
+  REJECTED: {
+    tabActive: 'bg-rose-50 text-rose-700 shadow-sm ring-1 ring-rose-200',
+    tabInactive: 'text-rose-700/70 hover:text-rose-700 hover:bg-rose-50/70',
+    icon: 'text-rose-600',
+    badge: 'bg-rose-50 text-rose-700 border-rose-200',
+  },
+} as const;
+
 const AdminJobManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { jobs, meta, loading } = useSelector((state: RootState) => state.drive);
@@ -46,7 +66,6 @@ const AdminJobManagement: React.FC = () => {
   const [page, setPage] = useState(1);
   const PAGE_LIMIT = 10;
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedJobIds, setSelectedJobIds] = useState<number[]>([]);
   const [sortBy, setSortBy] = useState<string>('newest');
   const [filterDepartment, setFilterDepartment] = useState<string>('all');
   const [filterLocation, setFilterLocation] = useState<string>('all');
@@ -57,7 +76,6 @@ const AdminJobManagement: React.FC = () => {
 
   useEffect(() => {
     setPage(1);
-    setSelectedJobIds([]);
   }, [activeTab]);
 
   const handleStatusUpdate = async (jobIds: number[], status: string) => {
@@ -65,23 +83,16 @@ const AdminJobManagement: React.FC = () => {
       await dispatch(updateJobStatus({ jobIds, status })).unwrap();
       toast.success(`Job(s) ${status.toLowerCase()} successfully`);
       dispatch(fetchJobs({ status: activeTab, page, limit: PAGE_LIMIT }));
-      setSelectedJobIds([]);
     } catch (error: any) {
       toast.error(error || "Failed to update job status");
     }
-  };
-
-  const toggleSelectJob = (id: number) => {
-    setSelectedJobIds(prev =>
-      prev.includes(id) ? prev.filter(jobId => jobId !== id) : [...prev, id]
-    );
   };
 
   const filteredAndSortedJobs = useMemo(() => {
     const getSalaryValue = (salary: unknown): number => {
       if (typeof salary === 'number') return salary;
       if (typeof salary === 'string') {
-        const parsed = parseInt(salary.replace(/[^0-9]/g, ''), 10);
+        const parsed = parseInt((salary.match(/\d+/g) || []).join(''), 10);
         return Number.isNaN(parsed) ? 0 : parsed;
       }
       return 0;
@@ -161,21 +172,16 @@ const AdminJobManagement: React.FC = () => {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`relative flex-1 lg:flex-none px-6 py-2.5 rounded-xl text-sm font-semibold transition-all ${activeTab === tab
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
+                  ? STATUS_STYLES[tab].tabActive
+                  : STATUS_STYLES[tab].tabInactive
                   }`}
               >
                 <span className="relative z-10 flex items-center justify-center gap-2">
-                  {tab === 'PENDING' && <Clock className="w-4 h-4" />}
-                  {tab === 'APPROVED' && <CheckCircle className="w-4 h-4" />}
-                  {tab === 'REJECTED' && <XCircle className="w-4 h-4" />}
+                  {tab === 'PENDING' && <Clock className={`w-4 h-4 ${STATUS_STYLES.PENDING.icon}`} />}
+                  {tab === 'APPROVED' && <CheckCircle className={`w-4 h-4 ${STATUS_STYLES.APPROVED.icon}`} />}
+                  {tab === 'REJECTED' && <XCircle className={`w-4 h-4 ${STATUS_STYLES.REJECTED.icon}`} />}
                   {tab.charAt(0) + tab.slice(1).toLowerCase()}
                 </span>
-                {activeTab === tab && (
-                  <div
-                    className="absolute inset-0 bg-white rounded-xl shadow-sm"
-                  />
-                )}
               </button>
             ))}
           </div>
@@ -223,46 +229,6 @@ const AdminJobManagement: React.FC = () => {
           </div>
         </div>
 
-        {/* Batch Actions Bar */}
-        {selectedJobIds.length > 0 && (
-          <div className="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-1.5rem)] sm:w-auto max-w-[95vw] bg-slate-900 text-white px-4 sm:px-6 py-4 rounded-2xl shadow-2xl flex flex-wrap items-center justify-center gap-3 sm:gap-6">
-            <span className="text-sm font-medium">
-              {selectedJobIds.length} items selected
-            </span>
-            <div className="h-4 w-px bg-slate-700" />
-            <div className="flex items-center gap-3">
-              {activeTab !== 'APPROVED' && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-emerald-400 hover:text-emerald-300 hover:bg-emerald-400/10 rounded-xl"
-                  onClick={() => handleStatusUpdate(selectedJobIds, 'APPROVED')}
-                >
-                  <CheckCircle className="w-4 h-4 mr-2" /> Approve
-                </Button>
-              )}
-              {activeTab !== 'REJECTED' && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  className="text-rose-400 hover:text-rose-300 hover:bg-rose-400/10 rounded-xl"
-                  onClick={() => handleStatusUpdate(selectedJobIds, 'REJECTED')}
-                >
-                  <XCircle className="w-4 h-4 mr-2" /> Reject
-                </Button>
-              )}
-              <Button
-                size="sm"
-                variant="ghost"
-                className="text-slate-400 hover:text-white rounded-xl"
-                onClick={() => setSelectedJobIds([])}
-              >
-                Cancel
-              </Button>
-            </div>
-          </div>
-        )}
-
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {loading ? (
@@ -274,8 +240,6 @@ const AdminJobManagement: React.FC = () => {
               <JobCard
                 key={job.id}
                 job={job}
-                isSelected={selectedJobIds.includes(job.id)}
-                onSelect={() => toggleSelectJob(job.id)}
                 onStatusUpdate={handleStatusUpdate}
                 activeTab={activeTab}
               />
@@ -329,21 +293,13 @@ const AdminJobManagement: React.FC = () => {
   );
 };
 
-const JobCard = ({ job, isSelected, onSelect, onStatusUpdate, activeTab }: any) => {
+const JobCard = ({ job, onStatusUpdate, activeTab }: any) => {
   return (
     <div
-      className={`group relative bg-white rounded-[20px] border p-5 transition-all duration-300 ${isSelected
-          ? 'border-indigo-500 ring-4 ring-indigo-500/5 shadow-lg'
-          : 'border-slate-200 hover:shadow-xl hover:shadow-slate-200/50'
-        }`}
+      className="group relative bg-white rounded-[20px] border p-5 transition-all duration-300 border-slate-200 hover:shadow-xl hover:shadow-slate-200/50"
     >
       {/* Top Controls */}
       <div className="absolute top-4 right-4 flex items-center gap-2">
-        <Checkbox
-          checked={isSelected}
-          onCheckedChange={onSelect}
-          className="rounded-md border-slate-300 data-[state=checked]:bg-indigo-600 data-[state=checked]:border-indigo-600"
-        />
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
@@ -357,6 +313,15 @@ const JobCard = ({ job, isSelected, onSelect, onStatusUpdate, activeTab }: any) 
       </div>
 
       <div className="space-y-4">
+        <div className="flex items-center justify-between pr-10">
+          <Badge
+            variant="outline"
+            className={`text-[11px] font-bold tracking-wide px-2.5 py-1 rounded-md border ${(job.status && STATUS_STYLES[job.status as keyof typeof STATUS_STYLES]?.badge) || 'bg-slate-100 text-slate-700 border-slate-200'}`}
+          >
+            {job.status || 'UNKNOWN'}
+          </Badge>
+        </div>
+
         {/* Company & Title */}
         <div className="flex items-start gap-4 pr-10">
           <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600 shrink-0">
@@ -409,7 +374,7 @@ const JobCard = ({ job, isSelected, onSelect, onStatusUpdate, activeTab }: any) 
           {activeTab === 'PENDING' ? (
             <>
               <Button
-                className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl h-10 shadow-sm"
+                className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl h-10 shadow-sm"
                 onClick={(e) => {
                   e.stopPropagation();
                   onStatusUpdate([job.id], 'APPROVED');
