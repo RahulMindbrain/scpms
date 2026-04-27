@@ -9,7 +9,7 @@ import type { AppDispatch } from "../../../redux/store/store";
 import type { RootState } from "../../../redux/reducers/rootReducer";
 import { toast } from "sonner";
 import { loginUser } from "@/redux/thunks/loginThunk";
-// import { logoutUser } from "@/redux/thunks/logoutThunk";
+import { logout } from "@/redux/slices/authSlice";
 import { useSearchParams } from "react-router-dom";
 type UserRole = "student" | "company" | "admin";
 
@@ -29,13 +29,16 @@ const SignIn: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const { isAuthenticated, userType } = useSelector((state: RootState) => state.auth);
-const [searchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
+  const roleFromUrl = searchParams.get("role") as UserRole | null;
+  const [activeRole, setActiveRole] = useState<UserRole>(roleFromUrl || "student");
 
-const roleFromUrl = searchParams.get("role") as UserRole | null;
-
-const [activeRole, setActiveRole] = useState<UserRole>(
-  roleFromUrl || "student"
-);
+  useEffect(() => {
+    if (!roleFromUrl) return;
+    if (roleFromUrl === "student" || roleFromUrl === "company" || roleFromUrl === "admin") {
+      setActiveRole(roleFromUrl);
+    }
+  }, [roleFromUrl]);
   useEffect(() => {
     if (isAuthenticated) {
       const role = userType?.toLowerCase();
@@ -69,6 +72,7 @@ const [activeRole, setActiveRole] = useState<UserRole>(
       const user = result.data;
 
       if (user.role.toLowerCase() !== activeRole) {
+        dispatch(logout());
         toast.error(
           `Unauthorized: This account is registered as ${user.role.toLowerCase()}, but you are trying to sign in as ${activeRole}.`
         );

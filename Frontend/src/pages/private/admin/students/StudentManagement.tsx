@@ -78,7 +78,7 @@ const StudentManagement: React.FC = () => {
       return {
         id: s.id,
         name: s.firstname ? `${s.firstname} ${s.lastname || ''}` : 'Unknown',
-        dept: s.student?.department?.name || 'N/A',
+        dept: s.student?.department?.name || 'Unassigned',
         deptId: s.student?.department?.id || null,
         verified: s.status === 'ACTIVE',
         status: s.status === 'ACTIVE' ? 'approved' : (s.status === 'REJECTED' ? 'rejected' : 'pending'),
@@ -195,9 +195,9 @@ const StudentManagement: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="All Status">All Status</SelectItem>
-              <SelectItem value="placed">Placed</SelectItem>
-              <SelectItem value="in-process">In-Process</SelectItem>
-              <SelectItem value="eligible">Eligible</SelectItem>
+              <SelectItem value="approved">Approved</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -291,8 +291,8 @@ const StudentManagement: React.FC = () => {
         </Card>
         <Card className="shadow-sm border border-slate-200/60 rounded-xl">
           <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-[28px] font-bold text-blue-600">{students.filter((s: any) => s.status === 'placed').length}</span>
-            <span className="text-[13px] text-slate-500 mt-1">Placed</span>
+            <span className="text-[28px] font-bold text-blue-600">{students.filter((s: any) => s.status === 'rejected').length}</span>
+            <span className="text-[13px] text-slate-500 mt-1">Rejected</span>
           </CardContent>
         </Card>
       </div>

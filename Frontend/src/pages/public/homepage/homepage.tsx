@@ -46,6 +46,13 @@ const HomePage: React.FC = () => {
     return `/${userType.toLowerCase()}/dashboard`;
   };
 
+  const scrollToSection = (sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (!section) return;
+    const y = section.getBoundingClientRect().top + window.scrollY - 90;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans selection:bg-teal-500/30">
       {/* Navigation */}
@@ -65,18 +72,20 @@ const HomePage: React.FC = () => {
             <div className="hidden md:flex items-center gap-10">
               <div className="flex items-center gap-8">
                 {['Features', 'Portals', 'Stats'].map((item) => (
-                  <a key={item} href={`#${item.toLowerCase()}`}
+                  <button key={item}
+                    type="button"
+                    onClick={() => scrollToSection(item.toLowerCase())}
                     className={`text-sm font-semibold transition-colors ${scrolled ? 'text-slate-500 hover:text-blue-600' : 'text-slate-300 hover:text-white'}`}>
                     {item}
-                  </a>
+                  </button>
                 ))}
               </div>
               <div className="flex items-center gap-6 ml-4 border-l border-slate-200/20 pl-6">
                 {!isAuthenticated ? (
                   <>
-                    <a href="/login" className={`text-sm font-bold ${scrolled ? 'text-slate-900' : 'text-white'} hover:text-blue-500 transition-colors`}>
+                    <Link to="/login" className={`text-sm font-bold ${scrolled ? 'text-slate-900' : 'text-white'} hover:text-blue-500 transition-colors`}>
                       Sign In
-                    </a>
+                    </Link>
                     <Link
                       to="/signup"
                       className="bg-gradient-to-br from-blue-700 to-slate-900 text-white px-6 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-lg shadow-blue-500/20"
@@ -122,21 +131,22 @@ const HomePage: React.FC = () => {
           <div className="flex flex-col h-full pt-20 px-6 pb-10">
             <div className="flex flex-col gap-6 mb-auto">
               {['Features', 'Portals', 'Stats'].map((item) => (
-                <a key={item} href={`#${item.toLowerCase()}`}
-                  onClick={() => setIsMenuOpen(false)}
+                <button key={item}
+                  type="button"
+                  onClick={() => { scrollToSection(item.toLowerCase()); setIsMenuOpen(false); }}
                   className="text-2xl font-bold text-slate-800 hover:text-blue-600 transition-colors">
                   {item}
-                </a>
+                </button>
               ))}
             </div>
             <div className="flex flex-col gap-4">
               {!isAuthenticated ? (
                 <>
-                  <a href="/login"
+                  <Link to="/login"
                     onClick={() => setIsMenuOpen(false)}
                     className="flex items-center justify-center py-4 text-lg font-bold text-slate-900 border border-slate-200 rounded-2xl">
                     Sign In
-                  </a>
+                  </Link>
                   <button
                     onClick={() => { setIsMenuOpen(false); navigate('/signup'); }}
                     className="py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-2xl text-lg font-bold shadow-xl shadow-blue-500/20">
@@ -175,7 +185,7 @@ const HomePage: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <header className="relative min-h-[90vh] flex items-center pt-24 pb-16 sm:pt-28 sm:pb-20 md:pt-20">
+      <header className="relative min-h-[90vh] flex items-center pt-24 pb-16 sm:pt-28 sm:pb-20 md:pt-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             src="/hero-bg.png"
@@ -215,21 +225,21 @@ const HomePage: React.FC = () => {
                 {isAuthenticated ? 'Go to Dashboard' : 'Launch Dashboard'} <ChevronRight size={18} />
               </button>
               <button
-                onClick={() => {
-                  const section = document.getElementById('features');
-                  section?.scrollIntoView({ behavior: 'smooth' });
-                }}
+                onClick={() => scrollToSection('features')}
                 className="px-6 sm:px-8 py-3 sm:py-3.5 bg-white/10 backdrop-blur-sm text-white border border-white/30 rounded-xl font-bold hover:bg-white/20 transition-all text-center"
               >
                 Explore Features
               </button>
             </div>
           </div>
+          <p className="mt-8 text-xs text-slate-300/80 tracking-wide">
+            Mindbrain Innovations
+          </p>
         </div>
       </header>
 
       {/* Stats Section Overlay */}
-      <section id="stats" className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 sm:-mt-12 md:-mt-20">
+      <section id="stats" className="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-12 md:-mt-20">
         <div className="bg-white rounded-[1.5rem] sm:rounded-[2rem] shadow-2xl shadow-blue-500/5 border border-slate-100 overflow-hidden">
           <div className="grid grid-cols-2 lg:grid-cols-4">
             <StatItem value="570+" label="Registered Students" />
