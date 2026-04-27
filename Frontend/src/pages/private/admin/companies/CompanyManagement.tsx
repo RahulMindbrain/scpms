@@ -1,15 +1,13 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
   Building2,
-  MapPin,
   Search,
   CheckCircle2,
   Mail,
-  Trash2,
+  // Trash2,
   XCircle,
   ExternalLink,
   Globe,
-  ArrowUpRight,
   Briefcase,
   Users,
   LayoutGrid
@@ -29,15 +27,13 @@ interface Company {
   id: number;
   userId: number;
   name: string;
-  sector: string;
-  location: string;
-  avgPackage: string;
-  hiredCount: number;
   status: 'active' | 'upcoming' | 'completed' | 'inactive';
   approval: 'Approved' | 'Pending';
   logo?: string;
   email?: string;
   description?: string;
+  createdAt?: string;
+  userStatus?: string;
 }
 
 import Loader from '@/components/Loader';
@@ -72,30 +68,26 @@ const CompanyManagement: React.FC = () => {
       id: c.id,
       userId: c.user?.id,
       name: c.name || 'N/A',
-      sector: 'Technology',
-      location: 'Multiple',
-      avgPackage: 'Competitive',
-      hiredCount: 0,
       status: 'active',
       approval: 'Approved',
       logo: undefined,
       email: c.user?.email || 'N/A',
-      description: c.description || ''
+      description: c.description || '',
+      createdAt: c.createdAt,
+      userStatus: c.user?.status
     }));
 
     const inactive = reduxInactiveCompanies.map((c: any): Company => ({
       id: c.id,
       userId: c.id,
       name: c.firstname || 'N/A',
-      sector: 'Technology',
-      location: 'Multiple',
-      avgPackage: 'N/A',
-      hiredCount: 0,
       status: 'inactive',
       approval: 'Pending',
       logo: undefined,
       email: c.email || 'N/A',
-      description: ''
+      description: '',
+      createdAt: c.createdAt,
+      userStatus: c.status
     }));
 
     return [...active, ...inactive];
@@ -137,9 +129,9 @@ const CompanyManagement: React.FC = () => {
     dispatch(fetchJobsByCompanyId({ id: companyId, params: { page: 1, limit: 10, status: 'APPROVED' } }));
   };
 
-  const deleteCompany = (_id: number) => {
-    toast.info("Integration for deleting companies is coming soon.");
-  };
+  // const deleteCompany = (_id: number) => {
+  //   toast.info("Integration for deleting companies is coming soon.");
+  // };
 
   if (loading && reduxCompanies.length === 0) {
     return <Loader text="Loading partner network..." />;
@@ -225,11 +217,11 @@ const CompanyManagement: React.FC = () => {
         {/* Pill-style Segmented Filter Controls */}
         <div className="flex items-center justify-between">
           <div className="flex bg-white/70 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200/60 shadow-sm overflow-x-auto scrollbar-hide">
-            {['All', 'Active', 'Inactive', 'Upcoming', 'Completed'].map((opt) => (
+            {['All', 'Active', 'Inactive'].map((opt) => (
               <button
                 key={opt}
                 onClick={() => setFilter(opt)}
-                className={`flex-shrink-0 px-6 py-2.5 rounded-[0.85rem] text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 ${filter === opt
+                className={`shrink-0 px-6 py-2.5 rounded-[0.85rem] text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 ${filter === opt
                     ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10'
                     : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100/50'
                   }`}
@@ -263,7 +255,7 @@ const CompanyManagement: React.FC = () => {
                 {/* Header Information */}
                 <div className="flex justify-between items-start mb-6">
                   <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 bg-gradient-to-br from-slate-50 to-slate-100 rounded-2xl flex items-center justify-center border border-slate-200 group-hover:border-indigo-200 transition-all duration-300 shadow-sm">
+                    <div className="w-14 h-14 bg-linear-to-br from-slate-50 to-slate-100 rounded-2xl flex items-center justify-center border border-slate-200 group-hover:border-indigo-200 transition-all duration-300 shadow-sm">
                       <Building2 className="w-7 h-7 text-slate-400 group-hover:text-indigo-600 transition-colors duration-300" />
                     </div>
                     <div>
@@ -272,7 +264,7 @@ const CompanyManagement: React.FC = () => {
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge variant="outline" className="text-[9px] py-0 h-5 px-2 bg-slate-50 border-slate-200 text-slate-500 font-bold uppercase tracking-widest">
-                          {company.sector}
+                          {company.userStatus || 'UNKNOWN'}
                         </Badge>
                       </div>
                     </div>
@@ -286,13 +278,13 @@ const CompanyManagement: React.FC = () => {
                     >
                       <ExternalLink size={18} />
                     </button>
-                    <button
+                    {/* <button
                       onClick={() => deleteCompany(company.id)}
                       className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                       title="Delete Partner"
                     >
                       <Trash2 size={18} />
-                    </button>
+                    </button> */}
                   </div>
                 </div>
 
@@ -308,41 +300,23 @@ const CompanyManagement: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="flex items-center gap-3 p-3.5 bg-slate-50/50 rounded-2xl border border-slate-100 group-hover:border-indigo-100/50 transition-colors">
-                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center border border-slate-100 shadow-sm">
-                      <MapPin className="w-4 h-4 text-slate-400 group-hover:text-indigo-500 transition-colors" />
+                  <div className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm group-hover:border-indigo-100 transition-colors">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Registered</p>
                     </div>
-                    <div>
-                      <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Global Base</p>
-                      <p className="text-xs font-bold text-slate-700">{company.location}</p>
-                    </div>
-                  </div>
-
-                  {/* Enhanced Metrics Grid */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm group-hover:border-indigo-100 transition-colors">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Placement</p>
-                      </div>
-                      <p className="text-sm font-black text-slate-800">{company.hiredCount} Hired</p>
-                    </div>
-                    <div className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm group-hover:border-indigo-100 transition-colors">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
-                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Avg Package</p>
-                      </div>
-                      <p className="text-sm font-black text-indigo-600 group-hover:text-indigo-700">{company.avgPackage}</p>
-                    </div>
+                    <p className="text-sm font-black text-slate-800">
+                      {company.createdAt
+                        ? new Date(company.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                        : 'N/A'}
+                    </p>
                   </div>
                 </div>
 
                 {/* Footer Controls */}
                 <div className="flex items-center justify-between pt-5 border-t border-slate-100/60">
                   <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${company.status === 'active' ? 'bg-emerald-500' :
-                        company.status === 'completed' ? 'bg-indigo-500' : 'bg-slate-300'
-                      }`}></div>
+                    <div className={`w-2 h-2 rounded-full ${company.status === 'active' ? 'bg-emerald-500' : 'bg-slate-300'}`}></div>
                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">
                       {company.status}
                     </span>
@@ -499,9 +473,9 @@ const CompanyManagement: React.FC = () => {
                       <div>
                         <h4 className="font-bold text-slate-900 text-base">{job.title}</h4>
                         <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-slate-400 font-medium">{job.category}</span>
+                          <span className="text-xs text-slate-500 font-medium">{job.location || 'N/A'}</span>
                           <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                          <span className="text-xs text-slate-400 font-medium">{job.jobType}</span>
+                          <span className="text-xs text-slate-400 font-medium">Job #{job.id}</span>
                         </div>
                       </div>
                       <Badge variant={job.status === 'APPROVED' ? 'success' : job.status === 'REJECTED' ? 'destructive' : 'secondary'} className="text-[10px] font-black tracking-widest">
@@ -509,22 +483,41 @@ const CompanyManagement: React.FC = () => {
                       </Badge>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                      <div className="flex items-center gap-6">
-                        <div className="space-y-1">
-                          <p className="text-[8px] font-black text-slate-400 uppercase">Est. Compensation</p>
-                          <p className="text-xs font-bold text-emerald-600">₹{job.salaryRange || 'N/A'}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-[8px] font-black text-slate-400 uppercase">Closing Date</p>
-                          <p className="text-xs font-bold text-slate-700">
-                            {job.deadline ? new Date(job.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : 'N/A'}
-                          </p>
-                        </div>
+                    {job.description ? (
+                      <p className="text-xs text-slate-500 leading-relaxed line-clamp-2 mb-4">
+                        {job.description}
+                      </p>
+                    ) : (
+                      <p className="text-xs text-slate-400 italic mb-4">No description provided</p>
+                    )}
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-4 border-t border-slate-50">
+                      <div className="space-y-1">
+                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Salary (LPA)</p>
+                        <p className="text-xs font-bold text-emerald-600">₹{job.salary ?? 'N/A'}</p>
                       </div>
-                      <Button variant="outline" size="sm" className="h-9 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest border-slate-200 hover:bg-slate-50 flex items-center gap-2">
-                        Details <ArrowUpRight className="w-3.5 h-3.5" />
-                      </Button>
+                      <div className="space-y-1">
+                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">CGPA</p>
+                        <p className="text-xs font-bold text-slate-700">
+                          {job.minCgpa ?? 'N/A'} - {job.maxCgpa ?? 'N/A'}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Departments</p>
+                        <p className="text-xs font-bold text-slate-700 truncate">
+                          {job.eligibleDepartments?.length
+                            ? job.eligibleDepartments.map((dep: any) => dep.name).join(', ')
+                            : 'N/A'}
+                        </p>
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Posted On</p>
+                        <p className="text-xs font-bold text-slate-700">
+                          {job.createdAt
+                            ? new Date(job.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+                            : 'N/A'}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 ))}
