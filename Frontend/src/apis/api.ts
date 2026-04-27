@@ -44,11 +44,16 @@ api.interceptors.response.use(
       _retry?: boolean
     }
 
-    // If the error is 401 and it's not a retry and not the refresh request itself
+    const isAuthLoginRequest =
+      originalRequest.url === "/auth/login" ||
+      originalRequest.url?.endsWith("/auth/login")
+
+    // If the error is 401 and it's not a retry and not an auth endpoint
     if (
       error.response?.status === 401 &&
       !originalRequest._retry &&
-      originalRequest.url !== "/auth/refresh"
+      originalRequest.url !== "/auth/refresh" &&
+      !isAuthLoginRequest
     ) {
       // If we are already refreshing, queue this request
       if (isRefreshing) {
