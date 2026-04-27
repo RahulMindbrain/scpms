@@ -55,8 +55,8 @@ const StudentManagement: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<'active' | 'inactive'>('active');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDept, setSelectedDept] = useState('All Depts');
-  const [selectedStatus, setSelectedStatus] = useState('All Status');
+  const [selectedDept, _setSelectedDept] = useState('All Depts');
+  const [selectedStatus, _setSelectedStatus] = useState('All Status');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Viewing Student Profile State
@@ -73,14 +73,20 @@ const StudentManagement: React.FC = () => {
 
   const students = useMemo(() => {
     const currentList = activeTab === 'active' ? reduxStudents : reduxInactiveStudents;
-    return currentList.map((s: any) => {
-   
+    const tabScopedList = currentList.filter((s: any) =>
+      activeTab === 'active' ? s.status === 'ACTIVE' : s.status !== 'ACTIVE'
+    );
+
+    return tabScopedList.map((s: any) => {
+      const isVerified = s.status === 'ACTIVE';
+      const departmentName = s.student?.department?.name || '';
+
       return {
         id: s.id,
         name: s.firstname ? `${s.firstname} ${s.lastname || ''}` : 'Unknown',
-        dept: s.student?.department?.name || 'Unassigned',
+        dept: isVerified ? departmentName : '',
         deptId: s.student?.department?.id || null,
-        verified: s.status === 'ACTIVE',
+        verified: isVerified,
         status: s.status === 'ACTIVE' ? 'approved' : (s.status === 'REJECTED' ? 'rejected' : 'pending'),
       };
     });
@@ -176,30 +182,34 @@ const StudentManagement: React.FC = () => {
               className="pl-9 bg-white border-slate-200 shadow-sm h-10 w-full"
             />
           </div>
-          <Select value={selectedDept} onValueChange={setSelectedDept}>
-            <SelectTrigger className="w-full sm:w-[140px] bg-white border-slate-200 shadow-sm h-10">
-              <SelectValue placeholder="All Depts" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All Depts">All Depts</SelectItem>
-              {departments.map((dept: any) => (
-                <SelectItem key={dept.id} value={dept.name || dept.deptName}>
-                  {dept.name || dept.deptName}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-            <SelectTrigger className="w-full sm:w-[140px] bg-white border-slate-200 shadow-sm h-10">
-              <SelectValue placeholder="All Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="All Status">All Status</SelectItem>
-              <SelectItem value="approved">Approved</SelectItem>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="rejected">Rejected</SelectItem>
-            </SelectContent>
-          </Select>
+          {activeTab !== 'active' && (
+            <>
+              {/* <Select value={selectedDept} onValueChange={setSelectedDept}>
+                <SelectTrigger className="w-full sm:w-[140px] bg-white border-slate-200 shadow-sm h-10">
+                  <SelectValue placeholder="All Depts" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All Depts">All Depts</SelectItem>
+                  {departments.map((dept: any) => (
+                    <SelectItem key={dept.id} value={dept.name || dept.deptName}>
+                      {dept.name || dept.deptName}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select> */}
+              {/* <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger className="w-full sm:w-[140px] bg-white border-slate-200 shadow-sm h-10">
+                  <SelectValue placeholder="All Status" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="All Status">All Status</SelectItem>
+                  <SelectItem value="approved">Approved</SelectItem>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="rejected">Rejected</SelectItem>
+                </SelectContent>
+              </Select> */}
+            </>
+          )}
         </div>
         
         <div className="flex flex-row items-center gap-3 w-full xl:w-auto">
@@ -354,7 +364,6 @@ const StudentManagement: React.FC = () => {
             <TableHeader className="bg-white border-b border-slate-100">
               <TableRow className="hover:bg-transparent">
                 <TableHead className="font-semibold text-slate-500 py-4 pl-6">Name</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-center">Department</TableHead>
                 <TableHead className="font-semibold text-slate-500 text-center">Status</TableHead>
                 {/* <TableHead className="font-semibold text-slate-500 text-right pr-6">Actions</TableHead> */}
               </TableRow>
@@ -363,7 +372,6 @@ const StudentManagement: React.FC = () => {
               {filteredStudents.map((student) => (
                 <TableRow key={student.id} className="bg-white hover:bg-slate-50/50 border-b border-slate-100/60 transition-colors">
                   <TableCell className="font-bold text-slate-800 py-4 pl-6">{student.name}</TableCell>
-                  <TableCell className="text-slate-600 font-medium text-center">{student.dept}</TableCell>
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-2">
                       {student.status === 'pending' ? (
