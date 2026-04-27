@@ -43,3 +43,55 @@ export const createJobSchema = z
     message: "maxCgpa must be greater than or equal to minCgpa",
     path: ["maxCgpa"],
   });
+
+export const updateJobSchema = z
+  .object({
+    title: z.string().min(3, "Title must be at least 3 characters").optional(),
+
+    description: z
+      .string()
+      .min(10, "Description must be at least 10 characters")
+      .optional(),
+
+    salary: z.number().positive("Salary must be greater than 0").optional(),
+
+    location: z.string().min(2, "Location must be valid").optional(),
+
+    minCgpa: z
+      .number()
+      .min(0, "Min CGPA cannot be negative")
+      .max(10, "Min CGPA cannot exceed 10")
+      .optional(),
+
+    maxCgpa: z
+      .number()
+      .min(0, "Max CGPA cannot be negative")
+      .max(10, "Max CGPA cannot exceed 10")
+      .optional(),
+
+    addSkillIds: z.array(z.number().int().positive()).optional(),
+
+    removeSkillIds: z.array(z.number().int().positive()).optional(),
+
+    addEligibleDepartmentIds: z.array(z.number().int().positive()).optional(),
+
+    removeEligibleDepartmentIds: z
+      .array(z.number().int().positive())
+      .optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.minCgpa !== undefined && data.maxCgpa !== undefined) {
+        return data.maxCgpa >= data.minCgpa;
+      }
+
+      return true;
+    },
+    {
+      message: "maxCgpa must be greater than or equal to minCgpa",
+      path: ["maxCgpa"],
+    },
+  )
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field is required to update job",
+  });

@@ -21,12 +21,14 @@ import {
 } from "../controllers/schedule.message.controller";
 
 import { getScheduleApplicationsController } from "../controllers/application.controller";
+import requireActiveUser from "../middlewares/requireActiveUser";
 
 const scheduleRoute = Router();
 
 scheduleRoute.post(
   "/",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   createScheduleController,
 );
@@ -34,6 +36,7 @@ scheduleRoute.post(
 scheduleRoute.get(
   "/",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   getAllSchedulesController,
 );
@@ -41,6 +44,7 @@ scheduleRoute.get(
 scheduleRoute.put(
   "/:id",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   updateScheduleController,
 );
@@ -48,6 +52,7 @@ scheduleRoute.put(
 scheduleRoute.delete(
   "/:id",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   deleteScheduleController,
 );
@@ -55,6 +60,7 @@ scheduleRoute.delete(
 scheduleRoute.post(
   "/:id/jobs",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   addJobsController,
 );
@@ -62,13 +68,16 @@ scheduleRoute.post(
 scheduleRoute.delete(
   "/jobs",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
+
   removeJobsController,
 );
 
 scheduleRoute.get(
   "/company",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("COMPANY"),
   getCompanySchedulesController,
 );
@@ -76,6 +85,7 @@ scheduleRoute.get(
 scheduleRoute.get(
   "/:id/applications",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN", "COMPANY"),
   getScheduleApplicationsController,
 );
@@ -83,6 +93,7 @@ scheduleRoute.get(
 scheduleRoute.post(
   "/:id/messages",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN", "COMPANY"),
   sendScheduleMessageController,
 );
@@ -90,6 +101,7 @@ scheduleRoute.post(
 scheduleRoute.get(
   "/:id/messages",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN", "COMPANY"),
   getScheduleMessagesController,
 );
@@ -97,6 +109,7 @@ scheduleRoute.get(
 scheduleRoute.put(
   "/:id/approval",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("COMPANY"),
   updateScheduleApprovalController,
 );
@@ -104,6 +117,7 @@ scheduleRoute.put(
 scheduleRoute.get(
   "/by-company-id",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN", "COMPANY"),
   getSchedulesForUserController,
 );
@@ -111,6 +125,7 @@ scheduleRoute.get(
 scheduleRoute.get(
   "/:id",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN", "COMPANY", "STUDENT"),
   getScheduleByIdController,
 );

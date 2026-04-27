@@ -4,7 +4,6 @@ import prisma from "../config/db";
 export const createJob = async (data: any) => {
   const { eligibleDepartmentIds, skillIds, companyId, salary, ...rest } = data;
 
-  // ✅ Validate salary
   if (!salary || salary <= 0) {
     throw new Error("Valid salary is required");
   }
@@ -12,7 +11,7 @@ export const createJob = async (data: any) => {
   return prisma.job.create({
     data: {
       ...rest,
-      salary, // ✅ explicitly include
+      salary,
 
       company: {
         connect: { id: companyId },
@@ -50,7 +49,7 @@ export const getJobs = async (params: {
 
   const where = {
     ...(status && { status }),
-    ...(companyId && { companyId }), // ✅ ADD THIS
+    ...(companyId && { companyId }),
   };
 
   const [data, total] = await Promise.all([
@@ -98,28 +97,68 @@ export const getCompanyByUserId = async (userId: number) => {
 };
 
 export const updateJob = async (id: number, data: any) => {
-  const { eligibleDepartmentIds, salary, ...rest } = data;
+  const {
+    addEligibleDepartmentIds,
+    removeEligibleDepartmentIds,
 
-  // ✅ Optional validation
+    addSkillIds,
+    removeSkillIds,
+
+    salary,
+    ...rest
+  } = data;
+
   if (salary !== undefined && salary <= 0) {
     throw new Error("Salary must be positive");
   }
 
+  const eligibleDepartmentOps: any = {};
+
+  if (addEligibleDepartmentIds?.length) {
+    eligibleDepartmentOps.connect = addEligibleDepartmentIds.map(
+      (deptId: number) => ({ id: deptId }),
+    );
+  }
+
+  if (removeEligibleDepartmentIds?.length) {
+    eligibleDepartmentOps.disconnect = removeEligibleDepartmentIds.map(
+      (deptId: number) => ({ id: deptId }),
+    );
+  }
+
+  const skillOps: any = {};
+
+  if (addSkillIds?.length) {
+    skillOps.connect = addSkillIds.map((skillId: number) => ({ id: skillId }));
+  }
+
+  if (removeSkillIds?.length) {
+    skillOps.disconnect = removeSkillIds.map((skillId: number) => ({
+      id: skillId,
+    }));
+  }
+
   return prisma.job.update({
     where: { id },
+
     data: {
       ...rest,
-      ...(salary !== undefined && { salary }), // ✅ update salary safely
 
-      ...(eligibleDepartmentIds && {
-        eligibleDepartments: {
-          set: eligibleDepartmentIds.map((id: number) => ({ id })),
-        },
+      ...(salary !== undefined && { salary }),
+
+      ...(Object.keys(eligibleDepartmentOps).length && {
+        eligibleDepartments: eligibleDepartmentOps,
+      }),
+
+      ...(Object.keys(skillOps).length && {
+        skills: skillOps,
       }),
     },
+
     include: {
       company: true,
       eligibleDepartments: true,
+      skills: true,
     },
   });
 };

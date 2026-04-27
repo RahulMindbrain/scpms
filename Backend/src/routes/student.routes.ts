@@ -18,6 +18,7 @@ import {
   getApplicationsController,
 } from "../controllers/application.controller";
 import { getCloudinarySignatureController } from "../cloudinaryUploads/cloudinary";
+import requireActiveUser from "../middlewares/requireActiveUser";
 
 const StudentRoutes = Router();
 
@@ -40,6 +41,7 @@ StudentRoutes.put(
   "/profile",
   authenticateUser,
   authorizeRoles("STUDENT"),
+  requireActiveUser,
   validate(updateStudentSchema),
   updateStudentController,
 );
@@ -47,6 +49,7 @@ StudentRoutes.put(
 StudentRoutes.get(
   "/show-all-jobs",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("STUDENT"),
   getJobsController,
 );
@@ -54,6 +57,7 @@ StudentRoutes.get(
 StudentRoutes.post(
   "/apply-job",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("STUDENT"),
   createApplicationController,
 );
@@ -61,6 +65,7 @@ StudentRoutes.post(
 StudentRoutes.get(
   "/get-job-application",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("STUDENT"),
   getApplicationsController,
 );
@@ -68,6 +73,7 @@ StudentRoutes.get(
 StudentRoutes.put(
   "/application/:applicationId",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("STUDENT"),
   applicationActionController,
 );

@@ -6,8 +6,10 @@ import {
   getSkillByName,
   updateSkill,
 } from "../repository/skills.repository";
+import { normalizeSkillName } from "../utils/normalize.utils";
 
 export const createSkillService = async (name: string) => {
+  name = normalizeSkillName(name);
   const existing = await getSkillByName(name);
 
   if (existing) {
@@ -32,6 +34,7 @@ export const getSkillByIdService = async (id: number) => {
 };
 
 export const updateSkillService = async (id: number, name: string) => {
+  name = normalizeSkillName(name);
   const skill = await getSkillById(id);
 
   if (!skill) {

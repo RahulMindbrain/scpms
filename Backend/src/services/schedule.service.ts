@@ -26,6 +26,7 @@ import { createManyNotifications } from "../repository/notification.repository";
 import { runInBackground } from "../utils/Background.task";
 import { emitToUsers } from "../socket";
 import { SOCKET_EVENTS } from "../socket.event";
+import { normalizeText } from "../utils/normalize.utils";
 
 type CreateInterviewScheduleInput = {
   title: string;
@@ -47,6 +48,13 @@ type UpdateScheduleInput = {
 export const createInterviewScheduleService = async (
   data: CreateInterviewScheduleInput,
 ) => {
+  if (data.title !== undefined) {
+    data.title = normalizeText(data.title);
+  }
+
+  if (data.venue !== undefined) {
+    data.venue = normalizeText(data.venue);
+  }
   const { companyId, jobIds, startTime, endTime, venue, createdBy } = data;
 
   const start = new Date(startTime);
@@ -138,6 +146,13 @@ export const updateScheduleService = async (
   id: number,
   data: UpdateScheduleInput,
 ) => {
+  if (data.title !== undefined) {
+    data.title = normalizeText(data.title);
+  }
+
+  if (data.venue !== undefined) {
+    data.venue = normalizeText(data.venue);
+  }
   const existing = await getScheduleById(id);
   if (!existing) throw new Error("Schedule not found");
 
@@ -287,6 +302,9 @@ export const updateScheduleApprovalService = async (
   status: "APPROVED" | "REJECTED",
   rejectionReason?: string,
 ) => {
+  if (rejectionReason !== undefined) {
+    rejectionReason = normalizeText(rejectionReason);
+  }
   const schedule = await getScheduleById(scheduleId);
 
   if (!schedule) throw new Error("Schedule not found");
@@ -421,22 +439,22 @@ export const getSchedulesForUserService = async (
 
   const schedules = await getSchedulesByCompanyIdRepo(companyId);
 
-return schedules.map((s) => ({
-  id: s.id,
-  title: s.title,
-  startTime: s.startTime,
-  endTime: s.endTime,
-  venue: s.venue,
+  return schedules.map((s) => ({
+    id: s.id,
+    title: s.title,
+    startTime: s.startTime,
+    endTime: s.endTime,
+    venue: s.venue,
 
-  status: s.status,
-  companyApprovalStatus: s.companyApprovalStatus,
-  approvedAt: s.approvedAt,
-  rejectedAt: s.rejectedAt,
-  rejectionReason: s.rejectionReason,
-  createdAt: s.createdAt,
+    status: s.status,
+    companyApprovalStatus: s.companyApprovalStatus,
+    approvedAt: s.approvedAt,
+    rejectedAt: s.rejectedAt,
+    rejectionReason: s.rejectionReason,
+    createdAt: s.createdAt,
 
-  companyName: s.company.name,
-  jobCount: s.jobs.length,
-  jobs: s.jobs,
-}));
+    companyName: s.company.name,
+    jobCount: s.jobs.length,
+    jobs: s.jobs,
+  }));
 };
