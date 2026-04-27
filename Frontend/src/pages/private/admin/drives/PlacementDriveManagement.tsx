@@ -1,15 +1,12 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
-  Calendar,
   MapPin,
   GraduationCap,
   ChevronDown,
   Building2,
   AlertCircle,
-  Briefcase,
   Search,
   Filter,
-  Users,
   DollarSign,
   ChevronRight,
   Target,
@@ -32,6 +29,37 @@ interface DriveStatus {
   bg: string;
 }
 
+interface Department {
+  id: number;
+  name: string;
+}
+
+interface Company {
+  id: number;
+  name: string;
+  description?: string;
+}
+
+interface Job {
+  id: number;
+  title: string;
+  description?: string;
+  salary?: number | string | null;
+  salaryRange?: number | string | null;
+  location?: string | null;
+  status?: string;
+  minCgpa?: number | null;
+  maxCgpa?: number | null;
+  maxBacklogs?: number | null;
+  interviewScheduleId?: number | null;
+  createdAt?: string;
+  company?: Company;
+  eligibleDepartments?: Department[];
+  _count?: {
+    applications?: number;
+  };
+}
+
 const statusConfig: Record<string, DriveStatus> = {
   active: { label: 'Active', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-100' },
   upcoming: { label: 'Upcoming', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-100' },
@@ -39,9 +67,8 @@ const statusConfig: Record<string, DriveStatus> = {
 };
 
 const PlacementDriveManagement: React.FC = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
-  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [activeFilter, setActiveFilter] = useState('All Drives');
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -77,13 +104,14 @@ const PlacementDriveManagement: React.FC = () => {
     const now = new Date();
     
     // 1. Map and Enrich Jobs
-    const enrichedJobs = reduxJobs.map((job: any) => {
-      const deadlineDate = job.deadline ? new Date(job.deadline) : null;
+    const enrichedJobs = reduxJobs.map((job: Job) => {
+      const scheduleDate = job.createdAt ? new Date(job.createdAt) : null;
       
       let status: 'active' | 'completed' | 'upcoming' = 'active';
-      if (deadlineDate) {
-        if (deadlineDate < now) status = 'completed';
-        else if (deadlineDate.getTime() - now.getTime() > 14 * 24 * 60 * 60 * 1000) status = 'upcoming'; // > 2 weeks away
+      if (job.status === 'CLOSED' || job.status === 'REJECTED') {
+        status = 'completed';
+      } else if (scheduleDate && scheduleDate.getTime() - now.getTime() > 14 * 24 * 60 * 60 * 1000) {
+        status = 'upcoming';
       }
 
       // Handle both salary and salaryRange fields
@@ -96,12 +124,12 @@ const PlacementDriveManagement: React.FC = () => {
         ...job,
         status,
         formattedSalary,
-        formattedDate: job.deadline ? new Date(job.deadline).toLocaleDateString('en-IN', {
+        formattedDate: job.createdAt ? new Date(job.createdAt).toLocaleDateString('en-IN', {
           day: 'numeric',
           month: 'short',
           year: 'numeric'
         }) : 'TBD',
-        departments: job.eligibleDepartments?.map((d: any) => d.name) || []
+        departments: job.eligibleDepartments?.map((d: Department) => d.name) || []
       };
     });
 
@@ -141,7 +169,7 @@ const PlacementDriveManagement: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
         
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
@@ -204,14 +232,24 @@ const PlacementDriveManagement: React.FC = () => {
                 )}
               </AnimatePresence>
             </div>
-{/* 
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="flex items-center justify-center gap-2 px-8 py-3.5 bg-blue-600 text-white rounded-2xl text-sm font-bold hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/25 active:scale-95"
-            >
-              <Plus className="w-4 h-4" /> 
-              <span>Create Drive</span>
-            </button> */}
+          </div>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Total Drives</p>
+            <p className="text-3xl font-black text-slate-900 mt-2">{reduxJobs.length}</p>
+          </div>
+          <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Companies</p>
+            <p className="text-3xl font-black text-slate-900 mt-2">{processedDrives.length}</p>
+          </div>
+          <div className="bg-white rounded-3xl p-5 border border-slate-100 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-widest text-slate-400">Scheduled Interviews</p>
+            <p className="text-3xl font-black text-slate-900 mt-2">
+              {reduxJobs.filter((job: Job) => !!job.interviewScheduleId).length}
+            </p>
           </div>
         </div>
 
@@ -307,7 +345,7 @@ const PlacementDriveManagement: React.FC = () => {
                                 className="relative bg-white rounded-[2rem] p-6 md:p-8 border border-slate-100 shadow-sm hover:shadow-lg transition-all group/job overflow-hidden"
                               >
                                 {/* Decorative Gradient */}
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-50/50 to-transparent rounded-full -mr-16 -mt-16 group-hover/job:scale-150 transition-transform duration-700" />
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-blue-50/50 to-transparent rounded-full -mr-16 -mt-16 group-hover/job:scale-150 transition-transform duration-700" />
 
                                 <div className="relative flex flex-col xl:flex-row gap-8">
                                   {/* Job Core Info */}
@@ -317,17 +355,21 @@ const PlacementDriveManagement: React.FC = () => {
                                         <h3 className="text-2xl font-bold text-slate-800 group-hover/job:text-blue-600 transition-colors uppercase tracking-tight">
                                           {job.title}
                                         </h3>
-                                        <Badge className={cn("px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.1em] border", statusConfig[job.status].bg, statusConfig[job.status].color)}>
+                                        <Badge className={cn("px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border", statusConfig[job.status].bg, statusConfig[job.status].color)}>
                                           {statusConfig[job.status].label}
                                         </Badge>
                                       </div>
 
                                       <div className="flex flex-wrap gap-2 pt-1">
-                                        {job.departments.map((dept: string) => (
+                                        {job.departments.length > 0 ? job.departments.map((dept: string) => (
                                           <span key={dept} className="px-3 py-1.5 bg-slate-50 text-slate-500 border border-slate-200 rounded-xl text-[10px] font-bold uppercase tracking-wider">
                                             {dept}
                                           </span>
-                                        ))}
+                                        )) : (
+                                          <span className="px-3 py-1.5 bg-slate-50 text-slate-500 border border-slate-200 rounded-xl text-[10px] font-bold uppercase tracking-wider">
+                                            All Departments
+                                          </span>
+                                        )}
                                       </div>
                                     </div>
 
@@ -336,7 +378,7 @@ const PlacementDriveManagement: React.FC = () => {
                                     </p>
 
                                     {/* Attributes Grid */}
-                                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
+                                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-6 pt-2">
                                       <div className="flex flex-col gap-1.5">
                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                                           <DollarSign className="w-3.5 h-3.5 text-emerald-500" /> Salary
@@ -353,11 +395,17 @@ const PlacementDriveManagement: React.FC = () => {
                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
                                           <Target className="w-3.5 h-3.5 text-indigo-500" /> Min CGPA
                                         </span>
-                                        <span className="text-lg font-bold text-slate-900">{job.minCgpa}+</span>
+                                        <span className="text-lg font-bold text-slate-900">{job.minCgpa ?? 'N/A'}</span>
                                       </div>
                                       <div className="flex flex-col gap-1.5">
                                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
-                                          <Clock className="w-3.5 h-3.5 text-amber-500" /> Deadline
+                                          <GraduationCap className="w-3.5 h-3.5 text-violet-500" /> Max Backlogs
+                                        </span>
+                                        <span className="text-lg font-bold text-slate-900">{job.maxBacklogs ?? 'No limit'}</span>
+                                      </div>
+                                      <div className="flex flex-col gap-1.5">
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5">
+                                          <Clock className="w-3.5 h-3.5 text-amber-500" /> Posted On
                                         </span>
                                         <span className="text-lg font-bold text-slate-900">{job.formattedDate}</span>
                                       </div>
@@ -365,23 +413,11 @@ const PlacementDriveManagement: React.FC = () => {
                                   </div>
 
                                   {/* Stats & Actions */}
-                                  <div className="flex flex-col sm:flex-row xl:flex-col items-center xl:items-end justify-between xl:justify-center gap-8 w-full xl:w-auto xl:min-w-[260px] border-t xl:border-t-0 xl:border-l border-slate-100 pt-8 xl:pt-0 xl:pl-10">
-                                    <div className="text-center xl:text-right space-y-1">
-                                      <div className="flex items-center justify-center xl:justify-end gap-3 text-slate-900">
-                                        <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                                          <Users className="w-6 h-6" />
-                                        </div>
-                                        <span className="text-5xl font-black tracking-tighter tabular-nums">
-                                          {job._count?.applications || 0}
-                                        </span>
-                                      </div>
-                                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] whitespace-nowrap pt-1">Total Applicants Registered</p>
-                                    </div>
-
+                                  <div className="flex flex-col sm:flex-row xl:flex-col items-stretch xl:items-end justify-center gap-8 w-full xl:w-auto xl:min-w-[260px] border-t xl:border-t-0 xl:border-l border-slate-100 pt-8 xl:pt-0 xl:pl-10">
                                     <div className="flex items-center gap-3 w-full sm:w-auto xl:w-full">
                                       <button 
                                         onClick={() => handleViewDetails(job)}
-                                        className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-[0.1em] hover:bg-blue-600 transition-all shadow-lg active:scale-95"
+                                        className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg active:scale-95"
                                       >
                                         <span>View Details</span>
                                         <ChevronRight className="w-4 h-4" />
@@ -417,78 +453,6 @@ const PlacementDriveManagement: React.FC = () => {
         )}
       </div>
 
-      {/* Modern Modal for Drive Creation */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Launch New Recruitment Drive"
-        maxWidth="sm:max-w-2xl"
-        preventOutsideClick={true}
-      >
-        <div className="px-1 py-4">
-          <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Company</label>
-                <div className="relative">
-                  <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input type="text" className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all" placeholder="Select Company" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Job Designation</label>
-                <div className="relative">
-                  <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input type="text" className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all" placeholder="e.g. Software Engineer" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Submission Deadline</label>
-                <div className="relative">
-                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input 
-                    type="date" 
-                    min={new Date().toISOString().split('T')[0]}
-                    className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all" 
-                  />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Compensation (Annual)</label>
-                <div className="relative">
-                  <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                  <input type="text" className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all" placeholder="e.g. 15,00,000" />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Drive Abstract</label>
-              <textarea rows={4} className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all resize-none" placeholder="Provide a brief overview of the role and expectations..."></textarea>
-            </div>
-
-            <div className="flex justify-end gap-3 pt-6 border-t border-slate-100">
-               <button type="button" onClick={() => setIsModalOpen(false)} className="px-8 py-3 text-sm font-bold text-slate-500 hover:text-slate-800 transition-all">
-                Discard
-              </button>
-              <button 
-                type="submit" 
-                disabled={loading}
-                className="px-10 py-3 bg-blue-600 text-white rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-blue-700 transition-all shadow-xl shadow-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? (
-                  <span className="flex items-center gap-2">
-                    <Loader size="sm" /> Launching...
-                  </span>
-                ) : (
-                  "Launch Drive"
-                )}
-              </button>
-            </div>
-          </form>
-        </div>
-      </Modal>
-
       {/* Details Modal */}
       <Modal
         isOpen={isDetailsOpen}
@@ -519,7 +483,7 @@ const PlacementDriveManagement: React.FC = () => {
               </Badge>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-1">
                 <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                   <DollarSign className="w-3.5 h-3.5 text-emerald-500" /> Package
@@ -536,7 +500,15 @@ const PlacementDriveManagement: React.FC = () => {
                 <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                   <GraduationCap className="w-3.5 h-3.5 text-indigo-500" /> CGPA Req.
                 </div>
-                <p className="text-xl font-black text-slate-900">{selectedJob.minCgpa}+</p>
+                <p className="text-xl font-black text-slate-900">
+                  {selectedJob.minCgpa ?? 'N/A'} - {selectedJob.maxCgpa ?? 'N/A'}
+                </p>
+              </div>
+              <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100 space-y-1">
+                <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                  <Clock className="w-3.5 h-3.5 text-amber-500" /> Backlogs
+                </div>
+                <p className="text-xl font-black text-slate-900">{selectedJob.maxBacklogs ?? 'No limit'}</p>
               </div>
             </div>
 
@@ -556,7 +528,7 @@ const PlacementDriveManagement: React.FC = () => {
                 <Target className="w-4 h-4 text-indigo-500" /> Eligible Departments
               </div>
               <div className="flex flex-wrap gap-2">
-                {selectedJob.departments.map((dept: string) => (
+                {(selectedJob.departments?.length ? selectedJob.departments : ['All Departments']).map((dept: string) => (
                   <span key={dept} className="px-5 py-2.5 bg-slate-50 text-slate-600 border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest">
                     {dept}
                   </span>
