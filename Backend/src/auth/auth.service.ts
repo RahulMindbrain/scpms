@@ -203,7 +203,7 @@ export const resetPasswordService = async (
   const hashedPassword = await bcrypt.hash(newPassword, 10);
 
   await updatePasswordById(user.id, hashedPassword);
-  await clearOtp(user.id); // clears otp + resets counters
+  await clearOtp(user.id);
 
   return { message: "Password reset successful" };
 };

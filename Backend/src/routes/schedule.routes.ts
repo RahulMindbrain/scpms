@@ -37,7 +37,7 @@ scheduleRoute.get(
   "/",
   authenticateUser,
   requireActiveUser,
-  authorizeRoles("ADMIN"),
+  authorizeRoles("ADMIN", "COMPANY"),
   getAllSchedulesController,
 );
 

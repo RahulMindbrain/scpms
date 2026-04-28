@@ -76,10 +76,15 @@ export const getScheduleById = async (id: number) => {
   });
 };
 
-export const getAllSchedules = async () => {
+export const getAllSchedules = async (companyId: number) => {
   return prisma.interviewSchedule.findMany({
+    where: {
+      companyId,
+    },
     include: baseScheduleInclude,
-    orderBy: { startTime: "asc" },
+    orderBy: {
+      startTime: "asc",
+    },
   });
 };
 

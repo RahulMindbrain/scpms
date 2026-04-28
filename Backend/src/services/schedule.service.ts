@@ -126,8 +126,30 @@ export const createInterviewScheduleService = async (
   return schedule;
 };
 
-export const getAllSchedulesService = async () => {
-  return getAllSchedules();
+export const getAllSchedulesService = async (
+  userId: number,
+  role: "ADMIN" | "COMPANY",
+  companyIdFromQuery?: number,
+) => {
+  let companyId: number;
+
+  if (role === "COMPANY") {
+    const company = await getCompanyByUserId(userId);
+
+    if (!company) {
+      throw new Error("Company not found");
+    }
+
+    companyId = company.id;
+  } else {
+    if (!companyIdFromQuery) {
+      throw new Error("Company ID is required");
+    }
+
+    companyId = companyIdFromQuery;
+  }
+
+  return getAllSchedules(companyId);
 };
 
 export const getScheduleByIdService = async (id: number) => {
