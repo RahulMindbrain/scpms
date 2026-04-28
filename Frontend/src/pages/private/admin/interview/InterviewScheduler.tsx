@@ -19,11 +19,13 @@ import { fetchSchedules, deleteSchedule, fetchScheduleMessages, sendScheduleMess
 import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useNavigate } from 'react-router-dom';
 
 import Loader from '@/components/Loader';
 
 const InterviewSchedulerPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { schedules, loading } = useSelector((state: RootState) => state.interview);
   const { companies } = useSelector((state: RootState) => state.company);
 
@@ -114,6 +116,11 @@ const InterviewSchedulerPage: React.FC = () => {
     } finally {
       setMsgLoading(null);
     }
+  };
+
+  const handleOpenApplications = (e: React.MouseEvent, scheduleId: number) => {
+    e.stopPropagation();
+    navigate(`/admin/applications/${scheduleId}`);
   };
 
   const handleSendMessage = async () => {
@@ -265,6 +272,14 @@ const InterviewSchedulerPage: React.FC = () => {
                     {/* Action Bar / Stack */}
                     <div className="bg-slate-50/50 p-4 sm:p-6 lg:w-44 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-slate-100">
                       <div className="flex items-center gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-xl transition-all"
+                          onClick={(e) => handleOpenApplications(e, drive.id)}
+                        >
+                          <Users size={18} />
+                        </Button>
                         <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all" onClick={(e) => handleOpenEdit(e, drive)}>
                           <Edit3 size={18} />
                         </Button>
