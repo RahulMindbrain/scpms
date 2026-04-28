@@ -5,7 +5,13 @@ export const registerSchema = z.object({
   firstname: z.string().min(2, "Firstname must be at least 2 characters"),
   lastname: z.string().min(2, "Lastname must be at least 2 characters"),
   email: z.string().email("Invalid email format"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
+ password: z
+  .string()
+  .min(6, "Password must be at least 6 characters")
+  .regex(
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
+    "Password must contain uppercase, lowercase, number, and special character (@$!%*?& only)",
+  ),
   role: z.enum([Role.STUDENT, Role.COMPANY]),
 });
 
