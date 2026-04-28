@@ -100,21 +100,21 @@ export const markAllAsReadController = async (_req: Request, res: Response) => {
 };
 
 export const getUpcomingEventsController = async (
-  _req: Request,
+  req: Request,
   res: Response,
 ) => {
   try {
-    const user = res.locals.user;
+    const { id, role } = res.locals.user;
 
-    if (!user?.id) {
+    if (!id) {
       return sendError(res, 401, "Unauthorized");
     }
 
-    if (user.role !== "STUDENT") {
-      return sendError(res, 403, "Only students can access upcoming events");
-    }
+    const page = Math.max(Number(req.query.page) || 1, 1);
 
-    const data = await getUpcomingEventsService(user.id);
+    const limit = Math.min(Math.max(Number(req.query.limit) || 10, 1), 50);
+
+    const data = await getUpcomingEventsService(id, role, page, limit);
 
     return sendSuccess(res, 200, "Upcoming events fetched", data);
   } catch (error: any) {

@@ -47,7 +47,7 @@ notificationRouter.get(
   "/upcoming-events",
   authenticateUser,
   requireActiveUser,
-  authorizeRoles("STUDENT"),
+  //authorizeRoles("STUDENT"),
   getUpcomingEventsController,
 );
 
