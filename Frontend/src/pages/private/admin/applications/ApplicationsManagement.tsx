@@ -1,19 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Building2, Briefcase, Info } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchApplications } from '@/redux/thunks/applicationThunk';
+import { fetchScheduleApplications, fetchSchedules } from '@/redux/thunks/interviewThunk';
 import type { RootState, AppDispatch } from '@/redux/store/store';
-
+import { useParams } from "react-router-dom";
 import Loader from '@/components/Loader';
 
 const ApplicationsManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const dispatch = useDispatch<AppDispatch>();
-  const { applications, loading } = useSelector((state: RootState) => state.application);
+  const { applications = [], schedules = [], loading } = useSelector((state: RootState) => state.interview);
+  const { id } = useParams<{ id?: string }>();
+  const routeScheduleId = id ? Number(id) : null;
+  const fallbackScheduleId = schedules[0]?.id ? Number(schedules[0].id) : null;
+  const scheduleId = routeScheduleId && Number.isFinite(routeScheduleId)
+    ? routeScheduleId
+    : fallbackScheduleId;
 
   useEffect(() => {
-    dispatch(fetchApplications(1));
-  }, [dispatch]);
+    if (!routeScheduleId) {
+      dispatch(fetchSchedules());
+    }
+  }, [dispatch, routeScheduleId]);
+
+  useEffect(() => {
+    if (scheduleId && Number.isFinite(scheduleId)) {
+      dispatch(fetchScheduleApplications(scheduleId));
+    }
+  }, [dispatch, scheduleId]);
 
   const filteredApplications = applications.filter((app: any) =>
     app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -62,7 +76,7 @@ const ApplicationsManagement: React.FC = () => {
         )}
 
         {/* Desktop Table View (Hidden on Mobile) */}
-        {!loading && (
+        {!loading && scheduleId && (
           <>
             <div className="hidden md:block overflow-hidden bg-white rounded-2xl border border-slate-200 shadow-sm">
               <table className="w-full text-left">
@@ -139,7 +153,14 @@ const ApplicationsManagement: React.FC = () => {
         )}
 
         {/* Empty State */}
-        {!loading && filteredApplications.length === 0 && (
+        {!loading && !scheduleId && (
+          <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
+            <Info className="mx-auto text-slate-300 mb-2" size={40} />
+            <p className="text-slate-500">No interview schedules are available to load applications.</p>
+          </div>
+        )}
+
+        {!loading && scheduleId && filteredApplications.length === 0 && (
           <div className="text-center py-20 bg-white rounded-2xl border border-dashed border-slate-300">
             <Info className="mx-auto text-slate-300 mb-2" size={40} />
             <p className="text-slate-500">No applications found matching your search.</p>

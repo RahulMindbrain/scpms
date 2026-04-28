@@ -3,12 +3,14 @@ import { fetchSchedules, createSchedule, updateSchedule, deleteSchedule, fetchSc
 
 interface InterviewState {
   schedules: any[];
+  applications: any[];
   loading: boolean;
   error: string | null;
 }
 
 const initialState: InterviewState = {
   schedules: [],
+  applications: [],
   loading: false,
   error: null,
 };
@@ -126,11 +128,22 @@ const interviewSlice = createSlice({
         );
       })
       // Fetch Applications
+      .addCase(fetchScheduleApplications.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
       .addCase(fetchScheduleApplications.fulfilled, (state, action: PayloadAction<any>) => {
         const { id, applications } = action.payload;
+        state.loading = false;
+        state.applications = applications || [];
         state.schedules = state.schedules.map((s) =>
           s.id === id ? { ...s, applications } : s
         );
+      })
+      .addCase(fetchScheduleApplications.rejected, (state, action) => {
+        state.loading = false;
+        state.applications = [];
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch applications";
       });
   },
 });
