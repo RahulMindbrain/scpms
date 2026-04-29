@@ -23,9 +23,13 @@ import Loader from "@/components/Loader"
 export default function StudentDashboard() {
   const dispatch = useDispatch<AppDispatch>()
   const { socket } = useSocket()
+
   const { upcomingEvents = [], unreadCount = 0, loading = false } = useSelector(
     (state: RootState) => state.notification || {}
   )
+
+  // ✅ ADDED: get user
+  const { user } = useSelector((state: RootState) => state.auth)
 
   const nextEvent = upcomingEvents.length > 0 ? upcomingEvents[0] : null
 
@@ -34,6 +38,32 @@ export default function StudentDashboard() {
     dispatch(fetchUnreadCount())
   }, [dispatch])
 
+  // ✅ ADDED: JOIN SOCKET LOGIC
+  useEffect(() => {
+    if (!socket || !user) return;
+
+    const handleConnect = () => {
+      socket.emit("join", {
+        userId: user.id,
+        role: user.role,
+      });
+
+      console.log("✅ Joined socket:", user.id, user.role);
+    };
+
+    // if already connected
+    if (socket.connected) {
+      handleConnect();
+    }
+
+    socket.on("connect", handleConnect);
+
+    return () => {
+      socket.off("connect", handleConnect);
+    };
+  }, [socket, user]);
+
+  // ✅ EXISTING LISTENERS (unchanged)
   useEffect(() => {
     if (!socket) return;
 

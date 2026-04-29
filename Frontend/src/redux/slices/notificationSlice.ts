@@ -72,8 +72,18 @@ const notificationSlice = createSlice({
       })
       .addCase(fetchNotifications.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload.notifications;
-        state.pagination = action.payload.pagination;
+        const payload = action.payload as any;
+        const notifications = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.notifications)
+            ? payload.notifications
+            : Array.isArray(payload?.data)
+              ? payload.data
+              : [];
+
+        state.items = notifications;
+        state.unreadCount = notifications.filter((n: Notification) => !n.read).length;
+        state.pagination = payload?.pagination ?? state.pagination;
       })
       .addCase(fetchNotifications.rejected, (state, action) => {
         state.loading = false;
@@ -91,7 +101,14 @@ const notificationSlice = createSlice({
       })
       .addCase(fetchUpcomingEvents.fulfilled, (state, action) => {
         state.loading = false;
-        state.upcomingEvents = action.payload || [];
+        const payload = action.payload as any;
+        state.upcomingEvents = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.events)
+            ? payload.events
+            : Array.isArray(payload?.data)
+              ? payload.data
+              : [];
       })
       .addCase(fetchUpcomingEvents.rejected, (state, action) => {
         state.loading = false;
