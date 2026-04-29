@@ -57,6 +57,15 @@ CompanyRoutes.post(
   createJobController,
 );
 
+CompanyRoutes.put(
+  "/post-job/:id",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("COMPANY"),
+  validate(updateCompanySchema),
+  updateJobController,
+);
+
 CompanyRoutes.get(
   "/get-jobs",
   authenticateUser,
