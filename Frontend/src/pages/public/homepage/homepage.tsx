@@ -232,9 +232,6 @@ const HomePage: React.FC = () => {
               </button>
             </div>
           </div>
-          <p className="mt-8 text-xs text-slate-300/80 tracking-wide">
-            Mindbrain Innovations
-          </p>
         </div>
       </header>
 

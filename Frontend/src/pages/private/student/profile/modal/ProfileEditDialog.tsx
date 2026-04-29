@@ -100,10 +100,10 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
           const depts = Array.isArray(deptRes.data?.data)
             ? deptRes.data.data
             : Array.isArray(deptRes.data)
-            ? deptRes.data
-            : Array.isArray(deptRes)
-            ? deptRes
-            : [];
+              ? deptRes.data
+              : Array.isArray(deptRes)
+                ? deptRes
+                : [];
           setAllDepartmentsList(depts);
         }
       } catch (error) {
