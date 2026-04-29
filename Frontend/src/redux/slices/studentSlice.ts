@@ -1,5 +1,5 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { fetchStudents, fetchInactiveStudents, activateStudents, fetchStudentProfile, createStudentProfile, updateStudentProfile, fetchJobs, applyJob, fetchJobApplications } from "../thunks/studentThunk";
+import { fetchStudents, fetchInactiveStudents, activateStudents, fetchStudentProfile, createStudentProfile, updateStudentProfile, fetchJobs, applyJob, fetchJobApplications, updateApplicationStatus } from "../thunks/studentThunk";
 
 interface StudentState {
   students: any[];
@@ -161,6 +161,18 @@ const studentSlice = createSlice({
         state.statusCounts = action.payload.data.statusCounts || [];
       })
       .addCase(fetchJobApplications.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Update Job Application Status (Student Accept/Reject)
+      .addCase(updateApplicationStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateApplicationStatus.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(updateApplicationStatus.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

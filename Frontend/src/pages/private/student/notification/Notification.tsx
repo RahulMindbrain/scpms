@@ -72,7 +72,7 @@ const Notification = () => {
     if (!notification.read) {
       await handleMarkAsRead(notification.id, false);
     }
-    setSelectedNotification(notification);
+    setSelectedNotification({ ...notification, read: true });
   };
 
   const handleDelete = async (id: number) => {

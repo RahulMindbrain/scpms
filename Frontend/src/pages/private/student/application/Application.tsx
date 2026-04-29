@@ -7,7 +7,7 @@ import {
   Calendar, Building2, ChevronDown,
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchJobApplications } from '@/redux/thunks/studentThunk';
+import { fetchJobApplications, updateApplicationStatus } from '@/redux/thunks/studentThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import { Button } from '@/components/ui/button';
@@ -15,6 +15,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import Loader from '@/components/Loader';
+import { toast } from 'sonner';
 
 type Status = 'APPLIED' | 'SHORTLISTED' | 'TECHNICAL_ROUND' | 'HR_ROUND' | 'SELECTED' | 'REJECTED';
 
@@ -97,11 +98,15 @@ const CompanyAvatar = ({ name }: { name: string }) => {
 const ApplicationRow = ({
   app,
   isExpanded,
-  onToggle
+  onToggle,
+  onAction,
+  updatingId
 }: {
   app: any;
   isExpanded: boolean;
   onToggle: () => void;
+  onAction: (id: number, action: "ACCEPT" | "REJECT") => void;
+  updatingId: number | null;
 }) => {
   const status = app.status as Status;
   const isSelected = status === 'SELECTED';
@@ -219,6 +224,39 @@ const ApplicationRow = ({
                     </div>
                   </div>
                 )}
+
+                {isSelected && (
+                  <div className="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-100">
+                    <p className="text-xs font-bold text-emerald-900 mb-3">
+                      Offer received. Choose to accept or reject.
+                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button
+                        size="sm"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                        disabled={updatingId === app.id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onAction(app.id, "ACCEPT");
+                        }}
+                      >
+                        Accept
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="border-red-200 text-red-600 hover:bg-red-50"
+                        disabled={updatingId === app.id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onAction(app.id, "REJECT");
+                        }}
+                      >
+                        Reject
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -252,6 +290,7 @@ const ApplicationStatus = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [updatingId, setUpdatingId] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(fetchJobApplications({}));
@@ -293,6 +332,23 @@ const ApplicationStatus = () => {
 
   const activeApps = applications.filter((a: any) => !['SELECTED', 'REJECTED'].includes(a.status));
   const latestApp = activeApps.length > 0 ? activeApps[0] : null;
+
+  const handleApplicationAction = async (id: number, action: "ACCEPT" | "REJECT") => {
+    const loadingText = action === "ACCEPT" ? "Accepting offer..." : "Rejecting offer...";
+    const successText = action === "ACCEPT" ? "Offer accepted successfully" : "Offer rejected successfully";
+    const toastId = toast.loading(loadingText);
+
+    try {
+      setUpdatingId(id);
+      await dispatch(updateApplicationStatus({ id, action })).unwrap();
+      await dispatch(fetchJobApplications({})).unwrap();
+      toast.success(successText, { id: toastId });
+    } catch (err: any) {
+      toast.error(err?.message || "Failed to update application status", { id: toastId });
+    } finally {
+      setUpdatingId(null);
+    }
+  };
 
   if (loading && applications.length === 0) {
     return <Loader text="Syncing your application journey..." fullScreen />;
@@ -423,6 +479,8 @@ const ApplicationStatus = () => {
                 app={app}
                 isExpanded={expandedId === app.id}
                 onToggle={() => setExpandedId(expandedId === app.id ? null : app.id)}
+                onAction={handleApplicationAction}
+                updatingId={updatingId}
               />
             ))}
           </div>

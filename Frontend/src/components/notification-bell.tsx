@@ -7,21 +7,69 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useSocket } from "@/socket/SocketProvider";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import type { AppDispatch } from "@/redux/store/store";
+import type { RootState } from "@/redux/reducers/rootReducer";
+import {
+  fetchNotifications,
+  fetchUnreadCount,
+  markAllNotificationsAsRead,
+  markNotificationAsRead,
+} from "@/redux/thunks/notificationThunks";
+import useAuth from "@/redux/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export function NotificationBell() {
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useSocket();
+  const dispatch = useDispatch<AppDispatch>();
+  const { userType } = useAuth();
+  const navigate = useNavigate();
+  const apiUnreadCount = useSelector((state: RootState) => state.notification.unreadCount);
+  const apiNotifications = useSelector((state: RootState) => state.notification.items);
+  const isStudent = userType === "STUDENT";
+
+  useEffect(() => {
+    if (isStudent) {
+      dispatch(fetchUnreadCount());
+      dispatch(fetchNotifications({ page: 1, limit: 10 }));
+    }
+  }, [dispatch, isStudent]);
+
+  const studentNotifications = apiNotifications.map((notification) => ({
+    id: notification.id,
+    title: notification.title || "Notification",
+    message: notification.message || "No message available.",
+    timestamp: notification.createdAt
+      ? new Date(notification.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+      : "",
+    read: notification.read,
+  }));
+
+  const displayedNotifications = isStudent ? studentNotifications : notifications;
+  const displayedUnreadCount = isStudent ? apiUnreadCount : unreadCount;
+  const notificationsPagePath =
+    userType === "ADMIN"
+      ? "/admin/notification"
+      : userType === "COMPANY"
+        ? "/company/interviews"
+        : "/student/notifications";
+
+  const totalUnreadCount = isStudent
+    ? Math.max(unreadCount, apiUnreadCount)
+    : unreadCount;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative h-9 w-9 rounded-full bg-muted/50 hover:bg-muted">
           <Bell className="h-[1.1rem] w-[1.1rem]" />
-          {unreadCount > 0 && (
+          {totalUnreadCount > 0 && (
             <Badge
               variant="destructive"
               className="absolute -right-1 -top-1 px-1.5 py-0.5 text-[10px] min-w-[1.2rem] h-[1.2rem] flex items-center justify-center rounded-full border-2 border-background animate-in zoom-in duration-300"
             >
-              {unreadCount > 99 ? "99+" : unreadCount}
+              {totalUnreadCount > 99 ? "99+" : totalUnreadCount}
             </Badge>
           )}
         </Button>
@@ -31,7 +79,7 @@ export function NotificationBell() {
           <div className="flex items-center justify-between p-4 border-b bg-muted/30">
             <h3 className="font-semibold text-sm">Notifications</h3>
             <div className="flex gap-2">
-                {notifications.length > 0 && (
+                {!isStudent && notifications.length > 0 && (
                   <Button
                     variant="ghost"
                     size="sm"
@@ -41,12 +89,18 @@ export function NotificationBell() {
                     Clear all
                   </Button>
                 )}
-                {unreadCount > 0 && (
+                {displayedUnreadCount > 0 && (
                   <Button
                     variant="ghost"
                     size="sm"
                     className="h-8 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50/50 transition-colors"
-                    onClick={markAllAsRead}
+                    onClick={() => {
+                      if (isStudent) {
+                        dispatch(markAllNotificationsAsRead());
+                      } else {
+                        markAllAsRead();
+                      }
+                    }}
                   >
                     Mark all read
                   </Button>
@@ -55,7 +109,7 @@ export function NotificationBell() {
           </div>
 
           <div className="max-h-[350px] overflow-y-auto overflow-x-hidden custom-scrollbar">
-            {notifications.length === 0 ? (
+            {displayedNotifications.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-10 px-4 text-center">
                 <div className="h-12 w-12 rounded-full bg-muted flex items-center justify-center mb-3">
                   <Bell className="h-6 w-6 text-muted-foreground/50" />
@@ -65,13 +119,23 @@ export function NotificationBell() {
               </div>
             ) : (
               <div className="flex flex-col divide-y divide-border/50">
-                {notifications.map((notification) => (
+                {displayedNotifications.map((notification) => (
                   <div
                     key={notification.id}
                     className={`relative p-4 flex gap-3 hover:bg-muted/50 transition-colors cursor-pointer group ${
                       !notification.read ? "bg-muted/20" : ""
                     }`}
-                    onClick={() => !notification.read && markAsRead(notification.id)}
+                    onClick={async () => {
+                      if (!notification.read) {
+                        if (isStudent) {
+                          await dispatch(markNotificationAsRead(Number(notification.id)));
+                          dispatch(fetchUnreadCount());
+                        } else {
+                          markAsRead(String(notification.id));
+                        }
+                      }
+                      navigate(notificationsPagePath);
+                    }}
                   >
                     {!notification.read && (
                       <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-500 rounded-full" />
