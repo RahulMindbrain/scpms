@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getAPI, postAPI } from "../../apis/api";
+import { deleteAPI, getAPI, postAPI, putAPI } from "../../apis/api";
 
 export const fetchDepartments = createAsyncThunk(
   "department/fetchAll",
@@ -23,4 +23,34 @@ export const createDepartment = createAsyncThunk(
       return rejectWithValue(error?.message || "Failed to create department");
     }
   }
+);
+
+export const updateDepartment = createAsyncThunk(
+  "department/update",
+  async (
+    payload: { id: number; name: string; isActive?: boolean },
+    { rejectWithValue },
+  ) => {
+    try {
+      const response = await putAPI<any>(`/dept/${payload.id}`, {
+        name: payload.name,
+        isActive: payload.isActive,
+      });
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error?.message || "Failed to update department");
+    }
+  },
+);
+
+export const deleteDepartment = createAsyncThunk(
+  "department/delete",
+  async (id: number, { rejectWithValue }) => {
+    try {
+      const response = await deleteAPI<any>(`/dept/${id}`);
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error?.message || "Failed to delete department");
+    }
+  },
 );

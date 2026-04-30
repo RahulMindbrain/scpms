@@ -1,8 +1,8 @@
 import axios, { type AxiosRequestConfig, type AxiosError } from "axios"
 
 // ─── Base Configuration ───────────────────────────────────────────────────────
-// const BASE_URL = "http://localhost:3030";
-const BASE_URL = "https://scpms.onrender.com"
+const BASE_URL = "http://localhost:3030";
+// const BASE_URL = "https://scpms.onrender.com"
 
 const api = axios.create({
   baseURL: BASE_URL,
