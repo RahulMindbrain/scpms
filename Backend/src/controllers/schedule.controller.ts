@@ -127,6 +127,12 @@ export const addJobsController = async (req: Request, res: Response) => {
 
 export const removeJobsController = async (req: Request, res: Response) => {
   try {
+    const id = Number(req.params.id);
+
+if (!id) {
+  throw new Error("Invalid schedule ID");
+}
+    console.log("hi");
     const { jobIds } = req.body;
 
     await removeJobsFromScheduleService(jobIds);

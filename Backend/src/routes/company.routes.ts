@@ -14,12 +14,8 @@ import authenticateUser from "../middlewares/authenticateUser";
 import {
   createJobController,
   getJobsController,
-  updateJobController,
-} from "../controllers/job.controller";
-import {
-  createJobSchema,
-  updateJobSchema,
-} from "../validators/job.validator";
+  updateJobController,} from "../controllers/job.controller";
+import { createJobSchema, updateJobSchema, } from "../validators/job.validator";
 import {
   getApplicationsController,
   updateApplicationController,
@@ -28,12 +24,12 @@ import requireActiveUser from "../middlewares/requireActiveUser";
 
 const CompanyRoutes = Router();
 
-// Company Profile
 CompanyRoutes.post(
   "/profile",
   authenticateUser,
   authorizeRoles("COMPANY"),
   validate(createCompanySchema),
+  createCompanyController,
   createCompanyController
 );
 
@@ -41,7 +37,7 @@ CompanyRoutes.get(
   "/profile",
   authenticateUser,
   authorizeRoles("COMPANY"),
-  getCompanyProfileController
+  getCompanyProfileController,
 );
 
 CompanyRoutes.put(
@@ -50,51 +46,49 @@ CompanyRoutes.put(
   requireActiveUser,
   authorizeRoles("COMPANY"),
   validate(updateCompanySchema),
-  updateCompanyController
+  updateCompanyController,
 );
 
-// Jobs
 CompanyRoutes.post(
-  "/jobs",
+  "/post-job",
   authenticateUser,
   requireActiveUser,
   authorizeRoles("COMPANY"),
   validate(createJobSchema),
-  createJobController
+  createJobController,
 );
 
 CompanyRoutes.put(
-  "/jobs/:id",
+  "/post-job/:id",
   authenticateUser,
   requireActiveUser,
   authorizeRoles("COMPANY"),
-  validate(updateJobSchema),
-  updateJobController
+  validate(updateCompanySchema),
+  updateJobController,
 );
 
 CompanyRoutes.get(
-  "/jobs",
+  "/get-jobs",
   authenticateUser,
   requireActiveUser,
   authorizeRoles("COMPANY"),
-  getJobsController
+  getJobsController,
 );
 
-// Applications
 CompanyRoutes.get(
-  "/applications",
+  "/get-job-application",
   authenticateUser,
   requireActiveUser,
   authorizeRoles("COMPANY"),
-  getApplicationsController
+  getApplicationsController,
 );
 
 CompanyRoutes.put(
-  "/applications/:id/status",
+  "/update-job-status/:id",
   authenticateUser,
   requireActiveUser,
   authorizeRoles("COMPANY"),
-  updateApplicationController
+  updateApplicationController,
 );
 
 export default CompanyRoutes;
