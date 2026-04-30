@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { Plus, Search, Wrench } from "lucide-react";
+import { Pencil, Plus, Search, Trash2, Wrench } from "lucide-react";
 import { toast } from "sonner";
-import { getAPI, postAPI, putAPI } from "@/apis/api";
+import { deleteAPI, getAPI, postAPI, putAPI } from "@/apis/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -43,11 +43,13 @@ const SkillManagement = () => {
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isUpdateOpen, setIsUpdateOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [newSkillName, setNewSkillName] = useState("");
   const [updateSkillName, setUpdateSkillName] = useState("");
   const [editingSkillId, setEditingSkillId] = useState<number | null>(null);
+  const [deletingSkillId, setDeletingSkillId] = useState<number | null>(null);
 
   const loadSkills = async () => {
     try {
@@ -139,6 +141,25 @@ const SkillManagement = () => {
       await loadSkills();
     } catch (error: any) {
       toast.error(error?.message || "Failed to update skill.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!deletingSkillId) return;
+
+    try {
+      setIsSubmitting(true);
+      const response = await deleteAPI<ApiResponse<any>>(
+        `/skills/delete/${deletingSkillId}`,
+      );
+      toast.success(response?.message || "Skill deleted successfully.");
+      setIsDeleteDialogOpen(false);
+      setDeletingSkillId(null);
+      await loadSkills();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete skill.");
     } finally {
       setIsSubmitting(false);
     }
@@ -276,14 +297,31 @@ const SkillManagement = () => {
                       {skill.id}
                     </TableCell>
                     <TableCell className="text-right pr-6">
-                      <Button
-                        variant="outline"
-                        className="h-8 border-slate-300 hover:bg-slate-100"
-                        onClick={() => void openEditDialog(skill.id)}
-                        disabled={isSubmitting}
-                      >
-                        Edit
-                      </Button>
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                          onClick={() => void openEditDialog(skill.id)}
+                          disabled={isSubmitting}
+                          title="Edit Skill"
+                        >
+                          <Pencil className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
+                          onClick={() => {
+                            setDeletingSkillId(skill.id);
+                            setIsDeleteDialogOpen(true);
+                          }}
+                          disabled={isSubmitting}
+                          title="Delete Skill"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))
@@ -310,7 +348,7 @@ const SkillManagement = () => {
               </label>
               <Input
                 required
-                placeholder="e.g. Swagger"
+                placeholder="e.g. Django Python Framework"
                 value={updateSkillName}
                 onChange={(e) => setUpdateSkillName(e.target.value)}
                 className="h-10 bg-white border-slate-200"
@@ -341,6 +379,46 @@ const SkillManagement = () => {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[420px] bg-white border-none shadow-xl rounded-xl">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold text-slate-900">
+              Delete Skill
+            </DialogTitle>
+            <DialogDescription className="text-slate-500 text-[13px]">
+              Are you sure you want to delete this skill? This action cannot be
+              undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="mt-4 gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              className="flex-1"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+              onClick={() => void handleDelete()}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader size="sm" /> Deleting...
+                </>
+              ) : (
+                "Delete"
+              )}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
