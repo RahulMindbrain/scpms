@@ -20,6 +20,7 @@ import {
   getApplicationsController,
   updateApplicationController,
 } from "../controllers/application.controller";
+import requireActiveUser from "../middlewares/requireActiveUser";
 
 const CompanyRoutes = Router();
 
@@ -41,6 +42,7 @@ CompanyRoutes.get(
 CompanyRoutes.put(
   "/profile",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("COMPANY"),
   validate(updateCompanySchema),
   updateCompanyController,
@@ -49,14 +51,25 @@ CompanyRoutes.put(
 CompanyRoutes.post(
   "/post-job",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("COMPANY"),
   validate(createJobSchema),
   createJobController,
 );
 
+CompanyRoutes.put(
+  "/post-job/:id",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("COMPANY"),
+  validate(updateCompanySchema),
+  updateJobController,
+);
+
 CompanyRoutes.get(
   "/get-jobs",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("COMPANY"),
   getJobsController,
 );
@@ -64,6 +77,7 @@ CompanyRoutes.get(
 CompanyRoutes.get(
   "/get-job-application",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("COMPANY"),
   getApplicationsController,
 );
@@ -71,6 +85,7 @@ CompanyRoutes.get(
 CompanyRoutes.put(
   "/update-job-status/:id",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("COMPANY"),
   updateApplicationController,
 );

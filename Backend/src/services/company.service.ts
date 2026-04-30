@@ -3,12 +3,17 @@ import {
   getCompanyByUserId,
   updateCompany,
 } from "../repository/company.repository";
+import { normalizeCompanyName, normalizeText } from "../utils/normalize.utils";
 
 export const createCompanyService = async (
   userId: number,
   name: string,
   description?: string,
 ) => {
+  name = normalizeCompanyName(name);
+  if (description !== undefined) {
+    description = normalizeText(description);
+  }
   const existing = await getCompanyByUserId(userId);
 
   if (existing) {
@@ -35,6 +40,12 @@ export const updateCompanyService = async (
     description?: string;
   },
 ) => {
+  if (data.name !== undefined) {
+    data.name = normalizeCompanyName(data.name);
+  }
+  if (data.description !== undefined) {
+    data.description = normalizeText(data.description);
+  }
   const existing = await getCompanyByUserId(userId);
 
   if (!existing) {

@@ -9,6 +9,7 @@ import {
 } from "../controllers/notification.controller";
 import authenticateUser from "../middlewares/authenticateUser";
 import { authorizeRoles } from "../middlewares/verifyRole";
+import requireActiveUser from "../middlewares/requireActiveUser";
 
 const notificationRouter = Router();
 
@@ -17,27 +18,36 @@ notificationRouter.get("/", authenticateUser, getNotificationsController);
 notificationRouter.get(
   "/unread-count",
   authenticateUser,
+  requireActiveUser,
   getUnreadCountController,
 );
 
 notificationRouter.put(
   "/mark-all-read",
   authenticateUser,
+  requireActiveUser,
   markAllAsReadController,
 );
 
-notificationRouter.put("/:id/read", authenticateUser, markAsReadController);
+notificationRouter.put(
+  "/:id/read",
+  authenticateUser,
+  requireActiveUser,
+  markAsReadController,
+);
 
 notificationRouter.delete(
   "/:id",
   authenticateUser,
+  requireActiveUser,
   deleteNotificationController,
 );
 
 notificationRouter.get(
   "/upcoming-events",
   authenticateUser,
-  authorizeRoles("STUDENT"),
+  requireActiveUser,
+  //authorizeRoles("STUDENT"),
   getUpcomingEventsController,
 );
 

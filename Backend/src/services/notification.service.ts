@@ -22,7 +22,12 @@ import {
 import { emitToUsers } from "../socket";
 import { SOCKET_EVENTS } from "../socket.event";
 import { sendEmailService } from "./mail/mail.service";
-import { getUpcomingSchedulesForStudent } from "../repository/schedule.repository";
+import {
+  getUpcomingSchedulesForAdmin,
+  getUpcomingSchedulesForCompany,
+  getUpcomingSchedulesForStudent,
+} from "../repository/schedule.repository";
+import { getCompanyByUserId } from "../repository/company.repository";
 
 export const createNotificationService = async (data: any) => {
   return createNotification(data);
@@ -155,18 +160,34 @@ export const deleteNotificationService = async (
   return await deleteNotification(notificationId);
 };
 
-export const getUpcomingEventsService = async (userId: number) => {
-  const student = await getStudentByUserId(userId);
-  if (!student) throw new Error("Student not found");
+export const getUpcomingEventsService = async (
+  userId: number,
+  role: "STUDENT" | "COMPANY" | "ADMIN",
+  page: number = 1,
+  limit: number = 10,
+) => {
+  const skip = (page - 1) * limit;
 
-  const schedules = await getUpcomingSchedulesForStudent(student.id);
+  switch (role) {
+    case "STUDENT": {
+      const student = await getStudentByUserId(userId);
+      if (!student) throw new Error("Student not found");
 
-  return schedules.map((s) => ({
-    id: s.id,
-    title: s.title,
-    company: s.company.name,
-    startTime: s.startTime,
-    endTime: s.endTime,
-    venue: s.venue,
-  }));
+      return getUpcomingSchedulesForStudent(student.id, skip, limit, page);
+    }
+
+    case "COMPANY": {
+      const company = await getCompanyByUserId(userId);
+      if (!company) throw new Error("Company not found");
+
+      return getUpcomingSchedulesForCompany(company.id, skip, limit, page);
+    }
+
+    case "ADMIN": {
+      return getUpcomingSchedulesForAdmin(userId, skip, limit, page);
+    }
+
+    default:
+      throw new Error("Invalid role");
+  }
 };

@@ -40,11 +40,18 @@ export const createScheduleController = async (req: Request, res: Response) => {
 };
 
 export const getAllSchedulesController = async (
-  _req: Request,
+  req: Request,
   res: Response,
 ) => {
   try {
-    const data = await getAllSchedulesService();
+    const { id: userId, role } = res.locals.user;
+
+    const companyId = req.query.companyId
+      ? Number(req.query.companyId)
+      : undefined;
+
+    const data = await getAllSchedulesService(userId, role, companyId);
+
     return sendSuccess(res, 200, "Schedules fetched", data);
   } catch (error: any) {
     return sendError(res, 400, error.message);

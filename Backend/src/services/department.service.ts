@@ -5,8 +5,13 @@ import {
   updateDepartment,
   deleteDepartment,
 } from "../repository/department.repository";
+import {
+  normalizeDepartmentName,
+  normalizeName,
+} from "../utils/normalize.utils";
 
 export const createDepartmentService = async (name: string) => {
+  name = normalizeDepartmentName(name);
   return createDepartment(name);
 };
 
@@ -25,6 +30,7 @@ export const getDepartmentByIdService = async (id: number) => {
 };
 
 export const updateDepartmentService = async (id: number, name: string) => {
+  name = normalizeDepartmentName(name);
   return updateDepartment(id, name);
 };
 

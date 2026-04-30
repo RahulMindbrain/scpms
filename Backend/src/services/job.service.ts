@@ -7,11 +7,24 @@ import {
   updateJob,
 } from "../repository/job.repository";
 import { getSkillsByIds } from "../repository/skill.repostiory";
+import { normalizeText } from "../utils/normalize.utils";
 
 export const createJobService = async (data: any, userId: number) => {
   const { eligibleDepartmentIds, skillIds } = data;
 
   const company = await getCompanyByUserId(userId);
+
+  if (data.title !== undefined) {
+    data.title = normalizeText(data.title);
+  }
+
+  if (data.description !== undefined) {
+    data.description = normalizeText(data.description);
+  }
+
+  if (data.location !== undefined) {
+    data.location = normalizeText(data.location);
+  }
 
   if (!company) {
     throw new Error("Company profile not found");
@@ -83,6 +96,36 @@ export const getJobsService = async (params: {
 };
 
 export const updateJobService = async (id: number, data: any) => {
+  if (!id || isNaN(id)) {
+    throw new Error("Invalid job id");
+  }
+
+  if (data.title !== undefined) {
+    data.title = normalizeText(data.title);
+  }
+
+  if (data.description !== undefined) {
+    data.description = normalizeText(data.description);
+  }
+
+  if (data.location !== undefined) {
+    data.location = normalizeText(data.location);
+  }
+
+  if (data.eligibleDepartmentIds?.length) {
+    const departments = await getDepartmentsByIds(data.eligibleDepartmentIds);
+
+    const foundIds = departments.map((d) => d.id);
+
+    const missingIds = data.eligibleDepartmentIds.filter(
+      (deptId: number) => !foundIds.includes(deptId),
+    );
+
+    if (missingIds.length) {
+      throw new Error(`Invalid department IDs: ${missingIds.join(", ")}`);
+    }
+  }
+
   return updateJob(id, data);
 };
 

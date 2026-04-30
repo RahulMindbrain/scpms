@@ -43,12 +43,21 @@ import { SOCKET_EVENTS } from "../socket.event";
 import { createManyNotifications } from "../repository/notification.repository";
 import { runInBackground } from "../utils/Background.task";
 
+import {
+  normalizeEmails,
+  normalizeName,
+  normalizeText,
+} from "../utils/normalize.utils";
+
 export const createAdminService = async (
   firstname: string,
   lastname: string,
   email: string,
   password: string,
 ) => {
+  firstname = normalizeName(firstname);
+  lastname = normalizeName(lastname);
+  email = normalizeEmails(email);
   const count = await getAdminCount();
 
   if (count > 0) {

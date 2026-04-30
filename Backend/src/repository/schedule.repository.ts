@@ -76,10 +76,15 @@ export const getScheduleById = async (id: number) => {
   });
 };
 
-export const getAllSchedules = async () => {
+export const getAllSchedules = async (companyId: number) => {
   return prisma.interviewSchedule.findMany({
+    where: {
+      companyId,
+    },
     include: baseScheduleInclude,
-    orderBy: { startTime: "asc" },
+    orderBy: {
+      startTime: "asc",
+    },
   });
 };
 
@@ -287,40 +292,327 @@ export const getSchedulesByCompanyIdRepo = async (companyId: number) => {
   });
 };
 
-export const getUpcomingSchedulesForStudent = async (studentId: number) => {
+// export const getUpcomingSchedulesForStudent = async (studentId: number) => {
+//   const now = new Date();
+
+//   return prisma.interviewSchedule.findMany({
+//     where: {
+//       startTime: {
+//         gte: now,
+//       },
+//       jobs: {
+//         some: {
+//           applications: {
+//             some: {
+//               studentId,
+//             },
+//           },
+//         },
+//       },
+//     },
+//     include: {
+//       company: {
+//         select: {
+//           id: true,
+//           name: true,
+//         },
+//       },
+//       jobs: {
+//         select: {
+//           id: true,
+//           title: true,
+//         },
+//       },
+//     },
+//     orderBy: {
+//       startTime: "asc",
+//     },
+//   });
+// };
+
+export const getUpcomingSchedulesForStudent = async (
+  studentId: number,
+  skip: number,
+  take: number,
+  page: number,
+) => {
   const now = new Date();
 
-  return prisma.interviewSchedule.findMany({
-    where: {
-      startTime: {
-        gte: now,
-      },
-      jobs: {
-        some: {
-          applications: {
-            some: {
-              studentId,
-            },
+  const where = {
+    startTime: {
+      gte: now,
+    },
+
+    jobs: {
+      some: {
+        applications: {
+          some: {
+            studentId,
           },
         },
       },
     },
-    include: {
-      company: {
-        select: {
-          id: true,
-          name: true,
+  };
+
+  const [items, total] = await prisma.$transaction([
+    prisma.interviewSchedule.findMany({
+      where,
+
+      include: {
+        company: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+
+        jobs: {
+          where: {
+            applications: {
+              some: {
+                studentId,
+              },
+            },
+          },
+
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            salary: true,
+            location: true,
+            status: true,
+            minCgpa: true,
+            maxCgpa: true,
+            maxBacklogs: true,
+            createdAt: true,
+
+            skills: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+
+            eligibleDepartments: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+
+            applications: {
+              where: {
+                studentId,
+              },
+              select: {
+                id: true,
+                status: true,
+                isAccepted: true,
+                acceptedAt: true,
+                createdAt: true,
+              },
+            },
+          },
         },
       },
-      jobs: {
-        select: {
-          id: true,
-          title: true,
-        },
+
+      orderBy: {
+        startTime: "asc",
       },
+
+      skip,
+      take,
+    }),
+
+    prisma.interviewSchedule.count({
+      where,
+    }),
+  ]);
+
+  return {
+    items,
+    pagination: {
+      page,
+      limit: take,
+      total,
+      totalPages: Math.ceil(total / take),
     },
-    orderBy: {
-      startTime: "asc",
+  };
+};
+
+export const getUpcomingSchedulesForCompany = async (
+  companyId: number,
+  skip: number,
+  take: number,
+  page: number,
+) => {
+  const now = new Date();
+
+  const where = {
+    companyId,
+    startTime: {
+      gte: now,
+    },
+  };
+
+  const [items, total] = await prisma.$transaction([
+    prisma.interviewSchedule.findMany({
+      where,
+      include: {
+        company: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+
+        jobs: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            salary: true,
+            location: true,
+            status: true,
+            minCgpa: true,
+            maxCgpa: true,
+            maxBacklogs: true,
+            createdAt: true,
+
+            skills: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+
+            eligibleDepartments: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+
+      orderBy: {
+        startTime: "asc",
+      },
+
+      skip,
+      take,
+    }),
+
+    prisma.interviewSchedule.count({
+      where,
+    }),
+  ]);
+
+  return {
+    items,
+    pagination: {
+      page,
+      limit: take,
+      total,
+      totalPages: Math.ceil(total / take),
+    },
+  };
+};
+
+export const getUpcomingSchedulesForAdmin = async (
+  userId: number,
+  skip: number,
+  take: number,
+  page: number,
+) => {
+  const now = new Date();
+
+  const admin = await prisma.admin.findUnique({
+    where: {
+      userId,
+    },
+    select: {
+      id: true,
     },
   });
+
+  if (!admin) {
+    throw new Error("Admin not found");
+  }
+
+  const where = {
+    createdBy: admin.id,
+    startTime: {
+      gte: now,
+    },
+  };
+
+  const [items, total] = await prisma.$transaction([
+    prisma.interviewSchedule.findMany({
+      where,
+      include: {
+        company: {
+          select: {
+            id: true,
+            name: true,
+            description: true,
+          },
+        },
+
+        jobs: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            salary: true,
+            location: true,
+            status: true,
+            minCgpa: true,
+            maxCgpa: true,
+            maxBacklogs: true,
+            createdAt: true,
+
+            skills: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+
+            eligibleDepartments: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+      },
+
+      orderBy: {
+        startTime: "asc",
+      },
+
+      skip,
+      take,
+    }),
+
+    prisma.interviewSchedule.count({
+      where,
+    }),
+  ]);
+
+  return {
+    items,
+    pagination: {
+      page,
+      limit: take,
+      total,
+      totalPages: Math.ceil(total / take),
+    },
+  };
 };

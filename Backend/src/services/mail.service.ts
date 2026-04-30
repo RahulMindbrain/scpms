@@ -3,8 +3,8 @@ import { sendMail } from "../utils/mails/transporter.mail";
 type SendEmailParams = {
   recipients: string | string[];
   subject?: string;
-  message?: string; // plain text fallback
-  html?: string; // preferred
+  message?: string;
+  html?: string;
   fromName?: string;
 };
 
@@ -13,7 +13,7 @@ export const sendEmailService = async ({
   subject,
   message,
   html,
- // fromName,
+  // fromName,
 }: SendEmailParams) => {
   try {
     if (!recipients) {
@@ -35,7 +35,7 @@ export const sendEmailService = async ({
         to: emails,
         subject: finalSubject,
         html: finalHtml,
-       // fromName,
+        // fromName,
       });
     }
 
@@ -45,7 +45,7 @@ export const sendEmailService = async ({
           to: email,
           subject: finalSubject,
           html: finalHtml,
-         // fromName,
+          // fromName,
         }),
       ),
     );

@@ -20,13 +20,15 @@ import {
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { sendOtpEmail } from "../utils/mails/otp.mail.helper";
+import { normalizeEmails } from "../utils/normalize.utils";
 
 const OTP_EXPIRY = Number(process.env.OTP_EXPIRY_MINUTES || 5);
 const MAX_GEN = Number(process.env.OTP_MAX_GENERATIONS || 5);
 const MAX_ATTEMPTS = Number(process.env.OTP_MAX_ATTEMPTS || 5);
 
-export const loginService = async (mobile: string, password: string) => {
-  const existUser = await findByEmail(mobile);
+export const loginService = async (email: string, password: string) => {
+  email = normalizeEmails(email);
+  const existUser = await findByEmail(email);
 
   if (!existUser) {
     throw new Error("Invalid email or password");
@@ -103,6 +105,7 @@ export const logoutService = async (id: number) => {
 };
 
 export const forgotPasswordService = async (email: string) => {
+  email = normalizeEmails(email);
   const user = await getUserOtpState(email);
   if (!user) throw new Error("User not found");
 
@@ -133,16 +136,13 @@ export const forgotPasswordService = async (email: string) => {
 };
 
 export const resendOtpService = async (email: string) => {
+  email = normalizeEmails(email);
   const user = await getUserOtpState(email);
   if (!user) throw new Error("User not found");
 
   const now = new Date();
 
-  if (
-    user.otp &&
-    user.otpExpiry &&
-    now.getTime() < new Date(user.otpExpiry).getTime()
-  ) {
+  if (user.otp && user.otpExpiry && now.getTime() < user.otpExpiry.getTime()) {
     throw new Error("OTP still valid. Cannot resend yet.");
   }
 
@@ -154,8 +154,6 @@ export const resendOtpService = async (email: string) => {
 
   const updated = await storeOtpByUserId(user.id, hashedOtp, OTP_EXPIRY);
 
-  await sendOtpEmail(user.email, otp);
-
   return {
     message: "OTP resent",
     otpExpiry: updated.otpExpiry,
@@ -163,6 +161,7 @@ export const resendOtpService = async (email: string) => {
 };
 
 export const verifyOtpService = async (email: string, inputOtp: string) => {
+  email = normalizeEmails(email);
   const user = await getUserOtpState(email);
 
   if (!user) throw new Error("User not found");
@@ -197,6 +196,7 @@ export const resetPasswordService = async (
   email: string,
   newPassword: string,
 ) => {
+  email = normalizeEmails(email);
   const user = await getUserOtpState(email);
   if (!user) throw new Error("User not found");
 

@@ -54,10 +54,10 @@ const authenticateUser = async (
       return;
     }
 
-    if (user.status !== "ACTIVE") {
-      sendError(res, 403, "Account not approved");
-      return;
-    }
+    // if (user.status !== "ACTIVE") {
+    //   sendError(res, 403, "Account not approved");
+    //   return;
+    // }
 
     res.locals.user = user;
 

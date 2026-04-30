@@ -6,6 +6,7 @@ import {
   updateUser,
 } from "../repository/user.repository";
 import { hashPassword } from "../utils/hashPassword";
+import { normalizeEmails, normalizeName } from "../utils/normalize.utils";
 
 export const createUserService = async (
   firstname: string,
@@ -14,6 +15,10 @@ export const createUserService = async (
   password: string,
   role: Role,
 ) => {
+  firstname = normalizeName(firstname);
+  lastname = normalizeName(lastname);
+  email = normalizeEmails(email);
+
   const existingUser = await findUserByEmail(email);
 
   if (existingUser) {
@@ -50,6 +55,13 @@ export const updateUserService = async (
     lastname?: string;
   },
 ) => {
+  if (data.firstname !== undefined) {
+    data.firstname = normalizeName(data.firstname);
+  }
+
+  if (data.lastname !== undefined) {
+    data.lastname = normalizeName(data.lastname);
+  }
   const existing = await getUserById(userId);
 
   if (!existing) {
