@@ -27,16 +27,17 @@ export function NotificationBell() {
   const navigate = useNavigate();
   const apiUnreadCount = useSelector((state: RootState) => state.notification.unreadCount);
   const apiNotifications = useSelector((state: RootState) => state.notification.items);
+  const isLoggedIn = !!userType;
   const isStudent = userType === "STUDENT";
 
   useEffect(() => {
-    if (isStudent) {
+    if (isLoggedIn) {
       dispatch(fetchUnreadCount());
       dispatch(fetchNotifications({ page: 1, limit: 10 }));
     }
-  }, [dispatch, isStudent]);
+  }, [dispatch, isLoggedIn]);
 
-  const studentNotifications = apiNotifications.map((notification) => ({
+  const mappedApiNotifications = apiNotifications.map((notification) => ({
     id: notification.id,
     title: notification.title || "Notification",
     message: notification.message || "No message available.",
@@ -46,18 +47,16 @@ export function NotificationBell() {
     read: notification.read,
   }));
 
-  const displayedNotifications = isStudent ? studentNotifications : notifications;
-  const displayedUnreadCount = isStudent ? apiUnreadCount : unreadCount;
+  const displayedNotifications = mappedApiNotifications.length > 0 ? mappedApiNotifications : notifications;
+  const displayedUnreadCount = mappedApiNotifications.length > 0 ? apiUnreadCount : unreadCount;
   const notificationsPagePath =
     userType === "ADMIN"
       ? "/admin/notification"
       : userType === "COMPANY"
-        ? "/company/interviews"
+        ? "/company/notifications"
         : "/student/notifications";
 
-  const totalUnreadCount = isStudent
-    ? Math.max(unreadCount, apiUnreadCount)
-    : unreadCount;
+  const totalUnreadCount = Math.max(unreadCount, apiUnreadCount);
 
   return (
     <DropdownMenu>
@@ -95,11 +94,8 @@ export function NotificationBell() {
                     size="sm"
                     className="h-8 text-xs font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50/50 transition-colors"
                     onClick={() => {
-                      if (isStudent) {
-                        dispatch(markAllNotificationsAsRead());
-                      } else {
-                        markAllAsRead();
-                      }
+                      dispatch(markAllNotificationsAsRead());
+                      markAllAsRead();
                     }}
                   >
                     Mark all read
@@ -127,12 +123,9 @@ export function NotificationBell() {
                     }`}
                     onClick={async () => {
                       if (!notification.read) {
-                        if (isStudent) {
-                          await dispatch(markNotificationAsRead(Number(notification.id)));
-                          dispatch(fetchUnreadCount());
-                        } else {
-                          markAsRead(String(notification.id));
-                        }
+                        await dispatch(markNotificationAsRead(Number(notification.id)));
+                        dispatch(fetchUnreadCount());
+                        markAsRead(String(notification.id));
                       }
                       navigate(notificationsPagePath);
                     }}

@@ -52,6 +52,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         secondary: [
           // { title: "Analytics", url: "/admin/report", icon: <BarChart3 /> },
           { title: "Bulk Email", url: "/admin/bulk-email", icon: <Mail /> },
+          { title: "Notifications", url: "/admin/notification", icon: <Bell /> },
           { title: "Departments", url: "/admin/departments", icon: <Building2 /> },
             // { title: "Document Management", url: "/admin/documents", icon: <Folder /> },
           // { title: "Settings", url: "/admin/setting", icon: <Settings /> },
@@ -84,6 +85,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         secondary: [
           { title: "Shortlist", url: "/company/shortlist", icon: <ListChecks /> },
           { title: "Interview Rounds", url: "/company/interviews", icon: <Calendar /> },
+          { title: "Notifications", url: "/company/notifications", icon: <Bell /> },
           // { title: "Update Results", url: "/company/results", icon: <FileEdit /> },
         ],
       }

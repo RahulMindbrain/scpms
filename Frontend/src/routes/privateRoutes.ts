@@ -30,6 +30,7 @@ import Shortlist from "@/pages/private/company/selection/Shortlist";
 import InterviewRounds from "@/pages/private/company/selection/InterviewRounds";
 import UpdateResults from "@/pages/private/company/selection/UpdateResults";
 import CompanyProfile from "@/pages/private/company/profile/CompanyProfile";
+import CompanyNotificationPage from "@/pages/private/company/notification/Notification";
 
 export const PrivateRoutes: RouteOptions<any>[] = [
     {
@@ -170,5 +171,9 @@ export const PrivateRoutes: RouteOptions<any>[] = [
     {
         path: "/company/results",
         component: UpdateResults
+    },
+    {
+        path: "/company/notifications",
+        component: CompanyNotificationPage
     },
 ];
