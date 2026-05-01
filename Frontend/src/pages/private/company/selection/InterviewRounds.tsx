@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Calendar, Clock, MapPin, Info, User, Search, ChevronRight, Loader2,
   MessageSquare
@@ -183,26 +183,26 @@ const CompanyInterviewManager: React.FC = () => {
       </div>
 
       {/* Stats Overview Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {[
           { label: 'Total Rounds', value: stats.total, color: 'indigo', icon: Calendar },
           { label: 'Pending', value: stats.pending, color: 'amber', icon: Clock },
           { label: 'Candidates', value: stats.activeCandidates, color: 'emerald', icon: User }
         ].map((stat, idx) => (
-          <div key={idx} className="bg-[#1e1f26] border border-[rgba(255,255,255,0.07)] rounded-2xl p-6 hover:border-indigo-500/20 transition-all">
-            <div className="flex items-center justify-between mb-4">
+          <div key={idx} className="bg-[#1e1f26] border border-[rgba(255,255,255,0.07)] rounded-xl p-5 hover:border-indigo-500/30 transition-all group">
+            <div className="flex items-center justify-between mb-3">
               <div className={cn(
-                "w-10 h-10 rounded-xl flex items-center justify-center",
+                "w-9 h-9 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110",
                 stat.color === 'indigo' ? "bg-indigo-500/10 text-indigo-400" : 
                 stat.color === 'amber' ? "bg-amber-500/10 text-amber-400" : 
                 "bg-emerald-500/10 text-emerald-400"
               )}>
-                <stat.icon className="w-5 h-5" />
+                <stat.icon className="w-4.5 h-4.5" />
               </div>
-              <span className="text-[10px] font-bold text-[#c7c4d7] uppercase tracking-widest">Real-time</span>
+              <span className="text-[9px] font-bold text-[#908fa0] uppercase tracking-widest opacity-60">Snapshot</span>
             </div>
-            <p className="text-[#908fa0] font-bold text-xs uppercase tracking-widest mb-1">{stat.label}</p>
-            <p className="text-3xl font-black text-[#e2e2eb]">{stat.value}</p>
+            <p className="text-[#908fa0] font-bold text-[10px] uppercase tracking-widest mb-0.5">{stat.label}</p>
+            <p className="text-2xl font-bold text-[#e2e2eb]">{stat.value}</p>
           </div>
         ))}
       </div>
@@ -227,13 +227,13 @@ const CompanyInterviewManager: React.FC = () => {
           </div>
 
           <div className="relative flex-1 lg:max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#908fa0]" />
             <input
               type="text"
               placeholder="Search schedule..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2.5 bg-[rgba(255,255,255,0.02)] border-none rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all text-xs font-medium text-[#c7c4d7] placeholder:text-[#c7c4d7]"
+              className="w-full pl-9 pr-4 py-2 bg-[#0c0e14] border border-[rgba(255,255,255,0.08)] rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500/50 transition-all text-xs font-medium text-[#e2e2eb] placeholder:text-[#908fa0]"
             />
           </div>
         </div>
@@ -316,27 +316,27 @@ const CompanyInterviewManager: React.FC = () => {
                   </div>
 
                   {/* Right Side: Approval Actions */}
-                  <div className="flex flex-row lg:flex-col gap-3 w-full lg:w-[160px]">
+                  <div className="flex flex-row lg:flex-col gap-2 w-full lg:w-[140px]">
                     {schedule.companyApprovalStatus === 'PENDING' ? (
                       <>
                         <Button 
                           onClick={() => handleUpdateStatus(schedule.id, 'APPROVED')}
                           disabled={statusLoading === schedule.id}
-                          className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold py-5 text-xs uppercase tracking-widest transition-all"
+                          className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold py-2.5 text-[10px] uppercase tracking-widest transition-all"
                         >
-                          {statusLoading === schedule.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Approve'}
+                          {statusLoading === schedule.id ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Approve'}
                         </Button>
                         <Button 
                           variant="ghost"
                           onClick={() => { setSelectedSchedule(schedule); setIsRejectModalOpen(true); }}
-                          className="flex-1 text-rose-400 hover:bg-rose-500/10 rounded-xl font-bold py-5 text-xs uppercase tracking-widest transition-all"
+                          className="flex-1 text-rose-400 hover:bg-rose-500/10 rounded-xl font-bold py-2.5 text-[10px] uppercase tracking-widest transition-all"
                         >
                           Decline
                         </Button>
                       </>
                     ) : (
                       <div className={cn(
-                        "w-full py-3 text-center rounded-xl font-black text-[10px] uppercase tracking-[0.2em] border",
+                        "w-full py-2.5 text-center rounded-xl font-bold text-[9px] uppercase tracking-[0.15em] border",
                         schedule.companyApprovalStatus === 'APPROVED' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border-rose-500/20"
                       )}>
                         {schedule.companyApprovalStatus}

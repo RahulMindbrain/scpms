@@ -145,7 +145,7 @@ const AdminJobManagement: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#111319] pb-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
+      <div className="px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
 
         {/* Top Header Section */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">

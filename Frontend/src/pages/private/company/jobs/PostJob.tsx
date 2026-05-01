@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import {
@@ -22,7 +22,7 @@ import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import Loader from '@/components/Loader';
 
-const inputBase = "w-full pl-12 pr-4 py-3.5 rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#0c0e14] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-[#e2e2eb] placeholder:text-[#908fa0] font-medium";
+const inputBase = "w-full pl-11 pr-4 py-2.5 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0c0e14] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-[#e2e2eb] placeholder:text-[#908fa0] text-sm font-medium";
 
 const PostJob: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -130,22 +130,22 @@ const PostJob: React.FC = () => {
     <div className="font-sans">
       <div className="max-w-4xl mx-auto bg-[#1e1f26] rounded-[2rem] border border-[rgba(255,255,255,0.07)] overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
         {/* Header */}
-        <header className="p-8 sm:p-10 border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]">
-          <h1 className="text-3xl font-extrabold text-[#e2e2eb] tracking-tight">Create New Job Drive</h1>
-          <p className="mt-2 text-[#908fa0] text-lg">Configure your recruitment requirements to find the best talent.</p>
+        <header className="p-6 sm:p-8 border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]">
+          <h1 className="text-2xl font-extrabold text-[#e2e2eb] tracking-tight">Create New Job Drive</h1>
+          <p className="mt-1 text-[#908fa0] text-sm">Configure your recruitment requirements to find the best talent.</p>
         </header>
 
-        <form onSubmit={handleSubmit} className="p-8 sm:p-10 space-y-12">
+        <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-8">
           {/* Basic Information */}
-          <section className="space-y-8">
+          <section className="space-y-6">
             <h2 className="flex items-center gap-3 text-xl font-bold text-[#e2e2eb]">
               <span className="p-2 bg-indigo-500/10 text-indigo-400 rounded-xl"><Briefcase size={22} /></span>
               Basic Information
             </h2>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#c7c4d7] ml-1">Job Title</label>
+                <label className="text-xs font-bold uppercase tracking-wider text-[#908fa0] ml-1">Job Title</label>
                 <div className="relative group">
                   <Zap className="absolute left-4 top-1/2 -translate-y-1/2 text-[#908fa0] group-focus-within:text-indigo-400 transition-colors" size={18} />
                   <input type="text" name="title" value={formData.title} onChange={handleInputChange}

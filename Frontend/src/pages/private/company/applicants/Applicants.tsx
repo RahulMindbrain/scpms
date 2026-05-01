@@ -125,20 +125,20 @@ const Applicants: React.FC = () => {
               ) : (
                 filteredApplicants.map((app: any, index: number) => (
                   <tr key={index} className="hover:bg-[rgba(255,255,255,0.025)] transition-all group">
-                    <td className="px-4 py-4 font-bold text-[#e2e2eb]">
+                    <td className="px-4 py-3 font-bold text-[#e2e2eb] text-sm">
                       {app.student?.user?.firstname || 'N/A'} {app.student?.user?.lastname || ''}
                     </td>
-                    <td className="px-4 py-4 text-sm font-medium text-[#908fa0]">{app.student?.department?.name || `Dept ${app.student?.departmentId || 'N/A'}`}</td>
-                    <td className="px-4 py-4 text-sm font-black text-[#c7c4d7]">{app.student?.cgpa || 'N/A'}</td>
-                    <td className="px-4 py-4 text-sm font-medium text-[#c7c4d7]">{app.job?.title || 'N/A'}</td>
-                    <td className="px-4 py-4 font-bold">
+                    <td className="px-4 py-3 text-xs font-medium text-[#908fa0]">{app.student?.department?.name || `Dept ${app.student?.departmentId || 'N/A'}`}</td>
+                    <td className="px-4 py-3 text-xs font-black text-[#c7c4d7]">{app.student?.cgpa || 'N/A'}</td>
+                    <td className="px-4 py-3 text-xs font-medium text-[#c7c4d7]">{app.job?.title || 'N/A'}</td>
+                    <td className="px-4 py-3 font-bold">
                       <Select
                         value={app.status}
                         onValueChange={(value) => handleStatusUpdate(app.id, value)}
                       >
-                        <SelectTrigger className="w-[140px] h-9 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] rounded-xl hover:bg-[rgba(255,255,255,0.07)] transition-colors text-[#e2e2eb]">
+                        <SelectTrigger className="w-[120px] h-7 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] rounded-lg hover:bg-[rgba(255,255,255,0.07)] transition-colors text-[11px] text-[#e2e2eb]">
                           <SelectValue>
-                            <Badge variant={
+                            <Badge className="text-[10px] py-0 px-2" variant={
                               app.status === 'SELECTED' ? 'success' :
                                 app.status === 'REJECTED' ? 'danger' :
                                   app.status === 'SHORTLISTED' ? 'default' :

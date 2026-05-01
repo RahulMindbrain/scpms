@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect, useMemo } from 'react';
-import { 
-  Plus, Edit3, Building2, Clock, 
-  MapPin, Briefcase, ChevronDown, ChevronUp, 
+import {
+  Plus, Edit3, Building2, Clock,
+  MapPin, Briefcase, ChevronDown, ChevronUp,
   Trash2, Search, Users, MessageSquare, Send
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -32,7 +32,7 @@ const InterviewSchedulerPage: React.FC = () => {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('all');
-  
+
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
   const [mode, setMode] = useState<'create' | 'edit'>('edit');
@@ -141,20 +141,20 @@ const InterviewSchedulerPage: React.FC = () => {
 
   const filteredSchedules = Array.isArray(schedules)
     ? schedules.filter((s) => {
-        const matchesCompany =
-          selectedCompanyId === 'all' ||
-          String(s.companyId) === selectedCompanyId;
-        const matchesSearch =
-          s.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          s.company?.name?.toLowerCase().includes(searchTerm.toLowerCase());
-        return matchesCompany && matchesSearch;
-      })
+      const matchesCompany =
+        selectedCompanyId === 'all' ||
+        String(s.companyId) === selectedCompanyId;
+      const matchesSearch =
+        s.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        s.company?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      return matchesCompany && matchesSearch;
+    })
     : [];
 
   return (
     <div className="min-h-screen bg-[#111319] p-4 sm:p-6 md:p-8">
-      <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
-        
+      <div className="space-y-6 md:space-y-8">
+
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-1">
@@ -179,8 +179,8 @@ const InterviewSchedulerPage: React.FC = () => {
             </div>
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
-              <Input 
-                placeholder="Search drives..." 
+              <Input
+                placeholder="Search drives..."
                 className="pl-10 w-full sm:w-[200px] md:w-[250px] border-none bg-[#1e1f26] shadow-sm ring-1 ring-slate-200 focus:ring-primary/40 rounded-xl h-11"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -195,23 +195,23 @@ const InterviewSchedulerPage: React.FC = () => {
         {/* Drives List */}
         <div className="space-y-4">
           {loading ? (
-             <div className="py-20">
-                <Loader text="Syncing data..." />
-             </div>
+            <div className="py-20">
+              <Loader text="Syncing data..." />
+            </div>
           ) : filteredSchedules.map((drive) => {
             const dateInfo = formatDate(drive.startTime);
             const isExpanded = expandedId === drive.id;
 
             return (
-              <Card 
-                key={drive.id} 
+              <Card
+                key={drive.id}
                 className={cn(
                   "border-none shadow-sm transition-all duration-300 overflow-hidden group",
                   isExpanded ? "ring-2 ring-primary/20 shadow-xl" : "hover:shadow-md"
                 )}
               >
                 <CardContent className="p-0">
-                  <div 
+                  <div
                     className="flex flex-col lg:flex-row cursor-pointer select-none"
                     onClick={() => toggleExpand(drive.id)}
                   >
@@ -236,8 +236,8 @@ const InterviewSchedulerPage: React.FC = () => {
                         <Badge className={cn(
                           "px-4 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-[0.1em] border-none shadow-sm h-fit self-start",
                           drive.status === 'COMPLETED' ? "bg-emerald-500/10 text-emerald-600" :
-                          drive.status === 'ONGOING' ? "bg-sky-500/10 text-sky-600" :
-                          "bg-amber-500/10 text-amber-600"
+                            drive.status === 'ONGOING' ? "bg-sky-500/10 text-sky-600" :
+                              "bg-amber-500/10 text-amber-600"
                         )}>
                           {drive.status}
                         </Badge>
@@ -246,25 +246,25 @@ const InterviewSchedulerPage: React.FC = () => {
                       {/* Quick Info Grid */}
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                         <div className="flex items-center gap-3">
-                             <div className="p-2 bg-slate-100 rounded-lg text-primary"><Clock size={16} /></div>
-                             <div className="flex flex-col">
-                                <span className="text-[9px] font-black text-[#908fa0] uppercase">Timing</span>
-                                <span className="text-xs sm:text-sm font-bold text-[#c7c4d7]">{formatTime(drive.startTime)} - {formatTime(drive.endTime)}</span>
-                             </div>
+                          <div className="p-2 bg-slate-100 rounded-lg text-primary"><Clock size={16} /></div>
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-black text-[#908fa0] uppercase">Timing</span>
+                            <span className="text-xs sm:text-sm font-bold text-[#c7c4d7]">{formatTime(drive.startTime)} - {formatTime(drive.endTime)}</span>
+                          </div>
                         </div>
                         <div className="flex items-center gap-3">
-                             <div className="p-2 bg-slate-100 rounded-lg text-rose-500"><MapPin size={16} /></div>
-                             <div className="flex flex-col">
-                                <span className="text-[9px] font-black text-[#908fa0] uppercase">Venue</span>
-                                <span className="text-xs sm:text-sm font-bold text-[#c7c4d7] truncate max-w-[150px]">{drive.venue}</span>
-                             </div>
+                          <div className="p-2 bg-slate-100 rounded-lg text-rose-500"><MapPin size={16} /></div>
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-black text-[#908fa0] uppercase">Venue</span>
+                            <span className="text-xs sm:text-sm font-bold text-[#c7c4d7] truncate max-w-[150px]">{drive.venue}</span>
+                          </div>
                         </div>
                         <div className="flex items-center gap-3">
-                             <div className="p-2 bg-slate-100 rounded-lg text-amber-500"><Briefcase size={16} /></div>
-                             <div className="flex flex-col">
-                                <span className="text-[9px] font-black text-[#908fa0] uppercase">Openings</span>
-                                <span className="text-xs sm:text-sm font-bold text-[#c7c4d7]">{drive.jobs?.length || 0} Roles</span>
-                             </div>
+                          <div className="p-2 bg-slate-100 rounded-lg text-amber-500"><Briefcase size={16} /></div>
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-black text-[#908fa0] uppercase">Openings</span>
+                            <span className="text-xs sm:text-sm font-bold text-[#c7c4d7]">{drive.jobs?.length || 0} Roles</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -291,7 +291,7 @@ const InterviewSchedulerPage: React.FC = () => {
                         </Button>
                       </div>
                       <div className="w-10 h-10 rounded-xl bg-slate-200/50 flex items-center justify-center text-[#908fa0]">
-                         {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                        {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                       </div>
                     </div>
                   </div>
@@ -341,11 +341,11 @@ const InterviewSchedulerPage: React.FC = () => {
         </div>
       </div>
 
-      <EditScheduleModal 
-        schedule={selectedSchedule} 
-        open={isEditModalOpen} 
+      <EditScheduleModal
+        schedule={selectedSchedule}
+        open={isEditModalOpen}
         onOpenChange={setIsEditModalOpen}
-        mode={mode} 
+        mode={mode}
       />
 
       <Modal

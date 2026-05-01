@@ -67,7 +67,7 @@ export function SectionCards({ totalPlaced, avgSalary, totalStudents, totalDepar
   const values = { totalPlaced, avgSalary, totalStudents, totalDepartments }
 
   return (
-    <div className="grid grid-cols-1 gap-4 px-4 lg:px-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
       {cards.map(({ label, sub, footer, icon: Icon, gradient, border, iconBg, key, format }) => (
         <Card
           key={key}

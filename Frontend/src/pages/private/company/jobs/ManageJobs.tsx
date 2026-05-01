@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Eye, Edit2, Trash2 } from 'lucide-react';
 // import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -34,7 +34,7 @@ const ManageJobs: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
+    <div className="space-y-6 animate-in fade-in duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-end gap-4">
         {/* <Button className="font-bold px-6 py-6 rounded-2xl shadow-lg shadow-blue-500/20">
           <Plus className="w-5 h-5 mr-2" /> Post New Job
@@ -42,8 +42,8 @@ const ManageJobs: React.FC = () => {
       </div>
 
       <div className="bg-[#1e1f26] rounded-2xl border border-[rgba(255,255,255,0.07)] overflow-hidden">
-        <div className="p-6 border-b border-[rgba(255,255,255,0.06)]">
-          <h2 className="text-xl font-bold">Your Job Postings</h2>
+        <div className="p-5 border-b border-[rgba(255,255,255,0.06)]">
+          <h2 className="text-lg font-bold text-[#e2e2eb]">Your Job Postings</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -73,37 +73,37 @@ const ManageJobs: React.FC = () => {
                 </tr>
               ) : (
                 jobs?.map((job: any) => (
-                  <tr key={job.id} className="hover:bg-[rgba(255,255,255,0.03)] transition-colors group">
-                    <td className="px-6 py-5 font-bold text-[#e2e2eb]">{job.title}</td>
-                    <td className="px-6 py-5 text-sm font-medium text-[#c7c4d7]">{formatSalary(job.salary)}</td>
-                    <td className="px-6 py-5 text-sm font-medium text-[#c7c4d7]">{job.location}</td>
-                    <td className="px-6 py-5 text-sm font-bold text-[#c7c4d7] text-center">0</td>
-                    <td className="px-6 py-5 text-sm font-medium text-[#908fa0]">
+                  <tr key={job.id} className="hover:bg-[rgba(255,255,255,0.02)] transition-colors group border-b border-[rgba(255,255,255,0.04)] last:border-0">
+                    <td className="px-6 py-3.5 font-bold text-[#e2e2eb]">{job.title}</td>
+                    <td className="px-6 py-3.5 text-xs font-medium text-[#c7c4d7]">{formatSalary(job.salary)}</td>
+                    <td className="px-6 py-3.5 text-xs font-medium text-[#c7c4d7]">{job.location}</td>
+                    <td className="px-6 py-3.5 text-xs font-bold text-[#c7c4d7] text-center">0</td>
+                    <td className="px-6 py-3.5 text-xs font-medium text-[#908fa0]">
                       {job.createdAt ? new Date(job.createdAt).toLocaleDateString('en-US', {
                         month: 'short',
                         day: '2-digit',
                         year: 'numeric'
                       }) : 'N/A'}
                     </td>
-                    <td className="px-6 py-5">
+                    <td className="px-6 py-3.5">
                       <Badge variant={
                         job.status === 'APPROVED' || job.status === 'Active' ? 'default' : 
                         job.status === 'REJECTED' || job.status === 'Closed' ? 'danger' : 
                         'outline'
-                      }>
+                      } className="px-2 py-0.5 text-[10px]">
                         {job.status}
                       </Badge>
                     </td>
-                    <td className="px-6 py-5">
-                      <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-[#908fa0] hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">
-                          <Eye className="w-4 h-4" />
+                    <td className="px-6 py-3.5">
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button className="p-1.5 text-[#908fa0] hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">
+                          <Eye className="w-3.5 h-3.5" />
                         </button>
-                        <button className="p-2 text-[#908fa0] hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all">
-                          <Edit2 className="w-4 h-4" />
+                        <button className="p-1.5 text-[#908fa0] hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all">
+                          <Edit2 className="w-3.5 h-3.5" />
                         </button>
-                        <button className="p-2 text-[#908fa0] hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all">
-                          <Trash2 className="w-4 h-4" />
+                        <button className="p-1.5 text-[#908fa0] hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all">
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       </div>
                     </td>

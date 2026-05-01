@@ -139,7 +139,7 @@ const CompanyManagement: React.FC = () => {
 
   if (error) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-12 flex flex-col items-center justify-center space-y-4">
+      <div className=" px-4 py-12 flex flex-col items-center justify-center space-y-4">
         <div className="p-4 bg-rose-50 rounded-full">
           <XCircle className="w-12 h-12 text-rose-500" />
         </div>
@@ -160,7 +160,7 @@ const CompanyManagement: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#111319] pb-12">
-      <div className="max-w-7xl mx-auto px-6 pt-8 space-y-8 ">
+      <div className=" px-6 pt-8 space-y-8 ">
         {/* Modern Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-1">
@@ -222,8 +222,8 @@ const CompanyManagement: React.FC = () => {
                 key={opt}
                 onClick={() => setFilter(opt)}
                 className={`shrink-0 px-6 py-2.5 rounded-[0.85rem] text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 ${filter === opt
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
-                    : 'text-[#908fa0] hover:text-[#e2e2eb] hover:bg-[rgba(255,255,255,0.05)]'
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+                  : 'text-[#908fa0] hover:text-[#e2e2eb] hover:bg-[rgba(255,255,255,0.05)]'
                   }`}
               >
                 {opt}
@@ -325,8 +325,8 @@ const CompanyManagement: React.FC = () => {
                   <button
                     onClick={() => toggleApproval(company.id, company.userId, company.approval)}
                     className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${company.approval === 'Approved'
-                        ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100'
-                        : 'bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-100'
+                      ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100'
+                      : 'bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-100'
                       }`}
                   >
                     {company.approval === 'Approved' ? (
@@ -454,8 +454,8 @@ const CompanyManagement: React.FC = () => {
                     }
                   }}
                   className={`px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all ${jobsStatusFilter === status
-                      ? 'bg-white text-slate-900 shadow-sm'
-                      : 'text-slate-500 hover:text-slate-700'
+                    ? 'bg-white text-slate-900 shadow-sm'
+                    : 'text-slate-500 hover:text-slate-700'
                     }`}
                 >
                   {status}

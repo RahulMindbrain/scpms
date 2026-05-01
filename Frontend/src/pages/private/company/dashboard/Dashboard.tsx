@@ -90,7 +90,7 @@ export default function Dashboard() {
             totalStudents={metrics.totalApplicants}
             totalDepartments={metrics.deptStats.length}
           />
-          <div className="px-4 lg:px-6">
+          <div className="">
             <ChartAreaInteractive data={metrics.deptStats} />
           </div>
           <DeptStatsTable deptStats={metrics.deptStats} />

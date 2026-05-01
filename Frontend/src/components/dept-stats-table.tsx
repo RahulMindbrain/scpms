@@ -32,7 +32,7 @@ function PlacementBadge({ pct }: { pct: number }) {
 
 export function DeptStatsTable({ deptStats }: DeptStatsTableProps) {
   return (
-    <div className="px-4 lg:px-6">
+    <div className="">
       <div className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[#1e1f26] overflow-hidden">
         <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.06)] flex items-center gap-2">
           <h3 className="text-sm font-semibold text-[#e2e2eb]">Department-wise Placement Stats</h3>

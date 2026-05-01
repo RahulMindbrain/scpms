@@ -73,7 +73,7 @@ const PlacementDriveManagement: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [expandedCompanies, setExpandedCompanies] = useState<Record<number, boolean>>({});
-  
+
   const filterRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch<AppDispatch>();
   const { jobs: reduxJobs, loading, error } = useSelector((state: RootState) => state.drive);
@@ -102,11 +102,11 @@ const PlacementDriveManagement: React.FC = () => {
 
   const processedDrives = useMemo(() => {
     const now = new Date();
-    
+
     // 1. Map and Enrich Jobs
     const enrichedJobs = reduxJobs.map((job: Job) => {
       const scheduleDate = job.createdAt ? new Date(job.createdAt) : null;
-      
+
       let status: 'active' | 'completed' | 'upcoming' = 'active';
       if (job.status === 'CLOSED' || job.status === 'REJECTED') {
         status = 'completed';
@@ -116,8 +116,8 @@ const PlacementDriveManagement: React.FC = () => {
 
       // Handle both salary and salaryRange fields
       const salaryValue = job.salary || job.salaryRange;
-      const formattedSalary = salaryValue 
-        ? `₹${Number(salaryValue).toLocaleString('en-IN')}` 
+      const formattedSalary = salaryValue
+        ? `₹${Number(salaryValue).toLocaleString('en-IN')}`
         : 'N/A';
 
       return {
@@ -136,10 +136,10 @@ const PlacementDriveManagement: React.FC = () => {
     // 2. Filter Jobs
     const filteredJobs = enrichedJobs.filter(job => {
       const matchesFilter = activeFilter === 'All Drives' || job.status.toLowerCase() === activeFilter.toLowerCase();
-      const matchesSearch = 
-        job.title?.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      const matchesSearch =
+        job.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         job.company?.name?.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       return matchesFilter && matchesSearch;
     });
 
@@ -148,7 +148,7 @@ const PlacementDriveManagement: React.FC = () => {
     filteredJobs.forEach(job => {
       const companyId = job.company?.id;
       if (!companyId) return;
-      
+
       if (!groups[companyId]) {
         groups[companyId] = {
           company: job.company,
@@ -157,7 +157,7 @@ const PlacementDriveManagement: React.FC = () => {
       }
       groups[companyId].jobs.push(job);
     });
-    
+
     return Object.values(groups);
   }, [reduxJobs, activeFilter, searchQuery]);
 
@@ -169,21 +169,21 @@ const PlacementDriveManagement: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#111319]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-        
+      <div className=" px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <div className="space-y-2">
             <h1 className="text-4xl font-extrabold text-[#e2e2eb] tracking-tight">Placement Drives</h1>
             <p className="text-lg text-[#908fa0] font-medium">Manage and monitor recruitment cycles with ease.</p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             {/* Search Bar */}
             <div className="relative group w-full sm:w-auto sm:min-w-[300px]">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0] group-focus-within:text-blue-500 transition-colors" />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Search company or role..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -263,7 +263,7 @@ const PlacementDriveManagement: React.FC = () => {
               <h3 className="text-rose-900 font-bold uppercase tracking-tight">Data Fetching Failed</h3>
               <p className="text-rose-600 text-sm font-medium">{error}</p>
             </div>
-            <button 
+            <button
               onClick={() => dispatch(fetchJobs({ status: 'APPROVED' }))}
               className="px-8 py-3 bg-rose-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-rose-700 transition-all shadow-lg active:scale-95"
             >
@@ -281,11 +281,11 @@ const PlacementDriveManagement: React.FC = () => {
             {processedDrives.length > 0 ? (
               processedDrives.map((group) => {
                 const isExpanded = expandedCompanies[group.company.id] ?? true;
-                
+
                 return (
                   <div key={group.company.id} className="group/company space-y-4">
                     {/* Company Card */}
-                    <button 
+                    <button
                       onClick={() => toggleCompany(group.company.id)}
                       className={cn(
                         "w-full flex flex-col md:flex-row md:items-center gap-6 p-6 rounded-[2.5rem] text-left transition-all duration-300",
@@ -296,7 +296,7 @@ const PlacementDriveManagement: React.FC = () => {
                       <div className="w-20 h-20 bg-[#111319] rounded-3xl flex items-center justify-center text-blue-600 border border-[rgba(255,255,255,0.06)] shrink-0 group-hover/company:scale-110 transition-transform">
                         <Building2 className="w-10 h-10" />
                       </div>
-                      
+
                       <div className="flex-1 space-y-1">
                         <div className="flex flex-wrap items-center gap-3">
                           <h2 className="text-3xl font-black text-[#e2e2eb] tracking-tight">{group.company.name}</h2>
@@ -335,9 +335,9 @@ const PlacementDriveManagement: React.FC = () => {
                           exit={{ height: 0, opacity: 0 }}
                           className="overflow-hidden"
                         >
-                          <div className="grid grid-cols-1 gap-5 pl-0 md:pl-24 pr-2">
+                          <div className="grid grid-cols-1 gap-5  pr-2">
                             {group.jobs.map((job) => (
-                              <motion.div 
+                              <motion.div
                                 key={job.id}
                                 layout
                                 initial={{ opacity: 0, x: -20 }}
@@ -415,7 +415,7 @@ const PlacementDriveManagement: React.FC = () => {
                                   {/* Stats & Actions */}
                                   <div className="flex flex-col sm:flex-row xl:flex-col items-stretch xl:items-end justify-center gap-8 w-full xl:w-auto xl:min-w-[260px] border-t xl:border-t-0 xl:border-l border-[rgba(255,255,255,0.06)] pt-8 xl:pt-0 xl:pl-10">
                                     <div className="flex items-center gap-3 w-full sm:w-auto xl:w-full">
-                                      <button 
+                                      <button
                                         onClick={() => handleViewDetails(job)}
                                         className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg active:scale-95"
                                       >
@@ -441,7 +441,7 @@ const PlacementDriveManagement: React.FC = () => {
                 </div>
                 <h3 className="text-xl font-bold text-[#e2e2eb] mb-2 uppercase tracking-tight">No drives matches your search</h3>
                 <p className="text-[#908fa0] font-medium max-w-xs mx-auto">Try adjusting your filters or search keywords to find what you're looking for.</p>
-                <button 
+                <button
                   onClick={() => { setSearchQuery(''); setActiveFilter('All Drives'); }}
                   className="mt-8 text-blue-600 font-bold text-xs uppercase tracking-widest hover:underline"
                 >
@@ -524,7 +524,7 @@ const PlacementDriveManagement: React.FC = () => {
             </div>
 
             <div className="space-y-4">
-               <div className="flex items-center gap-2 text-xs font-black text-[#e2e2eb] uppercase tracking-[0.2em]">
+              <div className="flex items-center gap-2 text-xs font-black text-[#e2e2eb] uppercase tracking-[0.2em]">
                 <Target className="w-4 h-4 text-indigo-500" /> Eligible Departments
               </div>
               <div className="flex flex-wrap gap-2">
@@ -537,7 +537,7 @@ const PlacementDriveManagement: React.FC = () => {
             </div>
 
             <div className="flex justify-end pt-4">
-              <button 
+              <button
                 onClick={() => setIsDetailsOpen(false)}
                 className="px-10 py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl active:scale-95"
               >
