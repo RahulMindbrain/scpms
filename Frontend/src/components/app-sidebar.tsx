@@ -15,6 +15,7 @@ import {
   PlusCircle,
   GraduationCap,
   Wrench,
+  Zap,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -28,6 +29,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
 } from "@/components/ui/sidebar"
 import useAuth from "@/redux/hooks/useAuth"
 
@@ -39,54 +41,47 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     if (role === "admin") {
       return {
         main: [
-          { title: "Dashboard", url: "/admin/dashboard", icon: <LayoutDashboard /> },
-          { title: "Students", url: "/admin/students", icon: <Users /> },
-          { title: "Companies", url: "/admin/companies", icon: <Building2 /> },
-          { title: "Placement Drives", url: "/admin/drives", icon: <Briefcase /> },
-          { title: "Manage Jobs", url: "/admin/jobs", icon: <ListChecks /> },
-          { title: "Applications", url: "/admin/applications", icon: <FileText /> },
-          // { title: "Shortlisting", url: "/admin/shortlisting", icon: <ListChecks /> },
-          { title: "Interview Scheduler", url: "/admin/event-management", icon: <Calendar /> },
-          { title: "Skills", url: "/admin/skills", icon: <Wrench /> },
+          { title: "Dashboard",          url: "/admin/dashboard",       icon: <LayoutDashboard /> },
+          { title: "Students",           url: "/admin/students",        icon: <Users /> },
+          { title: "Companies",          url: "/admin/companies",       icon: <Building2 /> },
+          { title: "Placement Drives",   url: "/admin/drives",          icon: <Briefcase /> },
+          { title: "Manage Jobs",        url: "/admin/jobs",            icon: <ListChecks /> },
+          { title: "Applications",       url: "/admin/applications",    icon: <FileText /> },
+          { title: "Interview Scheduler",url: "/admin/event-management",icon: <Calendar /> },
+          { title: "Skills",             url: "/admin/skills",          icon: <Wrench /> },
         ],
         secondary: [
-          // { title: "Analytics", url: "/admin/report", icon: <BarChart3 /> },
-          { title: "Bulk Email", url: "/admin/bulk-email", icon: <Mail /> },
-          { title: "Notifications", url: "/admin/notification", icon: <Bell /> },
-          { title: "Departments", url: "/admin/departments", icon: <Building2 /> },
-            // { title: "Document Management", url: "/admin/documents", icon: <Folder /> },
-          // { title: "Settings", url: "/admin/setting", icon: <Settings /> },
+          { title: "Bulk Email",         url: "/admin/bulk-email",      icon: <Mail /> },
+          { title: "Notifications",      url: "/admin/notification",    icon: <Bell /> },
+          { title: "Departments",        url: "/admin/departments",     icon: <Building2 /> },
         ],
       }
     } else if (role === "student") {
       return {
         main: [
-          { title: "Dashboard", url: "/student/dashboard", icon: <LayoutDashboard /> },
-          { title: "My Profile", url: "/student/profile", icon: <User /> },
-          { title: "Eligibility", url: "/student/eligibility", icon: <CheckCircle /> },
-          { title: "Job Listings", url: "/student/jobs", icon: <Briefcase /> },
-          { title: "My Applications", url: "/student/application", icon: <FileSearch /> },
+          { title: "Dashboard",          url: "/student/dashboard",     icon: <LayoutDashboard /> },
+          { title: "My Profile",         url: "/student/profile",       icon: <User /> },
+          { title: "Eligibility",        url: "/student/eligibility",   icon: <CheckCircle /> },
+          { title: "Job Listings",       url: "/student/jobs",          icon: <Briefcase /> },
+          { title: "My Applications",    url: "/student/application",   icon: <FileSearch /> },
         ],
         secondary: [
-          // { title: "Interview Schedule", url: "/student/interview", icon: <Calendar /> },
-          { title: "Notifications", url: "/student/notifications", icon: <Bell /> },
-          // { title: "Documents", url: "/student/documents", icon: <FileText /> },
+          { title: "Notifications",      url: "/student/notifications", icon: <Bell /> },
         ],
       }
     } else if (role === "company") {
       return {
         main: [
-          { title: "Dashboard", url: "/company/dashboard", icon: <LayoutDashboard /> },
-          { title: "Profile", url: "/company/profile", icon: <Building2 /> },
-          { title: "Post Job", url: "/company/post-job", icon: <PlusCircle /> },
-          { title: "Manage Jobs", url: "/company/jobs", icon: <Briefcase /> },
-          { title: "Applicants", url: "/company/applicants", icon: <Users /> },
+          { title: "Dashboard",          url: "/company/dashboard",     icon: <LayoutDashboard /> },
+          { title: "Profile",            url: "/company/profile",       icon: <Building2 /> },
+          { title: "Post Job",           url: "/company/post-job",      icon: <PlusCircle /> },
+          { title: "Manage Jobs",        url: "/company/jobs",          icon: <Briefcase /> },
+          { title: "Applicants",         url: "/company/applicants",    icon: <Users /> },
         ],
         secondary: [
-          { title: "Shortlist", url: "/company/shortlist", icon: <ListChecks /> },
-          { title: "Interview Rounds", url: "/company/interviews", icon: <Calendar /> },
-          { title: "Notifications", url: "/company/notifications", icon: <Bell /> },
-          // { title: "Update Results", url: "/company/results", icon: <FileEdit /> },
+          { title: "Shortlist",          url: "/company/shortlist",     icon: <ListChecks /> },
+          { title: "Interview Rounds",   url: "/company/interviews",    icon: <Calendar /> },
+          { title: "Notifications",      url: "/company/notifications", icon: <Bell /> },
         ],
       }
     }
@@ -99,33 +94,50 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     avatar: initials,
   }
 
+  const roleColors: Record<string, string> = {
+    admin:   "from-indigo-500 to-violet-600",
+    student: "from-cyan-500 to-indigo-500",
+    company: "from-emerald-500 to-cyan-500",
+  }
+  const gradientClass = roleColors[role ?? ""] ?? "from-indigo-500 to-violet-600"
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
-      <SidebarHeader>
+      {/* ── Header / Logo ── */}
+      <SidebarHeader className="border-b border-[rgba(255,255,255,0.06)] pb-3">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              className="data-[slot=sidebar-menu-button]:p-1.5! hover:bg-[rgba(255,255,255,0.04)]"
             >
-              <a href="#">
-                <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <GraduationCap className="size-5" />
+              <a href="#" className="flex items-center gap-3">
+                {/* Gradient logo icon */}
+                <div className={`flex aspect-square size-9 items-center justify-center rounded-xl bg-gradient-to-br ${gradientClass} shadow-lg shadow-indigo-500/25 shrink-0`}>
+                  <GraduationCap className="size-5 text-white" />
                 </div>
-                <div className="flex flex-col gap-0.5 leading-none">
-                  <span className="text-[16px] font-semibold">Smart CPMS</span>
-                  <span className="text-xs text-muted-foreground uppercase tracking-wider">{role} Portal</span>
+                <div className="flex flex-col gap-0.5 leading-none min-w-0">
+                  <span className="text-[15px] font-bold text-[#e2e2eb] tracking-tight">Smart CPMS</span>
+                  <span className="text-[10px] text-[#908fa0] uppercase tracking-[0.1em] flex items-center gap-1">
+                    <Zap className="size-2.5 text-[#6366f1]" />
+                    {role} Portal
+                  </span>
                 </div>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
-      <SidebarContent>
+
+      {/* ── Navigation ── */}
+      <SidebarContent className="py-2">
         <NavMain items={navigation.main} />
-        <NavSecondary items={navigation.secondary} className="mt-auto" />
+        <SidebarSeparator className="bg-[rgba(255,255,255,0.06)] my-2" />
+        <NavSecondary items={navigation.secondary} className="mt-0" />
       </SidebarContent>
-      <SidebarFooter>
+
+      {/* ── Footer / User ── */}
+      <SidebarFooter className="border-t border-[rgba(255,255,255,0.06)] pt-2">
         <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>

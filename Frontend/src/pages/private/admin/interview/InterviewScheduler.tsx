@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+﻿import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Plus, Edit3, Building2, Clock, 
   MapPin, Briefcase, ChevronDown, ChevronUp, 
@@ -152,19 +152,19 @@ const InterviewSchedulerPage: React.FC = () => {
     : [];
 
   return (
-    <div className="min-h-screen bg-slate-50/40 p-4 sm:p-6 md:p-8">
+    <div className="min-h-screen bg-[#111319] p-4 sm:p-6 md:p-8">
       <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
         
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Interview Scheduler</h1>
-            <p className="text-slate-500 text-sm sm:text-base font-medium">Manage recruitment drives efficiently</p>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#e2e2eb] tracking-tight">Interview Scheduler</h1>
+            <p className="text-[#908fa0] text-sm sm:text-base font-medium">Manage recruitment drives efficiently</p>
           </div>
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <div className="flex flex-col sm:flex-row items-center gap-2">
               <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
-                <SelectTrigger className="w-full sm:w-[180px] border-none bg-white shadow-sm ring-1 ring-slate-200 rounded-xl h-11">
+                <SelectTrigger className="w-full sm:w-[180px] border-none bg-[#1e1f26] shadow-sm ring-1 ring-slate-200 rounded-xl h-11">
                   <SelectValue placeholder="All Companies" />
                 </SelectTrigger>
                 <SelectContent>
@@ -178,10 +178,10 @@ const InterviewSchedulerPage: React.FC = () => {
               </Select>
             </div>
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
               <Input 
                 placeholder="Search drives..." 
-                className="pl-10 w-full sm:w-[200px] md:w-[250px] border-none bg-white shadow-sm ring-1 ring-slate-200 focus:ring-primary/40 rounded-xl h-11"
+                className="pl-10 w-full sm:w-[200px] md:w-[250px] border-none bg-[#1e1f26] shadow-sm ring-1 ring-slate-200 focus:ring-primary/40 rounded-xl h-11"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
@@ -216,18 +216,18 @@ const InterviewSchedulerPage: React.FC = () => {
                     onClick={() => toggleExpand(drive.id)}
                   >
                     {/* Date Box - Responsive Alignment */}
-                    <div className="bg-slate-50 lg:w-32 p-4 sm:p-6 flex flex-row lg:flex-col items-center justify-center border-b lg:border-b-0 lg:border-r border-slate-100/80 relative gap-3 sm:gap-1">
+                    <div className="bg-[#111319] lg:w-32 p-4 sm:p-6 flex flex-row lg:flex-col items-center justify-center border-b lg:border-b-0 lg:border-r border-[rgba(255,255,255,0.06)]/80 relative gap-3 sm:gap-1">
                       <div className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-primary rounded-r-full" />
-                      <span className="text-[10px] sm:text-xs font-black text-slate-400 uppercase tracking-tighter">{dateInfo.month}</span>
-                      <span className="text-2xl sm:text-4xl font-black text-slate-900 group-hover:text-primary transition-colors leading-none">{dateInfo.day}</span>
-                      <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 uppercase tracking-widest">{dateInfo.weekday}</span>
+                      <span className="text-[10px] sm:text-xs font-black text-[#908fa0] uppercase tracking-tighter">{dateInfo.month}</span>
+                      <span className="text-2xl sm:text-4xl font-black text-[#e2e2eb] group-hover:text-primary transition-colors leading-none">{dateInfo.day}</span>
+                      <span className="text-[10px] sm:text-[11px] font-bold text-[#908fa0] uppercase tracking-widest">{dateInfo.weekday}</span>
                     </div>
 
                     {/* Content Body */}
                     <div className="flex-1 p-5 sm:p-6 md:p-8 flex flex-col justify-center space-y-4 sm:space-y-6">
                       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                         <div className="space-y-2">
-                          <h3 className="text-lg sm:text-2xl font-black text-slate-900 tracking-tight leading-tight">{drive.title}</h3>
+                          <h3 className="text-lg sm:text-2xl font-black text-[#e2e2eb] tracking-tight leading-tight">{drive.title}</h3>
                           <div className="flex items-center gap-2 text-primary font-bold text-xs sm:text-sm bg-primary/5 px-3 py-1.5 rounded-full w-fit">
                             <Building2 size={14} className="sm:w-4 sm:h-4" />
                             {drive.company?.name || "Corporate Partner"}
@@ -248,49 +248,49 @@ const InterviewSchedulerPage: React.FC = () => {
                         <div className="flex items-center gap-3">
                              <div className="p-2 bg-slate-100 rounded-lg text-primary"><Clock size={16} /></div>
                              <div className="flex flex-col">
-                                <span className="text-[9px] font-black text-slate-400 uppercase">Timing</span>
-                                <span className="text-xs sm:text-sm font-bold text-slate-700">{formatTime(drive.startTime)} - {formatTime(drive.endTime)}</span>
+                                <span className="text-[9px] font-black text-[#908fa0] uppercase">Timing</span>
+                                <span className="text-xs sm:text-sm font-bold text-[#c7c4d7]">{formatTime(drive.startTime)} - {formatTime(drive.endTime)}</span>
                              </div>
                         </div>
                         <div className="flex items-center gap-3">
                              <div className="p-2 bg-slate-100 rounded-lg text-rose-500"><MapPin size={16} /></div>
                              <div className="flex flex-col">
-                                <span className="text-[9px] font-black text-slate-400 uppercase">Venue</span>
-                                <span className="text-xs sm:text-sm font-bold text-slate-700 truncate max-w-[150px]">{drive.venue}</span>
+                                <span className="text-[9px] font-black text-[#908fa0] uppercase">Venue</span>
+                                <span className="text-xs sm:text-sm font-bold text-[#c7c4d7] truncate max-w-[150px]">{drive.venue}</span>
                              </div>
                         </div>
                         <div className="flex items-center gap-3">
                              <div className="p-2 bg-slate-100 rounded-lg text-amber-500"><Briefcase size={16} /></div>
                              <div className="flex flex-col">
-                                <span className="text-[9px] font-black text-slate-400 uppercase">Openings</span>
-                                <span className="text-xs sm:text-sm font-bold text-slate-700">{drive.jobs?.length || 0} Roles</span>
+                                <span className="text-[9px] font-black text-[#908fa0] uppercase">Openings</span>
+                                <span className="text-xs sm:text-sm font-bold text-[#c7c4d7]">{drive.jobs?.length || 0} Roles</span>
                              </div>
                         </div>
                       </div>
                     </div>
 
                     {/* Action Bar / Stack */}
-                    <div className="bg-slate-50/50 p-4 sm:p-6 lg:w-44 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-slate-100">
+                    <div className="bg-[#111319] p-4 sm:p-6 lg:w-44 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-slate-100">
                       <div className="flex items-center gap-2">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-xl transition-all"
+                          className="h-9 w-9 sm:h-10 sm:w-10 text-[#908fa0] hover:text-sky-600 hover:bg-sky-50 rounded-xl transition-all"
                           onClick={(e) => handleOpenApplications(e, drive.id)}
                         >
                           <Users size={18} />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all" onClick={(e) => handleOpenEdit(e, drive)}>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-[#908fa0] hover:text-primary hover:bg-primary/5 rounded-xl transition-all" onClick={(e) => handleOpenEdit(e, drive)}>
                           <Edit3 size={18} />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all" onClick={(e) => handleDelete(e, drive.id)}>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-[#908fa0] hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all" onClick={(e) => handleDelete(e, drive.id)}>
                           <Trash2 size={18} />
                         </Button>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all" onClick={(e) => handleOpenMessages(e, drive)}>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-[#908fa0] hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all" onClick={(e) => handleOpenMessages(e, drive)}>
                           <MessageSquare size={18} />
                         </Button>
                       </div>
-                      <div className="w-10 h-10 rounded-xl bg-slate-200/50 flex items-center justify-center text-slate-500">
+                      <div className="w-10 h-10 rounded-xl bg-slate-200/50 flex items-center justify-center text-[#908fa0]">
                          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                       </div>
                     </div>
@@ -303,32 +303,32 @@ const InterviewSchedulerPage: React.FC = () => {
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: "auto", opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
-                        className="border-t border-slate-100 bg-white"
+                        className="border-t border-[rgba(255,255,255,0.06)] bg-white"
                       >
                         <div className="p-5 sm:p-8 md:p-10 space-y-6 bg-gradient-to-b from-white to-slate-50/30">
                           <div className="flex items-center gap-3">
                             <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-2xl">
                               <Briefcase size={20} />
                             </div>
-                            <h4 className="text-base sm:text-lg font-black text-slate-900 tracking-tight uppercase">Job Openings</h4>
+                            <h4 className="text-base sm:text-lg font-black text-[#e2e2eb] tracking-tight uppercase">Job Openings</h4>
                           </div>
 
                           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                             {drive.jobs?.map((job: any) => (
-                              <div key={job.id} className="p-5 sm:p-6 rounded-2xl border border-slate-100 bg-white shadow-sm hover:ring-2 hover:ring-primary/20 transition-all space-y-4">
+                              <div key={job.id} className="p-5 sm:p-6 rounded-2xl border border-[rgba(255,255,255,0.06)] bg-[#1e1f26] shadow-sm hover:ring-2 hover:ring-primary/20 transition-all space-y-4">
                                 <div className="space-y-1">
-                                  <p className="font-black text-slate-900 text-sm sm:text-base">{job.title}</p>
-                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{job.jobType} • {job.location}</p>
+                                  <p className="font-black text-[#e2e2eb] text-sm sm:text-base">{job.title}</p>
+                                  <p className="text-[10px] font-bold text-[#908fa0] uppercase tracking-widest">{job.jobType} • {job.location}</p>
                                 </div>
                                 <div className="flex items-center justify-between pt-4 border-t border-slate-50">
                                   <Badge variant="outline" className="rounded-lg text-[8px] sm:text-[9px] font-black tracking-widest border-slate-200">{job.status}</Badge>
-                                  <div className="flex items-center gap-1.5 text-slate-500">
+                                  <div className="flex items-center gap-1.5 text-[#908fa0]">
                                     <Users size={12} />
                                     <span className="text-[9px] font-black uppercase tracking-tight">{job._count?.applications || 0} Candidates</span>
                                   </div>
                                 </div>
                               </div>
-                            )) || <div className="col-span-full py-8 text-slate-400 font-bold text-center italic text-sm">No jobs linked.</div>}
+                            )) || <div className="col-span-full py-8 text-[#908fa0] font-bold text-center italic text-sm">No jobs linked.</div>}
                           </div>
                         </div>
                       </motion.div>
@@ -362,17 +362,17 @@ const InterviewSchedulerPage: React.FC = () => {
               </div>
             ) : activeSchedule?.messages && activeSchedule.messages.length > 0 ? (
               [...activeSchedule.messages].reverse().map((msg: any) => (
-                <div key={msg.id} className="bg-slate-50 border border-slate-100 rounded-2xl p-5 space-y-2">
-                  <p className="text-xs font-black text-slate-700">
+                <div key={msg.id} className="bg-[#111319] border border-[rgba(255,255,255,0.06)] rounded-2xl p-5 space-y-2">
+                  <p className="text-xs font-black text-[#c7c4d7]">
                     {msg.senderName || (msg.isAdmin ? 'Placement Admin' : 'Company')}
                   </p>
-                  <p className="text-sm text-slate-600 font-medium leading-relaxed">{msg.message}</p>
+                  <p className="text-sm text-[#c7c4d7] font-medium leading-relaxed">{msg.message}</p>
                 </div>
               ))
             ) : (
               <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
                 <MessageSquare className="w-6 h-6 text-slate-300" />
-                <p className="text-slate-400 text-sm font-bold">No formal notes yet.</p>
+                <p className="text-[#908fa0] text-sm font-bold">No formal notes yet.</p>
               </div>
             )}
           </div>
@@ -380,7 +380,7 @@ const InterviewSchedulerPage: React.FC = () => {
           <div className="border-t border-slate-100" />
 
           <div className="space-y-3">
-            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+            <label className="text-[10px] font-black uppercase tracking-widest text-[#908fa0]">
               Post a Formal Note
             </label>
             <textarea
@@ -388,7 +388,7 @@ const InterviewSchedulerPage: React.FC = () => {
               placeholder="Write a clear formal note for the company regarding this schedule."
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
-              className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-medium text-slate-700 placeholder:text-slate-300 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-200 resize-none transition-all"
+              className="w-full px-5 py-4 bg-[#111319] border border-[rgba(255,255,255,0.08)] rounded-2xl text-sm font-medium text-[#c7c4d7] placeholder:text-slate-300 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-200 resize-none transition-all"
             />
             <Button
               onClick={handleSendMessage}

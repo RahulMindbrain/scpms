@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { 
   CheckCircle2, XCircle, Clock, ChevronDown, 
   Send, Briefcase, X
@@ -48,7 +48,7 @@ const UpdateResults: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50/50 px-4 py-8 md:px-12">
+    <div className="min-h-screen bg-[#111319] px-4 py-8 md:px-12">
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header - More Spacing */}

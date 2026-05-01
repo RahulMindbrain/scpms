@@ -48,62 +48,133 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ============================================================
+   STITCH "INDIGO NEXUS" — Smart CPMS Dark Design System
+   Primary: #6366f1 Electric Indigo | Generated via Stitch MCP
+   ============================================================ */
+
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.205 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.205 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.205 0 0);
-    --primary: oklch(0.51 0.22 258.64); /* Blue 600-ish */
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.967 0.003 264.54);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.967 0.003 264.54);
-    --muted-foreground: oklch(0.551 0.01 264.54);
-    --accent: oklch(0.967 0.003 264.54);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --destructive-foreground: oklch(0.985 0 0);
-    --border: oklch(0.92 0.004 264.54);
-    --input: oklch(0.92 0.004 264.54);
-    --ring: oklch(0.51 0.22 258.64);
-    --chart-1: oklch(0.51 0.22 258.64);
-    --chart-2: oklch(0.627 0.265 303.9);
-    --chart-3: oklch(0.446 0.157 24.8);
-    --chart-4: oklch(0.828 0.189 184.4);
-    --chart-5: oklch(0.645 0.246 16.2);
-    --radius: 0.625rem;
-    --sidebar: oklch(0.985 0.002 247.83);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.51 0.22 258.64);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.94 0.005 247.83);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.92 0.004 264.54);
-    --sidebar-ring: oklch(0.51 0.22 258.64);
+  /* ── Core Dark Backgrounds (Tonal Layering) ── */
+  --background:                #111319;
+  --surface:                   #111319;
+  --surface-dim:               #111319;
+  --surface-container-lowest:  #0c0e14;
+  --surface-container-low:     #191b22;
+  --surface-container:         #1e1f26;
+  --surface-container-high:    #282a30;
+  --surface-container-highest: #33343b;
+  --surface-bright:            #373940;
+
+  /* ── Foreground / Text ── */
+  --foreground:                #e2e2eb;
+  --muted-foreground:          #c7c4d7;
+
+  /* ── Card ── */
+  --card:                      #1e1f26;
+  --card-foreground:           #e2e2eb;
+
+  /* ── Popover ── */
+  --popover:                   #1e1f26;
+  --popover-foreground:        #e2e2eb;
+
+  /* ── Primary — Electric Indigo ── */
+  --primary:                   #6366f1;
+  --primary-foreground:        #ffffff;
+  --primary-container:         #8083ff;
+  --inverse-primary:           #494bd6;
+
+  /* ── Secondary ── */
+  --secondary:                 #1e1f26;
+  --secondary-foreground:      #e2e2eb;
+
+  /* ── Muted ── */
+  --muted:                     #1e1f26;
+
+  /* ── Accent ── */
+  --accent:                    #282a30;
+  --accent-foreground:         #e2e2eb;
+
+  /* ── Destructive — Rose ── */
+  --destructive:               #f43f5e;
+  --destructive-foreground:    #ffffff;
+
+  /* ── Borders & Inputs ── */
+  --border:                    rgba(255, 255, 255, 0.08);
+  --input:                     #0c0e14;
+  --ring:                      #6366f1;
+
+  /* ── Radius ── */
+  --radius:                    0.5rem;
+
+  /* ── Charts ── */
+  --chart-1:                   #6366f1;
+  --chart-2:                   #4edea3;
+  --chart-3:                   #f59e0b;
+  --chart-4:                   #22d3ee;
+  --chart-5:                   #f43f5e;
+
+  /* ── Sidebar ── */
+  --sidebar:                   #0c0e14;
+  --sidebar-foreground:        #e2e2eb;
+  --sidebar-primary:           #6366f1;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent:            rgba(99, 102, 241, 0.12);
+  --sidebar-accent-foreground: #c0c1ff;
+  --sidebar-border:            rgba(255, 255, 255, 0.06);
+  --sidebar-ring:              #6366f1;
+}
+
+/* ── Force dark theme globally ── */
+html, body, #root {
+  background-color: #111319;
+  color: #e2e2eb;
 }
 
 .dark {
-    /* We effectively disable dark mode by making it look like lighting mode or just letting it be if the user forces it, but the user said "base white theme not dark mode" */
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.205 0 0);
-    --sidebar: oklch(0.985 0.002 247.83);
-    --sidebar-foreground: oklch(0.145 0 0);
+  --background:                #111319;
+  --foreground:                #e2e2eb;
+  --card:                      #1e1f26;
+  --card-foreground:           #e2e2eb;
+  --popover:                   #1e1f26;
+  --popover-foreground:        #e2e2eb;
+  --primary:                   #6366f1;
+  --primary-foreground:        #ffffff;
+  --secondary:                 #1e1f26;
+  --secondary-foreground:      #e2e2eb;
+  --muted:                     #1e1f26;
+  --muted-foreground:          #c7c4d7;
+  --accent:                    #282a30;
+  --accent-foreground:         #e2e2eb;
+  --destructive:               #f43f5e;
+  --destructive-foreground:    #ffffff;
+  --border:                    rgba(255, 255, 255, 0.08);
+  --input:                     #0c0e14;
+  --ring:                      #6366f1;
+  --sidebar:                   #0c0e14;
+  --sidebar-foreground:        #e2e2eb;
+  --sidebar-primary:           #6366f1;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent:            rgba(99, 102, 241, 0.12);
+  --sidebar-accent-foreground: #c0c1ff;
+  --sidebar-border:            rgba(255, 255, 255, 0.06);
+  --sidebar-ring:              #6366f1;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
-    }
+    font-family: 'Inter Variable', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
   html {
     @apply font-sans;
-    }
+    color-scheme: dark;
+  }
 
-  /* Pointer cursor for all clickable / interactive elements */
   button,
   a,
   [role="button"],
@@ -128,7 +199,6 @@
     cursor: pointer;
   }
 
-  /* Disabled elements should show not-allowed */
   button:disabled,
   input:disabled,
   select:disabled,
@@ -136,61 +206,117 @@
     cursor: not-allowed;
   }
 }
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-track {
-  background: transparent;
-}
+
+/* ============================================================
+   CUSTOM SCROLLBAR
+   ============================================================ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  @apply bg-slate-800 rounded-full hover:bg-slate-700 transition-colors;
+  background: rgba(99, 102, 241, 0.35);
+  border-radius: 9999px;
 }
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(99, 102, 241, 0.6);
+}
+
+/* ============================================================
+   GLASSMORPHISM UTILITIES
+   ============================================================ */
+.glass-card {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+.glass-modal {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+/* ============================================================
+   INPUT FIELDS
+   ============================================================ */
 .input-field {
-  @apply focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500;
+  background-color: #0c0e14;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e2e2eb;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
+.input-field:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+  outline: none;
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  to   { opacity: 1; transform: translateY(0); }
 }
-.animate-in {
-  animation: slideUp 0.5s ease-out forwards;
+.animate-in { animation: slideUp 0.4s ease-out forwards; }
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 12px rgba(99, 102, 241, 0.3); }
+  50%       { box-shadow: 0 0 24px rgba(99, 102, 241, 0.6); }
 }
+.animate-glow { animation: glow-pulse 2s ease-in-out infinite; }
+
 @keyframes shine {
-  0% { transform: translateX(-100%); }
+  0%   { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
 }
-/* Skeleton loader animation */
+
 @keyframes skeleton-pulse {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: 0.3; }
+  50%       { opacity: 0.7; }
 }
-.skeleton {
-  @apply bg-slate-200 rounded-lg animate-pulse;
-}
-.skeleton-text {
-  @apply bg-slate-200 rounded h-4 animate-pulse;
-}
-.skeleton-circle {
-  @apply bg-slate-200 rounded-full animate-pulse;
-}
-/* Progress bar fill animation */
-@keyframes progress-fill {
-  from { width: 0%; }
-}
-.animate-progress {
-  animation: progress-fill 1s ease-out forwards;
-}
-/* Subtle dot pattern for banners */
+.skeleton       { background: #282a30; border-radius: 0.5rem; animation: skeleton-pulse 1.5s ease-in-out infinite; }
+.skeleton-text  { background: #282a30; border-radius: 0.25rem; height: 1rem; animation: skeleton-pulse 1.5s ease-in-out infinite; }
+.skeleton-circle{ background: #282a30; border-radius: 9999px; animation: skeleton-pulse 1.5s ease-in-out infinite; }
+
+@keyframes progress-fill { from { width: 0%; } }
+.animate-progress { animation: progress-fill 1s ease-out forwards; }
+
+/* ============================================================
+   DOT PATTERN
+   ============================================================ */
 .dot-pattern {
-  background-image: radial-gradient(circle, rgba(255,255,255,0.12) 1px, transparent 1px);
-  background-size: 16px 16px;
+  background-image: radial-gradient(circle, rgba(99, 102, 241, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
-/* No scrollbar utility */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+
+/* ============================================================
+   NO SCROLLBAR
+   ============================================================ */
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ============================================================
+   STAT CARD ACCENT BORDERS
+   ============================================================ */
+.stat-card-indigo  { border-top: 2px solid #6366f1; }
+.stat-card-emerald { border-top: 2px solid #4edea3; }
+.stat-card-amber   { border-top: 2px solid #f59e0b; }
+.stat-card-rose    { border-top: 2px solid #f43f5e; }
+.stat-card-cyan    { border-top: 2px solid #22d3ee; }
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+.badge-success { background: rgba(78, 222, 163, 0.15); color: #4edea3; }
+.badge-warning { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+.badge-error   { background: rgba(244, 63, 94, 0.15);  color: #f87171; }
+.badge-indigo  { background: rgba(99, 102, 241, 0.15); color: #c0c1ff; }
+.badge-cyan    { background: rgba(34, 211, 238, 0.15); color: #22d3ee; }
+
+/* ============================================================
+   PRIMARY BUTTON GLOW
+   ============================================================ */
+.btn-primary-glow:hover {
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.45);
 }

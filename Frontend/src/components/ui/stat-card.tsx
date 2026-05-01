@@ -19,26 +19,26 @@ export const StatCard: React.FC<StatCardProps> = ({
 }) => {
   return (
     <div className={cn(
-      "bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/40 group hover:shadow-2xl transition-all duration-300",
+      "bg-[#1e1f26] p-8 rounded-[2.5rem] border border-[rgba(255,255,255,0.07)] shadow-none group hover:border-indigo-500/20 hover:shadow-lg hover:shadow-indigo-500/5 transition-all duration-300",
       className
     )}>
       <div className="flex items-center justify-between mb-4">
         {Icon && (
-          <div className="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+          <div className="w-14 h-14 bg-indigo-500/10 text-indigo-400 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
             <Icon className="w-7 h-7" />
           </div>
         )}
         {subtext && (
-          <div className="text-[10px] font-black text-emerald-500 bg-emerald-50 px-3 py-1.5 rounded-full uppercase tracking-widest">
+          <div className="text-[10px] font-black text-emerald-400 bg-emerald-400/10 px-3 py-1.5 rounded-full uppercase tracking-widest border border-emerald-400/20">
             {subtext}
           </div>
         )}
       </div>
       <div>
-        <div className="text-4xl font-black text-slate-900 mb-1 tracking-tight">
+        <div className="text-4xl font-black text-[#e2e2eb] mb-1 tracking-tight">
           {value}
         </div>
-        <div className="text-slate-400 text-xs font-bold uppercase tracking-[0.1em]">
+        <div className="text-[#908fa0] text-xs font-bold uppercase tracking-[0.1em]">
           {label}
         </div>
       </div>

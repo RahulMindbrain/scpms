@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import {
   Calendar,
   Clock, MapPin,
@@ -63,7 +63,7 @@ const UpcomingInterviews: Interview[] = [
 
 const InterviewSchedule: React.FC = () => {
   return (
-    <div className="min-h-screen bg-[#f8fafc] p-4 md:p-8 font-sans text-slate-900">
+    <div className="min-h-screen bg-[#111319] p-4 md:p-8 font-sans text-slate-900">
       <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Main Content Area */}

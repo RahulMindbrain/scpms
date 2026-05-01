@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { 
   Building2, 
   Briefcase, 
@@ -87,21 +87,21 @@ const BulkEmail: React.FC = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <header className="mb-8">
-        <h1 className="text-2xl font-black text-slate-800 uppercase tracking-tight">Bulk Communications</h1>
-        <p className="text-slate-500 text-sm">Target students based on specific company opportunities.</p>
+        <h1 className="text-2xl font-black text-[#e2e2eb] uppercase tracking-tight">Bulk Communications</h1>
+        <p className="text-[#908fa0] text-sm">Target students based on specific company opportunities.</p>
       </header>
 
       <div className="grid gap-6">
         {/* Step 1: Company Selection */}
-        <section className="bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm">
-          <label className="flex items-center gap-2 text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">
+        <section className="bg-[#1e1f26] p-6 rounded-[2rem] border border-[rgba(255,255,255,0.08)] shadow-sm">
+          <label className="flex items-center gap-2 text-[11px] font-black text-[#908fa0] uppercase tracking-widest mb-4">
             <Building2 className="w-4 h-4" /> 01. Select Company
           </label>
           <div className="relative">
             <select
               value={selectedCompanyId}
               onChange={(e) => setSelectedCompanyId(e.target.value)}
-              className="w-full pl-4 pr-10 py-4 bg-slate-50 border border-slate-200 rounded-2xl appearance-none font-bold text-slate-700 focus:ring-4 focus:ring-indigo-500/5 transition-all"
+              className="w-full pl-4 pr-10 py-4 bg-[#111319] border border-[rgba(255,255,255,0.08)] rounded-2xl appearance-none font-bold text-[#c7c4d7] focus:ring-4 focus:ring-indigo-500/5 transition-all"
             >
               <option value="">Choose a company...</option>
               {reduxCompanies.map((c: any) => (
@@ -110,13 +110,13 @@ const BulkEmail: React.FC = () => {
                 </option>
               ))}
             </select>
-            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0] pointer-events-none" />
           </div>
         </section>
 
         {/* Step 2: Job Selection */}
-        <section className={`bg-white p-6 rounded-[2rem] border border-slate-200 shadow-sm transition-opacity ${!selectedCompanyId && 'opacity-50 pointer-events-none'}`}>
-          <label className="flex items-center gap-2 text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">
+        <section className={`bg-[#1e1f26] p-6 rounded-[2rem] border border-[rgba(255,255,255,0.08)] shadow-sm transition-opacity ${!selectedCompanyId && 'opacity-50 pointer-events-none'}`}>
+          <label className="flex items-center gap-2 text-[11px] font-black text-[#908fa0] uppercase tracking-widest mb-4">
             <Briefcase className="w-4 h-4" /> 02. Select Jobs
           </label>
           
@@ -128,22 +128,22 @@ const BulkEmail: React.FC = () => {
                 <div 
                   key={job.id}
                   onClick={() => toggleJob(job.id)}
-                  className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer border-2 transition-all ${selectedJobIds.includes(job.id) ? 'border-indigo-500 bg-indigo-50/50' : 'border-slate-100 bg-slate-50 hover:border-slate-200'}`}
+                  className={`flex items-center gap-3 p-4 rounded-xl cursor-pointer border-2 transition-all ${selectedJobIds.includes(job.id) ? 'border-indigo-500 bg-indigo-50/50' : 'border-[rgba(255,255,255,0.06)] bg-[#111319] hover:border-[rgba(255,255,255,0.08)]'}`}
                 >
                   {selectedJobIds.includes(job.id) ? <CheckSquare className="w-5 h-5 text-indigo-600" /> : <Square className="w-5 h-5 text-slate-300" />}
-                  <span className="text-sm font-bold text-slate-700">{job.title}</span>
+                  <span className="text-sm font-bold text-[#c7c4d7]">{job.title}</span>
                 </div>
               ))}
               {(!reduxJobs || reduxJobs.length === 0) && selectedCompanyId && !reduxLoading && (
-                <p className="text-xs text-slate-400 italic">No approved jobs found for this company.</p>
+                <p className="text-xs text-[#908fa0] italic">No approved jobs found for this company.</p>
               )}
             </div>
           )}
         </section>
 
         {/* Step 3: Content */}
-        <section className="bg-white p-6 rounded-[2.5rem] border border-slate-200 shadow-sm space-y-4">
-          <label className="flex items-center gap-2 text-[11px] font-black text-slate-400 uppercase tracking-widest mb-2">
+        <section className="bg-[#1e1f26] p-6 rounded-[2.5rem] border border-[rgba(255,255,255,0.08)] shadow-sm space-y-4">
+          <label className="flex items-center gap-2 text-[11px] font-black text-[#908fa0] uppercase tracking-widest mb-2">
             <Mail className="w-4 h-4" /> 03. Compose Message
           </label>
           <input
@@ -151,14 +151,14 @@ const BulkEmail: React.FC = () => {
             placeholder="Subject (Optional: defaults to 'New Opportunities Available')"
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            className="w-full px-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-slate-800 placeholder:text-slate-300"
+            className="w-full px-4 py-4 bg-[#111319] border border-[rgba(255,255,255,0.08)] rounded-2xl font-bold text-[#e2e2eb] placeholder:text-slate-300"
           />
           <textarea
             rows={6}
             placeholder="Message Body (HTML supported). Leave blank to use default template."
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            className="w-full px-5 py-5 bg-slate-50 border border-slate-200 rounded-[2rem] text-sm font-medium text-slate-600"
+            className="w-full px-5 py-5 bg-[#111319] border border-[rgba(255,255,255,0.08)] rounded-[2rem] text-sm font-medium text-[#c7c4d7]"
           />
         </section>
 
@@ -167,7 +167,7 @@ const BulkEmail: React.FC = () => {
           <Button
             variant="outline"
             onClick={() => setIsPreviewOpen(true)}
-            className="flex-1 rounded-2xl border-slate-200 py-7 font-black uppercase tracking-widest text-xs"
+            className="flex-1 rounded-2xl border-[rgba(255,255,255,0.08)] py-7 font-black uppercase tracking-widest text-xs"
           >
             <Eye className="w-4 h-4 mr-2" /> Preview
           </Button>
@@ -184,12 +184,12 @@ const BulkEmail: React.FC = () => {
 
       {/* Simple Preview Modal */}
       <Modal isOpen={isPreviewOpen} onClose={() => setIsPreviewOpen(false)} title="Message Preview">
-         <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
-            <p className="text-[10px] font-black text-slate-400 uppercase mb-1">Subject</p>
+         <div className="p-6 bg-[#111319] rounded-2xl border border-slate-100">
+            <p className="text-[10px] font-black text-[#908fa0] uppercase mb-1">Subject</p>
             <p className="font-bold mb-4">{subject || "New Opportunities Available"}</p>
             <hr className="mb-4" />
             <div 
-              className="text-sm text-slate-600 prose prose-slate"
+              className="text-sm text-[#c7c4d7] prose prose-slate"
               dangerouslySetInnerHTML={{ __html: message || "<p>Standard placement invitation template will be used...</p>" }}
             />
          </div>

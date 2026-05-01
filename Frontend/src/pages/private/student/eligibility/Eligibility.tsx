@@ -1,4 +1,4 @@
-import { 
+﻿import { 
   CheckCircle2, 
   XCircle,
   Info,
@@ -123,7 +123,7 @@ const Eligibility = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 font-sans text-slate-900">
+    <div className="min-h-screen bg-[#111319] p-6 lg:p-10 font-sans text-slate-900">
       <div className="max-w-6xl mx-auto">
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">

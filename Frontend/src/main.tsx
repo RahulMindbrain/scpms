@@ -11,7 +11,7 @@ import { SocketProvider } from "./socket/SocketProvider.tsx"
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
     <Provider store={store}>
-      <ThemeProvider>
+      <ThemeProvider defaultTheme="dark" storageKey="cpms-theme">
         <SocketProvider>
           <App />
         </SocketProvider>

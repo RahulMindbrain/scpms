@@ -14,7 +14,7 @@ const Loader: React.FC<LoaderProps> = ({ fullScreen = false, size = "md", text }
   };
 
   const containerClasses = fullScreen
-    ? "fixed inset-0 z-50 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm"
+    ? "fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#111319]/90 backdrop-blur-sm"
     : `flex flex-col items-center justify-center ${size === 'sm' ? 'p-2' : 'p-8'} w-full h-full ${size === 'sm' ? '' : 'min-h-[200px]'}`;
 
   return (
@@ -22,7 +22,7 @@ const Loader: React.FC<LoaderProps> = ({ fullScreen = false, size = "md", text }
       <div className="relative">
         {/* Outer Ring */}
         <div
-          className={`${sizeClasses[size]} rounded-full border-slate-200 animate-pulse`}
+          className={`${sizeClasses[size]} rounded-full border-[rgba(99,102,241,0.2)] animate-pulse`}
         ></div>
         
         {/* Spinning Ring */}
@@ -39,7 +39,7 @@ const Loader: React.FC<LoaderProps> = ({ fullScreen = false, size = "md", text }
       </div>
       
       {text && (
-        <p className="mt-4 text-sm font-medium text-slate-600 animate-pulse tracking-wide">
+        <p className="mt-4 text-sm font-medium text-[#c7c4d7] animate-pulse tracking-wide">
           {text}
         </p>
       )}

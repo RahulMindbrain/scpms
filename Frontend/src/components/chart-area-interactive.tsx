@@ -24,23 +24,24 @@ interface PlacementChartProps {
 const chartConfig = {
   totalStudents: {
     label: "Total Students",
-    color: "var(--primary)",
+    color: "#6366f1",
   },
   placedStudents: {
     label: "Placed Students",
-    color: "hsl(var(--chart-2))",
+    color: "#4edea3",
   },
 } satisfies ChartConfig
 
 export function ChartAreaInteractive({ data }: PlacementChartProps) {
   return (
-    <Card className="@container/card">
-      <CardHeader>
-        <CardTitle>Placement Overview by Department</CardTitle>
-        <CardDescription>
+    <Card className="@container/card bg-[#1e1f26] border border-[rgba(255,255,255,0.07)] shadow-none">
+      <CardHeader className="border-b border-[rgba(255,255,255,0.06)] pb-3">
+        <CardTitle className="text-sm font-semibold text-[#e2e2eb]">Placement Overview by Department</CardTitle>
+        <CardDescription className="text-xs text-[#908fa0]">
           Comparison of total students vs placed students across departments
         </CardDescription>
       </CardHeader>
+
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
           config={chartConfig}
@@ -73,18 +74,20 @@ export function ChartAreaInteractive({ data }: PlacementChartProps) {
                 />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" />
             <XAxis
               dataKey="department"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
+              tick={{ fill: "#908fa0", fontSize: 11 }}
               tickFormatter={(value) => value.length > 10 ? `${value.substring(0, 10)}...` : value}
             />
-            <YAxis 
+            <YAxis
                 tickLine={false}
                 axisLine={false}
                 tickMargin={8}
+                tick={{ fill: "#908fa0", fontSize: 11 }}
             />
             <ChartTooltip
               cursor={false}

@@ -1,4 +1,4 @@
-import {
+﻿import {
   Mail, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
   Briefcase, FileText, Building2,
@@ -363,7 +363,7 @@ const StudentProfile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-20">
+    <div className="min-h-screen bg-[#111319] pb-20">
       <div className="max-w-[1400px] mx-auto space-y-8 px-4 sm:px-6 lg:px-8 pt-8">
         
         {/* Header Section */}

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import { Pencil, Plus, Search, Trash2, Wrench } from "lucide-react";
 import { toast } from "sonner";
 import { deleteAPI, getAPI, postAPI, putAPI } from "@/apis/api";
@@ -166,13 +166,13 @@ const SkillManagement = () => {
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6 bg-[#f8fafc] min-h-screen">
+    <div className="p-4 md:p-8 space-y-6 bg-[#111319] min-h-screen">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-[#e2e2eb] flex items-center gap-2">
             <Wrench className="w-6 h-6 text-blue-600" /> Skill Management
           </h1>
-          <p className="text-[13px] text-slate-500 mt-1">
+          <p className="text-[13px] text-[#908fa0] mt-1">
             Create and manage skills available to students
           </p>
         </div>
@@ -182,18 +182,18 @@ const SkillManagement = () => {
               <Plus className="w-4 h-4 mr-2" /> Create Skill
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[420px] bg-[#f8fafc] border-none shadow-xl rounded-xl">
+          <DialogContent className="sm:max-w-[420px] bg-[#111319] border-none shadow-xl rounded-xl">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-slate-900">
+              <DialogTitle className="text-xl font-semibold text-[#e2e2eb]">
                 New Skill
               </DialogTitle>
-              <DialogDescription className="text-slate-500 text-[13px]">
+              <DialogDescription className="text-[#908fa0] text-[13px]">
                 Add a new skill to the platform.
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleCreate} className="space-y-5 pt-2">
               <div className="space-y-2">
-                <label className="text-[13px] font-semibold text-slate-600">
+                <label className="text-[13px] font-semibold text-[#c7c4d7]">
                   Skill Name
                 </label>
                 <Input
@@ -201,7 +201,7 @@ const SkillManagement = () => {
                   placeholder="e.g. Django Python Framework"
                   value={newSkillName}
                   onChange={(e) => setNewSkillName(e.target.value)}
-                  className="h-10 bg-white border-slate-200"
+                  className="h-10 bg-[#1e1f26] border-[rgba(255,255,255,0.08)]"
                 />
               </div>
               <DialogFooter>
@@ -237,30 +237,30 @@ const SkillManagement = () => {
 
       <Card className="shadow-sm border border-slate-200/60 rounded-xl max-w-sm">
         <CardContent className="p-6 flex flex-col items-center justify-center">
-          <span className="text-[28px] font-bold text-slate-800">{skills.length}</span>
-          <span className="text-[13px] text-slate-500 mt-1">Total Skills</span>
+          <span className="text-[28px] font-bold text-[#e2e2eb]">{skills.length}</span>
+          <span className="text-[13px] text-[#908fa0] mt-1">Total Skills</span>
         </CardContent>
       </Card>
 
       <div className="relative w-full sm:w-[300px]">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
         <Input
           placeholder="Search skills..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 bg-white border-slate-200 shadow-sm h-10"
+          className="pl-9 bg-[#1e1f26] border-[rgba(255,255,255,0.08)] shadow-sm h-10"
         />
       </div>
 
-      <Card className="overflow-hidden shadow-sm border border-slate-200/60 bg-white rounded-xl">
+      <Card className="overflow-hidden shadow-sm border border-slate-200/60 bg-[#1e1f26] rounded-xl">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-white border-b border-slate-100">
+            <TableHeader className="bg-[#1e1f26] border-b border-[rgba(255,255,255,0.06)]">
               <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold text-slate-500 py-4 pl-6">#</TableHead>
-                <TableHead className="font-semibold text-slate-500">Skill Name</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-center">ID</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-right pr-6">
+                <TableHead className="font-semibold text-[#908fa0] py-4 pl-6">#</TableHead>
+                <TableHead className="font-semibold text-[#908fa0]">Skill Name</TableHead>
+                <TableHead className="font-semibold text-[#908fa0] text-center">ID</TableHead>
+                <TableHead className="font-semibold text-[#908fa0] text-right pr-6">
                   Action
                 </TableHead>
               </TableRow>
@@ -275,7 +275,7 @@ const SkillManagement = () => {
               ) : filteredSkills.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="py-20 text-center">
-                    <div className="flex flex-col items-center gap-2 text-slate-400">
+                    <div className="flex flex-col items-center gap-2 text-[#908fa0]">
                       <Wrench className="w-10 h-10 opacity-20" />
                       <span className="text-sm font-medium">No skills found</span>
                     </div>
@@ -285,15 +285,15 @@ const SkillManagement = () => {
                 filteredSkills.map((skill, index) => (
                   <TableRow
                     key={skill.id}
-                    className="bg-white hover:bg-slate-50/50 border-b border-slate-100/60 transition-colors"
+                    className="bg-[#1e1f26] hover:bg-[#111319] border-b border-slate-100/60 transition-colors"
                   >
-                    <TableCell className="font-medium text-slate-400 py-4 pl-6">
+                    <TableCell className="font-medium text-[#908fa0] py-4 pl-6">
                       {index + 1}
                     </TableCell>
-                    <TableCell className="font-semibold text-slate-800">
+                    <TableCell className="font-semibold text-[#e2e2eb]">
                       {skill.name}
                     </TableCell>
-                    <TableCell className="text-center text-slate-400 text-sm font-mono">
+                    <TableCell className="text-center text-[#908fa0] text-sm font-mono">
                       {skill.id}
                     </TableCell>
                     <TableCell className="text-right pr-6">
@@ -332,18 +332,18 @@ const SkillManagement = () => {
       </Card>
 
       <Dialog open={isUpdateOpen} onOpenChange={setIsUpdateOpen}>
-        <DialogContent className="sm:max-w-[420px] bg-[#f8fafc] border-none shadow-xl rounded-xl">
+        <DialogContent className="sm:max-w-[420px] bg-[#111319] border-none shadow-xl rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-slate-900">
+            <DialogTitle className="text-xl font-semibold text-[#e2e2eb]">
               Update Skill
             </DialogTitle>
-            <DialogDescription className="text-slate-500 text-[13px]">
+            <DialogDescription className="text-[#908fa0] text-[13px]">
               Edit skill information for student profiles.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdate} className="space-y-5 pt-2">
             <div className="space-y-2">
-              <label className="text-[13px] font-semibold text-slate-600">
+              <label className="text-[13px] font-semibold text-[#c7c4d7]">
                 Skill Name
               </label>
               <Input
@@ -351,7 +351,7 @@ const SkillManagement = () => {
                 placeholder="e.g. Django Python Framework"
                 value={updateSkillName}
                 onChange={(e) => setUpdateSkillName(e.target.value)}
-                className="h-10 bg-white border-slate-200"
+                className="h-10 bg-[#1e1f26] border-[rgba(255,255,255,0.08)]"
               />
             </div>
             <DialogFooter>
@@ -383,12 +383,12 @@ const SkillManagement = () => {
       </Dialog>
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[420px] bg-white border-none shadow-xl rounded-xl">
+        <DialogContent className="sm:max-w-[420px] bg-[#1e1f26] border-none shadow-xl rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-slate-900">
+            <DialogTitle className="text-xl font-semibold text-[#e2e2eb]">
               Delete Skill
             </DialogTitle>
-            <DialogDescription className="text-slate-500 text-[13px]">
+            <DialogDescription className="text-[#908fa0] text-[13px]">
               Are you sure you want to delete this skill? This action cannot be
               undone.
             </DialogDescription>

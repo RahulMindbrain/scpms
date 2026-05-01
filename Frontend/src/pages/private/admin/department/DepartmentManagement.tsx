@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Building2,
@@ -132,14 +132,14 @@ const DepartmentManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6 bg-[#f8fafc] min-h-screen">
+    <div className="p-4 md:p-8 space-y-6 bg-[#111319] min-h-screen">
       {/* Top Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+          <h1 className="text-2xl font-bold text-[#e2e2eb] flex items-center gap-2">
             <Building2 className="w-6 h-6 text-blue-600" /> Department Management
           </h1>
-          <p className="text-[13px] text-slate-500 mt-1">Manage all academic departments</p>
+          <p className="text-[13px] text-[#908fa0] mt-1">Manage all academic departments</p>
         </div>
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
@@ -147,22 +147,22 @@ const DepartmentManagement: React.FC = () => {
               <Plus className="w-4 h-4 mr-2" /> Create Department
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[400px] bg-[#f8fafc] border-none shadow-xl rounded-xl">
+          <DialogContent className="sm:max-w-[400px] bg-[#111319] border-none shadow-xl rounded-xl">
             <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-slate-900">New Department</DialogTitle>
-              <DialogDescription className="text-slate-500 text-[13px]">
+              <DialogTitle className="text-xl font-semibold text-[#e2e2eb]">New Department</DialogTitle>
+              <DialogDescription className="text-[#908fa0] text-[13px]">
                 Add a new academic department to the system.
               </DialogDescription>
             </DialogHeader>
             <form onSubmit={handleCreate} className="space-y-5 pt-2">
               <div className="space-y-2">
-                <label className="text-[13px] font-semibold text-slate-600">Department Name</label>
+                <label className="text-[13px] font-semibold text-[#c7c4d7]">Department Name</label>
                 <Input
                   required
                   placeholder="e.g. Computer Science Engineering"
                   value={deptName}
                   onChange={(e) => setDeptName(e.target.value)}
-                  className="h-10 bg-white border-slate-200"
+                  className="h-10 bg-[#1e1f26] border-[rgba(255,255,255,0.08)]"
                 />
               </div>
               <DialogFooter>
@@ -196,33 +196,33 @@ const DepartmentManagement: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
         <Card className="shadow-sm border border-slate-200/60 rounded-xl max-w-sm mx-auto sm:mx-0">
           <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-[28px] font-bold text-slate-800">{departments.length}</span>
-            <span className="text-[13px] text-slate-500 mt-1">Total Departments</span>
+            <span className="text-[28px] font-bold text-[#e2e2eb]">{departments.length}</span>
+            <span className="text-[13px] text-[#908fa0] mt-1">Total Departments</span>
           </CardContent>
         </Card>
       </div>
 
       {/* Search */}
       <div className="relative w-full sm:w-[300px]">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
         <Input
           placeholder="Search departments..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-9 bg-white border-slate-200 shadow-sm h-10"
+          className="pl-9 bg-[#1e1f26] border-[rgba(255,255,255,0.08)] shadow-sm h-10"
         />
       </div>
 
       {/* Table */}
-      <Card className="overflow-hidden shadow-sm border border-slate-200/60 bg-white rounded-xl">
+      <Card className="overflow-hidden shadow-sm border border-slate-200/60 bg-[#1e1f26] rounded-xl">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-white border-b border-slate-100">
+            <TableHeader className="bg-[#1e1f26] border-b border-[rgba(255,255,255,0.06)]">
               <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold text-slate-500 py-4 pl-6">#</TableHead>
-                <TableHead className="font-semibold text-slate-500">Department Name</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-center">ID</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-right pr-6">Action</TableHead>
+                <TableHead className="font-semibold text-[#908fa0] py-4 pl-6">#</TableHead>
+                <TableHead className="font-semibold text-[#908fa0]">Department Name</TableHead>
+                <TableHead className="font-semibold text-[#908fa0] text-center">ID</TableHead>
+                <TableHead className="font-semibold text-[#908fa0] text-right pr-6">Action</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -235,7 +235,7 @@ const DepartmentManagement: React.FC = () => {
               ) : filtered.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="py-20 text-center">
-                    <div className="flex flex-col items-center gap-2 text-slate-400">
+                    <div className="flex flex-col items-center gap-2 text-[#908fa0]">
                       <Building2 className="w-10 h-10 opacity-20" />
                       <span className="text-sm font-medium">No departments found</span>
                     </div>
@@ -245,13 +245,13 @@ const DepartmentManagement: React.FC = () => {
                 filtered.map((dept: any, index: number) => (
                   <TableRow
                     key={dept.id}
-                    className="bg-white hover:bg-slate-50/50 border-b border-slate-100/60 transition-colors"
+                    className="bg-[#1e1f26] hover:bg-[#111319] border-b border-slate-100/60 transition-colors"
                   >
-                    <TableCell className="font-medium text-slate-400 py-4 pl-6">{index + 1}</TableCell>
-                    <TableCell className="font-semibold text-slate-800">
+                    <TableCell className="font-medium text-[#908fa0] py-4 pl-6">{index + 1}</TableCell>
+                    <TableCell className="font-semibold text-[#e2e2eb]">
                       {dept.name || dept.deptName || '—'}
                     </TableCell>
-                    <TableCell className="text-center text-slate-400 text-sm font-mono">
+                    <TableCell className="text-center text-[#908fa0] text-sm font-mono">
                       {dept.id}
                     </TableCell>
                     <TableCell className="text-right pr-6">
@@ -290,22 +290,22 @@ const DepartmentManagement: React.FC = () => {
       </Card>
 
       <Dialog open={isUpdateOpen} onOpenChange={setIsUpdateOpen}>
-        <DialogContent className="sm:max-w-[400px] bg-[#f8fafc] border-none shadow-xl rounded-xl">
+        <DialogContent className="sm:max-w-[400px] bg-[#111319] border-none shadow-xl rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-slate-900">Update Department</DialogTitle>
-            <DialogDescription className="text-slate-500 text-[13px]">
+            <DialogTitle className="text-xl font-semibold text-[#e2e2eb]">Update Department</DialogTitle>
+            <DialogDescription className="text-[#908fa0] text-[13px]">
               Edit department information.
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleUpdate} className="space-y-5 pt-2">
             <div className="space-y-2">
-              <label className="text-[13px] font-semibold text-slate-600">Department Name</label>
+              <label className="text-[13px] font-semibold text-[#c7c4d7]">Department Name</label>
               <Input
                 required
                 placeholder="e.g. Computer Science Engineering"
                 value={updateDeptName}
                 onChange={(e) => setUpdateDeptName(e.target.value)}
-                className="h-10 bg-white border-slate-200"
+                className="h-10 bg-[#1e1f26] border-[rgba(255,255,255,0.08)]"
               />
             </div>
             <DialogFooter>
@@ -335,10 +335,10 @@ const DepartmentManagement: React.FC = () => {
       </Dialog>
 
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[400px] bg-white border-none shadow-xl rounded-xl">
+        <DialogContent className="sm:max-w-[400px] bg-[#1e1f26] border-none shadow-xl rounded-xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-slate-900">Delete Department</DialogTitle>
-            <DialogDescription className="text-slate-500 text-[13px]">
+            <DialogTitle className="text-xl font-semibold text-[#e2e2eb]">Delete Department</DialogTitle>
+            <DialogDescription className="text-[#908fa0] text-[13px]">
               Are you sure you want to delete this department? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>

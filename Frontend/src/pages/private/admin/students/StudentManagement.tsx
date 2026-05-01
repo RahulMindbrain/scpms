@@ -169,17 +169,17 @@ const StudentManagement: React.FC = () => {
   }
 
   return (
-    <div className="p-4 md:p-8 space-y-6 bg-[#f8fafc] min-h-screen">
+    <div className="p-4 md:p-8 space-y-6 bg-[#111319] min-h-screen">
       {/* Top Bar */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
           <div className="relative w-full sm:w-[280px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
             <Input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search students..."
-              className="pl-9 bg-white border-slate-200 shadow-sm h-10 w-full"
+              className="pl-9 bg-[#0c0e14] border-[rgba(255,255,255,0.08)] text-[#e2e2eb] placeholder:text-[#908fa0] h-10 w-full focus:border-indigo-500"
             />
           </div>
           {activeTab !== 'active' && (
@@ -281,28 +281,28 @@ const StudentManagement: React.FC = () => {
 
       {/* Stats Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="shadow-sm border border-slate-200/60 rounded-xl">
+        <Card className="shadow-none border border-[rgba(255,255,255,0.07)] rounded-xl bg-[#1e1f26] border-t-2 border-t-indigo-500/80">
           <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-[28px] font-bold text-slate-800">{students.length}</span>
-            <span className="text-[13px] text-slate-500 mt-1">Total Students</span>
+            <span className="text-[28px] font-bold text-[#e2e2eb]">{students.length}</span>
+            <span className="text-[13px] text-[#908fa0] mt-1">Total Students</span>
           </CardContent>
         </Card>
-        <Card className="shadow-sm border border-slate-200/60 rounded-xl">
+        <Card className="shadow-none border border-[rgba(255,255,255,0.07)] rounded-xl bg-[#1e1f26] border-t-2 border-t-emerald-500/80">
           <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-[28px] font-bold text-green-500">{reduxStudents.length}</span>
-            <span className="text-[13px] text-slate-500 mt-1">Verified</span>
+            <span className="text-[28px] font-bold text-emerald-400">{reduxStudents.length}</span>
+            <span className="text-[13px] text-[#908fa0] mt-1">Verified</span>
           </CardContent>
         </Card>
-        <Card className="shadow-sm border border-slate-200/60 rounded-xl">
+        <Card className="shadow-none border border-[rgba(255,255,255,0.07)] rounded-xl bg-[#1e1f26] border-t-2 border-t-amber-500/80">
           <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-[28px] font-bold text-orange-400">{reduxInactiveStudents.length}</span>
-            <span className="text-[13px] text-slate-500 mt-1">Pending Verification</span>
+            <span className="text-[28px] font-bold text-amber-400">{reduxInactiveStudents.length}</span>
+            <span className="text-[13px] text-[#908fa0] mt-1">Pending Verification</span>
           </CardContent>
         </Card>
-        <Card className="shadow-sm border border-slate-200/60 rounded-xl">
+        <Card className="shadow-none border border-[rgba(255,255,255,0.07)] rounded-xl bg-[#1e1f26] border-t-2 border-t-rose-500/80">
           <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-[28px] font-bold text-blue-600">{students.filter((s: any) => s.status === 'rejected').length}</span>
-            <span className="text-[13px] text-slate-500 mt-1">Rejected</span>
+            <span className="text-[28px] font-bold text-rose-400">{students.filter((s: any) => s.status === 'rejected').length}</span>
+            <span className="text-[13px] text-[#908fa0] mt-1">Rejected</span>
           </CardContent>
         </Card>
       </div>
@@ -310,18 +310,18 @@ const StudentManagement: React.FC = () => {
       {/* Students Table */}
       {/* Tabs + Activate All */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-1 bg-white border border-slate-200 rounded-xl p-1 w-fit shadow-sm">
+        <div className="flex items-center gap-1 bg-[#0c0e14] border border-[rgba(255,255,255,0.07)] rounded-xl p-1 w-fit">
           <button
             onClick={() => setActiveTab('active')}
             className={`px-5 py-2 rounded-lg text-[13px] font-semibold transition-all ${
               activeTab === 'active'
-                ? 'bg-blue-600 text-white shadow-sm'
-                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30'
+                : 'text-[#908fa0] hover:text-[#e2e2eb] hover:bg-[rgba(255,255,255,0.05)]'
             }`}
           >
             Active Students
             <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-              activeTab === 'active' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+              activeTab === 'active' ? 'bg-white/20 text-white' : 'bg-[rgba(255,255,255,0.08)] text-[#908fa0]'
             }`}>
               {reduxStudents.length}
             </span>
@@ -330,13 +330,13 @@ const StudentManagement: React.FC = () => {
             onClick={() => setActiveTab('inactive')}
             className={`px-5 py-2 rounded-lg text-[13px] font-semibold transition-all ${
               activeTab === 'inactive'
-                ? 'bg-orange-500 text-white shadow-sm'
-                : 'text-slate-500 hover:text-slate-800 hover:bg-slate-50'
+                ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/30'
+                : 'text-[#908fa0] hover:text-[#e2e2eb] hover:bg-[rgba(255,255,255,0.05)]'
             }`}
           >
             Inactive Students
             <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-              activeTab === 'inactive' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+              activeTab === 'inactive' ? 'bg-white/20 text-white' : 'bg-[rgba(255,255,255,0.08)] text-[#908fa0]'
             }`}>
               {reduxInactiveStudents.length}
             </span>
@@ -358,20 +358,19 @@ const StudentManagement: React.FC = () => {
         )}
       </div>
 
-      <Card className="overflow-hidden shadow-sm border border-slate-200/60 bg-white rounded-xl">
+      <Card className="overflow-hidden shadow-none border border-[rgba(255,255,255,0.07)] bg-[#1e1f26] rounded-xl">
         <div className="overflow-x-auto">
           <Table>
-            <TableHeader className="bg-white border-b border-slate-100">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold text-slate-500 py-4 pl-6">Name</TableHead>
-                <TableHead className="font-semibold text-slate-500 text-center">Status</TableHead>
-                {/* <TableHead className="font-semibold text-slate-500 text-right pr-6">Actions</TableHead> */}
+            <TableHeader className="bg-[#191b22] border-b border-[rgba(255,255,255,0.06)]">
+              <TableRow className="hover:bg-transparent border-0">
+                <TableHead className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#908fa0] h-11 pl-6">Name</TableHead>
+                <TableHead className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#908fa0] h-11 text-center">Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredStudents.map((student) => (
-                <TableRow key={student.id} className="bg-white hover:bg-slate-50/50 border-b border-slate-100/60 transition-colors">
-                  <TableCell className="font-bold text-slate-800 py-4 pl-6">{student.name}</TableCell>
+                <TableRow key={student.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.025)] transition-colors">
+                  <TableCell className="font-semibold text-[#e2e2eb] py-4 pl-6">{student.name}</TableCell>
                   <TableCell className="text-center">
                     <div className="flex items-center justify-center gap-2">
                       {student.status === 'pending' ? (
@@ -419,8 +418,8 @@ const StudentManagement: React.FC = () => {
           </Table>
         </div>
         {filteredStudents.length === 0 && (
-          <div className="py-20 text-center text-muted-foreground">
-            <Search className="w-12 h-12 mx-auto mb-4 opacity-10" />
+          <div className="py-20 text-center text-[#908fa0]">
+            <Search className="w-12 h-12 mx-auto mb-4 opacity-20" />
             <p className="font-medium">No results matched your search</p>
           </div>
         )}

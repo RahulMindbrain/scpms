@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+﻿import React, { useEffect, useState, useMemo } from 'react';
 import {
   Briefcase,
   Building2,
@@ -144,20 +144,20 @@ const AdminJobManagement: React.FC = () => {
   }, [jobs]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] pb-12">
+    <div className="min-h-screen bg-[#111319] pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 space-y-8">
 
         {/* Top Header Section */}
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Jobs</h1>
-            <p className="text-slate-500 mt-1">Manage and moderate job listings across the platform.</p>
+            <h1 className="text-3xl font-bold text-[#e2e2eb] tracking-tight">Jobs</h1>
+            <p className="text-[#908fa0] mt-1">Manage and moderate job listings across the platform.</p>
           </div>
           <div className="relative w-full md:w-96 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0] group-focus-within:text-indigo-600 transition-colors" />
             <Input
               placeholder="Search by title, company..."
-              className="pl-11 h-12 bg-white border-slate-200 rounded-2xl shadow-sm focus-visible:ring-indigo-500/10 focus-visible:border-indigo-500 transition-all"
+              className="pl-11 h-12 bg-[#1e1f26] border-[rgba(255,255,255,0.08)] rounded-2xl shadow-sm focus-visible:ring-indigo-500/10 focus-visible:border-indigo-500 transition-all"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -165,7 +165,7 @@ const AdminJobManagement: React.FC = () => {
         </header>
 
         {/* Filters & Tabs Bar */}
-        <div className="sticky top-4 z-40 bg-white/80 backdrop-blur-xl border border-slate-200/60 rounded-3xl p-3 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-4">
+        <div className="sticky top-4 z-40 bg-[#1e1f26]/80 backdrop-blur-xl border border-slate-200/60 rounded-3xl p-3 shadow-sm flex flex-col lg:flex-row items-center justify-between gap-4">
           <div className="flex p-1 bg-slate-100/80 rounded-2xl w-full lg:w-auto">
             {(['PENDING', 'APPROVED', 'REJECTED'] as const).map((tab) => (
               <button
@@ -188,8 +188,8 @@ const AdminJobManagement: React.FC = () => {
 
           <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
             <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="w-[160px] h-10 rounded-xl bg-white border-slate-200">
-                <ArrowUpDown className="w-3.5 h-3.5 mr-2 text-slate-400" />
+              <SelectTrigger className="w-[160px] h-10 rounded-xl bg-[#1e1f26] border-[rgba(255,255,255,0.08)]">
+                <ArrowUpDown className="w-3.5 h-3.5 mr-2 text-[#908fa0]" />
                 <SelectValue placeholder="Sort by" />
               </SelectTrigger>
               <SelectContent>
@@ -200,8 +200,8 @@ const AdminJobManagement: React.FC = () => {
             </Select>
 
             <Select value={filterDepartment} onValueChange={setFilterDepartment}>
-              <SelectTrigger className="w-[140px] h-10 rounded-xl bg-white border-slate-200">
-                <Filter className="w-3.5 h-3.5 mr-2 text-slate-400" />
+              <SelectTrigger className="w-[140px] h-10 rounded-xl bg-[#1e1f26] border-[rgba(255,255,255,0.08)]">
+                <Filter className="w-3.5 h-3.5 mr-2 text-[#908fa0]" />
                 <SelectValue placeholder="Department" />
               </SelectTrigger>
               <SelectContent>
@@ -215,8 +215,8 @@ const AdminJobManagement: React.FC = () => {
             </Select>
 
             <Select value={filterLocation} onValueChange={setFilterLocation}>
-              <SelectTrigger className="w-[140px] h-10 rounded-xl bg-white border-slate-200">
-                <MapPin className="w-3.5 h-3.5 mr-2 text-slate-400" />
+              <SelectTrigger className="w-[140px] h-10 rounded-xl bg-[#1e1f26] border-[rgba(255,255,255,0.08)]">
+                <MapPin className="w-3.5 h-3.5 mr-2 text-[#908fa0]" />
                 <SelectValue placeholder="Location" />
               </SelectTrigger>
               <SelectContent>
@@ -255,10 +255,10 @@ const AdminJobManagement: React.FC = () => {
 
         {/* Pagination */}
         {!loading && filteredAndSortedJobs.length > 0 && (
-          <div className="flex items-center justify-between pt-8 border-t border-slate-200">
-            <p className="text-sm text-slate-500">
-              Showing <span className="font-medium text-slate-900">{filteredAndSortedJobs.length}</span> of{' '}
-              <span className="font-medium text-slate-900">{meta?.total ?? filteredAndSortedJobs.length}</span> results
+          <div className="flex items-center justify-between pt-8 border-t border-[rgba(255,255,255,0.08)]">
+            <p className="text-sm text-[#908fa0]">
+              Showing <span className="font-medium text-[#e2e2eb]">{filteredAndSortedJobs.length}</span> of{' '}
+              <span className="font-medium text-[#e2e2eb]">{meta?.total ?? filteredAndSortedJobs.length}</span> results
             </p>
             <div className="flex items-center gap-2">
               <Button
@@ -270,13 +270,13 @@ const AdminJobManagement: React.FC = () => {
               >
                 <ChevronLeft className="w-4 h-4" />
               </Button>
-              <Button variant="outline" size="sm" className="rounded-xl h-9 w-9 p-0 bg-white border-indigo-200 text-indigo-600">
+              <Button variant="outline" size="sm" className="rounded-xl h-9 w-9 p-0 bg-[#1e1f26] border-indigo-200 text-indigo-600">
                 {meta?.page ?? page}
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-xl h-9 w-9 p-0 hover:bg-white"
+                className="rounded-xl h-9 w-9 p-0 hover:bg-[#1e1f26]"
                 disabled={(meta?.page ?? page) >= (meta?.totalPages ?? page)}
                 onClick={() => setPage(prev => {
                   const totalPages = meta?.totalPages ?? prev;
@@ -296,14 +296,14 @@ const AdminJobManagement: React.FC = () => {
 const JobCard = ({ job, onStatusUpdate, activeTab }: any) => {
   return (
     <div
-      className="group relative bg-white rounded-[20px] border p-5 transition-all duration-300 border-slate-200 hover:shadow-xl hover:shadow-slate-200/50"
+      className="group relative bg-[#1e1f26] rounded-[20px] border p-5 transition-all duration-300 border-[rgba(255,255,255,0.08)] hover:shadow-xl hover:shadow-slate-200/50"
     >
       {/* Top Controls */}
       <div className="absolute top-4 right-4 flex items-center gap-2">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
-              <MoreVertical className="w-4 h-4 text-slate-400" />
+              <MoreVertical className="w-4 h-4 text-[#908fa0]" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="rounded-xl">
@@ -316,7 +316,7 @@ const JobCard = ({ job, onStatusUpdate, activeTab }: any) => {
         <div className="flex items-center justify-between pr-10">
           <Badge
             variant="outline"
-            className={`text-[11px] font-bold tracking-wide px-2.5 py-1 rounded-md border ${(job.status && STATUS_STYLES[job.status as keyof typeof STATUS_STYLES]?.badge) || 'bg-slate-100 text-slate-700 border-slate-200'}`}
+            className={`text-[11px] font-bold tracking-wide px-2.5 py-1 rounded-md border ${(job.status && STATUS_STYLES[job.status as keyof typeof STATUS_STYLES]?.badge) || 'bg-slate-100 text-[#c7c4d7] border-[rgba(255,255,255,0.08)]'}`}
           >
             {job.status || 'UNKNOWN'}
           </Badge>
@@ -324,7 +324,7 @@ const JobCard = ({ job, onStatusUpdate, activeTab }: any) => {
 
         {/* Company & Title */}
         <div className="flex items-start gap-4 pr-10">
-          <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-indigo-600 shrink-0">
+          <div className="w-12 h-12 rounded-xl bg-[#111319] border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-indigo-600 shrink-0">
             {job.company?.logo ? (
               <img src={job.company.logo} alt={job.company.name} className="w-8 h-8 object-contain" />
             ) : (
@@ -332,17 +332,17 @@ const JobCard = ({ job, onStatusUpdate, activeTab }: any) => {
             )}
           </div>
           <div className="min-w-0">
-            <h3 className="text-base font-bold text-slate-900 leading-tight group-hover:text-indigo-600 transition-colors truncate">
+            <h3 className="text-base font-bold text-[#e2e2eb] leading-tight group-hover:text-indigo-600 transition-colors truncate">
               {job.title}
             </h3>
-            <p className="text-sm text-slate-500 font-medium truncate">{job.company?.name}</p>
+            <p className="text-sm text-[#908fa0] font-medium truncate">{job.company?.name}</p>
           </div>
         </div>
 
         {/* Stats Row */}
         <div className="flex flex-wrap items-center gap-y-2 gap-x-4">
-          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-500">
-            <MapPin className="w-3.5 h-3.5 text-slate-400" />
+          <div className="flex items-center gap-1.5 text-xs font-medium text-[#908fa0]">
+            <MapPin className="w-3.5 h-3.5 text-[#908fa0]" />
             {job.location || '-'}
           </div>
           <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg">
@@ -352,7 +352,7 @@ const JobCard = ({ job, onStatusUpdate, activeTab }: any) => {
         </div>
 
         {/* Description */}
-        <p className="text-sm text-slate-600 leading-relaxed line-clamp-2 min-h-[40px]">
+        <p className="text-sm text-[#c7c4d7] leading-relaxed line-clamp-2 min-h-[40px]">
           {job.description || '-'}
         </p>
 
@@ -362,7 +362,7 @@ const JobCard = ({ job, onStatusUpdate, activeTab }: any) => {
             <Badge
               key={dept.id}
               variant="secondary"
-              className="bg-slate-100 text-slate-600 border-none font-semibold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md"
+              className="bg-slate-100 text-[#c7c4d7] border-none font-semibold text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-md"
             >
               {dept.name}
             </Badge>
@@ -370,7 +370,7 @@ const JobCard = ({ job, onStatusUpdate, activeTab }: any) => {
         </div>
 
         {/* Footer Actions */}
-        <div className="pt-4 flex items-center gap-3 border-t border-slate-100">
+        <div className="pt-4 flex items-center gap-3 border-t border-[rgba(255,255,255,0.06)]">
           {activeTab === 'PENDING' ? (
             <>
               <Button
@@ -410,18 +410,18 @@ const JobCard = ({ job, onStatusUpdate, activeTab }: any) => {
 
 
 const EmptyState = ({ onReset }: { onReset: () => void }) => (
-  <div className="col-span-full py-20 flex flex-col items-center justify-center bg-white rounded-[32px] border border-dashed border-slate-200 text-center px-6">
+  <div className="col-span-full py-20 flex flex-col items-center justify-center bg-[#1e1f26] rounded-[32px] border border-dashed border-[rgba(255,255,255,0.08)] text-center px-6">
     <div className="w-20 h-20 bg-indigo-50 rounded-full flex items-center justify-center mb-6">
       <Briefcase className="w-10 h-10 text-indigo-200" />
     </div>
-    <h3 className="text-xl font-bold text-slate-900 mb-2">No jobs found</h3>
-    <p className="text-slate-500 max-w-xs mb-8">
+    <h3 className="text-xl font-bold text-[#e2e2eb] mb-2">No jobs found</h3>
+    <p className="text-[#908fa0] max-w-xs mb-8">
       We couldn't find any job listings matching your current criteria. Try adjusting your filters.
     </p>
     <Button
       variant="outline"
       onClick={onReset}
-      className="rounded-xl px-8 border-slate-200"
+      className="rounded-xl px-8 border-[rgba(255,255,255,0.08)]"
     >
       Clear all filters
     </Button>

@@ -159,13 +159,13 @@ const CompanyManagement: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50/50 pb-12">
+    <div className="min-h-screen bg-[#111319] pb-12">
       <div className="max-w-7xl mx-auto px-6 pt-8 space-y-8 ">
         {/* Modern Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-1">
-            <h1 className="text-3xl font-black text-slate-900 tracking-tight">Companies Dashboard</h1>
-            <p className="text-slate-500 text-sm font-medium">Manage and monitor corporate relations and placement health.</p>
+            <h1 className="text-3xl font-black text-[#e2e2eb] tracking-tight">Companies Dashboard</h1>
+            <p className="text-[#908fa0] text-sm font-medium">Manage and monitor corporate relations and placement health.</p>
           </div>
 
           <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -176,7 +176,7 @@ const CompanyManagement: React.FC = () => {
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by company name..."
-                className="w-full pl-11 pr-4 py-3 bg-white border border-slate-200 rounded-[1.25rem] text-sm font-medium placeholder:text-slate-400 focus:outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all duration-300 shadow-sm shadow-slate-200/50"
+                className="w-full pl-11 pr-4 py-3 bg-[#0c0e14] border border-[rgba(255,255,255,0.08)] rounded-[1.25rem] text-sm font-medium text-[#e2e2eb] placeholder:text-[#908fa0] focus:outline-none focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all duration-300"
               />
             </div>
           </div>
@@ -216,21 +216,21 @@ const CompanyManagement: React.FC = () => {
 
         {/* Pill-style Segmented Filter Controls */}
         <div className="flex items-center justify-between">
-          <div className="flex bg-white/70 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200/60 shadow-sm overflow-x-auto scrollbar-hide">
+          <div className="flex bg-[#0c0e14] backdrop-blur-md p-1.5 rounded-2xl border border-[rgba(255,255,255,0.07)] overflow-x-auto scrollbar-hide">
             {['All', 'Active', 'Inactive'].map((opt) => (
               <button
                 key={opt}
                 onClick={() => setFilter(opt)}
                 className={`shrink-0 px-6 py-2.5 rounded-[0.85rem] text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 ${filter === opt
-                    ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10'
-                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-100/50'
+                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/20'
+                    : 'text-[#908fa0] hover:text-[#e2e2eb] hover:bg-[rgba(255,255,255,0.05)]'
                   }`}
               >
                 {opt}
               </button>
             ))}
           </div>
-          <div className="hidden md:flex items-center gap-2 text-slate-400 text-xs font-bold">
+          <div className="hidden md:flex items-center gap-2 text-[#908fa0] text-xs font-bold">
             <LayoutGrid className="w-4 h-4" />
             <span className="uppercase tracking-widest">Showing {filteredCompanies.length} entities</span>
           </div>
@@ -247,7 +247,7 @@ const CompanyManagement: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.3 }}
-                className="group relative bg-white/80 backdrop-blur-sm p-6 rounded-[2rem] border border-slate-200/60 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1.5 transition-all duration-500 overflow-hidden"
+                className="group relative bg-[#1e1f26] backdrop-blur-sm p-6 rounded-[2rem] border border-[rgba(255,255,255,0.07)] shadow-none hover:shadow-xl hover:shadow-indigo-500/10 hover:-translate-y-1.5 transition-all duration-500 overflow-hidden"
               >
                 {/* Visual Accent Decoration */}
                 <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 blur-3xl rounded-full -mr-16 -mt-16 group-hover:bg-indigo-500/10 transition-colors duration-500"></div>
@@ -300,12 +300,12 @@ const CompanyManagement: React.FC = () => {
                     </div>
                   )}
 
-                  <div className="p-4 bg-white rounded-2xl border border-slate-100 shadow-sm group-hover:border-indigo-100 transition-colors">
+                  <div className="p-4 bg-[rgba(255,255,255,0.04)] rounded-2xl border border-[rgba(255,255,255,0.06)] group-hover:border-indigo-500/20 transition-colors">
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="w-1.5 h-1.5 bg-indigo-500 rounded-full"></div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Registered</p>
+                      <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full"></div>
+                      <p className="text-[9px] font-black text-[#908fa0] uppercase tracking-widest">Registered</p>
                     </div>
-                    <p className="text-sm font-black text-slate-800">
+                    <p className="text-sm font-black text-[#e2e2eb]">
                       {company.createdAt
                         ? new Date(company.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
                         : 'N/A'}
@@ -314,7 +314,7 @@ const CompanyManagement: React.FC = () => {
                 </div>
 
                 {/* Footer Controls */}
-                <div className="flex items-center justify-between pt-5 border-t border-slate-100/60">
+                <div className="flex items-center justify-between pt-5 border-t border-[rgba(255,255,255,0.06)]">
                   <div className="flex items-center gap-2">
                     <div className={`w-2 h-2 rounded-full ${company.status === 'active' ? 'bg-emerald-500' : 'bg-slate-300'}`}></div>
                     <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">

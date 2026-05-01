@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Search, Filter, GraduationCap } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchApplications } from '@/redux/thunks/applicationThunk';

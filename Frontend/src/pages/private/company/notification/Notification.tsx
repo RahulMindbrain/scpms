@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+﻿import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowUpRight,
   Bell,
@@ -148,7 +148,7 @@ const CompanyNotificationPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50/50 p-4 sm:p-6 lg:p-8 text-slate-900">
+    <div className="min-h-screen bg-[#111319] p-4 sm:p-6 lg:p-8 text-slate-900">
       <motion.main
         initial="hidden"
         animate="visible"
