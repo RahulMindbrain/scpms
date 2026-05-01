@@ -89,7 +89,7 @@ const CompanyProfile = () => {
   }
 
   return (
-    <div className="container mx-auto max-w-3xl py-10">
+    <div className="py-6">
       <Card>
         <CardHeader>
           <CardTitle>Company Profile</CardTitle>

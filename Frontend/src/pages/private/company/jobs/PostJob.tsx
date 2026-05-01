@@ -130,12 +130,12 @@ const PostJob: React.FC = () => {
     <div className="font-sans">
       <div className="bg-[#1e1f26] rounded-[2rem] border border-[rgba(255,255,255,0.07)] overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
         {/* Header */}
-        <header className="p-6 sm:p-8 border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]">
+        <header className="p-5 sm:p-6 border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]">
           <h1 className="text-2xl font-extrabold text-[#e2e2eb] tracking-tight">Create New Job Drive</h1>
           <p className="mt-1 text-[#908fa0] text-sm">Configure your recruitment requirements to find the best talent.</p>
         </header>
 
-        <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-8">
+        <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-6">
           {/* Basic Information */}
           <section className="space-y-6">
             <h2 className="flex items-center gap-3 text-xl font-bold text-[#e2e2eb]">

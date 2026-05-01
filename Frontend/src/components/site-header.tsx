@@ -95,7 +95,7 @@ export function SiteHeader() {
       transition-[width,height,background-color] ease-linear
       group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)
     ">
-      <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
+      <div className="flex w-full items-center gap-1 px-4 md:px-6 max-w-7xl mx-auto">
         {/* Sidebar toggle */}
         <SidebarTrigger className="-ml-1 text-muted-foreground hover:text-foreground hover:bg-accent/10 transition-colors" />
 
