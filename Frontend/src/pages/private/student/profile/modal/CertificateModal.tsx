@@ -49,12 +49,12 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[500px] rounded-2xl p-0 overflow-hidden bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-black uppercase tracking-tight text-slate-900">Add Certificate</DialogTitle>
+          <DialogTitle className="text-2xl font-black uppercase tracking-tight text-[#e2e2eb]">Add Certificate</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 py-4 px-7">
           <div className="space-y-2">
-            <Label htmlFor="title" className="text-xs font-black uppercase tracking-widest text-slate-500">Certificate Title</Label>
+            <Label htmlFor="title" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Certificate Title</Label>
             <Input
               id="title"
               placeholder="Full Stack Web Development"
@@ -65,7 +65,7 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="issuer" className="text-xs font-black uppercase tracking-widest text-slate-500">Issuer</Label>
+            <Label htmlFor="issuer" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Issuer</Label>
             <Input
               id="issuer"
               placeholder="Coursera / Udemy / LinkedIn"
@@ -76,7 +76,7 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
           </div>
 
            <div className="space-y-2">
-            <Label htmlFor="date" className="text-xs font-black uppercase tracking-widest text-slate-500">Issued Date</Label>
+            <Label htmlFor="date" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Issued Date</Label>
             <Input
               id="date"
               type="date"
@@ -87,7 +87,7 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
           </div>
 
           <div className="space-y-2">
-            <Label className="text-xs font-black uppercase tracking-widest text-slate-500">Certificate File (Optional)</Label>
+            <Label className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Certificate File (Optional)</Label>
             <div className="flex items-center gap-4">
                <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-[rgba(255,255,255,0.08)] rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-indigo-500/10 transition-all group">
                   {isUploading ? <Loader size="sm" /> : <Upload size={18} className="text-[#908fa0] group-hover:text-blue-500" />}

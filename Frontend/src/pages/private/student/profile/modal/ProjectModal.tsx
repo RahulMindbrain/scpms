@@ -47,12 +47,12 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[520px] rounded-2xl p-0 overflow-hidden bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-black uppercase tracking-tight text-slate-900">Add New Project</DialogTitle>
+          <DialogTitle className="text-2xl font-black uppercase tracking-tight text-[#e2e2eb]">Add New Project</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 py-4 px-7">
           <div className="space-y-2">
-            <Label htmlFor="title" className="text-xs font-black uppercase tracking-widest text-slate-500">Project Title</Label>
+            <Label htmlFor="title" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Project Title</Label>
             <Input
               id="title"
               placeholder="e.g. AI Portfolio Platform"
@@ -63,7 +63,7 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-xs font-black uppercase tracking-widest text-slate-500">Project Description</Label>
+            <Label htmlFor="description" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Project Description</Label>
             <Textarea
               id="description"
               placeholder="Tell us about your project..."
@@ -74,7 +74,7 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="techStack" className="text-xs font-black uppercase tracking-widest text-slate-500">Tech Stack (e.g. React, Nodejs)</Label>
+            <Label htmlFor="techStack" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Tech Stack (e.g. React, Nodejs)</Label>
             <Input
               id="techStack"
               placeholder="React, TypeScript, Tailwind"
@@ -86,9 +86,9 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="githubUrl" className="text-xs font-black uppercase tracking-widest text-slate-500">GitHub Link</Label>
+              <Label htmlFor="githubUrl" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">GitHub Link</Label>
               <div className="relative">
-                <Code2 className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
+                <Code2 className="absolute left-3 top-3.5 h-4 w-4 text-[#908fa0]" />
                 <Input
                   id="githubUrl"
                   placeholder="https://github.com..."
@@ -99,9 +99,9 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="liveUrl" className="text-xs font-black uppercase tracking-widest text-slate-500">Live Demo</Label>
+              <Label htmlFor="liveUrl" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Live Demo</Label>
               <div className="relative">
-                <Globe className="absolute left-3 top-3.5 h-4 w-4 text-slate-400" />
+                <Globe className="absolute left-3 top-3.5 h-4 w-4 text-[#908fa0]" />
                 <Input
                   id="liveUrl"
                   placeholder="https://project.com..."

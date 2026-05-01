@@ -63,14 +63,14 @@ const UpcomingInterviews: Interview[] = [
 
 const InterviewSchedule: React.FC = () => {
   return (
-    <div className="min-h-screen bg-[#111319] p-4 md:p-8 font-sans text-slate-900">
+    <div className="min-h-screen bg-[#111319] p-4 md:p-8 font-sans text-[#e2e2eb]">
       <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         {/* Main Content Area */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-slate-800">Upcoming Interviews</h2>
+              <h2 className="text-2xl font-bold text-[#e2e2eb]">Upcoming Interviews</h2>
               <p className="text-[#908fa0] text-sm mt-1">You have {UpcomingInterviews.length} interviews scheduled for this week.</p>
             </div>
             {/* <button className="text-sm font-semibold text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 px-4 py-2 rounded-lg transition-colors">
@@ -95,7 +95,7 @@ const InterviewSchedule: React.FC = () => {
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-bold text-slate-800">{item.company}</h3>
+                        <h3 className="text-lg font-bold text-[#e2e2eb]">{item.company}</h3>
                         <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-md uppercase tracking-wider ${
                           item.type === 'online' 
                             ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
@@ -110,7 +110,7 @@ const InterviewSchedule: React.FC = () => {
                   </div>
 
                   <div className="flex flex-row sm:flex-col items-end justify-between sm:justify-center gap-2 border-t sm:border-t-0 pt-4 sm:pt-0">
-                    <div className="flex items-center gap-4 text-slate-600">
+                    <div className="flex items-center gap-4 text-[#c7c4d7]">
                       <div className="flex items-center gap-1.5 text-sm font-semibold">
                         <Calendar size={14} className="text-blue-500" />
                         {item.date}
@@ -153,8 +153,8 @@ const InterviewSchedule: React.FC = () => {
           {/* <div className="bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
-                <History size={18} className="text-slate-400" />
-                <h2 className="font-bold text-slate-800">Recent Activity</h2>
+                <History size={18} className="text-[#908fa0]" />
+                <h2 className="font-bold text-[#e2e2eb]">Recent Activity</h2>
               </div>
               <MoreVertical size={16} className="text-[#908fa0] cursor-pointer" />
             </div>
@@ -163,16 +163,16 @@ const InterviewSchedule: React.FC = () => {
               <div className="flex gap-4">
                 <div className="w-1 bg-emerald-400 rounded-full"></div>
                 <div>
-                  <p className="text-sm font-bold text-slate-800">Apple Inc.</p>
-                  <p className="text-xs text-slate-500">Technical Round 1 Completed</p>
+                  <p className="text-sm font-bold text-[#e2e2eb]">Apple Inc.</p>
+                  <p className="text-xs text-[#908fa0]">Technical Round 1 Completed</p>
                   <p className="text-[10px] text-[#908fa0] mt-1 uppercase font-bold">Apr 8 • 2:00 PM</p>
                 </div>
               </div>
               <div className="flex gap-4">
                 <div className="w-1 bg-slate-200 rounded-full"></div>
                 <div>
-                  <p className="text-sm font-bold text-slate-800">Netflix</p>
-                  <p className="text-xs text-slate-500">Application Viewed</p>
+                  <p className="text-sm font-bold text-[#e2e2eb]">Netflix</p>
+                  <p className="text-xs text-[#908fa0]">Application Viewed</p>
                   <p className="text-[10px] text-[#908fa0] mt-1 uppercase font-bold">Apr 7 • 10:45 AM</p>
                 </div>
               </div>

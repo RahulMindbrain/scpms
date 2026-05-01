@@ -74,7 +74,7 @@ const StepIndicator = ({ currentStatus }: { currentStatus: Status }) => {
       </div>
       {nextStage && STATUS_CONFIG[nextStage] && (
         <>
-          <ChevronRight size={12} className="text-slate-300" />
+          <ChevronRight size={12} className="text-[#c7c4d7]" />
           <span className="text-[#908fa0] font-medium text-[11px] uppercase tracking-wide">
             Next: {STATUS_CONFIG[nextStage].label}
           </span>
@@ -174,7 +174,7 @@ const ApplicationRow = ({
               <div className="bg-[#1e1f26] p-4 rounded-xl border border-[rgba(255,255,255,0.06)] shadow-sm">
                 <div className="flex items-center justify-between mb-4">
                   <h4 className="text-xs font-bold text-[#e2e2eb] uppercase tracking-wider">Application Timeline</h4>
-                  <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                  <div className="flex items-center gap-2 text-[10px] font-bold text-[#908fa0]">
                     <Clock size={12} /> LAST UPDATED: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
                 </div>
@@ -198,13 +198,13 @@ const ApplicationRow = ({
                           "w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all duration-500",
                           isPassed ? "bg-indigo-500/100 border-blue-500 text-white" :
                           isCurrent ? "bg-[#1e1f26] border-blue-500 text-indigo-400 scale-125 shadow-lg shadow-blue-100" :
-                          "bg-[#1e1f26] border-[rgba(255,255,255,0.08)] text-slate-300"
+                          "bg-[#1e1f26] border-[rgba(255,255,255,0.08)] text-[#c7c4d7]"
                         )}>
                           {isPassed ? <CheckCircle2 size={12} strokeWidth={3} /> : <Circle size={10} fill={isCurrent ? "currentColor" : "none"} />}
                         </div>
                         <span className={cn(
                           "text-[9px] font-bold uppercase tracking-tight whitespace-nowrap",
-                          isPassed || isCurrent ? "text-slate-900" : "text-slate-400"
+                          isPassed || isCurrent ? "text-[#e2e2eb]" : "text-[#908fa0]"
                         )}>
                           {STATUS_CONFIG[stage]?.label || stage}
                         </span>
@@ -441,7 +441,7 @@ const ApplicationStatus = () => {
       )}
 
       {/* ─── Filters & Search ─── */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 py-2 border-b border-slate-100">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 py-2 border-b border-[rgba(255,255,255,0.07)]">
         <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
           {["All", "Active", "Shortlisted", "Selected", "Rejected"].map((filter) => (
             <button
@@ -451,7 +451,7 @@ const ApplicationStatus = () => {
                 "px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap",
                 activeFilter === filter
                   ? "bg-slate-900 text-white shadow-lg"
-                  : "bg-white text-[#908fa0] hover:bg-[#191b22] border border-slate-100"
+                  : "bg-white text-[#908fa0] hover:bg-[#191b22] border border-[rgba(255,255,255,0.07)]"
               )}
             >
               {filter}
@@ -459,7 +459,7 @@ const ApplicationStatus = () => {
           ))}
         </div>
         <div className="relative w-full lg:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#908fa0]" size={16} />
           <Input
             placeholder="Search company or role..."
             className="pl-10 h-10 bg-[#1e1f26] border-[rgba(255,255,255,0.06)] rounded-xl text-sm focus-visible:ring-indigo-500/100 shadow-sm"
@@ -486,10 +486,10 @@ const ApplicationStatus = () => {
           </div>
         ) : (
           <div className="py-20 flex flex-col items-center text-center">
-            <div className="w-20 h-20 bg-[#191b22] rounded-3xl flex items-center justify-center text-slate-200 mb-4 border border-slate-100">
+            <div className="w-20 h-20 bg-[#191b22] rounded-3xl flex items-center justify-center text-[#c7c4d7] mb-4 border border-[rgba(255,255,255,0.07)]">
               <Search size={40} />
             </div>
-            <h3 className="text-lg font-bold text-slate-900">No applications found</h3>
+            <h3 className="text-lg font-bold text-[#e2e2eb]">No applications found</h3>
             <p className="text-[#908fa0] text-sm max-w-xs mt-1">We couldn't find any applications matching your current filters or search term.</p>
             <Button
               variant="link"

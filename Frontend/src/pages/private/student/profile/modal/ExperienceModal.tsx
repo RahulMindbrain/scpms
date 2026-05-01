@@ -38,27 +38,27 @@ const ExperienceModal = ({ isOpen, onClose, onAddExperience }: ExperienceModalPr
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[520px] rounded-2xl p-0 overflow-hidden bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-black uppercase tracking-tight text-slate-900">Add Experience</DialogTitle>
+          <DialogTitle className="text-2xl font-black uppercase tracking-tight text-[#e2e2eb]">Add Experience</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6 py-4 px-7">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="company" className="text-xs font-black uppercase tracking-widest text-slate-500">Company</Label>
+              <Label htmlFor="company" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Company</Label>
               <Input
                 id="company"
                 placeholder="Google"
-                className="rounded-2xl h-11 border-slate-200"
+                className="rounded-2xl h-11 border-[rgba(255,255,255,0.08)]"
                 value={experience.companyName}
                 onChange={(e) => setExperience({ ...experience, companyName: e.target.value })}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="role" className="text-xs font-black uppercase tracking-widest text-slate-500">Role</Label>
+              <Label htmlFor="role" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Role</Label>
               <Input
                 id="role"
                 placeholder="Software Engineer"
-                className="rounded-2xl h-11 border-slate-200"
+                className="rounded-2xl h-11 border-[rgba(255,255,255,0.08)]"
                 value={experience.role}
                 onChange={(e) => setExperience({ ...experience, role: e.target.value })}
               />
@@ -67,21 +67,21 @@ const ExperienceModal = ({ isOpen, onClose, onAddExperience }: ExperienceModalPr
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="startDate" className="text-xs font-black uppercase tracking-widest text-slate-500">Start Date</Label>
+              <Label htmlFor="startDate" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Start Date</Label>
               <Input
                 id="startDate"
                 type="date"
-                className="rounded-2xl h-11 border-slate-200"
+                className="rounded-2xl h-11 border-[rgba(255,255,255,0.08)]"
                 value={experience.startDate}
                 onChange={(e) => setExperience({ ...experience, startDate: e.target.value })}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="endDate" className="text-xs font-black uppercase tracking-widest text-slate-500">End Date (Optional)</Label>
+              <Label htmlFor="endDate" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">End Date (Optional)</Label>
               <Input
                 id="endDate"
                 type="date"
-                className="rounded-2xl h-11 border-slate-200"
+                className="rounded-2xl h-11 border-[rgba(255,255,255,0.08)]"
                 value={experience.endDate}
                 onChange={(e) => setExperience({ ...experience, endDate: e.target.value })}
               />
@@ -89,7 +89,7 @@ const ExperienceModal = ({ isOpen, onClose, onAddExperience }: ExperienceModalPr
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-xs font-black uppercase tracking-widest text-slate-500">Description</Label>
+            <Label htmlFor="description" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Description</Label>
             <Textarea
               id="description"
               placeholder="Describe your role and impact..."

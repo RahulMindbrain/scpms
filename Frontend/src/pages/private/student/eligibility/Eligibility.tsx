@@ -123,7 +123,7 @@ const Eligibility = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#111319] p-6 lg:p-10 font-sans text-slate-900">
+    <div className="min-h-screen bg-[#111319] p-6 lg:p-10 font-sans text-[#e2e2eb]">
       <div className="max-w-6xl mx-auto">
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -135,24 +135,24 @@ const Eligibility = () => {
                 <div className="p-2 bg-indigo-500/10 rounded-xl">
                   <User className="w-5 h-5 text-blue-600" />
                 </div>
-                <h2 className="font-bold text-slate-800">Academic Profile</h2>
+                <h2 className="font-bold text-[#e2e2eb]">Academic Profile</h2>
               </div>
               
               <div className="space-y-4">
-                <div className="p-4 bg-[#191b22] rounded-2xl border border-slate-100">
+                <div className="p-4 bg-[#191b22] rounded-2xl border border-[rgba(255,255,255,0.07)]">
                   <p className="text-[11px] font-bold text-[#908fa0] uppercase mb-2">Current Standing</p>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-black text-slate-900">{studentCgpa || 0}</span>
+                    <span className="text-2xl font-black text-[#e2e2eb]">{studentCgpa || 0}</span>
                     <span className="text-[#908fa0] font-medium text-sm">/ 10.0 CGPA</span>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-[#191b22] rounded-2xl border border-slate-100">
+                  <div className="p-4 bg-[#191b22] rounded-2xl border border-[rgba(255,255,255,0.07)]">
                     <p className="text-[11px] font-bold text-[#908fa0] uppercase mb-1">Branch</p>
-                    <p className="font-bold text-slate-800">{studentBranch}</p>
+                    <p className="font-bold text-[#e2e2eb]">{studentBranch}</p>
                   </div>
-                  <div className="p-4 bg-[#191b22] rounded-2xl border border-slate-100">
+                  <div className="p-4 bg-[#191b22] rounded-2xl border border-[rgba(255,255,255,0.07)]">
                     <p className="text-[11px] font-bold text-[#908fa0] uppercase mb-1">Backlogs</p>
                     <p className={`font-bold ${studentBacklogs > 0 ? "text-amber-600" : "text-emerald-600"}`}>
                       {studentBacklogs}
@@ -161,7 +161,7 @@ const Eligibility = () => {
                 </div>
               </div>
 
-              <div className="mt-6 pt-6 border-t border-slate-100">
+              <div className="mt-6 pt-6 border-t border-[rgba(255,255,255,0.07)]">
                 <div className="flex items-start gap-3 p-3 bg-indigo-500/10/50 rounded-2xl border border-blue-100">
                   <Info className="w-4 h-4 text-indigo-400 mt-0.5" />
                   <p className="text-xs text-indigo-300 leading-relaxed">
@@ -183,8 +183,8 @@ const Eligibility = () => {
                     <stat.icon className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-slate-900">{stat.value}</p>
-                    <p className="text-xs font-medium text-slate-500">{stat.label}</p>
+                    <p className="text-2xl font-bold text-[#e2e2eb]">{stat.value}</p>
+                    <p className="text-xs font-medium text-[#908fa0]">{stat.label}</p>
                   </div>
                 </div>
               ))}
@@ -194,11 +194,11 @@ const Eligibility = () => {
           {/* Main Content / Company List */}
           <div className="lg:col-span-8">
             <div className="bg-[#1e1f26] rounded-2xl border border-[rgba(255,255,255,0.07)] overflow-hidden">
-              <div className="p-6 border-b border-slate-100">
+              <div className="p-6 border-b border-[rgba(255,255,255,0.07)]">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                   <h3 className="font-bold text-[#e2e2eb] text-lg">Company Opportunities</h3>
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
                     <input 
                       type="text" 
                       placeholder="Search company..." 
@@ -218,7 +218,7 @@ const Eligibility = () => {
                       className={`px-4 py-1.5 text-xs font-bold rounded-full border transition-all ${
                         activeFilter === tab.key
                           ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300 shadow-sm'
-                          : 'bg-[#1e1f26] border-[rgba(255,255,255,0.08)] text-[#908fa0] hover:border-slate-300 hover:text-[#c7c4d7]'
+                          : 'bg-[#1e1f26] border-[rgba(255,255,255,0.08)] text-[#908fa0] hover:border-[rgba(255,255,255,0.10)] hover:text-[#c7c4d7]'
                       }`}
                     >
                       {tab.label}
@@ -259,7 +259,7 @@ const Eligibility = () => {
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-3 text-xs font-medium text-slate-500">
+                            <div className="flex items-center gap-3 text-xs font-medium text-[#908fa0]">
                               <span className="flex items-center gap-1">
                                 <TrendingUp className="w-3 h-3" /> Min {company.minCGPA}
                               </span>
@@ -278,7 +278,7 @@ const Eligibility = () => {
                               Eligible
                             </div>
                           ) : (
-                            <div className="bg-[rgba(255,255,255,0.06)] text-[#908fa0] px-3 py-1 rounded-full text-[11px] font-bold border border-slate-200">
+                            <div className="bg-[rgba(255,255,255,0.06)] text-[#908fa0] px-3 py-1 rounded-full text-[11px] font-bold border border-[rgba(255,255,255,0.08)]">
                               Not Eligible
                             </div>
                           )}
@@ -300,7 +300,7 @@ const Eligibility = () => {
                 })}
 
                 {filteredCompanies.length === 0 && (
-                  <div className="p-12 text-center text-slate-400">
+                  <div className="p-12 text-center text-[#908fa0]">
                     <Search className="w-8 h-8 mx-auto mb-3 opacity-30" />
                     <p className="text-sm font-medium">No companies match your filter</p>
                   </div>

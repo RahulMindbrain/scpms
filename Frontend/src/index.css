@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
@@ -319,4 +319,16 @@ html, body, #root {
    ============================================================ */
 .btn-primary-glow:hover {
   box-shadow: 0 0 20px rgba(99, 102, 241, 0.45);
+}
+/* ============================================================
+   SELECT ELEMENT DARK OVERRIDE
+   ============================================================ */
+select {
+  background-color: #0c0e14 !important;
+  color: #e2e2eb !important;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+select option {
+  background-color: #1e1f26;
+  color: #e2e2eb;
 }

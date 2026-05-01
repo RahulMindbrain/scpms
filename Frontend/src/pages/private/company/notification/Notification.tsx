@@ -102,15 +102,15 @@ const CompanyNotificationPage = () => {
   const getTagConfig = (type: string) => {
     switch (type) {
       case 'NEW_APPLICANT':
-        return { label: 'Applicant', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-100' };
+        return { label: 'Applicant', icon: Users, color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' };
       case 'INTERVIEW_SCHEDULED':
       case 'INTERVIEW_UPDATED':
-        return { label: 'Interview', icon: Clock, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' };
+        return { label: 'Interview', icon: Clock, color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' };
       case 'JOB_STATUS_CHANGE':
-        return { label: 'Job', icon: Briefcase, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' };
+        return { label: 'Job', icon: Briefcase, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' };
       case 'SYSTEM_MESSAGE':
-        return { label: 'System', icon: Building2, color: 'text-slate-600', bg: 'bg-slate-50', border: 'border-slate-100' };
-      default: return { label: 'Update', icon: Bell, color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-100' };
+        return { label: 'System', icon: Building2, color: 'text-[#908fa0]', bg: 'bg-[rgba(255,255,255,0.05)]', border: 'border-[rgba(255,255,255,0.06)]' };
+      default: return { label: 'Update', icon: Bell, color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' };
     }
   };
 
@@ -148,7 +148,7 @@ const CompanyNotificationPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#111319] p-4 sm:p-6 lg:p-8 text-slate-900">
+    <div className="min-h-screen bg-[#111319] p-4 sm:p-6 lg:p-8">
       <motion.main
         initial="hidden"
         animate="visible"
@@ -156,15 +156,15 @@ const CompanyNotificationPage = () => {
         className="mx-auto max-w-5xl space-y-6"
       >
         {/* Header Section */}
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#1e1f26] p-6">
           <div>
             <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold tracking-tight text-slate-900">Notifications</h1>
+              <h1 className="text-2xl font-bold tracking-tight">Notifications</h1>
               <Badge className="bg-blue-50 text-blue-700 hover:bg-blue-100 border-blue-100 px-2.5">
                 {unreadCount} New
               </Badge>
             </div>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-[#908fa0]">
               Stay updated with new applicants, interview schedules, and job status changes.
             </p>
           </div>
@@ -173,7 +173,7 @@ const CompanyNotificationPage = () => {
             <Button
               onClick={handleMarkAllRead}
               disabled={unreadCount === 0 || loading}
-              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-5 h-10 shadow-sm"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-5 h-10 shadow-sm shadow-indigo-500/20"
             >
               Mark all as read
             </Button>
@@ -182,7 +182,7 @@ const CompanyNotificationPage = () => {
 
         {/* Filters & Search */}
         <div className="grid gap-4 md:grid-cols-[1fr,300px]">
-          <div className="flex flex-wrap gap-2 rounded-2xl border border-slate-200 bg-white p-2 shadow-sm">
+          <div className="flex flex-wrap gap-2 rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#191b22] p-2">
             {filterTabs.map((tab) => (
               <button
                 key={tab.key}
@@ -190,14 +190,14 @@ const CompanyNotificationPage = () => {
                 className={cn(
                   'flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all',
                   activeFilter === tab.key
-                    ? 'bg-blue-50 text-blue-700 shadow-xs'
-                    : 'text-slate-600 hover:bg-slate-50'
+                    ? 'bg-indigo-500/15 text-indigo-300 shadow-sm'
+                    : 'text-[#908fa0] hover:bg-[rgba(255,255,255,0.04)] hover:text-[#e2e2eb]'
                 )}
               >
                 {tab.label}
                 <span className={cn(
                   'rounded-full px-2 py-0.5 text-[10px]',
-                  activeFilter === tab.key ? 'bg-blue-100 text-blue-800' : 'bg-slate-100 text-slate-500'
+                  activeFilter === tab.key ? 'bg-indigo-500/20 text-indigo-300' : 'bg-[rgba(255,255,255,0.06)] text-[#908fa0]'
                 )}>
                   {tab.count}
                 </span>
@@ -206,13 +206,13 @@ const CompanyNotificationPage = () => {
           </div>
 
           <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#908fa0]" size={18} />
             <input
               type="text"
               placeholder="Search notifications..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-2xl border border-slate-200 bg-white py-2.5 pl-11 pr-4 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/10 transition-all shadow-sm outline-hidden"
+              className="w-full rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0c0e14] py-2.5 pl-11 pr-4 text-[#e2e2eb] text-sm focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-hidden placeholder:text-[#908fa0]"
             />
           </div>
         </div>
@@ -222,16 +222,16 @@ const CompanyNotificationPage = () => {
           {loading && notifications.length === 0 ? (
             <div className="space-y-4">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-32 w-full animate-pulse rounded-2xl bg-slate-100" />
+                <div key={i} className="h-32 w-full animate-pulse rounded-2xl bg-[rgba(255,255,255,0.05)]" />
               ))}
             </div>
           ) : filteredNotifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-slate-300 bg-white py-20">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-slate-50 text-slate-400">
+            <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-[rgba(255,255,255,0.1)] bg-[#1e1f26] py-20">
+              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[rgba(255,255,255,0.05)] text-[#908fa0]">
                 <Bell size={32} />
               </div>
-              <h3 className="text-lg font-semibold text-slate-900">No notifications found</h3>
-              <p className="text-sm text-slate-500">Your notification inbox is currently empty.</p>
+              <h3 className="text-lg font-semibold">No notifications found</h3>
+              <p className="text-sm text-[#908fa0]">Your notification inbox is currently empty.</p>
             </div>
           ) : (
             <AnimatePresence mode="popLayout">
@@ -251,18 +251,18 @@ const CompanyNotificationPage = () => {
                     className={cn(
                       'group relative overflow-hidden rounded-2xl border p-5 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/5',
                       !notification.read
-                        ? 'border-blue-200 bg-linear-to-br from-blue-50/50 to-white'
-                        : 'border-slate-200 bg-white'
+                        ? 'border-indigo-500/30 bg-indigo-500/[0.07]'
+                        : 'border-[rgba(255,255,255,0.07)] bg-[#1e1f26]'
                     )}
                   >
                     {!notification.read && (
-                      <div className="absolute left-0 top-0 h-full w-1 bg-blue-500" />
+                      <div className="absolute left-0 top-0 h-full w-1 bg-indigo-500" />
                     )}
                     
                     <div className="flex gap-4">
                       <div className={cn(
                         'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border transition-colors',
-                        !notification.read ? cn(config.bg, config.color, config.border) : 'bg-slate-50 text-slate-400 border-slate-100'
+                        !notification.read ? cn(config.bg, config.color, config.border) : 'bg-[rgba(255,255,255,0.05)] text-[#908fa0] border-[rgba(255,255,255,0.06)]'
                       )}>
                         <Icon size={20} />
                       </div>
@@ -275,31 +275,31 @@ const CompanyNotificationPage = () => {
                                 {config.label}
                               </Badge>
                               {!notification.read && (
-                                <span className="h-2 w-2 animate-pulse rounded-full bg-blue-500" />
+                                <span className="h-2 w-2 animate-pulse rounded-full bg-indigo-500" />
                               )}
                             </div>
-                            <h3 className={cn('text-base font-bold transition-colors', !notification.read ? 'text-slate-900' : 'text-slate-700')}>
+                            <h3 className={cn('text-base font-bold transition-colors', !notification.read ? "text-[#e2e2eb]" : "text-[#c7c4d7]")}>
                               {notification.title}
                             </h3>
                           </div>
-                          <div className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                          <div className="flex items-center gap-1.5 text-xs font-medium text-[#908fa0]">
                             <Clock size={14} />
                             {formatTime(notification.createdAt)}
                           </div>
                         </div>
 
-                        <p className={cn('mt-2 text-sm leading-relaxed max-w-2xl', !notification.read ? 'text-slate-600' : 'text-slate-500')}>
+                        <p className={cn('mt-2 text-sm leading-relaxed max-w-2xl', !notification.read ? "text-[#c7c4d7]" : "text-[#908fa0]")}>
                           {notification.message}
                         </p>
 
-                        <div className="mt-5 flex items-center justify-between border-t border-slate-50 pt-4">
+                        <div className="mt-5 flex items-center justify-between border-t border-[rgba(255,255,255,0.05)] pt-4">
                           <div className="flex items-center gap-4">
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleViewDetails(notification);
                               }}
-                              className="flex items-center gap-1.5 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                              className="flex items-center gap-1.5 text-sm font-bold text-indigo-400 hover:text-indigo-300 transition-colors"
                             >
                               View Details <ArrowUpRight size={14} />
                             </button>
@@ -309,7 +309,7 @@ const CompanyNotificationPage = () => {
                                   e.stopPropagation();
                                   handleMarkAsRead(notification.id);
                                 }}
-                                className="text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors"
+                                className="text-sm font-bold text-[#908fa0] hover:text-indigo-400 transition-colors"
                               >
                                 Mark as read
                               </button>
@@ -351,28 +351,28 @@ const CompanyNotificationPage = () => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-slate-200 bg-white p-8 shadow-2xl"
+              className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#1e1f26] p-8 shadow-2xl"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="space-y-1">
-                  <Badge variant="outline" className="mb-2 bg-blue-50 text-blue-700">
+                  <Badge variant="outline" className="mb-2 bg-indigo-500/10 text-indigo-300 border-indigo-500/20">
                     {selectedNotification.type.replace('_', ' ')}
                   </Badge>
-                  <h2 className="text-2xl font-bold text-slate-900">{selectedNotification.title}</h2>
-                  <div className="flex items-center gap-1.5 text-sm text-slate-400">
+                  <h2 className="text-2xl font-bold">{selectedNotification.title}</h2>
+                  <div className="flex items-center gap-1.5 text-sm text-[#908fa0]">
                     <Clock size={14} />
                     {new Date(selectedNotification.createdAt).toLocaleString()}
                   </div>
                 </div>
                 <button
                   onClick={() => setSelectedNotification(null)}
-                  className="rounded-xl p-2 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+                  className="rounded-xl p-2 text-[#908fa0] transition-colors hover:bg-[rgba(255,255,255,0.06)] hover:text-[#e2e2eb]"
                 >
                   <X size={20} />
                 </button>
               </div>
 
-              <div className="mt-6 rounded-2xl bg-slate-50 p-5 text-sm leading-relaxed text-slate-600 border border-slate-100">
+              <div className="mt-6 rounded-2xl bg-[#111319] p-5 text-sm leading-relaxed text-[#c7c4d7] border border-[rgba(255,255,255,0.07)]">
                 {selectedNotification.message}
               </div>
 
@@ -380,7 +380,7 @@ const CompanyNotificationPage = () => {
                 <Button variant="outline" onClick={() => setSelectedNotification(null)} className="rounded-xl">
                   Close
                 </Button>
-                <Button className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl">
+                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl">
                   Take Action
                 </Button>
               </div>

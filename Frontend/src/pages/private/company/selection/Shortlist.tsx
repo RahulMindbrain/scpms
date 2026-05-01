@@ -52,32 +52,32 @@ const Shortlist: React.FC = () => {
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Shortlisted Candidates</h1>
-          <p className="text-sm text-gray-500">Manage and move candidates to the next stage.</p>
+          <h1 className="text-2xl font-bold text-[#e2e2eb]">Shortlisted Candidates</h1>
+          <p className="text-sm text-[#908fa0]">Manage and move candidates to the next stage.</p>
         </div>
 
       </div>
 
       {/* Filters Card */}
-      <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+      <div className="bg-white p-4 rounded-2xl shadow-sm border border-[rgba(255,255,255,0.07)]">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
             <input
               type="text"
               placeholder="Search by name or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-[rgba(255,255,255,0.02)] border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-gray-500" />
+            <Filter className="w-4 h-4 text-[#908fa0]" />
             <select
               value={branchFilter}
               onChange={(e) => setBranchFilter(e.target.value)}
-              className="bg-gray-50 border-none px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 min-w-[120px]"
+              className="bg-[rgba(255,255,255,0.02)] border-none px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 min-w-[120px]"
             >
               <option value="All">All Departments</option>
               {uniqueBranches.map((branch: any) => (
@@ -89,20 +89,20 @@ const Shortlist: React.FC = () => {
       </div>
 
       {/* Responsive Content: Table for Desktop, Cards for Mobile */}
-      <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-[rgba(255,255,255,0.07)] overflow-hidden">
         <table className="w-full text-left">
-          <thead className="bg-gray-50 border-b border-gray-100">
+          <thead className="bg-[rgba(255,255,255,0.02)] border-b border-[rgba(255,255,255,0.07)]">
             <tr>
-              <th className="px-6 py-4 text-sm font-semibold text-gray-600">Candidate</th>
-              <th className="px-6 py-4 text-sm font-semibold text-gray-600">Department</th>
-              <th className="px-6 py-4 text-sm font-semibold text-gray-600">Status</th>
-              <th className="px-6 py-4 text-sm font-semibold text-gray-600">Email</th>
+              <th className="px-6 py-4 text-sm font-semibold text-[#c7c4d7]">Candidate</th>
+              <th className="px-6 py-4 text-sm font-semibold text-[#c7c4d7]">Department</th>
+              <th className="px-6 py-4 text-sm font-semibold text-[#c7c4d7]">Status</th>
+              <th className="px-6 py-4 text-sm font-semibold text-[#c7c4d7]">Email</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-50">
             {filteredData?.length === 0 ? (
               <tr>
-                <td colSpan={4} className="text-center py-12 text-gray-400">No candidates found</td>
+                <td colSpan={4} className="text-center py-12 text-[#908fa0]">No candidates found</td>
               </tr>
             ) : (
               filteredData?.map((item: any) => (
@@ -112,11 +112,11 @@ const Shortlist: React.FC = () => {
                       <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold">
                         {item.name.charAt(0).toUpperCase()}
                       </div>
-                      <span className="font-medium text-gray-900">{item.name}</span>
+                      <span className="font-medium text-[#e2e2eb]">{item.name}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-[#c7c4d7]">
                       <GraduationCap className="w-4 h-4" />
                       {item.branch}
                     </div>
@@ -126,7 +126,7 @@ const Shortlist: React.FC = () => {
                       {item.status}
                     </Badge>
                   </td>
-                  <td className="px-6 py-4 text-gray-500 text-sm">{item.email}</td>
+                  <td className="px-6 py-4 text-[#908fa0] text-sm">{item.email}</td>
                 </tr>
               ))
             )}
@@ -137,19 +137,19 @@ const Shortlist: React.FC = () => {
       {/* Mobile Card View */}
       <div className="grid grid-cols-1 gap-4 md:hidden">
         {filteredData?.map((item: any) => (
-          <div key={item.applicationId} className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm space-y-4">
+          <div key={item.applicationId} className="bg-white p-5 rounded-2xl border border-[rgba(255,255,255,0.07)] shadow-sm space-y-4">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-lg">
                 {item.name.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">{item.name}</h3>
-                <p className="text-xs text-gray-500">{item.email}</p>
+                <h3 className="font-bold text-[#e2e2eb]">{item.name}</h3>
+                <p className="text-xs text-[#908fa0]">{item.email}</p>
               </div>
             </div>
 
             <div className="flex justify-between items-center pt-2 border-t border-gray-50">
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-sm text-[#c7c4d7]">
                 <GraduationCap className="w-4 h-4" />
                 {item.branch}
               </div>
@@ -158,7 +158,7 @@ const Shortlist: React.FC = () => {
           </div>
         ))}
         {filteredData?.length === 0 && (
-          <p className="text-center py-10 text-gray-400">No candidates found</p>
+          <p className="text-center py-10 text-[#908fa0]">No candidates found</p>
         )}
       </div>
     </div>

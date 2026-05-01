@@ -52,13 +52,13 @@ const UpdateResults: React.FC = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         
         {/* Header - More Spacing */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-slate-200">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-[rgba(255,255,255,0.08)]">
           <div>
-            <h1 className="text-3xl font-black text-slate-900 flex items-center gap-3">
+            <h1 className="text-3xl font-black text-[#e2e2eb] flex items-center gap-3">
               <Briefcase className="text-blue-600 w-9 h-9" />
               Recruitment <span className="text-blue-600">Drive</span>
             </h1>
-            <p className="text-slate-500 mt-2 font-medium">Software Engineer Role • Final Review Phase</p>
+            <p className="text-[#908fa0] mt-2 font-medium">Software Engineer Role • Final Review Phase</p>
           </div>
           <Button className="bg-blue-600 hover:bg-blue-700 h-14 px-10 rounded-2xl font-bold shadow-xl shadow-blue-200">
             <Send className="w-5 h-5 mr-2" /> Publish Results
@@ -66,57 +66,57 @@ const UpdateResults: React.FC = () => {
         </div>
 
         {/* Main Table - De-congested for Web */}
-        <div className="bg-white rounded-[2.5rem] border border-slate-200/60 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-[2.5rem] border border-[rgba(255,255,255,0.08)]/60 shadow-sm overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left border-separate border-spacing-0">
               <thead>
-                <tr className="bg-slate-50/50">
-                  <th className="px-8 py-6 text-xs font-bold text-slate-400 uppercase tracking-widest">Candidate Details</th>
-                  <th className="px-8 py-6 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Technical</th>
-                  <th className="px-8 py-6 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">HR Round</th>
-                  <th className="px-8 py-6 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Total Score</th>
-                  <th className="px-8 py-6 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Result</th>
-                  <th className="px-8 py-6 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th>
+                <tr className="bg-[rgba(255,255,255,0.03)]">
+                  <th className="px-8 py-6 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Candidate Details</th>
+                  <th className="px-8 py-6 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-center">Technical</th>
+                  <th className="px-8 py-6 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-center">HR Round</th>
+                  <th className="px-8 py-6 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-center">Total Score</th>
+                  <th className="px-8 py-6 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-center">Result</th>
+                  <th className="px-8 py-6 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-[rgba(255,255,255,0.05)]">
                 {results.map((row) => (
                   <tr key={row.id} className="group hover:bg-blue-50/30 transition-all duration-300">
                     {/* Name & Branch */}
                     <td className="px-8 py-7">
-                      <div className="font-bold text-slate-900 text-lg leading-none mb-1">{row.name}</div>
-                      <Badge variant="secondary" className="bg-slate-100 text-slate-500 text-[10px] uppercase">{row.branch}</Badge>
+                      <div className="font-bold text-[#e2e2eb] text-lg leading-none mb-1">{row.name}</div>
+                      <Badge variant="secondary" className="bg-[rgba(255,255,255,0.04)] text-[#908fa0] text-[10px] uppercase">{row.branch}</Badge>
                     </td>
 
                     {/* Technical Score - Editable Inline */}
                     <td className="px-8 py-7 text-center">
-                      <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 group-hover:bg-white transition-colors">
+                      <div className="inline-flex items-center gap-2 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] rounded-xl px-3 py-2 group-hover:bg-white transition-colors">
                         <input 
                           type="number" 
                           value={row.technical} 
                           onChange={(e) => updateScore(row.id, 'technical', e.target.value)}
-                          className="w-10 bg-transparent text-center font-bold text-slate-700 outline-none"
+                          className="w-10 bg-transparent text-center font-bold text-[#c7c4d7] outline-none"
                         />
-                        <span className="text-slate-300 text-xs">/100</span>
+                        <span className="text-[#c7c4d7] text-xs">/100</span>
                       </div>
                     </td>
 
                     {/* HR Score - Editable Inline */}
                     <td className="px-8 py-7 text-center">
-                      <div className="inline-flex items-center gap-2 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 group-hover:bg-white transition-colors">
+                      <div className="inline-flex items-center gap-2 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] rounded-xl px-3 py-2 group-hover:bg-white transition-colors">
                         <input 
                           type="number" 
                           value={row.hr} 
                           onChange={(e) => updateScore(row.id, 'hr', e.target.value)}
-                          className="w-10 bg-transparent text-center font-bold text-slate-700 outline-none"
+                          className="w-10 bg-transparent text-center font-bold text-[#c7c4d7] outline-none"
                         />
-                        <span className="text-slate-300 text-xs">/100</span>
+                        <span className="text-[#c7c4d7] text-xs">/100</span>
                       </div>
                     </td>
 
                     {/* Total - Highlighted */}
                     <td className="px-8 py-7 text-center">
-                      <div className="font-black text-xl text-blue-600">{row.total}<span className="text-slate-300 text-sm font-normal"> / 200</span></div>
+                      <div className="font-black text-xl text-blue-600">{row.total}<span className="text-[#c7c4d7] text-sm font-normal"> / 200</span></div>
                     </td>
 
                     {/* Status Badge */}
@@ -133,7 +133,7 @@ const UpdateResults: React.FC = () => {
                     <td className="px-8 py-7 text-right">
                       <button 
                         onClick={() => { setSelectedResult(row); setIsUpdateModalOpen(true); }}
-                        className="inline-flex items-center gap-2 px-5 py-3 bg-white border border-slate-200 rounded-2xl text-sm font-black text-slate-600 hover:border-blue-600 hover:text-blue-600 hover:shadow-lg hover:shadow-blue-100 transition-all"
+                        className="inline-flex items-center gap-2 px-5 py-3 bg-white border border-[rgba(255,255,255,0.08)] rounded-2xl text-sm font-black text-[#c7c4d7] hover:border-blue-600 hover:text-blue-600 hover:shadow-lg hover:shadow-blue-100 transition-all"
                       >
                         UPDATE STATUS <ChevronDown className="w-4 h-4" />
                       </button>
@@ -152,28 +152,28 @@ const UpdateResults: React.FC = () => {
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={() => setIsUpdateModalOpen(false)} />
           <div className="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 animate-in slide-in-from-bottom-4 duration-300">
             <div className="flex justify-between items-center mb-8">
-              <h3 className="text-2xl font-black text-slate-900">Set Result</h3>
-              <button onClick={() => setIsUpdateModalOpen(false)} className="p-2 hover:bg-slate-100 rounded-full transition-colors">
-                <X className="w-6 h-6 text-slate-400" />
+              <h3 className="text-2xl font-black">Set Result</h3>
+              <button onClick={() => setIsUpdateModalOpen(false)} className="p-2 hover:bg-[rgba(255,255,255,0.04)] rounded-full transition-colors">
+                <X className="w-6 h-6 text-[#908fa0]" />
               </button>
             </div>
             <div className="space-y-4">
               {[
                 { id: 'Selected', icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'hover:border-emerald-500' },
                 { id: 'Rejected', icon: XCircle, color: 'text-red-600', bg: 'bg-red-50', border: 'hover:border-red-500' },
-                { id: 'Pending', icon: Clock, color: 'text-slate-400', bg: 'bg-slate-50', border: 'hover:border-slate-400' }
+                { id: 'Pending', icon: Clock, color: 'text-[#908fa0]', bg: 'bg-[rgba(255,255,255,0.02)]', border: 'hover:border-slate-400' }
               ].map((opt) => (
                 <button
                   key={opt.id}
                   onClick={() => handleUpdateStatus(opt.id)}
-                  className={`w-full flex items-center gap-5 p-5 rounded-3xl border-2 border-slate-50 transition-all text-left ${opt.border} hover:shadow-md group`}
+                  className={`w-full flex items-center gap-5 p-5 rounded-3xl border-2 border-[rgba(255,255,255,0.04)] transition-all text-left ${opt.border} hover:shadow-md group`}
                 >
                   <div className={`w-14 h-14 ${opt.bg} ${opt.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
                     <opt.icon className="w-7 h-7" />
                   </div>
                   <div>
-                    <div className="font-black text-slate-900 text-lg">{opt.id}</div>
-                    <div className="text-sm text-slate-500 font-medium">Finalize candidate as {opt.id.toLowerCase()}</div>
+                    <div className="font-black text-[#e2e2eb] text-lg">{opt.id}</div>
+                    <div className="text-sm text-[#908fa0] font-medium">Finalize candidate as {opt.id.toLowerCase()}</div>
                   </div>
                 </button>
               ))}

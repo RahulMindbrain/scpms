@@ -41,24 +41,24 @@ const ManageJobs: React.FC = () => {
         </Button> */}
       </div>
 
-      <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-slate-50">
-          <h2 className="text-xl font-bold text-slate-900">Your Job Postings</h2>
+      <div className="bg-[#1e1f26] rounded-2xl border border-[rgba(255,255,255,0.07)] overflow-hidden">
+        <div className="p-6 border-b border-[rgba(255,255,255,0.06)]">
+          <h2 className="text-xl font-bold">Your Job Postings</h2>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-slate-50/50">
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Job Title</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Package</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Location</th>
-                {/* <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-center">Applicants</th> */}
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Deadline</th>
-                <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Status</th>
-                {/* <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-widest text-right">Actions</th> */}
+              <tr className="bg-[rgba(255,255,255,0.03)]">
+                <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Job Title</th>
+                <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Package</th>
+                <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Location</th>
+                {/* <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-center">Applicants</th> */}
+                <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Deadline</th>
+                <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Status</th>
+                {/* <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-right">Actions</th> */}
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-[rgba(255,255,255,0.05)]">
               {loading ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-10 text-center">
@@ -67,18 +67,18 @@ const ManageJobs: React.FC = () => {
                 </tr>
               ) : jobs?.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-slate-500 font-medium">
+                  <td colSpan={7} className="px-6 py-10 text-center text-[#908fa0] font-medium">
                     No jobs found. Post a new job to get started.
                   </td>
                 </tr>
               ) : (
                 jobs?.map((job: any) => (
-                  <tr key={job.id} className="hover:bg-slate-50 transition-colors group">
-                    <td className="px-6 py-5 font-bold text-slate-800">{job.title}</td>
-                    <td className="px-6 py-5 text-sm font-medium text-slate-600">{formatSalary(job.salary)}</td>
-                    <td className="px-6 py-5 text-sm font-medium text-slate-600">{job.location}</td>
-                    <td className="px-6 py-5 text-sm font-bold text-slate-600 text-center">0</td>
-                    <td className="px-6 py-5 text-sm font-medium text-slate-500">
+                  <tr key={job.id} className="hover:bg-[rgba(255,255,255,0.03)] transition-colors group">
+                    <td className="px-6 py-5 font-bold text-[#e2e2eb]">{job.title}</td>
+                    <td className="px-6 py-5 text-sm font-medium text-[#c7c4d7]">{formatSalary(job.salary)}</td>
+                    <td className="px-6 py-5 text-sm font-medium text-[#c7c4d7]">{job.location}</td>
+                    <td className="px-6 py-5 text-sm font-bold text-[#c7c4d7] text-center">0</td>
+                    <td className="px-6 py-5 text-sm font-medium text-[#908fa0]">
                       {job.createdAt ? new Date(job.createdAt).toLocaleDateString('en-US', {
                         month: 'short',
                         day: '2-digit',
@@ -96,13 +96,13 @@ const ManageJobs: React.FC = () => {
                     </td>
                     <td className="px-6 py-5">
                       <div className="flex items-center justify-end gap-2">
-                        <button className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all">
+                        <button className="p-2 text-[#908fa0] hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">
                           <Eye className="w-4 h-4" />
                         </button>
-                        <button className="p-2 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all">
+                        <button className="p-2 text-[#908fa0] hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all">
                           <Edit2 className="w-4 h-4" />
                         </button>
-                        <button className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all">
+                        <button className="p-2 text-[#908fa0] hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>

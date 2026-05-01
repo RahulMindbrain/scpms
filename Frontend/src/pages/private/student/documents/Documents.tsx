@@ -41,7 +41,7 @@ const Documents = () => {
       case 'Offer Letter':
         return <FileText size={18} className="text-indigo-600" />;
       default:
-        return <FileText size={18} className="text-gray-600" />;
+        return <FileText size={18} className="text-[#c7c4d7]" />;
     }
   };
 
@@ -159,7 +159,7 @@ const Documents = () => {
         {/* Header */}
         <div className="flex justify-between mb-10">
           <div>
-            <h2 className="text-2xl font-bold text-slate-900">Academic Records</h2>
+            <h2 className="text-2xl font-bold text-[#e2e2eb]">Academic Records</h2>
             <p className="text-[#908fa0] text-sm">
               Manage and share your verified documents
             </p>
@@ -167,7 +167,7 @@ const Documents = () => {
 
           <div className="flex gap-3">
             <div className="hidden md:flex items-center relative">
-              <Search className="absolute left-3 text-slate-400" size={16} />
+              <Search className="absolute left-3 text-[#908fa0]" size={16} />
               <input
                 type="text"
                 placeholder="Search files..."
@@ -223,7 +223,7 @@ const Documents = () => {
                       }}
                     />
                   ) : (
-                    <div className="p-4 bg-[#191b22] text-slate-300">
+                    <div className="p-4 bg-[#191b22] text-[#c7c4d7]">
                       <FileText size={48} />
                     </div>
                   )}
@@ -233,7 +233,7 @@ const Documents = () => {
                   <h3 className="font-semibold truncate flex-1 pr-2" title={doc.name}>{doc.name}</h3>
                   {getIcon(doc.category)}
                 </div>
-                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-wider">{doc.size} • {doc.date}</p>
+                <p className="text-[10px] text-[#908fa0] font-medium uppercase tracking-wider">{doc.size} • {doc.date}</p>
 
                 <div className="flex justify-between mt-4">
                   <span className="text-emerald-600 text-sm">{doc.status}</span>
@@ -263,7 +263,7 @@ const Documents = () => {
               </div>
             ))
           ) : (
-            <div className="col-span-full text-center py-20 text-gray-400">
+            <div className="col-span-full text-center py-20 text-[#908fa0]">
               <FileClock size={40} />
               <p>No documents found</p>
             </div>

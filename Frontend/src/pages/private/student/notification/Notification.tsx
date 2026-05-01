@@ -100,16 +100,16 @@ const Notification = () => {
     switch (type) {
       case 'APPLICATION_SELECTED':
       case 'OFFER_ACCEPTED':
-        return { label: 'Selected', icon: Sparkles, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-100' };
+        return { label: 'Selected', icon: Sparkles, color: 'text-emerald-400', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' };
       case 'JOB_POSTED':
       case 'JOB_UPDATED':
         return { label: 'Job', icon: Briefcase, color: 'text-indigo-400', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' };
       case 'SCHEDULE_CREATED':
       case 'SCHEDULE_UPDATED':
-        return { label: 'Interview', icon: Calendar, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-100' };
+        return { label: 'Interview', icon: Calendar, color: 'text-amber-400', bg: 'bg-amber-500/10', border: 'border-amber-500/20' };
       case 'APPLICATION_REJECTED':
       case 'OFFER_REJECTED':
-        return { label: 'Update', icon: Info, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-100' };
+        return { label: 'Update', icon: Info, color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20' };
       default: return { label: 'System', icon: Bell, color: 'text-[#c7c4d7]', bg: 'bg-[#191b22]', border: 'border-[rgba(255,255,255,0.06)]' };
     }
   };
@@ -144,14 +144,12 @@ const Notification = () => {
       {Array.from({ length: 4 }).map((_, index) => (
         <div
           key={index}
-          className="rounded-2xl border border-[rgba(255,255,255,0.08)] bg-white p-5 shadow-sm animate-pulse"
+          className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#1e1f26] p-5 animate-pulse"
         >
-          <div className="flex gap-4">
-            <div className="h-11 w-11 rounded-xl bg-slate-100" />
-            <div className="flex-1 space-y-3">
-              <div className="h-4 w-1/3 rounded bg-slate-100" />
-              <div className="h-3 w-3/4 rounded bg-slate-100" />
-              <div className="h-3 w-1/2 rounded bg-slate-100" />
+          <div className="flex gap-4"><div className="h-11 w-11 rounded-xl bg-[rgba(255,255,255,0.06)]" />
+            <div className="flex-1 space-y-3"><div className="h-4 w-1/3 rounded bg-[rgba(255,255,255,0.06)]" />
+              <div className="h-3 w-3/4 rounded bg-[rgba(255,255,255,0.06)]" />
+              <div className="h-3 w-1/2 rounded bg-[rgba(255,255,255,0.06)]" />
             </div>
           </div>
         </div>
@@ -160,14 +158,14 @@ const Notification = () => {
   );
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 via-white to-blue-50/40 p-4 sm:p-6 lg:p-10 text-slate-900">
+    <div className="min-h-screen bg-[#111319] p-4 sm:p-6 lg:p-10">
       <motion.main
         initial="hidden"
         animate="visible"
         variants={containerVariants}
         className="mx-auto max-w-5xl space-y-6"
       >
-        <div className="rounded-3xl border border-[rgba(255,255,255,0.08)]/70 bg-white/95 p-5 sm:p-6 shadow-[0_8px_30px_rgba(15,23,42,0.06)] backdrop-blur">
+        <div className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#1e1f26] p-5 sm:p-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <div className="flex items-center gap-3">
@@ -176,7 +174,7 @@ const Notification = () => {
                   {unreadCount} unread
                 </Badge>
               </div>
-              <p className="mt-2 text-sm text-slate-500">
+              <p className="mt-2 text-sm text-[#908fa0]">
                 Stay updated with placements, interviews, and application status.
               </p>
             </div>
@@ -185,7 +183,7 @@ const Notification = () => {
               variant="outline"
               onClick={handleMarkAllRead}
               disabled={unreadCount === 0 || loading}
-              className="h-10 rounded-xl border-[rgba(255,255,255,0.08)] px-4 text-sm font-medium"
+              className="h-10 rounded-xl border-[rgba(255,255,255,0.1)] bg-[#191b22] text-[#c7c4d7] px-4 text-sm font-medium hover:bg-[rgba(255,255,255,0.05)]"
             >
               Mark all as read
             </Button>
@@ -200,11 +198,11 @@ const Notification = () => {
                   'inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm transition-all',
                   activeFilter === tab.key
                     ? 'border-indigo-500/30 bg-indigo-500/10 text-indigo-300 shadow-sm'
-                    : 'border-[rgba(255,255,255,0.08)] bg-white text-[#c7c4d7] hover:bg-[#191b22]'
+                    : 'border-[rgba(255,255,255,0.07)] bg-[#191b22] text-[#908fa0] hover:bg-[rgba(255,255,255,0.05)] hover:text-[#e2e2eb]'
                 )}
               >
                 {tab.label}
-                <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-2 py-0.5 text-xs text-slate-500">
+                <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-2 py-0.5 text-xs text-[#908fa0]">
                   {tab.count}
                 </span>
               </button>
@@ -218,13 +216,13 @@ const Notification = () => {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="rounded-3xl border border-[rgba(255,255,255,0.08)] bg-white p-12 text-center shadow-sm"
+            className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#1e1f26] p-12 text-center"
           >
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-50">
+            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-500/10">
               <Bell className="h-8 w-8 text-blue-500" />
             </div>
-            <h3 className="text-xl font-semibold text-slate-900">No notifications found</h3>
-            <p className="mx-auto mt-2 max-w-md text-sm text-slate-500">
+            <h3 className="text-xl font-semibold text-[#e2e2eb]">No notifications found</h3>
+            <p className="mx-auto mt-2 max-w-md text-sm text-[#908fa0]">
               {activeFilter === 'all'
                 ? "You're all caught up. New notifications will appear here."
                 : `No ${activeFilter} notifications right now.`}
@@ -249,8 +247,8 @@ const Notification = () => {
                     className={cn(
                       'group cursor-pointer rounded-2xl border p-4 sm:p-5 transition-all duration-200',
                       !notification.read
-                        ? 'border-indigo-500/30 bg-indigo-500/10/45 shadow-[0_10px_24px_rgba(37,99,235,0.10)]'
-                        : 'border-[rgba(255,255,255,0.08)]/90 bg-linear-to-br from-white to-slate-50/70 shadow-[0_6px_16px_rgba(15,23,42,0.04)] hover:shadow-[0_10px_24px_rgba(15,23,42,0.08)]'
+                        ? 'border-indigo-500/30 bg-indigo-500/[0.07]'
+                        : 'border-[rgba(255,255,255,0.06)] bg-[#1e1f26] hover:border-[rgba(255,255,255,0.10)]'
                     )}
                   >
                     <div className="flex items-start gap-4">
@@ -288,7 +286,7 @@ const Notification = () => {
                             </p>
                           </div>
 
-                          <div className="flex items-center gap-1 rounded-full bg-[rgba(255,255,255,0.06)] px-2.5 py-1 text-xs text-slate-500">
+                          <div className="flex items-center gap-1 rounded-full bg-[rgba(255,255,255,0.06)] px-2.5 py-1 text-xs text-[#908fa0]">
                             <Clock size={12} />
                             {formatTime(String(notification.createdAt))}
                           </div>
@@ -306,7 +304,7 @@ const Notification = () => {
                               Mark as read
                             </button>
                           ) : (
-                            <Badge className="rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700 hover:bg-emerald-50">
+                            <Badge className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-400 hover:bg-emerald-500/10">
                               Read
                             </Badge>
                           )}
@@ -347,7 +345,7 @@ const Notification = () => {
               <motion.div variants={itemVariants} className="pt-2">
                 <Button
                   onClick={() => dispatch(fetchNotifications({ page: pagination.page + 1, limit: pagination.limit }))}
-                  className="h-11 w-full rounded-xl border border-[rgba(255,255,255,0.08)] bg-white text-sm font-medium text-[#c7c4d7] shadow-sm hover:bg-slate-50"
+                  className="h-11 w-full rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#191b22] text-sm font-medium text-[#c7c4d7] hover:bg-[rgba(255,255,255,0.05)]"
                   disabled={loading}
                 >
                   {loading ? 'Loading...' : 'Load older notifications'}
@@ -371,23 +369,23 @@ const Notification = () => {
               initial={{ y: 16, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 16, opacity: 0, scale: 0.98 }}
-              className="w-full max-w-lg rounded-2xl border border-[rgba(255,255,255,0.08)] bg-white p-6 shadow-xl"
+              className="w-full max-w-lg rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#1e1f26] p-6 shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="mb-4 flex items-start justify-between gap-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900">{selectedNotification.title}</h3>
-                  <p className="mt-1 text-xs text-slate-500">{formatTime(selectedNotification.createdAt)}</p>
+                  <h3 className="text-lg font-semibold text-[#e2e2eb]">{selectedNotification.title}</h3>
+                  <p className="mt-1 text-xs text-[#908fa0]">{formatTime(selectedNotification.createdAt)}</p>
                 </div>
                 <button
                   onClick={() => setSelectedNotification(null)}
-                  className="rounded-lg p-1.5 text-[#908fa0] hover:bg-[rgba(255,255,255,0.06)] hover:text-slate-600"
+                  className="rounded-lg p-1.5 text-[#908fa0] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#e2e2eb]"
                 >
                   <X size={16} />
                 </button>
               </div>
 
-              <div className="rounded-xl bg-[#191b22] p-4 text-sm leading-relaxed text-slate-700">
+              <div className="rounded-xl bg-[#191b22] p-4 text-sm leading-relaxed text-[#c7c4d7]">
                 {selectedNotification.message}
               </div>
 

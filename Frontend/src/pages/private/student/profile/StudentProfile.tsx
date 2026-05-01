@@ -45,7 +45,7 @@ const ProgressRing = ({ percent, size = 60, stroke = 5 }: { percent: number, siz
           r={radius}
           cx={size / 2}
           cy={size / 2}
-          className="text-slate-100"
+          className="text-[rgba(255,255,255,0.08)]"
         />
         <motion.circle
           stroke="currentColor"
@@ -62,7 +62,7 @@ const ProgressRing = ({ percent, size = 60, stroke = 5 }: { percent: number, siz
           className="text-blue-600"
         />
       </svg>
-      <span className="absolute text-[10px] font-bold text-slate-700">{percent}%</span>
+      <span className="absolute text-[10px] font-bold text-[#c7c4d7]">{percent}%</span>
     </div>
   );
 };
@@ -369,7 +369,7 @@ const StudentProfile = () => {
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
-            <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-slate-900">Personal <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Profile</span></h1>
+            <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-[#e2e2eb]">Personal <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Profile</span></h1>
             <p className="text-lg text-[#908fa0] font-medium italic">Manage your professional identity and academic records.</p>
           </div>
           <Button
@@ -385,14 +385,14 @@ const StudentProfile = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Sidebar - Personal Details */}
           <div className="lg:col-span-4 space-y-6">
-            <Card className="overflow-hidden border-none shadow-xl shadow-slate-200/40 rounded-[2.5rem] bg-white">
+            <Card className="overflow-hidden border border-[rgba(255,255,255,0.07)] rounded-[2rem] bg-[#1e1f26]">
               <div className="h-32 bg-gradient-to-r from-blue-600 to-indigo-700 relative">
                 <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)', backgroundSize: '24px 24px' }}></div>
               </div>
               <CardContent className="pt-0 relative px-8 pb-8 text-center">
                 <div className="relative inline-block -mt-16">
                   <div className="absolute -inset-1 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-500 blur-sm opacity-50"></div>
-                  <Avatar className="h-32 w-32 border-4 border-white shadow-xl relative z-10">
+                  <Avatar className="h-32 w-32 border-4 border-[#1e1f26] shadow-xl relative z-10">
                     {profile.profileImage ? (
                       <AvatarImage src={profile.profileImage} alt={profile.name} className="object-cover" />
                     ) : (
@@ -430,7 +430,7 @@ const StudentProfile = () => {
                 <Separator className="my-8 opacity-50" />
 
                 <div className="space-y-4">
-                  <div className="flex items-center gap-4 text-left p-4 rounded-2xl bg-[rgba(255,255,255,0.02)] border border-transparent hover:border-[rgba(255,255,255,0.06)] hover:bg-white hover:shadow-sm transition-all group">
+                  <div className="flex items-center gap-4 text-left p-4 rounded-2xl bg-[rgba(255,255,255,0.02)] border border-transparent hover:border-[rgba(255,255,255,0.10)] hover:bg-[rgba(255,255,255,0.04)] transition-all group">
                     <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 shrink-0 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
                       <Mail className="h-5 w-5" />
                     </div>
@@ -440,14 +440,14 @@ const StudentProfile = () => {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-left p-4 rounded-2xl bg-[rgba(255,255,255,0.02)] border border-transparent hover:border-[rgba(255,255,255,0.06)] hover:bg-white hover:shadow-sm transition-all group">
-                    <div className="h-10 w-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
+                  <div className="flex items-center gap-4 text-left p-4 rounded-2xl bg-[rgba(255,255,255,0.02)] border border-transparent hover:border-[rgba(255,255,255,0.10)] hover:bg-[rgba(255,255,255,0.04)] transition-all group">
+                    <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 shrink-0 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
                       <ExternalLink className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <p className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest leading-none mb-1.5">LinkedIn</p>
                       {profile.linkedinUrl ? (
-                        <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer" className="truncate text-indigo-600 font-black text-sm hover:underline flex items-center gap-1 tracking-tight">
+                        <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer" className="truncate text-indigo-400 font-black text-sm hover:underline flex items-center gap-1 tracking-tight">
                           Profile Link <ExternalLink className="h-3 w-3" />
                         </a>
                       ) : (
@@ -477,9 +477,9 @@ const StudentProfile = () => {
               </CardContent>
             </Card>
 
-            <Card className="border-none shadow-lg shadow-slate-200/40 rounded-[2rem] overflow-hidden bg-white">
-              <CardHeader className="pb-4 border-b border-slate-50">
-                <CardTitle className="text-lg font-black tracking-tight flex items-center gap-2">
+            <Card className="border border-[rgba(255,255,255,0.07)] rounded-[2rem] overflow-hidden bg-[#1e1f26]">
+              <CardHeader className="pb-4 border-b border-[rgba(255,255,255,0.06)]">
+                <CardTitle className="text-lg font-black tracking-tight flex items-center gap-2 text-[#e2e2eb]">
                   <GraduationCap className="h-5 w-5 text-blue-600" />
                   Academic Standings
                 </CardTitle>
@@ -494,15 +494,15 @@ const StudentProfile = () => {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-4 rounded-2xl bg-[#191b22] border border-slate-100">
+                  <div className="p-4 rounded-2xl bg-[#191b22] border border-[rgba(255,255,255,0.06)]">
                     <p className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest mb-1">Backlogs</p>
                     <p className={`text-lg font-black ${profile.stats?.activeBacklogs > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
                       {profile.stats?.activeBacklogs || '0'}
                     </p>
                   </div>
-                  <div className="p-4 rounded-2xl bg-[#191b22] border border-slate-100">
+                  <div className="p-4 rounded-2xl bg-[#191b22] border border-[rgba(255,255,255,0.06)]">
                     <p className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest mb-1">Credits</p>
-                    <p className="text-lg font-black text-slate-700">NA</p>
+                    <p className="text-lg font-black text-[#c7c4d7]">NA</p>
                   </div>
                 </div>
               </CardContent>
@@ -538,10 +538,10 @@ const StudentProfile = () => {
                     className="space-y-8"
                   >
                     {/* Skills Card */}
-                    <Card className="border-none shadow-xl shadow-slate-200/50 rounded-[2.5rem] overflow-hidden bg-white">
+                    <Card className="border border-[rgba(255,255,255,0.07)] rounded-[2rem] overflow-hidden bg-[#1e1f26]">
                       <CardHeader className="pb-0">
                         <div className="flex items-center justify-between">
-                          <CardTitle className="text-xl font-black tracking-tight flex items-center gap-2">
+                          <CardTitle className="text-xl font-black tracking-tight flex items-center gap-2 text-[#e2e2eb]">
                             <Code2 className="h-5 w-5 text-blue-600" />
                             Technical Arsenal
                           </CardTitle>
@@ -554,7 +554,7 @@ const StudentProfile = () => {
                             Manage Skills
                           </Button>
                         </div>
-                        <CardDescription className="text-[#908fa0] font-medium">Core competencies and technical stack.</CardDescription>
+                        <CardDescription className="text-[#908fa0] font-medium text-sm">Core competencies and technical stack.</CardDescription>
                       </CardHeader>
                       <CardContent className="pt-8">
                         {profile.skills?.length > 0 ? (
@@ -572,8 +572,8 @@ const StudentProfile = () => {
                             ))}
                           </div>
                         ) : (
-                          <div className="flex flex-col items-center py-16 border-2 border-dashed rounded-[2rem] bg-[rgba(255,255,255,0.02)] border-slate-200">
-                            <div className="h-20 w-20 rounded-[2rem] bg-white shadow-lg flex items-center justify-center mb-6">
+                          <div className="flex flex-col items-center py-16 border-2 border-dashed rounded-[2rem] bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.08)]">
+                            <div className="h-20 w-20 rounded-[2rem] bg-[#191b22] border border-[rgba(255,255,255,0.06)] flex items-center justify-center mb-6">
                               <Lightbulb className="h-10 w-10 text-amber-500" />
                             </div>
                             <h4 className="text-lg font-bold text-[#e2e2eb] mb-2">Build your technical profile</h4>
@@ -591,8 +591,8 @@ const StudentProfile = () => {
 
                     {/* Quick Stats Summary or About */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                       <Card className="border-none shadow-xl shadow-slate-200/50 rounded-[2.5rem] bg-white p-8">
-                          <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600 mb-6 w-fit">
+                       <Card className="border border-[rgba(255,255,255,0.07)] rounded-[2rem] bg-[#1e1f26] p-8">
+                          <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-400 mb-6 w-fit">
                             <Bell className="h-6 w-6" />
                           </div>
                           <h3 className="text-lg font-bold text-[#e2e2eb] mb-2">Professional Journey</h3>
@@ -600,8 +600,8 @@ const StudentProfile = () => {
                             You have documented <span className="text-indigo-600 font-bold">{profile.experiences?.length || 0} work experiences</span>. Keeping this updated helps in career matching.
                           </p>
                        </Card>
-                       <Card className="border-none shadow-xl shadow-slate-200/50 rounded-[2.5rem] bg-white p-8">
-                          <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600 mb-6 w-fit">
+                       <Card className="border border-[rgba(255,255,255,0.07)] rounded-[2rem] bg-[#1e1f26] p-8">
+                          <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-400 mb-6 w-fit">
                             <CheckCircle className="h-6 w-6" />
                           </div>
                           <h3 className="text-lg font-bold text-[#e2e2eb] mb-2">Projects & Impact</h3>
@@ -621,10 +621,10 @@ const StudentProfile = () => {
                     className="space-y-8"
                   >
                     {/* Work Experience */}
-                    <Card className="border-none shadow-xl shadow-slate-200/50 rounded-[2.5rem] overflow-hidden bg-white">
-                      <CardHeader className="flex flex-row items-center justify-between pb-6 border-b border-slate-50">
+                    <Card className="border border-[rgba(255,255,255,0.07)] rounded-[2rem] overflow-hidden bg-[#1e1f26]">
+                      <CardHeader className="flex flex-row items-center justify-between pb-6 border-b border-[rgba(255,255,255,0.06)]">
                         <div>
-                          <CardTitle className="text-xl font-black tracking-tight flex items-center gap-2">
+                          <CardTitle className="text-xl font-black tracking-tight flex items-center gap-2 text-[#e2e2eb]">
                             <Briefcase className="h-5 w-5 text-blue-600" />
                             Work History
                           </CardTitle>
@@ -648,11 +648,11 @@ const StudentProfile = () => {
                                   <h4 className="text-lg font-black text-[#e2e2eb] leading-tight">{exp.companyName}</h4>
                                   <p className="text-indigo-400 font-black text-xs uppercase tracking-widest flex items-center gap-2">
                                     {exp.role} 
-                                    <span className="h-1 w-1 rounded-full bg-slate-300"></span>
-                                    <span className="text-slate-400">{exp.startDate} — {exp.endDate || 'Present'}</span>
+                                    <span className="h-1 w-1 rounded-full bg-[rgba(255,255,255,0.2)]"></span>
+                                    <span className="text-[#908fa0]">{exp.startDate} — {exp.endDate || 'Present'}</span>
                                   </p>
                                 </div>
-                                <Button variant="ghost" size="icon" className="h-10 w-10 text-[#908fa0] hover:bg-rose-50 hover:text-rose-600 rounded-xl transition-all"
+                                <Button variant="ghost" size="icon" className="h-10 w-10 text-[#908fa0] hover:bg-rose-500/10 hover:text-rose-400 rounded-xl transition-all"
                                   onClick={() => {
                                     const expId = profile.experiences[i]?.id;
                                     const updated = profile.experiences.filter((e: any) => e.id !== expId);
@@ -664,7 +664,7 @@ const StudentProfile = () => {
                                 </Button>
                               </div>
                               {exp.description && (
-                                <p className="text-[#908fa0] text-[14px] leading-relaxed font-medium bg-[rgba(255,255,255,0.02)] p-4 rounded-2xl border border-slate-50">{exp.description}</p>
+                                <p className="text-[#908fa0] text-[14px] leading-relaxed font-medium bg-[rgba(255,255,255,0.02)] p-4 rounded-2xl border border-[rgba(255,255,255,0.04)]">{exp.description}</p>
                               )}
                             </div>
                           </div>
@@ -677,10 +677,10 @@ const StudentProfile = () => {
                     </Card>
 
                     {/* Projects */}
-                    <Card className="border-none shadow-xl shadow-slate-200/50 rounded-[2.5rem] overflow-hidden bg-white">
-                      <CardHeader className="flex flex-row items-center justify-between pb-6 border-b border-slate-50">
+                    <Card className="border border-[rgba(255,255,255,0.07)] rounded-[2rem] overflow-hidden bg-[#1e1f26]">
+                      <CardHeader className="flex flex-row items-center justify-between pb-6 border-b border-[rgba(255,255,255,0.06)]">
                         <div>
-                          <CardTitle className="text-xl font-black tracking-tight flex items-center gap-2">
+                          <CardTitle className="text-xl font-black tracking-tight flex items-center gap-2 text-[#e2e2eb]">
                             <Code2 className="h-5 w-5 text-indigo-600" />
                             Projects
                           </CardTitle>
@@ -696,7 +696,7 @@ const StudentProfile = () => {
                             <motion.div 
                               key={i} 
                               whileHover={{ y: -5 }}
-                              className="group p-6 rounded-[2rem] border border-[rgba(255,255,255,0.06)] bg-white hover:shadow-2xl hover:shadow-slate-200/50 transition-all flex flex-col h-full"
+                              className="group p-6 rounded-[2rem] border border-[rgba(255,255,255,0.07)] bg-[#191b22] hover:border-indigo-500/20 hover:shadow-xl hover:shadow-indigo-900/20 transition-all flex flex-col h-full"
                             >
                               <div className="flex justify-between items-start mb-4">
                                 <h4 className="text-lg font-black text-[#e2e2eb] line-clamp-1">{proj.title}</h4>
@@ -711,7 +711,7 @@ const StudentProfile = () => {
                                   <span key={`${tag}-${idx}`} className="px-3 py-1 bg-[#191b22] text-[#908fa0] rounded-lg text-[10px] font-black uppercase tracking-widest">{tag}</span>
                                 ))}
                               </div>
-                              <Button variant="ghost" size="sm" className="w-full justify-between font-black text-xs uppercase tracking-widest text-rose-500 hover:bg-rose-50 rounded-xl h-10 px-4"
+                              <Button variant="ghost" size="sm" className="w-full justify-between font-black text-xs uppercase tracking-widest text-rose-400 hover:bg-rose-500/10 rounded-xl h-10 px-4"
                                 onClick={() => {
                                   const projId = profile.projects[i]?.id;
                                   const updated = profile.projects.filter((p: any) => p.id !== projId);
@@ -741,11 +741,11 @@ const StudentProfile = () => {
                     className="space-y-8"
                   >
                     {/* Resume Upload Section */}
-                    <Card className="border-none shadow-xl shadow-slate-200/50 rounded-[2.5rem] bg-white overflow-hidden">
+                    <Card className="border border-[rgba(255,255,255,0.07)] rounded-[2rem] bg-[#1e1f26] overflow-hidden">
                       <div className="p-8 flex flex-col md:flex-row items-center justify-between gap-8 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
                         <div className="text-center md:text-left space-y-2">
                            <h3 className="text-2xl font-black">Official Resume</h3>
-                           <p className="text-[#908fa0] font-medium">Upload your latest PDF resume for recruiters.</p>
+                           <p className="text-[#908fa0] font-medium text-sm">Upload your latest PDF resume for recruiters.</p>
                         </div>
                         <label className="shrink-0 w-full md:w-auto">
                           <Button asChild className="w-full md:w-auto gap-3 rounded-2xl bg-indigo-600 px-8 py-7 font-black shadow-xl shadow-blue-600/20 transition-all hover:bg-indigo-700 active:scale-95 cursor-pointer">
@@ -761,17 +761,17 @@ const StudentProfile = () => {
                         {profile.resumeUrl ? (
                           <div className="flex items-center justify-between p-6 border border-[rgba(255,255,255,0.06)] rounded-[2rem] bg-[rgba(255,255,255,0.02)]">
                              <div className="flex items-center gap-6">
-                                <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-rose-500">
+                                <div className="h-16 w-16 bg-[#191b22] rounded-2xl border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-rose-400">
                                    <FileText className="h-8 w-8" />
                                 </div>
                                 <div>
-                                   <p className="font-black text-slate-900">current_resume.pdf</p>
+                                   <p className="font-black text-[#e2e2eb]">current_resume.pdf</p>
                                    <p className="text-xs font-bold text-[#908fa0] uppercase tracking-widest mt-1">Uploaded to secure cloud</p>
                                 </div>
                              </div>
                              <Button 
                               onClick={() => openFile(profile.resumeUrl, "Resume.pdf")}
-                              className="rounded-xl font-bold bg-white text-[#e2e2eb] border border-[rgba(255,255,255,0.08)] hover:bg-[#191b22] px-6 h-12 shadow-sm"
+                              className="rounded-xl font-bold bg-[#1e1f26] text-[#e2e2eb] border border-[rgba(255,255,255,0.08)] hover:bg-[#191b22] px-6 h-12"
                              >
                                 Preview <ArrowRight className="ml-2 h-4 w-4" />
                              </Button>
@@ -785,10 +785,10 @@ const StudentProfile = () => {
                     </Card>
 
                     {/* Certifications */}
-                    <Card className="border-none shadow-xl shadow-slate-200/50 rounded-[2.5rem] bg-white overflow-hidden">
-                       <CardHeader className="flex flex-row items-center justify-between pb-6 border-b border-slate-50">
+                    <Card className="border border-[rgba(255,255,255,0.07)] rounded-[2rem] bg-[#1e1f26] overflow-hidden">
+                       <CardHeader className="flex flex-row items-center justify-between pb-6 border-b border-[rgba(255,255,255,0.06)]">
                           <div>
-                            <CardTitle className="text-xl font-black tracking-tight flex items-center gap-2">
+                            <CardTitle className="text-xl font-black tracking-tight flex items-center gap-2 text-[#e2e2eb]">
                               <GraduationCap className="h-5 w-5 text-amber-500" />
                               Certifications
                             </CardTitle>
@@ -801,8 +801,8 @@ const StudentProfile = () => {
                        <CardContent className="p-8">
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {profile.certificates?.length > 0 ? profile.certificates.map((cert: any, i: number) => (
-                              <div key={i} className="group p-6 rounded-[2rem] border border-[rgba(255,255,255,0.06)] bg-white flex flex-col h-full relative">
-                                <Button variant="ghost" size="icon" className="h-8 w-8 absolute right-4 top-4 text-[#908fa0] hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-all"
+                              <div key={i} className="group p-6 rounded-[2rem] border border-[rgba(255,255,255,0.07)] bg-[#191b22] flex flex-col h-full relative">
+                                <Button variant="ghost" size="icon" className="h-8 w-8 absolute right-4 top-4 text-[#908fa0] hover:bg-rose-500/10 hover:text-rose-400 rounded-lg transition-all"
                                   onClick={() => {
                                     const certId = profile.certificates[i]?.id;
                                     const updated = profile.certificates.filter((c: any) => c.id !== certId);
@@ -813,13 +813,13 @@ const StudentProfile = () => {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                                 <div className="space-y-4 flex-1">
-                                  <div className="h-12 w-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 mb-4">
+                                  <div className="h-12 w-12 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 mb-4">
                                     <FileText className="h-6 w-6" />
                                   </div>
                                   <h4 className="font-black text-[#e2e2eb] leading-tight pr-8">{cert.title}</h4>
-                                  <p className="text-amber-600 font-bold text-sm">{cert.issuer}</p>
+                                  <p className="text-amber-400 font-bold text-sm">{cert.issuer}</p>
                                 </div>
-                                <div className="mt-6 pt-4 border-t border-slate-50">
+                                <div className="mt-6 pt-4 border-t border-[rgba(255,255,255,0.05)]">
                                    <p className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest">Issued Date</p>
                                    <p className="text-sm font-bold text-[#c7c4d7] mt-1">{cert.issuedDate}</p>
                                 </div>
@@ -864,15 +864,15 @@ const StudentProfile = () => {
 
         {/* 📄 PDF/Document Preview Modal */}
         <Dialog open={!!previewUrl} onOpenChange={(open) => !open && setPreviewUrl(null)}>
-          <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden flex flex-col border-none shadow-2xl rounded-[2rem]">
-            <DialogHeader className="p-6 border-b bg-white shrink-0">
+          <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden flex flex-col bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] shadow-2xl rounded-[2rem]">
+            <DialogHeader className="p-6 border-b border-[rgba(255,255,255,0.06)] bg-[#191b22] shrink-0">
               <div className="flex items-center justify-between pr-8">
-                <DialogTitle className="text-xl font-black truncate flex items-center gap-3 text-slate-900">
+                <DialogTitle className="text-xl font-black truncate flex items-center gap-3 text-[#e2e2eb]">
                   <FileText className="h-6 w-6 text-rose-500" />
                   {previewName}
                 </DialogTitle>
                 <div className="flex gap-2">
-                   <Button variant="outline" className="rounded-xl font-bold" onClick={() => window.open(previewUrl!, '_blank')}>
+                   <Button variant="outline" className="rounded-xl font-bold border-[rgba(255,255,255,0.1)] text-[#c7c4d7] hover:bg-[rgba(255,255,255,0.05)]" onClick={() => window.open(previewUrl!, '_blank')}>
                       <ExternalLink className="h-4 w-4 mr-2" /> Open External
                    </Button>
                 </div>

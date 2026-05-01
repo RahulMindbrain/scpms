@@ -209,7 +209,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-sm font-semibold text-[#c7c4d7] ml-1">Full Name</Label>
                     <div className="relative">
-                      <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                      <User className="absolute left-3 top-3 h-4 w-4 text-[#908fa0]" />
                       <Input
                         id="name"
                         placeholder="e.g. John Doe"
@@ -347,7 +347,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                   <div className="space-y-2">
                     <Label htmlFor="portfolioUrl" className="text-sm font-semibold text-[#c7c4d7] ml-1">Portfolio Website URL</Label>
                     <div className="relative">
-                      <Globe className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
+                      <Globe className="absolute left-3 top-3 h-4 w-4 text-[#908fa0]" />
                       <Input
                         id="portfolioUrl"
                         placeholder="https://yourportfolio.com"

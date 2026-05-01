@@ -127,7 +127,7 @@ const JobListing = () => {
             placeholder="Search by role or company..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 bg-[#0c0e14] border border-[rgba(255,255,255,0.08)] rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-500/5 focus:border-blue-500 outline-none transition-all font-medium text-slate-800"
+            className="w-full pl-12 pr-4 py-3.5 bg-[#0c0e14] border border-[rgba(255,255,255,0.08)] rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-500/5 focus:border-blue-500 outline-none transition-all font-medium text-[#e2e2eb]"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -138,7 +138,7 @@ const JobListing = () => {
               className={`px-4 py-2 text-xs font-bold rounded-xl border transition-all capitalize ${
                 filterType === type
                   ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300'
-                  : 'bg-[#1e1f26] border-[rgba(255,255,255,0.08)] text-[#908fa0] hover:border-slate-300'
+                  : 'bg-[#1e1f26] border-[rgba(255,255,255,0.08)] text-[#908fa0] hover:border-[rgba(255,255,255,0.10)]'
               }`}
             >
               {type === 'all' ? 'All Types' : type}
@@ -179,18 +179,18 @@ const JobListing = () => {
                   <div className="grid grid-cols-2 gap-3">
                     <div className="flex items-center gap-2.5 p-2.5 bg-[#191b22] rounded-xl border border-[rgba(255,255,255,0.06)]/50">
                       <MapPin className="w-4 h-4 text-blue-500" />
-                      <span className="text-xs font-semibold text-slate-600">{job.location}</span>
+                      <span className="text-xs font-semibold text-[#c7c4d7]">{job.location}</span>
                     </div>
                     <div className="flex items-center gap-2.5 p-2.5 bg-[#191b22] rounded-xl border border-[rgba(255,255,255,0.06)]/50">
                       <IndianRupee className="w-4 h-4 text-emerald-500" />
-                      <span className="text-xs font-semibold text-slate-600">{formatSalary(job.salary)}</span>
+                      <span className="text-xs font-semibold text-[#c7c4d7]">{formatSalary(job.salary)}</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="mt-5 pt-4 border-t border-[rgba(255,255,255,0.04)] flex items-center justify-between relative z-10">
-                <div className="flex items-center gap-2 text-slate-400">
+                <div className="flex items-center gap-2 text-[#908fa0]">
                   <Clock className="w-3.5 h-3.5" />
                   <span className="text-[10px] font-bold uppercase tracking-widest">Posted {new Date(job.postedAt || (job as any).createdAt).toLocaleDateString()}</span>
                 </div>
@@ -215,11 +215,11 @@ const JobListing = () => {
       </div>
 
       {filteredJobs.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-slate-300">
+        <div className="flex flex-col items-center justify-center py-16 text-[#c7c4d7]">
           <div className="w-16 h-16 bg-[#191b22] rounded-full flex items-center justify-center mb-4">
             <Search className="w-8 h-8 opacity-30" />
           </div>
-          <p className="text-base font-semibold text-slate-400">No matching opportunities</p>
+          <p className="text-base font-semibold text-[#908fa0]">No matching opportunities</p>
           <p className="text-sm text-[#908fa0] mt-1">Try a different search term or filter</p>
         </div>
       )}
