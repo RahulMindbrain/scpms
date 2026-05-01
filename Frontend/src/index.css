@@ -1,4 +1,4 @@
-﻿@import "tailwindcss";
+@import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 @import "@fontsource-variable/inter";
@@ -54,53 +54,54 @@
    ============================================================ */
 
 :root {
-  /* ── Core Dark Backgrounds (Tonal Layering) ── */
-  --background:                #111319;
-  --surface:                   #111319;
-  --surface-dim:               #111319;
-  --surface-container-lowest:  #0c0e14;
-  --surface-container-low:     #191b22;
-  --surface-container:         #1e1f26;
-  --surface-container-high:    #282a30;
-  --surface-container-highest: #33343b;
-  --surface-bright:            #373940;
+  /* ── Core Light Backgrounds (Tonal Layering) ── */
+  --background:                #ffffff;
+  --surface:                   #ffffff;
+  --surface-dim:               #f1f5f9;
+  --surface-container-lowest:  #ffffff;
+  --surface-container-low:     #f8fafc;
+  --surface-container:         #f1f5f9;
+  --surface-container-high:    #e2e8f0;
+  --surface-container-highest: #cbd5e1;
+  --surface-bright:            #ffffff;
 
   /* ── Foreground / Text ── */
-  --foreground:                #e2e2eb;
-  --muted-foreground:          #c7c4d7;
+  --foreground:                #0f172a;
+  --muted-foreground:          #64748b;
 
   /* ── Card ── */
-  --card:                      #1e1f26;
-  --card-foreground:           #e2e2eb;
+  --card:                      #ffffff;
+  --card-foreground:           #0f172a;
 
   /* ── Popover ── */
-  --popover:                   #1e1f26;
-  --popover-foreground:        #e2e2eb;
+  --popover:                   #ffffff;
+  --popover-foreground:        #0f172a;
 
   /* ── Primary — Electric Indigo ── */
   --primary:                   #6366f1;
   --primary-foreground:        #ffffff;
-  --primary-container:         #8083ff;
-  --inverse-primary:           #494bd6;
+  --primary-container:         #e0e7ff;
+  --inverse-primary:           #818cf8;
 
   /* ── Secondary ── */
-  --secondary:                 #1e1f26;
-  --secondary-foreground:      #e2e2eb;
+  --secondary:                 #f1f5f9;
+  --secondary-foreground:      #0f172a;
 
   /* ── Muted ── */
-  --muted:                     #1e1f26;
+  --muted:                     #f1f5f9;
+  --muted-foreground:          #64748b;
 
   /* ── Accent ── */
-  --accent:                    #282a30;
-  --accent-foreground:         #e2e2eb;
+  --accent:                    #f1f5f9;
+  --accent-foreground:         #0f172a;
 
   /* ── Destructive — Rose ── */
-  --destructive:               #f43f5e;
+  --destructive:               #ef4444;
   --destructive-foreground:    #ffffff;
 
   /* ── Borders & Inputs ── */
-  --border:                    rgba(255, 255, 255, 0.08);
-  --input:                     #0c0e14;
+  --border:                    #e2e8f0;
+  --input:                     #ffffff;
   --ring:                      #6366f1;
 
   /* ── Radius ── */
@@ -108,26 +109,31 @@
 
   /* ── Charts ── */
   --chart-1:                   #6366f1;
-  --chart-2:                   #4edea3;
+  --chart-2:                   #10b981;
   --chart-3:                   #f59e0b;
-  --chart-4:                   #22d3ee;
-  --chart-5:                   #f43f5e;
+  --chart-4:                   #06b6d4;
+  --chart-5:                   #ef4444;
 
   /* ── Sidebar ── */
-  --sidebar:                   #0c0e14;
-  --sidebar-foreground:        #e2e2eb;
+  --sidebar:                   #ffffff;
+  --sidebar-foreground:        #0f172a;
   --sidebar-primary:           #6366f1;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent:            rgba(99, 102, 241, 0.12);
-  --sidebar-accent-foreground: #c0c1ff;
-  --sidebar-border:            rgba(255, 255, 255, 0.06);
+  --sidebar-accent:            rgba(99, 102, 241, 0.08);
+  --sidebar-accent-foreground: #4f46e5;
+  --sidebar-border:            #e2e8f0;
   --sidebar-ring:              #6366f1;
 }
 
-/* ── Force dark theme globally ── */
+/* ── Global Transitions ── */
+* {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ── Force theme variables globally ── */
 html, body, #root {
-  background-color: #111319;
-  color: #e2e2eb;
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 .dark {
@@ -160,6 +166,54 @@ html, body, #root {
   --sidebar-ring:              #6366f1;
 }
 
+/* ── Global Theme Overrides for Hardcoded Styles ── */
+.light .bg-\[\#111319\],
+.light .bg-\[\#111827\],
+.light .bg-\[\#0c0e14\],
+.light .bg-\[\#191b22\],
+.light .bg-\[\#1e1f26\],
+.light .bg-\[\#1f2937\],
+.light .bg-slate-950,
+.light .bg-slate-900 {
+  background-color: var(--background) !important;
+}
+
+.light .text-\[\#e2e2eb\],
+.light .text-slate-200 {
+  color: var(--foreground) !important;
+}
+
+.light .text-\[\#c7c4d7\],
+.light .text-\[\#908fa0\],
+.light .text-slate-400,
+.light ::placeholder {
+  color: var(--muted-foreground) !important;
+}
+
+/* Specifically target search inputs and form elements */
+.light input, 
+.light select, 
+.light textarea {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border) !important;
+}
+
+.light .border-\[rgba\(255\,255\,255\,0\.06\)\],
+.light .border-\[rgba\(255\,255\,255\,0\.08\)\],
+.light .border-white\/5,
+.light .border-white\/10 {
+  border-color: var(--border) !important;
+}
+
+.light .glass-card,
+.light .glass-modal {
+  background: rgba(0, 0, 0, 0.02) !important;
+  border-color: rgba(0, 0, 0, 0.08) !important;
+  backdrop-filter: blur(12px);
+}
+
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -172,7 +226,7 @@ html, body, #root {
   }
   html {
     @apply font-sans;
-    color-scheme: dark;
+    color-scheme: light dark;
   }
 
   button,
@@ -239,14 +293,17 @@ html, body, #root {
 /* ============================================================
    INPUT FIELDS
    ============================================================ */
+/* ============================================================
+   INPUT FIELDS
+   ============================================================ */
 .input-field {
-  background-color: #0c0e14;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #e2e2eb;
+  background-color: var(--input);
+  border: 1px solid var(--border);
+  color: var(--foreground);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 .input-field:focus {
-  border-color: #6366f1;
+  border-color: var(--primary);
   box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
   outline: none;
 }
@@ -275,9 +332,9 @@ html, body, #root {
   0%, 100% { opacity: 0.3; }
   50%       { opacity: 0.7; }
 }
-.skeleton       { background: #282a30; border-radius: 0.5rem; animation: skeleton-pulse 1.5s ease-in-out infinite; }
-.skeleton-text  { background: #282a30; border-radius: 0.25rem; height: 1rem; animation: skeleton-pulse 1.5s ease-in-out infinite; }
-.skeleton-circle{ background: #282a30; border-radius: 9999px; animation: skeleton-pulse 1.5s ease-in-out infinite; }
+.skeleton       { background: var(--accent); border-radius: 0.5rem; animation: skeleton-pulse 1.5s ease-in-out infinite; }
+.skeleton-text  { background: var(--accent); border-radius: 0.25rem; height: 1rem; animation: skeleton-pulse 1.5s ease-in-out infinite; }
+.skeleton-circle{ background: var(--accent); border-radius: 9999px; animation: skeleton-pulse 1.5s ease-in-out infinite; }
 
 @keyframes progress-fill { from { width: 0%; } }
 .animate-progress { animation: progress-fill 1s ease-out forwards; }
@@ -286,8 +343,9 @@ html, body, #root {
    DOT PATTERN
    ============================================================ */
 .dot-pattern {
-  background-image: radial-gradient(circle, rgba(99, 102, 241, 0.15) 1px, transparent 1px);
+  background-image: radial-gradient(circle, var(--primary) 1px, transparent 1px);
   background-size: 20px 20px;
+  opacity: 0.1;
 }
 
 /* ============================================================
@@ -300,19 +358,19 @@ html, body, #root {
    STAT CARD ACCENT BORDERS
    ============================================================ */
 .stat-card-indigo  { border-top: 2px solid #6366f1; }
-.stat-card-emerald { border-top: 2px solid #4edea3; }
+.stat-card-emerald { border-top: 2px solid #10b981; }
 .stat-card-amber   { border-top: 2px solid #f59e0b; }
-.stat-card-rose    { border-top: 2px solid #f43f5e; }
-.stat-card-cyan    { border-top: 2px solid #22d3ee; }
+.stat-card-rose    { border-top: 2px solid #ef4444; }
+.stat-card-cyan    { border-top: 2px solid #06b6d4; }
 
 /* ============================================================
    STATUS BADGES
    ============================================================ */
-.badge-success { background: rgba(78, 222, 163, 0.15); color: #4edea3; }
-.badge-warning { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-.badge-error   { background: rgba(244, 63, 94, 0.15);  color: #f87171; }
-.badge-indigo  { background: rgba(99, 102, 241, 0.15); color: #c0c1ff; }
-.badge-cyan    { background: rgba(34, 211, 238, 0.15); color: #22d3ee; }
+.badge-success { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+.badge-warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+.badge-error   { background: rgba(239, 68, 68, 0.1);  color: #ef4444; }
+.badge-indigo  { background: rgba(99, 102, 241, 0.1); color: #6366f1; }
+.badge-cyan    { background: rgba(6, 182, 212, 0.1); color: #06b6d4; }
 
 /* ============================================================
    PRIMARY BUTTON GLOW
@@ -320,15 +378,16 @@ html, body, #root {
 .btn-primary-glow:hover {
   box-shadow: 0 0 20px rgba(99, 102, 241, 0.45);
 }
+
 /* ============================================================
-   SELECT ELEMENT DARK OVERRIDE
+   SELECT ELEMENT OVERRIDE
    ============================================================ */
 select {
-  background-color: #0c0e14 !important;
-  color: #e2e2eb !important;
-  border-color: rgba(255, 255, 255, 0.08);
+  background-color: var(--input) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border);
 }
 select option {
-  background-color: #1e1f26;
-  color: #e2e2eb;
+  background-color: var(--card);
+  color: var(--foreground);
 }

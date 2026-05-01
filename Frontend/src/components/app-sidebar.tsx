@@ -104,12 +104,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       {/* ── Header / Logo ── */}
-      <SidebarHeader className="border-b border-[rgba(255,255,255,0.06)] pb-3">
+      <SidebarHeader className="border-b border-sidebar-border pb-3">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5! hover:bg-[rgba(255,255,255,0.04)]"
+              className="data-[slot=sidebar-menu-button]:p-1.5! hover:bg-sidebar-accent"
             >
               <a href="#" className="flex items-center gap-3">
                 {/* Gradient logo icon */}
@@ -117,9 +117,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   <GraduationCap className="size-5 text-white" />
                 </div>
                 <div className="flex flex-col gap-0.5 leading-none min-w-0">
-                  <span className="text-[15px] font-bold text-[#e2e2eb] tracking-tight">Smart CPMS</span>
-                  <span className="text-[10px] text-[#908fa0] uppercase tracking-[0.1em] flex items-center gap-1">
-                    <Zap className="size-2.5 text-[#6366f1]" />
+                  <span className="text-[15px] font-bold text-sidebar-foreground tracking-tight">Smart CPMS</span>
+                  <span className="text-[10px] text-muted-foreground uppercase tracking-[0.1em] flex items-center gap-1">
+                    <Zap className="size-2.5 text-primary" />
                     {role} Portal
                   </span>
                 </div>
@@ -132,14 +132,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {/* ── Navigation ── */}
       <SidebarContent className="py-2">
         <NavMain items={navigation.main} />
-        <SidebarSeparator className="bg-[rgba(255,255,255,0.06)] my-2" />
+        <SidebarSeparator className="bg-sidebar-border my-2" />
         <NavSecondary items={navigation.secondary} className="mt-0" />
       </SidebarContent>
 
       {/* ── Footer / User ── */}
-      <SidebarFooter className="border-t border-[rgba(255,255,255,0.06)] pt-2">
+      <SidebarFooter className="border-t border-sidebar-border pt-2">
         <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
+
   )
 }

@@ -2,6 +2,7 @@ import { Separator } from "@/components/ui/separator"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useLocation } from "react-router-dom"
 import { NotificationBell } from "@/components/notification-bell"
+import { ModeToggle } from "@/components/mode-toggle"
 import {
   LayoutDashboard, Users, Building2, Briefcase, FileText, ListChecks, Calendar,
   BarChart3, Mail, Folder, Settings, User, CheckCircle, FileSearch, Bell,
@@ -89,30 +90,31 @@ export function SiteHeader() {
   return (
     <header className="
       flex h-(--header-height) shrink-0 items-center gap-2
-      border-b border-[rgba(255,255,255,0.06)]
-      bg-[#111319]
-      transition-[width,height] ease-linear
+      border-b border-border
+      bg-background
+      transition-[width,height,background-color] ease-linear
       group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)
     ">
       <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
         {/* Sidebar toggle */}
-        <SidebarTrigger className="-ml-1 text-[#908fa0] hover:text-[#e2e2eb] hover:bg-[rgba(255,255,255,0.05)] transition-colors" />
+        <SidebarTrigger className="-ml-1 text-muted-foreground hover:text-foreground hover:bg-accent/10 transition-colors" />
 
         <Separator
           orientation="vertical"
-          className="mx-2 data-[orientation=vertical]:h-4 bg-[rgba(255,255,255,0.08)]"
+          className="mx-2 data-[orientation=vertical]:h-4 bg-border"
         />
 
         {/* Page title + icon */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center p-1.5 bg-[rgba(99,102,241,0.12)] rounded-md text-[#6366f1]">
+          <div className="flex items-center justify-center p-1.5 bg-primary/10 rounded-md text-primary">
             <PageIcon className="size-4" />
           </div>
-          <h1 className="text-sm font-semibold text-[#e2e2eb] tracking-tight">{getTitle()}</h1>
+          <h1 className="text-sm font-semibold text-foreground tracking-tight">{getTitle()}</h1>
         </div>
 
         {/* Right side actions */}
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-3">
+          <ModeToggle />
           <NotificationBell />
         </div>
       </div>

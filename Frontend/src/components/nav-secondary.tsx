@@ -26,7 +26,7 @@ export function NavSecondary({
 
   return (
     <SidebarGroup {...props}>
-      <SidebarGroupLabel className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#c7c4d7]/50 px-3 mb-1">
+      <SidebarGroupLabel className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/50 px-3 mb-1">
         General
       </SidebarGroupLabel>
       <SidebarGroupContent>
@@ -40,12 +40,12 @@ export function NavSecondary({
                   isActive={isActive}
                   className={
                     isActive
-                      ? "bg-[rgba(99,102,241,0.15)] text-[#c0c1ff] font-semibold border border-[rgba(99,102,241,0.25)]"
-                      : "text-[#c7c4d7] hover:bg-[rgba(255,255,255,0.05)] hover:text-[#e2e2eb]"
+                      ? "bg-primary/15 text-primary font-semibold border border-primary/25"
+                      : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                   }
                 >
                   <Link to={item.url} className="flex items-center gap-2.5">
-                    <span className={`size-4 shrink-0 ${isActive ? "text-[#6366f1]" : "text-[#908fa0]"}`}>
+                    <span className={`size-4 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground"}`}>
                       {item.icon}
                     </span>
                     <span className="text-sm">{item.title}</span>
@@ -57,5 +57,6 @@ export function NavSecondary({
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>
+
   )
 }

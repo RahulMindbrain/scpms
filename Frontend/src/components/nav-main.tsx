@@ -20,7 +20,7 @@ export function NavMain({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#c7c4d7]/50 px-3 mb-1">
+      <SidebarGroupLabel className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/50 px-3 mb-1">
         Navigation
       </SidebarGroupLabel>
       <SidebarMenu>
@@ -34,17 +34,17 @@ export function NavMain({
                 isActive={isActive}
                 className={
                   isActive
-                    ? "bg-[rgba(99,102,241,0.15)] text-[#c0c1ff] font-semibold border border-[rgba(99,102,241,0.25)] shadow-[0_0_12px_rgba(99,102,241,0.2)]"
-                    : "text-[#c7c4d7] hover:bg-[rgba(255,255,255,0.05)] hover:text-[#e2e2eb]"
+                    ? "bg-primary/15 text-primary font-semibold border border-primary/25 shadow-[0_0_12px_rgba(99,102,241,0.2)]"
+                    : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
                 }
               >
                 <NavLink to={item.url} className="flex items-center w-full gap-2.5 relative cursor-pointer transition-all duration-200">
-                  <span className={`size-4 shrink-0 ${isActive ? "text-[#6366f1]" : "text-[#908fa0]"}`}>
+                  <span className={`size-4 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground"}`}>
                     {item.icon}
                   </span>
                   <span className="text-sm">{item.title}</span>
                   {isActive && (
-                    <div className="absolute left-[-8px] w-[3px] h-5 bg-[#6366f1] rounded-r-full shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+                    <div className="absolute left-[-8px] w-[3px] h-5 bg-primary rounded-r-full shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
                   )}
                 </NavLink>
               </SidebarMenuButton>
@@ -53,5 +53,6 @@ export function NavMain({
         })}
       </SidebarMenu>
     </SidebarGroup>
+
   )
 }
