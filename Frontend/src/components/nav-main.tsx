@@ -42,7 +42,7 @@ export function NavMain({
                   <span className={`size-4 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground"}`}>
                     {item.icon}
                   </span>
-                  <span className="text-sm">{item.title}</span>
+                  <span className="text-sm group-data-[collapsible=icon]:hidden">{item.title}</span>
                   {isActive && (
                     <div className="absolute left-[-8px] w-[3px] h-5 bg-primary rounded-r-full shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
                   )}

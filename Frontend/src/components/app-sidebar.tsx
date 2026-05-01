@@ -102,7 +102,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const gradientClass = roleColors[role ?? ""] ?? "from-indigo-500 to-violet-600"
 
   return (
-    <Sidebar collapsible="offcanvas" {...props}>
+    <Sidebar collapsible="icon" {...props}>
       {/* ── Header / Logo ── */}
       <SidebarHeader className="border-b border-sidebar-border pb-3">
         <SidebarMenu>
@@ -116,7 +116,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <div className={`flex aspect-square size-9 items-center justify-center rounded-xl bg-gradient-to-br ${gradientClass} shadow-lg shadow-indigo-500/25 shrink-0`}>
                   <GraduationCap className="size-5 text-white" />
                 </div>
-                <div className="flex flex-col gap-0.5 leading-none min-w-0">
+                <div className="flex flex-col gap-0.5 leading-none min-w-0 group-data-[collapsible=icon]:hidden">
                   <span className="text-[15px] font-bold text-sidebar-foreground tracking-tight">Smart CPMS</span>
                   <span className="text-[10px] text-muted-foreground uppercase tracking-[0.1em] flex items-center gap-1">
                     <Zap className="size-2.5 text-primary" />

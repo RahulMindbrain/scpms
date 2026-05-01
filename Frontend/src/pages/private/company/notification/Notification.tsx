@@ -130,11 +130,11 @@ const CompanyNotificationPage = () => {
     let filtered = notifications;
     if (activeFilter === 'unread') filtered = filtered.filter((n) => !n.read);
     if (activeFilter === 'read') filtered = filtered.filter((n) => n.read);
-    
+
     if (searchQuery) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(n => 
-        n.title.toLowerCase().includes(query) || 
+      filtered = filtered.filter(n =>
+        n.title.toLowerCase().includes(query) ||
         n.message.toLowerCase().includes(query)
       );
     }
@@ -153,7 +153,7 @@ const CompanyNotificationPage = () => {
         initial="hidden"
         animate="visible"
         variants={containerVariants}
-        className="mx-auto max-w-5xl space-y-6"
+        className=" space-y-6"
       >
         {/* Header Section */}
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#1e1f26] p-6">
@@ -258,7 +258,7 @@ const CompanyNotificationPage = () => {
                     {!notification.read && (
                       <div className="absolute left-0 top-0 h-full w-1 bg-indigo-500" />
                     )}
-                    
+
                     <div className="flex gap-4">
                       <div className={cn(
                         'flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border transition-colors',

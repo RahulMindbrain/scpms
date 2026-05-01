@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import {
-  Briefcase, 
-  DollarSign, 
-  MapPin, 
-  GraduationCap, 
-  AlignLeft, 
-  CheckCircle2, 
-  Zap, 
-  BookOpen, 
+  Briefcase,
+  DollarSign,
+  MapPin,
+  GraduationCap,
+  AlignLeft,
+  CheckCircle2,
+  Zap,
+  BookOpen,
   Code2,
   FileText,
   ChevronDown,
@@ -41,7 +41,7 @@ const PostJob: React.FC = () => {
 
   const [selectedBranches, setSelectedBranches] = useState<number[]>([]);
   const [selectedSkills, setSelectedSkills] = useState<number[]>([]);
-  
+
   const [branchSearch, setBranchSearch] = useState('');
   const [skillSearch, setSkillSearch] = useState('');
   const [isBranchOpen, setIsBranchOpen] = useState(false);
@@ -53,7 +53,7 @@ const PostJob: React.FC = () => {
   useEffect(() => {
     dispatch(fetchDepartments());
     dispatch(fetchSkills());
-    
+
     const handleClickOutside = (event: MouseEvent) => {
       if (branchRef.current && !branchRef.current.contains(event.target as Node)) setIsBranchOpen(false);
       if (skillRef.current && !skillRef.current.contains(event.target as Node)) setIsSkillOpen(false);
@@ -118,17 +118,17 @@ const PostJob: React.FC = () => {
     }
   };
 
-  const filteredBranches = (departments || []).filter((dept: any) => 
+  const filteredBranches = (departments || []).filter((dept: any) =>
     (dept.name || dept.deptName || '').toLowerCase().includes(branchSearch.toLowerCase())
   );
 
-  const filteredSkills = (skills || []).filter((skill: any) => 
+  const filteredSkills = (skills || []).filter((skill: any) =>
     (skill.name || '').toLowerCase().includes(skillSearch.toLowerCase())
   );
 
   return (
     <div className="font-sans">
-      <div className="max-w-4xl mx-auto bg-[#1e1f26] rounded-[2rem] border border-[rgba(255,255,255,0.07)] overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
+      <div className="bg-[#1e1f26] rounded-[2rem] border border-[rgba(255,255,255,0.07)] overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
         {/* Header */}
         <header className="p-6 sm:p-8 border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]">
           <h1 className="text-2xl font-extrabold text-[#e2e2eb] tracking-tight">Create New Job Drive</h1>
@@ -142,7 +142,7 @@ const PostJob: React.FC = () => {
               <span className="p-2 bg-indigo-500/10 text-indigo-400 rounded-xl"><Briefcase size={22} /></span>
               Basic Information
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-[#908fa0] ml-1">Job Title</label>
@@ -179,7 +179,7 @@ const PostJob: React.FC = () => {
               <span className="p-2 bg-violet-500/10 text-violet-400 rounded-xl"><GraduationCap size={22} /></span>
               Eligibility Criteria
             </h2>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-[#c7c4d7] ml-1">Minimum CGPA</label>
@@ -224,9 +224,9 @@ const PostJob: React.FC = () => {
               <span className="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl"><Briefcase size={22} /></span>
               Target Branches
             </h2>
-            
+
             <div className="relative" ref={branchRef}>
-              <div 
+              <div
                 onClick={() => setIsBranchOpen(!isBranchOpen)}
                 className={`flex flex-wrap gap-2 p-3 min-h-[56px] rounded-2xl border-2 transition-all cursor-pointer bg-[#0c0e14] ${isBranchOpen ? 'border-emerald-500 ring-2 ring-emerald-500/15' : 'border-[rgba(255,255,255,0.08)] hover:border-emerald-500/40'}`}
               >
@@ -288,7 +288,7 @@ const PostJob: React.FC = () => {
             </h2>
 
             <div className="relative" ref={skillRef}>
-              <div 
+              <div
                 onClick={() => setIsSkillOpen(!isSkillOpen)}
                 className={`flex flex-wrap gap-2 p-3 min-h-[56px] rounded-2xl border-2 transition-all cursor-pointer bg-[#0c0e14] ${isSkillOpen ? 'border-rose-500 ring-2 ring-rose-500/15' : 'border-[rgba(255,255,255,0.08)] hover:border-rose-500/40'}`}
               >
@@ -346,11 +346,10 @@ const PostJob: React.FC = () => {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`group relative flex items-center gap-3 px-10 py-4 rounded-2xl font-bold text-white transition-all duration-300 ${
-                isSubmitting
+              className={`group relative flex items-center gap-3 px-10 py-4 rounded-2xl font-bold text-white transition-all duration-300 ${isSubmitting
                   ? 'bg-[rgba(255,255,255,0.08)] cursor-not-allowed text-[#908fa0]'
                   : 'bg-gradient-to-br from-indigo-600 to-violet-700 hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-1 active:translate-y-0'
-              }`}
+                }`}
             >
               {isSubmitting ? (
                 <><Loader size="sm" /> Processing...</>

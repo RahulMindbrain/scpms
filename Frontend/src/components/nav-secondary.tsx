@@ -48,7 +48,7 @@ export function NavSecondary({
                     <span className={`size-4 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground"}`}>
                       {item.icon}
                     </span>
-                    <span className="text-sm">{item.title}</span>
+                    <span className="text-sm group-data-[collapsible=icon]:hidden">{item.title}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
