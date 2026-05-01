@@ -108,12 +108,12 @@ const JobListing = () => {
       {/* Header */}
       <header className="flex items-center justify-between mb-8">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-blue-500/20">
+          <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-500/20">
             <Briefcase className="w-6 h-6" />
           </div>
           <div>
-            <h2 className="font-bold text-2xl text-slate-900 tracking-tight">Job Opportunities</h2>
-            <p className="text-slate-500 text-sm font-medium">Explore and apply for the latest recruitment drives.</p>
+            <h2 className="font-bold text-2xl text-[#e2e2eb] tracking-tight">Job Opportunities</h2>
+            <p className="text-[#908fa0] text-sm font-medium">Explore and apply for the latest recruitment drives.</p>
           </div>
         </div>
       </header>
@@ -121,13 +121,13 @@ const JobListing = () => {
       {/* Search and Filters */}
       <div className="mb-8 flex flex-col md:flex-row gap-4">
         <div className="relative flex-1 max-w-lg group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-600 transition-colors" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#908fa0] group-focus-within:text-indigo-400 transition-colors" />
           <input 
             type="text" 
             placeholder="Search by role or company..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-4 py-3.5 bg-white border border-slate-100 rounded-2xl shadow-sm focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 outline-none transition-all font-medium text-slate-800"
+            className="w-full pl-12 pr-4 py-3.5 bg-[#0c0e14] border border-[rgba(255,255,255,0.08)] rounded-2xl shadow-sm focus:ring-4 focus:ring-indigo-500/5 focus:border-blue-500 outline-none transition-all font-medium text-slate-800"
           />
         </div>
         <div className="flex items-center gap-2">
@@ -137,8 +137,8 @@ const JobListing = () => {
               onClick={() => setFilterType(type)}
               className={`px-4 py-2 text-xs font-bold rounded-xl border transition-all capitalize ${
                 filterType === type
-                  ? 'bg-blue-50 border-blue-200 text-blue-700'
-                  : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300'
+                  ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300'
+                  : 'bg-[#1e1f26] border-[rgba(255,255,255,0.08)] text-[#908fa0] hover:border-slate-300'
               }`}
             >
               {type === 'all' ? 'All Types' : type}
@@ -152,36 +152,36 @@ const JobListing = () => {
         {filteredJobs.map((job: Job) => {
           const isEligible = checkEligibility(job);
           return (
-            <div key={job.id} className="bg-white p-6 rounded-2xl shadow-lg shadow-slate-200/40 border border-slate-50 hover:border-blue-200 transition-all duration-300 relative group overflow-hidden">
+            <div key={job.id} className="bg-[#1e1f26] p-6 rounded-2xl shadow-lg shadow-slate-200/40 border border-[rgba(255,255,255,0.04)] hover:border-indigo-500/30 transition-all duration-300 relative group overflow-hidden">
               {/* Eligibility Decor */}
-              <div className={`absolute top-0 right-0 w-32 h-32 blur-3xl opacity-10 transition-opacity group-hover:opacity-20 ${isEligible ? 'bg-blue-600' : 'bg-red-600'}`}></div>
+              <div className={`absolute top-0 right-0 w-32 h-32 blur-3xl opacity-10 transition-opacity group-hover:opacity-20 ${isEligible ? 'bg-indigo-600' : 'bg-red-600'}`}></div>
 
               <div className="flex gap-5 relative z-10">
                 {/* Logo */}
-                <div className={`w-14 h-14 ${job.logoBg || 'bg-blue-600'} rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-black/10 transition-transform duration-500 group-hover:scale-110 shrink-0`}>
+                <div className={`w-14 h-14 ${job.logoBg || 'bg-indigo-600'} rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-black/10 transition-transform duration-500 group-hover:scale-110 shrink-0`}>
                   {job.logo || job.company.name.substring(0, 2)}
                 </div>
                 
                 {/* Info */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between mb-1 gap-3">
-                    <h3 className="text-lg font-bold text-slate-900 leading-tight">{job.title}</h3>
+                    <h3 className="text-lg font-bold text-[#e2e2eb] leading-tight">{job.title}</h3>
                     <Badge variant={isEligible ? 'success' : 'danger'} className="tracking-wider text-[9px] font-bold px-2.5 shrink-0">
                       {isEligible ? 'Eligible' : 'Not Eligible'}
                     </Badge>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-slate-500 font-semibold mb-4">
+                  <div className="flex items-center gap-2 text-sm text-[#908fa0] font-semibold mb-4">
                     <BriefcaseBusiness className="w-4 h-4 text-blue-500" />
                     <span>{job.company.name}</span>
                   </div>
                   
                   {/* Meta Grid */}
                   <div className="grid grid-cols-2 gap-3">
-                    <div className="flex items-center gap-2.5 p-2.5 bg-slate-50 rounded-xl border border-slate-100/50">
+                    <div className="flex items-center gap-2.5 p-2.5 bg-[#191b22] rounded-xl border border-[rgba(255,255,255,0.06)]/50">
                       <MapPin className="w-4 h-4 text-blue-500" />
                       <span className="text-xs font-semibold text-slate-600">{job.location}</span>
                     </div>
-                    <div className="flex items-center gap-2.5 p-2.5 bg-slate-50 rounded-xl border border-slate-100/50">
+                    <div className="flex items-center gap-2.5 p-2.5 bg-[#191b22] rounded-xl border border-[rgba(255,255,255,0.06)]/50">
                       <IndianRupee className="w-4 h-4 text-emerald-500" />
                       <span className="text-xs font-semibold text-slate-600">{formatSalary(job.salary)}</span>
                     </div>
@@ -189,7 +189,7 @@ const JobListing = () => {
                 </div>
               </div>
 
-              <div className="mt-5 pt-4 border-t border-slate-50 flex items-center justify-between relative z-10">
+              <div className="mt-5 pt-4 border-t border-[rgba(255,255,255,0.04)] flex items-center justify-between relative z-10">
                 <div className="flex items-center gap-2 text-slate-400">
                   <Clock className="w-3.5 h-3.5" />
                   <span className="text-[10px] font-bold uppercase tracking-widest">Posted {new Date(job.postedAt || (job as any).createdAt).toLocaleDateString()}</span>
@@ -202,8 +202,8 @@ const JobListing = () => {
                   disabled={!isEligible}
                   className={`rounded-xl font-bold text-xs px-5 py-4 ${
                     isEligible 
-                      ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/20' 
-                      : 'bg-slate-50 text-slate-300 cursor-not-allowed border border-slate-100'
+                      ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-lg shadow-indigo-500/20' 
+                      : 'bg-[#191b22] text-[#908fa0] cursor-not-allowed border border-[rgba(255,255,255,0.06)]'
                   }`}
                 >
                   View & Apply <ChevronRight className="w-4 h-4 ml-1" />
@@ -216,11 +216,11 @@ const JobListing = () => {
 
       {filteredJobs.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-slate-300">
-          <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+          <div className="w-16 h-16 bg-[#191b22] rounded-full flex items-center justify-center mb-4">
             <Search className="w-8 h-8 opacity-30" />
           </div>
           <p className="text-base font-semibold text-slate-400">No matching opportunities</p>
-          <p className="text-sm text-slate-400 mt-1">Try a different search term or filter</p>
+          <p className="text-sm text-[#908fa0] mt-1">Try a different search term or filter</p>
         </div>
       )}
 
@@ -233,31 +233,31 @@ const JobListing = () => {
       >
         <div className="space-y-8">
           <div className="flex flex-wrap gap-4">
-            <Badge variant="outline" className="px-4 py-2 rounded-xl text-xs font-semibold border-slate-200 flex gap-2 items-center">
+            <Badge variant="outline" className="px-4 py-2 rounded-xl text-xs font-semibold border-[rgba(255,255,255,0.08)] flex gap-2 items-center">
               <Calendar className="w-4 h-4 text-blue-600" /> Deadline: {selectedJob?.deadline}
             </Badge>
-            <Badge variant="outline" className="px-4 py-2 rounded-xl text-xs font-semibold border-slate-200 flex gap-2 items-center">
+            <Badge variant="outline" className="px-4 py-2 rounded-xl text-xs font-semibold border-[rgba(255,255,255,0.08)] flex gap-2 items-center">
               <IndianRupee className="w-4 h-4 text-emerald-600" /> Package: {selectedJob?.salary ? formatSalary(selectedJob.salary) : 'N/A'}
             </Badge>
           </div>
 
           <div className="space-y-4">
-            <h4 className="text-sm font-bold text-slate-900 uppercase tracking-wider">About the Role</h4>
-            <p className="text-slate-600 leading-relaxed font-medium">
+            <h4 className="text-sm font-bold text-[#e2e2eb] uppercase tracking-wider">About the Role</h4>
+            <p className="text-[#c7c4d7] leading-relaxed font-medium">
               {selectedJob?.description || "Detailed job description will be provided shortly. This role involves working with cross-functional teams to deliver high-quality software solutions."}
             </p>
           </div>
 
-          <div className="p-6 bg-blue-50 rounded-[1.5rem] border border-blue-100 space-y-3">
-            <h4 className="text-xs font-bold text-blue-900 uppercase tracking-wider">Application Process</h4>
-            <p className="text-blue-700 text-sm font-medium leading-relaxed">
+          <div className="p-6 bg-indigo-500/10 rounded-[1.5rem] border border-indigo-500/20 space-y-3">
+            <h4 className="text-xs font-bold text-indigo-200 uppercase tracking-wider">Application Process</h4>
+            <p className="text-indigo-300 text-sm font-medium leading-relaxed">
               Once you apply, your profile will be shared with the recruiter. If shortlisted, you'll be invited for a technical round via the interview scheduler.
             </p>
           </div>
 
           <div className="pt-4 flex gap-4">
             <Button 
-              className="flex-1 bg-blue-600 py-6 rounded-2xl font-bold tracking-wider shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all"
+              className="flex-1 bg-indigo-600 py-6 rounded-2xl font-bold tracking-wider shadow-lg shadow-indigo-500/20 hover:bg-indigo-700 transition-all"
               onClick={handleApply}
               disabled={isApplying}
             >

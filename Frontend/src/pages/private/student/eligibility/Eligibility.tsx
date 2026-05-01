@@ -33,7 +33,7 @@ const Eligibility = () => {
 
   // Brand color map for company initials
   const companyColors: Record<string, { bg: string; text: string }> = {
-    'Google': { bg: 'bg-blue-600', text: 'text-white' },
+    'Google': { bg: 'bg-indigo-600', text: 'text-white' },
     'Microsoft': { bg: 'bg-emerald-600', text: 'text-white' },
     'Amazon': { bg: 'bg-orange-500', text: 'text-white' },
     'Goldman Sachs': { bg: 'bg-blue-900', text: 'text-white' },
@@ -117,8 +117,8 @@ const Eligibility = () => {
       label: 'Ineligible Roles',
       value: String(Math.max(0, companies.length - filterTabs[1].count)).padStart(2, "0"),
       icon: XCircle,
-      color: 'text-slate-400',
-      bg: 'bg-slate-50'
+      color: 'text-[#908fa0]',
+      bg: 'bg-[#191b22]'
     },
   ];
 
@@ -130,30 +130,30 @@ const Eligibility = () => {
           
           {/* Sidebar / Profile Info */}
           <div className="lg:col-span-4 space-y-4">
-            <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm">
+            <div className="bg-[#1e1f26] rounded-2xl p-6 border border-[rgba(255,255,255,0.07)]">
               <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-blue-50 rounded-xl">
+                <div className="p-2 bg-indigo-500/10 rounded-xl">
                   <User className="w-5 h-5 text-blue-600" />
                 </div>
                 <h2 className="font-bold text-slate-800">Academic Profile</h2>
               </div>
               
               <div className="space-y-4">
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                  <p className="text-[11px] font-bold text-slate-400 uppercase mb-2">Current Standing</p>
+                <div className="p-4 bg-[#191b22] rounded-2xl border border-slate-100">
+                  <p className="text-[11px] font-bold text-[#908fa0] uppercase mb-2">Current Standing</p>
                   <div className="flex items-baseline gap-1">
                     <span className="text-2xl font-black text-slate-900">{studentCgpa || 0}</span>
-                    <span className="text-slate-400 font-medium text-sm">/ 10.0 CGPA</span>
+                    <span className="text-[#908fa0] font-medium text-sm">/ 10.0 CGPA</span>
                   </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <p className="text-[11px] font-bold text-slate-400 uppercase mb-1">Branch</p>
+                  <div className="p-4 bg-[#191b22] rounded-2xl border border-slate-100">
+                    <p className="text-[11px] font-bold text-[#908fa0] uppercase mb-1">Branch</p>
                     <p className="font-bold text-slate-800">{studentBranch}</p>
                   </div>
-                  <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <p className="text-[11px] font-bold text-slate-400 uppercase mb-1">Backlogs</p>
+                  <div className="p-4 bg-[#191b22] rounded-2xl border border-slate-100">
+                    <p className="text-[11px] font-bold text-[#908fa0] uppercase mb-1">Backlogs</p>
                     <p className={`font-bold ${studentBacklogs > 0 ? "text-amber-600" : "text-emerald-600"}`}>
                       {studentBacklogs}
                     </p>
@@ -162,9 +162,9 @@ const Eligibility = () => {
               </div>
 
               <div className="mt-6 pt-6 border-t border-slate-100">
-                <div className="flex items-start gap-3 p-3 bg-blue-50/50 rounded-2xl border border-blue-100">
-                  <Info className="w-4 h-4 text-blue-500 mt-0.5" />
-                  <p className="text-xs text-blue-700 leading-relaxed">
+                <div className="flex items-start gap-3 p-3 bg-indigo-500/10/50 rounded-2xl border border-blue-100">
+                  <Info className="w-4 h-4 text-indigo-400 mt-0.5" />
+                  <p className="text-xs text-indigo-300 leading-relaxed">
                     Eligibility is calculated automatically based on your latest verified university records.
                   </p>
                 </div>
@@ -178,7 +178,7 @@ const Eligibility = () => {
             {/* Quick Stats */}
             <div className="space-y-3">
               {eligibilitySummary.map((stat) => (
-                <div key={stat.label} className="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex items-center gap-4">
+                <div key={stat.label} className="bg-[#1e1f26] p-4 rounded-2xl border border-[rgba(255,255,255,0.08)] shadow-sm flex items-center gap-4">
                   <div className={`${stat.bg} ${stat.color} p-3 rounded-xl`}>
                     <stat.icon className="w-5 h-5" />
                   </div>
@@ -193,10 +193,10 @@ const Eligibility = () => {
 
           {/* Main Content / Company List */}
           <div className="lg:col-span-8">
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+            <div className="bg-[#1e1f26] rounded-2xl border border-[rgba(255,255,255,0.07)] overflow-hidden">
               <div className="p-6 border-b border-slate-100">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                  <h3 className="font-bold text-slate-800 text-lg">Company Opportunities</h3>
+                  <h3 className="font-bold text-[#e2e2eb] text-lg">Company Opportunities</h3>
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
                     <input 
@@ -204,7 +204,7 @@ const Eligibility = () => {
                       placeholder="Search company..." 
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 w-full sm:w-64 transition-all"
+                      className="pl-9 pr-4 py-2 bg-[#0c0e14] border border-[rgba(255,255,255,0.08)] rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-blue-500 w-full sm:w-64 transition-all"
                     />
                   </div>
                 </div>
@@ -217,12 +217,12 @@ const Eligibility = () => {
                       onClick={() => setActiveFilter(tab.key)}
                       className={`px-4 py-1.5 text-xs font-bold rounded-full border transition-all ${
                         activeFilter === tab.key
-                          ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm'
-                          : 'bg-white border-slate-200 text-slate-500 hover:border-slate-300 hover:text-slate-700'
+                          ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300 shadow-sm'
+                          : 'bg-[#1e1f26] border-[rgba(255,255,255,0.08)] text-[#908fa0] hover:border-slate-300 hover:text-[#c7c4d7]'
                       }`}
                     >
                       {tab.label}
-                      <span className={`ml-1.5 text-[10px] ${activeFilter === tab.key ? 'text-blue-500' : 'text-slate-400'}`}>
+                      <span className={`ml-1.5 text-[10px] ${activeFilter === tab.key ? 'text-indigo-400' : 'text-[#908fa0]'}`}>
                         {tab.count}
                       </span>
                     </button>
@@ -230,7 +230,7 @@ const Eligibility = () => {
                 </div>
               </div>
 
-              <div className="divide-y divide-slate-100">
+              <div className="divide-y divide-[rgba(255,255,255,0.05)]">
                 {filteredCompanies.map((company, index) => {
                   const colors = companyColors[company.name] || { bg: 'bg-slate-600', text: 'text-white' };
                   return (
@@ -238,8 +238,8 @@ const Eligibility = () => {
                       key={index} 
                       className={`p-6 transition-all group ${
                         !company.active 
-                          ? 'opacity-50 bg-slate-50/50' 
-                          : 'hover:bg-slate-50/50'
+                          ? 'opacity-50 bg-[rgba(255,255,255,0.02)]' 
+                          : 'hover:bg-[rgba(255,255,255,0.02)]'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -249,12 +249,12 @@ const Eligibility = () => {
                           </div>
                           <div>
                             <div className="flex items-center gap-2 mb-1">
-                              <h4 className={`font-bold ${company.active ? 'text-slate-900' : 'text-slate-500'}`}>{company.name}</h4>
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-slate-100 text-slate-500 tracking-tight">
+                              <h4 className={`font-bold ${company.active ? 'text-[#e2e2eb]' : 'text-[#908fa0]'}`}>{company.name}</h4>
+                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[rgba(255,255,255,0.06)] text-[#908fa0] tracking-tight">
                                 {company.role}
                               </span>
                               {company.applied && (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-blue-600 tracking-tight">
+                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-400 tracking-tight">
                                   Applied
                                 </span>
                               )}
@@ -278,7 +278,7 @@ const Eligibility = () => {
                               Eligible
                             </div>
                           ) : (
-                            <div className="bg-slate-100 text-slate-400 px-3 py-1 rounded-full text-[11px] font-bold border border-slate-200">
+                            <div className="bg-[rgba(255,255,255,0.06)] text-[#908fa0] px-3 py-1 rounded-full text-[11px] font-bold border border-slate-200">
                               Not Eligible
                             </div>
                           )}
@@ -286,12 +286,12 @@ const Eligibility = () => {
                           {company.active ? (
                             <button
                               onClick={() => navigate('/student/jobs')}
-                              className="flex items-center gap-1 text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform"
+                              className="flex items-center gap-1 text-xs font-bold text-indigo-400 group-hover:translate-x-1 transition-transform"
                             >
                               Apply Now <ArrowUpRight className="w-3 h-3" />
                             </button>
                           ) : (
-                            <span className="text-[10px] text-slate-400 italic">{company.reason}</span>
+                            <span className="text-[10px] text-[#908fa0] italic">{company.reason}</span>
                           )}
                         </div>
                       </div>

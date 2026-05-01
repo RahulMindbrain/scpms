@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,12 +36,12 @@ const ExperienceModal = ({ isOpen, onClose, onAddExperience }: ExperienceModalPr
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[520px] rounded-3xl p-8">
+      <DialogContent className="sm:max-w-[520px] rounded-2xl p-0 overflow-hidden bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] shadow-2xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-black uppercase tracking-tight text-slate-900">Add Experience</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 py-4 px-7">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="company" className="text-xs font-black uppercase tracking-widest text-slate-500">Company</Label>
@@ -93,15 +93,15 @@ const ExperienceModal = ({ isOpen, onClose, onAddExperience }: ExperienceModalPr
             <Textarea
               id="description"
               placeholder="Describe your role and impact..."
-              className="rounded-2xl border-slate-200 min-h-[100px]"
+              className="rounded-2xl border-[rgba(255,255,255,0.08)] min-h-[100px]"
               value={experience.description}
               onChange={(e) => setExperience({ ...experience, description: e.target.value })}
             />
           </div>
         </div>
 
-        <DialogFooter className="flex-row gap-3 mt-2">
-          <Button variant="outline" onClick={onClose} className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest border-slate-200">
+        <DialogFooter className="flex-row gap-3 mt-2 px-7 pb-7">
+          <Button variant="outline" onClick={onClose} className="flex-1 rounded-xl h-11 font-bold border-[rgba(255,255,255,0.1)] text-[#c7c4d7] hover:bg-[rgba(255,255,255,0.05)]">
             Cancel
           </Button>
           <Button onClick={handleSubmit} className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest bg-blue-600">

@@ -20,7 +20,7 @@ import { toast } from 'sonner';
 type Status = 'APPLIED' | 'SHORTLISTED' | 'TECHNICAL_ROUND' | 'HR_ROUND' | 'SELECTED' | 'REJECTED';
 
 const STATUS_CONFIG: Record<Status, { label: string; color: string; bgColor: string; icon: any }> = {
-  APPLIED: { label: 'Applied', color: 'text-blue-600', bgColor: 'bg-blue-50', icon: Clock },
+  APPLIED: { label: 'Applied', color: 'text-indigo-400', bgColor: 'bg-indigo-500/10', icon: Clock },
   SHORTLISTED: { label: 'Shortlisted', color: 'text-purple-600', bgColor: 'bg-purple-50', icon: CheckCircle2 },
   TECHNICAL_ROUND: { label: 'Technical', color: 'text-orange-600', bgColor: 'bg-orange-50', icon: Rocket },
   HR_ROUND: { label: 'HR Round', color: 'text-yellow-600', bgColor: 'bg-yellow-50', icon: UserCircle },
@@ -34,8 +34,8 @@ const STAGES: Status[] = ['APPLIED', 'SHORTLISTED', 'TECHNICAL_ROUND', 'HR_ROUND
 const StatusBadge = ({ status }: { status: Status }) => {
   const config = (status && STATUS_CONFIG[status]) || {
     label: status || 'Unknown',
-    color: 'text-slate-600',
-    bgColor: 'bg-slate-50',
+    color: 'text-[#c7c4d7]',
+    bgColor: 'bg-[#191b22]',
     icon: Clock
   };
   const Icon = config.icon || Clock;
@@ -67,15 +67,15 @@ const StepIndicator = ({ currentStatus }: { currentStatus: Status }) => {
   return (
     <div className="flex items-center gap-3">
       <div className="flex items-center gap-2">
-        <div className="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)] animate-pulse" />
-        <span className="text-slate-900 font-bold text-[11px] uppercase tracking-wide">
+        <div className="w-2.5 h-2.5 rounded-full bg-indigo-500/100 shadow-[0_0_8px_rgba(59,130,246,0.5)] animate-pulse" />
+        <span className="text-[#e2e2eb] font-bold text-[11px] uppercase tracking-wide">
           {currentLabel}
         </span>
       </div>
       {nextStage && STATUS_CONFIG[nextStage] && (
         <>
           <ChevronRight size={12} className="text-slate-300" />
-          <span className="text-slate-400 font-medium text-[11px] uppercase tracking-wide">
+          <span className="text-[#908fa0] font-medium text-[11px] uppercase tracking-wide">
             Next: {STATUS_CONFIG[nextStage].label}
           </span>
         </>
@@ -88,7 +88,7 @@ const StepIndicator = ({ currentStatus }: { currentStatus: Status }) => {
 const CompanyAvatar = ({ name }: { name: string }) => {
   const firstLetter = name.charAt(0).toUpperCase();
   return (
-    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-lg shrink-0 overflow-hidden shadow-sm">
+    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 border border-[rgba(255,255,255,0.08)] flex items-center justify-center text-[#908fa0] font-bold text-lg shrink-0 overflow-hidden shadow-sm">
       {firstLetter}
     </div>
   );
@@ -114,8 +114,8 @@ const ApplicationRow = ({
 
   return (
     <div className={cn(
-      "group bg-white rounded-2xl border border-slate-100 transition-all duration-300 overflow-hidden",
-      isExpanded ? "shadow-xl shadow-slate-200/50 border-blue-100 ring-1 ring-blue-50" : "hover:border-slate-200 hover:shadow-md hover:shadow-slate-200/30"
+      "group bg-white rounded-2xl border border-[rgba(255,255,255,0.06)] transition-all duration-300 overflow-hidden",
+      isExpanded ? "shadow-xl shadow-slate-200/50 border-indigo-500/20 ring-1 ring-indigo-500/10" : "hover:border-[rgba(255,255,255,0.08)] hover:shadow-md hover:shadow-slate-200/30"
     )}>
       {/* Table Row Content */}
       <div
@@ -126,16 +126,16 @@ const ApplicationRow = ({
           <CompanyAvatar name={app.job?.company?.name || "C"} />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-0.5">
-              <h3 className="text-sm font-bold text-slate-900 truncate">{app.job?.title || "Role"}</h3>
-              <span className="text-slate-400 font-medium text-xs hidden md:inline">•</span>
-              <p className="text-slate-600 font-medium text-xs truncate hidden md:inline">{app.job?.company?.name}</p>
+              <h3 className="text-sm font-bold text-[#e2e2eb] truncate">{app.job?.title || "Role"}</h3>
+              <span className="text-[#908fa0] font-medium text-xs hidden md:inline">•</span>
+              <p className="text-[#c7c4d7] font-medium text-xs truncate hidden md:inline">{app.job?.company?.name}</p>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 text-[10px] text-slate-400 font-medium">
+              <div className="flex items-center gap-1 text-[10px] text-[#908fa0] font-medium">
                 <Calendar size={12} />
                 <span>{new Date(app.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
               </div>
-              <div className="md:hidden flex items-center gap-1 text-[10px] text-slate-400 font-medium truncate">
+              <div className="md:hidden flex items-center gap-1 text-[10px] text-[#908fa0] font-medium truncate">
                 <Building2 size={12} />
                 <span className="truncate">{app.job?.company?.name}</span>
               </div>
@@ -156,7 +156,7 @@ const ApplicationRow = ({
               size="sm"
               className={cn(
                 "h-8 w-8 p-0 rounded-lg transition-transform",
-                isExpanded && "bg-slate-100 rotate-180 text-blue-600"
+                isExpanded && "bg-[rgba(255,255,255,0.06)] rotate-180 text-blue-600"
               )}
             >
               <ChevronDown size={16} />
@@ -167,13 +167,13 @@ const ApplicationRow = ({
 
       {/* Expanded Details */}
       {isExpanded && (
-        <div className="px-4 pb-5 pt-2 border-t border-slate-50 bg-slate-50/30 animate-in slide-in-from-top-2 duration-300">
+        <div className="px-4 pb-5 pt-2 border-t border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.015)] animate-in slide-in-from-top-2 duration-300">
           <div className="w-full">
             {/* Left: Tracker Detail */}
             <div className="space-y-4">
-              <div className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+              <div className="bg-[#1e1f26] p-4 rounded-xl border border-[rgba(255,255,255,0.06)] shadow-sm">
                 <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Application Timeline</h4>
+                  <h4 className="text-xs font-bold text-[#e2e2eb] uppercase tracking-wider">Application Timeline</h4>
                   <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
                     <Clock size={12} /> LAST UPDATED: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </div>
@@ -181,9 +181,9 @@ const ApplicationRow = ({
 
                 <div className="relative flex items-center justify-between px-2 py-4">
                   {/* Timeline Bar */}
-                  <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-slate-100 -translate-y-1/2" />
+                  <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-[rgba(255,255,255,0.06)] -translate-y-1/2" />
                   <div
-                    className="absolute top-1/2 left-0 h-0.5 bg-blue-500 -translate-y-1/2 transition-all duration-1000 ease-out"
+                    className="absolute top-1/2 left-0 h-0.5 bg-indigo-500/100 -translate-y-1/2 transition-all duration-1000 ease-out"
                     style={{ width: `${(Math.max(0, STAGES.indexOf(status)) / (STAGES.length - 1)) * 100}%` }}
                   />
 
@@ -196,9 +196,9 @@ const ApplicationRow = ({
                       <div key={stage} className="relative z-10 flex flex-col items-center gap-2">
                         <div className={cn(
                           "w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all duration-500",
-                          isPassed ? "bg-blue-500 border-blue-500 text-white" :
-                          isCurrent ? "bg-white border-blue-500 text-blue-500 scale-125 shadow-lg shadow-blue-100" :
-                          "bg-white border-slate-200 text-slate-300"
+                          isPassed ? "bg-indigo-500/100 border-blue-500 text-white" :
+                          isCurrent ? "bg-[#1e1f26] border-blue-500 text-indigo-400 scale-125 shadow-lg shadow-blue-100" :
+                          "bg-[#1e1f26] border-[rgba(255,255,255,0.08)] text-slate-300"
                         )}>
                           {isPassed ? <CheckCircle2 size={12} strokeWidth={3} /> : <Circle size={10} fill={isCurrent ? "currentColor" : "none"} />}
                         </div>
@@ -269,10 +269,10 @@ const ApplicationRow = ({
 
 /* ─── Quick Stat Card ─── */
 const StatCard = ({ title, value, icon: Icon, colorClass, bgColorClass }: any) => (
-  <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between hover:shadow-md transition-all group">
+  <div className="bg-[#1e1f26] p-4 rounded-2xl border border-[rgba(255,255,255,0.07)] flex items-center justify-between hover:border-indigo-500/20 transition-all group">
     <div>
-      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">{title}</p>
-      <p className="text-2xl font-black text-slate-900 tabular-nums">{value}</p>
+      <p className="text-[10px] font-bold uppercase tracking-wider text-[#908fa0] mb-1">{title}</p>
+      <p className="text-2xl font-black text-[#e2e2eb] tabular-nums">{value}</p>
     </div>
     <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", bgColorClass, colorClass)}>
       <Icon size={24} />
@@ -359,16 +359,16 @@ const ApplicationStatus = () => {
       {/* ─── Header ─── */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-bold uppercase tracking-wider mb-2">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-[10px] font-bold uppercase tracking-wider mb-2">
             <Sparkles size={12} /> My Career Dashboard
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">Applications Tracking</h1>
-          <p className="text-slate-500 text-sm font-medium mt-1">Manage and track your recruitment journey in real-time.</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#e2e2eb] tracking-tight">Applications Tracking</h1>
+          <p className="text-[#908fa0] text-sm font-medium mt-1">Manage and track your recruitment journey in real-time.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
             onClick={() => navigate('/student/jobs')}
-            className="bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/20 px-6"
+            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 px-6"
           >
             Find More Jobs <ArrowRight size={16} className="ml-2" />
           </Button>
@@ -409,7 +409,7 @@ const ApplicationStatus = () => {
 
       {/* ─── Smart Status Section ─── */}
       {latestApp && (
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl shadow-blue-500/20 relative overflow-hidden group">
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
             <div className="space-y-1">
@@ -418,7 +418,7 @@ const ApplicationStatus = () => {
                 <span className="text-white/60 text-[10px] font-medium">• Last updated {new Date(latestApp.updatedAt).toLocaleDateString()}</span>
               </div>
               <h2 className="text-xl font-bold">Your profile is currently under review for {latestApp.job?.title}</h2>
-              <p className="text-blue-100 text-sm font-medium">Hiring team at {latestApp.job?.company?.name} is evaluating your profile for the next stage.</p>
+              <p className="text-indigo-200 text-sm font-medium">Hiring team at {latestApp.job?.company?.name} is evaluating your profile for the next stage.</p>
             </div>
             <div className="flex flex-wrap items-center gap-4">
               <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
@@ -430,7 +430,7 @@ const ApplicationStatus = () => {
               </div>
               <Button
                 variant="secondary"
-                className="bg-white text-blue-600 hover:bg-blue-50 rounded-xl font-bold shadow-lg"
+                className="bg-white text-indigo-400 hover:bg-indigo-500/10 rounded-xl font-bold shadow-lg"
                 onClick={() => setExpandedId(latestApp.id)}
               >
                 Track Journey
@@ -451,7 +451,7 @@ const ApplicationStatus = () => {
                 "px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap",
                 activeFilter === filter
                   ? "bg-slate-900 text-white shadow-lg"
-                  : "bg-white text-slate-500 hover:bg-slate-50 border border-slate-100"
+                  : "bg-white text-[#908fa0] hover:bg-[#191b22] border border-slate-100"
               )}
             >
               {filter}
@@ -462,7 +462,7 @@ const ApplicationStatus = () => {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
           <Input
             placeholder="Search company or role..."
-            className="pl-10 h-10 bg-white border-slate-100 rounded-xl text-sm focus-visible:ring-blue-500 shadow-sm"
+            className="pl-10 h-10 bg-[#1e1f26] border-[rgba(255,255,255,0.06)] rounded-xl text-sm focus-visible:ring-indigo-500/100 shadow-sm"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -486,14 +486,14 @@ const ApplicationStatus = () => {
           </div>
         ) : (
           <div className="py-20 flex flex-col items-center text-center">
-            <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center text-slate-200 mb-4 border border-slate-100">
+            <div className="w-20 h-20 bg-[#191b22] rounded-3xl flex items-center justify-center text-slate-200 mb-4 border border-slate-100">
               <Search size={40} />
             </div>
             <h3 className="text-lg font-bold text-slate-900">No applications found</h3>
-            <p className="text-slate-400 text-sm max-w-xs mt-1">We couldn't find any applications matching your current filters or search term.</p>
+            <p className="text-[#908fa0] text-sm max-w-xs mt-1">We couldn't find any applications matching your current filters or search term.</p>
             <Button
               variant="link"
-              className="text-blue-600 font-bold mt-4"
+              className="text-indigo-400 font-bold mt-4"
               onClick={() => { setSearchQuery(""); setActiveFilter("All"); }}
             >
               Reset all filters
@@ -503,18 +503,18 @@ const ApplicationStatus = () => {
       </div>
 
       {/* ─── Footer completion tip ─── */}
-      <div className="bg-amber-50 border border-amber-100 p-4 rounded-2xl flex items-start sm:items-center gap-4">
-        <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shrink-0">
+      <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl flex items-start sm:items-center gap-4">
+        <div className="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-400 shrink-0">
           <Sparkles size={20} />
         </div>
         <div className="flex-1">
-          <h4 className="text-sm font-bold text-amber-900">Career Pro-Tip</h4>
-          <p className="text-xs text-amber-700/80">Candidates with completed project portfolios and verified skills are 4.5x more likely to clear technical rounds.</p>
+          <h4 className="text-sm font-bold text-amber-300">Career Pro-Tip</h4>
+          <p className="text-xs text-amber-400/80">Candidates with completed project portfolios and verified skills are 4.5x more likely to clear technical rounds.</p>
         </div>
         <Button
           variant="outline"
           size="sm"
-          className="bg-white border-amber-200 text-amber-700 hover:bg-amber-50 rounded-xl font-bold hidden sm:flex"
+          className="bg-[#1e1f26] border-amber-200 text-amber-700 hover:bg-amber-50 rounded-xl font-bold hidden sm:flex"
           onClick={() => navigate('/student/profile')}
         >
           Update Portfolio

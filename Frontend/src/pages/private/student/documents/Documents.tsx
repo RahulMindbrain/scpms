@@ -160,7 +160,7 @@ const Documents = () => {
         <div className="flex justify-between mb-10">
           <div>
             <h2 className="text-2xl font-bold text-slate-900">Academic Records</h2>
-            <p className="text-slate-500 text-sm">
+            <p className="text-[#908fa0] text-sm">
               Manage and share your verified documents
             </p>
           </div>
@@ -182,7 +182,7 @@ const Documents = () => {
             <button
               onClick={() => fileInputRef.current?.click()}
               disabled={isUploading}
-              className="flex items-center gap-2 px-6 py-2.5 bg-blue-600 text-white rounded-xl"
+              className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-xl"
             >
               {isUploading ? <Loader size="sm" /> : <Upload size={16} />}
               {isUploading ? "Uploading..." : "Upload"}
@@ -197,7 +197,7 @@ const Documents = () => {
               key={cat}
               onClick={() => setActiveTab(cat)}
               className={`px-4 py-2 rounded-full text-sm ${
-                activeTab === cat ? 'bg-blue-100 text-blue-700' : 'bg-white'
+                activeTab === cat ? 'bg-indigo-500/15 text-indigo-300' : 'bg-white'
               }`}
             >
               {cat}
@@ -209,9 +209,9 @@ const Documents = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredDocs.length > 0 ? (
             filteredDocs.map((doc) => (
-              <div key={doc.id} className="bg-white p-5 rounded-xl border">
+              <div key={doc.id} className="bg-[#1e1f26] p-5 rounded-xl border">
 
-                <div className="relative group/card h-40 mb-3 rounded-lg overflow-hidden bg-slate-50 border border-slate-100 flex items-center justify-center">
+                <div className="relative group/card h-40 mb-3 rounded-lg overflow-hidden bg-[#191b22] border border-[rgba(255,255,255,0.06)] flex items-center justify-center">
                   {getThumbnail(doc) ? (
                     <img
                       src={getThumbnail(doc)}
@@ -223,7 +223,7 @@ const Documents = () => {
                       }}
                     />
                   ) : (
-                    <div className="p-4 bg-slate-50 text-slate-300">
+                    <div className="p-4 bg-[#191b22] text-slate-300">
                       <FileText size={48} />
                     </div>
                   )}
@@ -243,7 +243,7 @@ const Documents = () => {
                     {/* ⬇️ DOWNLOAD */}
                     <button
                       onClick={() => downloadFile(doc.url, doc.name)}
-                      className="p-2 hover:bg-blue-50 rounded-lg text-slate-500 hover:text-blue-600 transition-colors"
+                      className="p-2 hover:bg-indigo-500/10 rounded-lg text-[#908fa0] hover:text-indigo-400 transition-colors"
                       title="Download"
                     >
                       <Download size={16} />

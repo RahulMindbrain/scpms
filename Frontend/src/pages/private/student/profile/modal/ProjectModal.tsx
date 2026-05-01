@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -45,18 +45,18 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[520px] rounded-3xl p-8">
+      <DialogContent className="sm:max-w-[520px] rounded-2xl p-0 overflow-hidden bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] shadow-2xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-black uppercase tracking-tight text-slate-900">Add New Project</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 py-4 px-7">
           <div className="space-y-2">
             <Label htmlFor="title" className="text-xs font-black uppercase tracking-widest text-slate-500">Project Title</Label>
             <Input
               id="title"
               placeholder="e.g. AI Portfolio Platform"
-              className="rounded-2xl border-slate-200 focus:ring-blue-500/10 h-12 font-bold"
+              className="rounded-2xl border-[rgba(255,255,255,0.08)] focus:ring-indigo-500/10 h-12 font-bold"
               value={project.title}
               onChange={(e) => setProject({ ...project, title: e.target.value })}
             />
@@ -67,7 +67,7 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
             <Textarea
               id="description"
               placeholder="Tell us about your project..."
-              className="rounded-2xl border-slate-200 focus:ring-blue-500/10 min-h-[100px] font-medium"
+              className="rounded-2xl border-[rgba(255,255,255,0.08)] focus:ring-indigo-500/10 min-h-[100px] font-medium"
               value={project.description}
               onChange={(e) => setProject({ ...project, description: e.target.value })}
             />
@@ -78,7 +78,7 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
             <Input
               id="techStack"
               placeholder="React, TypeScript, Tailwind"
-              className="rounded-2xl border-slate-200 focus:ring-blue-500/10 h-12 font-bold"
+              className="rounded-2xl border-[rgba(255,255,255,0.08)] focus:ring-indigo-500/10 h-12 font-bold"
               value={project.techStack}
               onChange={(e) => setProject({ ...project, techStack: e.target.value })}
             />
@@ -92,7 +92,7 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
                 <Input
                   id="githubUrl"
                   placeholder="https://github.com..."
-                  className="rounded-2xl border-slate-200 focus:ring-blue-500/10 h-12 font-bold pl-10"
+                  className="rounded-2xl border-[rgba(255,255,255,0.08)] focus:ring-indigo-500/10 h-12 font-bold pl-10"
                   value={project.githubUrl}
                   onChange={(e) => setProject({ ...project, githubUrl: e.target.value })}
                 />
@@ -105,7 +105,7 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
                 <Input
                   id="liveUrl"
                   placeholder="https://project.com..."
-                  className="rounded-2xl border-slate-200 focus:ring-blue-500/10 h-12 font-bold pl-10"
+                  className="rounded-2xl border-[rgba(255,255,255,0.08)] focus:ring-indigo-500/10 h-12 font-bold pl-10"
                   value={project.liveUrl}
                   onChange={(e) => setProject({ ...project, liveUrl: e.target.value })}
                 />
@@ -118,13 +118,13 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
           <Button
             variant="outline"
             onClick={onClose}
-            className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest border-slate-200"
+            className="flex-1 rounded-xl h-11 font-bold border-[rgba(255,255,255,0.1)] text-[#c7c4d7] hover:bg-[rgba(255,255,255,0.05)]"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
-            className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-700 shadow-lg shadow-blue-500/20"
+            className="flex-1 rounded-xl h-11 font-bold bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20"
           >
             Add Project
           </Button>

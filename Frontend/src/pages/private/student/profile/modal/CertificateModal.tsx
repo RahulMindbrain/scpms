@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
 import { Upload } from "lucide-react";
 import Loader from "@/components/Loader";
@@ -47,18 +47,18 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] rounded-3xl p-8">
+      <DialogContent className="sm:max-w-[500px] rounded-2xl p-0 overflow-hidden bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] shadow-2xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-black uppercase tracking-tight text-slate-900">Add Certificate</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 py-4 px-7">
           <div className="space-y-2">
             <Label htmlFor="title" className="text-xs font-black uppercase tracking-widest text-slate-500">Certificate Title</Label>
             <Input
               id="title"
               placeholder="Full Stack Web Development"
-              className="rounded-2xl h-12 border-slate-200"
+              className="rounded-xl h-11 border-[rgba(255,255,255,0.08)]"
               value={certificate.title}
               onChange={(e) => setCertificate({ ...certificate, title: e.target.value })}
             />
@@ -69,7 +69,7 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
             <Input
               id="issuer"
               placeholder="Coursera / Udemy / LinkedIn"
-              className="rounded-2xl h-12 border-slate-200"
+              className="rounded-xl h-11 border-[rgba(255,255,255,0.08)]"
               value={certificate.issuer}
               onChange={(e) => setCertificate({ ...certificate, issuer: e.target.value })}
             />
@@ -80,7 +80,7 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
             <Input
               id="date"
               type="date"
-              className="rounded-2xl h-12 border-slate-200"
+              className="rounded-xl h-11 border-[rgba(255,255,255,0.08)]"
               value={certificate.issuedDate}
               onChange={(e) => setCertificate({ ...certificate, issuedDate: e.target.value })}
             />
@@ -89,9 +89,9 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
           <div className="space-y-2">
             <Label className="text-xs font-black uppercase tracking-widest text-slate-500">Certificate File (Optional)</Label>
             <div className="flex items-center gap-4">
-               <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all group">
-                  {isUploading ? <Loader size="sm" /> : <Upload size={18} className="text-slate-400 group-hover:text-blue-500" />}
-                  <span className="text-sm font-bold text-slate-500 group-hover:text-blue-700">
+               <label className="flex-1 flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-[rgba(255,255,255,0.08)] rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-indigo-500/10 transition-all group">
+                  {isUploading ? <Loader size="sm" /> : <Upload size={18} className="text-[#908fa0] group-hover:text-blue-500" />}
+                  <span className="text-sm font-bold text-[#908fa0] group-hover:text-blue-700">
                     {file ? file.name : 'Click to upload PDF/Image'}
                   </span>
                   <input
@@ -105,14 +105,14 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
           </div>
         </div>
 
-        <DialogFooter className="flex-row gap-3 mt-2">
-          <Button variant="outline" onClick={onClose} className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest border-slate-200">
+        <DialogFooter className="flex-row gap-3 mt-2 px-7 pb-7">
+          <Button variant="outline" onClick={onClose} className="flex-1 rounded-xl h-11 font-bold border-[rgba(255,255,255,0.1)] text-[#c7c4d7] hover:bg-[rgba(255,255,255,0.05)]">
             Cancel
           </Button>
           <Button 
             onClick={handleSubmit} 
             disabled={isUploading}
-            className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest bg-blue-600 hover:bg-blue-700 text-white"
+            className="flex-1 rounded-xl h-11 font-bold bg-indigo-600 hover:bg-indigo-700 text-white"
           >
             {isUploading ? "Uploading..." : "Add"}
           </Button>

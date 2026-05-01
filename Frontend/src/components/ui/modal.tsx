@@ -33,33 +33,38 @@ export const Modal: React.FC<ModalProps> = ({
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent 
+      <DialogContent
         onInteractOutside={(e) => {
           if (preventOutsideClick) {
             e.preventDefault();
           }
         }}
-        className={cn(maxWidth, "rounded-[2rem] p-0 overflow-hidden border-none shadow-2xl", className)}
+        className={cn(
+          maxWidth,
+          "rounded-[1.5rem] p-0 overflow-hidden shadow-2xl",
+          "bg-[#1e1f26] border border-[rgba(255,255,255,0.08)]",
+          className
+        )}
       >
         {(title || subtitle) && (
-          <DialogHeader className="p-8 pb-0 space-y-1">
+          <DialogHeader className="p-7 pb-4 space-y-1 border-b border-[rgba(255,255,255,0.06)]">
             {title && (
-              <DialogTitle className="text-2xl font-black text-slate-900 tracking-tight">
+              <DialogTitle className="text-xl font-bold text-[#e2e2eb] tracking-tight">
                 {title}
               </DialogTitle>
             )}
             {subtitle && (
-              <DialogDescription className="text-slate-500 font-medium text-base">
+              <DialogDescription className="text-[#908fa0] font-medium text-sm">
                 {subtitle}
               </DialogDescription>
             )}
           </DialogHeader>
         )}
-        <div className="p-8 pt-6">
+        <div className="p-7 pt-5">
           {children}
         </div>
         {footer && (
-          <div className="p-8 pt-0 flex items-center justify-end gap-3 border-t border-slate-50 bg-slate-50/50 mt-2">
+          <div className="p-7 pt-0 flex items-center justify-end gap-3 border-t border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] mt-2">
             {footer}
           </div>
         )}

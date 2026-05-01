@@ -31,7 +31,7 @@ const UpcomingInterviews: Interview[] = [
     location: 'meet.google.com/abc-def',
     type: 'online',
     logoText: 'G',
-    accentColor: 'bg-blue-600',
+    accentColor: 'bg-indigo-600',
   },
   {
     id: 2,
@@ -71,9 +71,9 @@ const InterviewSchedule: React.FC = () => {
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-slate-800">Upcoming Interviews</h2>
-              <p className="text-slate-500 text-sm mt-1">You have {UpcomingInterviews.length} interviews scheduled for this week.</p>
+              <p className="text-[#908fa0] text-sm mt-1">You have {UpcomingInterviews.length} interviews scheduled for this week.</p>
             </div>
-            {/* <button className="text-sm font-semibold text-blue-600 hover:text-blue-700 bg-blue-50 px-4 py-2 rounded-lg transition-colors">
+            {/* <button className="text-sm font-semibold text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 px-4 py-2 rounded-lg transition-colors">
               View Calendar
             </button> */}
           </div>
@@ -82,7 +82,7 @@ const InterviewSchedule: React.FC = () => {
             {UpcomingInterviews.map((item) => (
               <div 
                 key={item.id} 
-                className={`group relative bg-white border rounded-2xl p-5 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 ${
+                className={`group relative bg-[#1e1f26] border rounded-2xl p-5 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 ${
                   item.type === 'online' 
                     ? 'border-emerald-200/60 hover:border-emerald-300' 
                     : 'border-amber-200/60 hover:border-amber-300'
@@ -104,8 +104,8 @@ const InterviewSchedule: React.FC = () => {
                           {item.type}
                         </span>
                       </div>
-                      <p className="text-slate-600 font-medium">{item.role}</p>
-                      <p className="text-slate-400 text-xs mt-0.5">{item.round}</p>
+                      <p className="text-[#c7c4d7] font-medium">{item.role}</p>
+                      <p className="text-[#908fa0] text-xs mt-0.5">{item.round}</p>
                     </div>
                   </div>
 
@@ -122,11 +122,11 @@ const InterviewSchedule: React.FC = () => {
                     </div>
                     
                     {item.type === 'online' ? (
-                      <a href={`https://${item.location}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-all shadow-sm">
+                      <a href={`https://${item.location}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-all shadow-sm">
                         Join Meeting <ExternalLink size={12} />
                       </a>
                     ) : (
-                      <button className="flex items-center gap-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg transition-all">
+                      <button className="flex items-center gap-2 text-xs font-bold text-[#c7c4d7] bg-[rgba(255,255,255,0.06)] hover:bg-slate-200 px-4 py-2 rounded-lg transition-all">
                         View Map <MapPin size={12} />
                       </button>
                     )}
@@ -142,21 +142,21 @@ const InterviewSchedule: React.FC = () => {
           {/* <div className="bg-slate-900 rounded-2xl p-6 text-white overflow-hidden relative">
             <div className="relative z-10">
               <h3 className="text-lg font-bold mb-2">Interview Prep</h3>
-              <p className="text-slate-400 text-sm mb-4">Complete your mock assessment to increase your chances by 40%.</p>
-              <button className="w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold text-sm transition-colors">
+              <p className="text-[#908fa0] text-sm mb-4">Complete your mock assessment to increase your chances by 40%.</p>
+              <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-500/100 rounded-xl font-bold text-sm transition-colors">
                 Start Mock Test
               </button>
             </div>
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-blue-500/20 rounded-full blur-2xl"></div>
+            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/100/20 rounded-full blur-2xl"></div>
           </div> */}
 
-          {/* <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          {/* <div className="bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] rounded-2xl p-6 shadow-sm">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-2">
                 <History size={18} className="text-slate-400" />
                 <h2 className="font-bold text-slate-800">Recent Activity</h2>
               </div>
-              <MoreVertical size={16} className="text-slate-400 cursor-pointer" />
+              <MoreVertical size={16} className="text-[#908fa0] cursor-pointer" />
             </div>
 
             <div className="space-y-6">
@@ -165,7 +165,7 @@ const InterviewSchedule: React.FC = () => {
                 <div>
                   <p className="text-sm font-bold text-slate-800">Apple Inc.</p>
                   <p className="text-xs text-slate-500">Technical Round 1 Completed</p>
-                  <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold">Apr 8 • 2:00 PM</p>
+                  <p className="text-[10px] text-[#908fa0] mt-1 uppercase font-bold">Apr 8 • 2:00 PM</p>
                 </div>
               </div>
               <div className="flex gap-4">
@@ -173,12 +173,12 @@ const InterviewSchedule: React.FC = () => {
                 <div>
                   <p className="text-sm font-bold text-slate-800">Netflix</p>
                   <p className="text-xs text-slate-500">Application Viewed</p>
-                  <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold">Apr 7 • 10:45 AM</p>
+                  <p className="text-[10px] text-[#908fa0] mt-1 uppercase font-bold">Apr 7 • 10:45 AM</p>
                 </div>
               </div>
             </div>
 
-            <button className="w-full mt-8 flex items-center justify-center gap-2 text-sm font-bold text-slate-500 hover:text-blue-600 transition-colors">
+            <button className="w-full mt-8 flex items-center justify-center gap-2 text-sm font-bold text-[#908fa0] hover:text-indigo-400 transition-colors">
               View All History <ChevronRight size={16} />
             </button>
           </div> */}

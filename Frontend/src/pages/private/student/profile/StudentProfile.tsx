@@ -131,7 +131,7 @@ const StudentProfile = () => {
         skills: backendProfile.skills?.map((s: any) => ({
           id: s.id,
           name: typeof s === 'string' ? s : s.name,
-          color: 'bg-blue-500'
+          color: 'bg-indigo-500/100'
         })) || [],
         resumeUrl: backendProfile.resumeUrl || ''
       }));
@@ -370,12 +370,12 @@ const StudentProfile = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-2">
             <h1 className="text-4xl lg:text-5xl font-black tracking-tight text-slate-900">Personal <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Profile</span></h1>
-            <p className="text-lg text-slate-500 font-medium italic">Manage your professional identity and academic records.</p>
+            <p className="text-lg text-[#908fa0] font-medium italic">Manage your professional identity and academic records.</p>
           </div>
           <Button
             onClick={() => setShowProfileEditDialog(true)}
             disabled={backendLoading}
-            className="group gap-2 rounded-2xl h-12 px-8 font-bold shadow-lg shadow-blue-600/20 transition-all bg-blue-600 hover:bg-blue-700 active:scale-95"
+            className="group gap-2 rounded-2xl h-12 px-8 font-bold shadow-lg shadow-blue-600/20 transition-all bg-indigo-600 hover:bg-indigo-700 active:scale-95"
           >
             {backendLoading ? <Loader size="sm" /> : <Edit3 className="h-4 w-4 transition-transform group-hover:rotate-12" />}
             Edit Profile
@@ -396,7 +396,7 @@ const StudentProfile = () => {
                     {profile.profileImage ? (
                       <AvatarImage src={profile.profileImage} alt={profile.name} className="object-cover" />
                     ) : (
-                      <AvatarFallback className="text-3xl font-black bg-blue-50 text-blue-600">
+                      <AvatarFallback className="text-3xl font-black bg-indigo-500/10 text-blue-600">
                         {profile.name.split(' ').map((n: string) => n[0]).join('')}
                       </AvatarFallback>
                     )}
@@ -404,25 +404,25 @@ const StudentProfile = () => {
                 </div>
                 
                 <div className="mt-6 space-y-1">
-                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">{profile.name}</h2>
-                  <p className="text-sm font-black text-blue-600 uppercase tracking-widest">{profile.stats?.department || 'Department'}</p>
+                  <h2 className="text-2xl font-black text-[#e2e2eb] tracking-tight">{profile.name}</h2>
+                  <p className="text-sm font-black text-indigo-400 uppercase tracking-widest">{profile.stats?.department || 'Department'}</p>
                 </div>
 
                 <div className="flex flex-wrap justify-center gap-2 mt-4">
-                  <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-none px-3 py-1 font-black text-[10px] uppercase tracking-widest">Year {profile.stats?.year || '1'}</Badge>
-                  <Badge variant="secondary" className="bg-slate-100 text-slate-600 border-none px-3 py-1 font-black text-[10px] uppercase tracking-widest">Class of {profile.stats?.passingYear || 'N/A'}</Badge>
+                  <Badge variant="secondary" className="bg-[rgba(255,255,255,0.06)] text-[#c7c4d7] border-none px-3 py-1 font-black text-[10px] uppercase tracking-widest">Year {profile.stats?.year || '1'}</Badge>
+                  <Badge variant="secondary" className="bg-[rgba(255,255,255,0.06)] text-[#c7c4d7] border-none px-3 py-1 font-black text-[10px] uppercase tracking-widest">Class of {profile.stats?.passingYear || 'N/A'}</Badge>
                 </div>
 
                 {/* Profile Completion Circular Progress */}
-                <div className="mt-8 p-6 rounded-[2rem] bg-slate-50/50 border border-slate-100 flex items-center gap-5">
+                <div className="mt-8 p-6 rounded-[2rem] bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.06)] flex items-center gap-5">
                   <ProgressRing percent={completion.percent} size={64} stroke={6} />
                   <div className="text-left">
-                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Strength</p>
-                    <p className="text-sm font-black text-slate-700 tracking-tight">
+                    <p className="text-xs font-black text-[#908fa0] uppercase tracking-widest">Strength</p>
+                    <p className="text-sm font-black text-[#c7c4d7] tracking-tight">
                       {completion.percent === 100 ? "Profile Perfect!" : "Keep it going!"}
                     </p>
                     {completion.missing.length > 0 && (
-                      <p className="text-[10px] text-slate-400 font-bold mt-0.5">Missing: {completion.missing[0]}</p>
+                      <p className="text-[10px] text-[#908fa0] font-bold mt-0.5">Missing: {completion.missing[0]}</p>
                     )}
                   </div>
                 </div>
@@ -430,28 +430,28 @@ const StudentProfile = () => {
                 <Separator className="my-8 opacity-50" />
 
                 <div className="space-y-4">
-                  <div className="flex items-center gap-4 text-left p-4 rounded-2xl bg-slate-50/30 border border-transparent hover:border-slate-100 hover:bg-white hover:shadow-sm transition-all group">
-                    <div className="h-10 w-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shrink-0 transition-colors group-hover:bg-blue-600 group-hover:text-white">
+                  <div className="flex items-center gap-4 text-left p-4 rounded-2xl bg-[rgba(255,255,255,0.02)] border border-transparent hover:border-[rgba(255,255,255,0.06)] hover:bg-white hover:shadow-sm transition-all group">
+                    <div className="h-10 w-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 shrink-0 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
                       <Mail className="h-5 w-5" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">Primary Email</p>
-                      <p className="truncate text-slate-700 font-black text-sm tracking-tight" title={profile.email}>{profile.email || 'N/A'}</p>
+                      <p className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest leading-none mb-1.5">Primary Email</p>
+                      <p className="truncate text-[#c7c4d7] font-black text-sm tracking-tight" title={profile.email}>{profile.email || 'N/A'}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4 text-left p-4 rounded-2xl bg-slate-50/30 border border-transparent hover:border-slate-100 hover:bg-white hover:shadow-sm transition-all group">
+                  <div className="flex items-center gap-4 text-left p-4 rounded-2xl bg-[rgba(255,255,255,0.02)] border border-transparent hover:border-[rgba(255,255,255,0.06)] hover:bg-white hover:shadow-sm transition-all group">
                     <div className="h-10 w-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0 transition-colors group-hover:bg-indigo-600 group-hover:text-white">
                       <ExternalLink className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1.5">LinkedIn</p>
+                      <p className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest leading-none mb-1.5">LinkedIn</p>
                       {profile.linkedinUrl ? (
                         <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer" className="truncate text-indigo-600 font-black text-sm hover:underline flex items-center gap-1 tracking-tight">
                           Profile Link <ExternalLink className="h-3 w-3" />
                         </a>
                       ) : (
-                        <p className="text-slate-400 font-medium text-sm italic">Not linked</p>
+                        <p className="text-[#908fa0] font-medium text-sm italic">Not linked</p>
                       )}
                     </div>
                   </div>
@@ -459,17 +459,17 @@ const StudentProfile = () => {
 
                 <div className="mt-8 flex justify-center gap-3">
                   {profile.linkedinUrl && (
-                    <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer" className="h-12 w-12 rounded-2xl border border-slate-100 flex items-center justify-center text-slate-700 hover:bg-blue-600 hover:text-white hover:border-transparent transition-all">
+                    <a href={profile.linkedinUrl} target="_blank" rel="noopener noreferrer" className="h-12 w-12 rounded-2xl border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-[#c7c4d7] hover:bg-indigo-600 hover:text-white hover:border-transparent transition-all">
                       <Briefcase className="h-5 w-5" />
                     </a>
                   )}
                   {profile.githubUrl && (
-                    <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="h-12 w-12 rounded-2xl border border-slate-100 flex items-center justify-center text-slate-700 hover:bg-slate-900 hover:text-white hover:border-transparent transition-all">
+                    <a href={profile.githubUrl} target="_blank" rel="noopener noreferrer" className="h-12 w-12 rounded-2xl border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-[#c7c4d7] hover:bg-slate-900 hover:text-white hover:border-transparent transition-all">
                       <Code2 className="h-5 w-5" />
                     </a>
                   )}
                   {profile.portfolioUrl && (
-                    <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer" className="h-12 w-12 rounded-2xl border border-slate-100 flex items-center justify-center text-slate-700 hover:bg-blue-600 hover:text-white hover:border-transparent transition-all">
+                    <a href={profile.portfolioUrl} target="_blank" rel="noopener noreferrer" className="h-12 w-12 rounded-2xl border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-[#c7c4d7] hover:bg-indigo-600 hover:text-white hover:border-transparent transition-all">
                       <Globe className="h-5 w-5" />
                     </a>
                   )}
@@ -494,14 +494,14 @@ const StudentProfile = () => {
                 </div>
                 
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Backlogs</p>
+                  <div className="p-4 rounded-2xl bg-[#191b22] border border-slate-100">
+                    <p className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest mb-1">Backlogs</p>
                     <p className={`text-lg font-black ${profile.stats?.activeBacklogs > 0 ? 'text-rose-500' : 'text-emerald-500'}`}>
                       {profile.stats?.activeBacklogs || '0'}
                     </p>
                   </div>
-                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Credits</p>
+                  <div className="p-4 rounded-2xl bg-[#191b22] border border-slate-100">
+                    <p className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest mb-1">Credits</p>
                     <p className="text-lg font-black text-slate-700">NA</p>
                   </div>
                 </div>
@@ -512,7 +512,7 @@ const StudentProfile = () => {
           {/* Right Content Area */}
           <div className="lg:col-span-8">
             <Tabs defaultValue="overview" className="w-full">
-              <TabsList className="w-full justify-start h-auto bg-transparent border-b border-slate-200 rounded-none p-0 gap-8 mb-8 relative">
+              <TabsList className="w-full justify-start h-auto bg-transparent border-b border-[rgba(255,255,255,0.08)] rounded-none p-0 gap-8 mb-8 relative">
                 {[
                   { value: 'overview', label: 'Overview' },
                   { value: 'experience', label: 'Experience' },
@@ -521,7 +521,7 @@ const StudentProfile = () => {
                   <TabsTrigger 
                     key={tab.value}
                     value={tab.value} 
-                    className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-blue-600 text-slate-400 rounded-none px-0 py-4 border-b-2 border-transparent data-[state=active]:border-blue-600 transition-all font-black text-xs uppercase tracking-widest"
+                    className="data-[state=active]:bg-transparent data-[state=active]:shadow-none data-[state=active]:text-indigo-400 text-[#908fa0] rounded-none px-0 py-4 border-b-2 border-transparent data-[state=active]:border-blue-600 transition-all font-black text-xs uppercase tracking-widest"
                   >
                     {tab.label}
                   </TabsTrigger>
@@ -549,12 +549,12 @@ const StudentProfile = () => {
                             variant="ghost" 
                             size="sm" 
                             onClick={() => setShowProfileEditDialog(true)}
-                            className="text-blue-600 hover:bg-blue-50 font-black text-xs uppercase tracking-widest rounded-xl"
+                            className="text-indigo-400 hover:bg-indigo-500/10 font-black text-xs uppercase tracking-widest rounded-xl"
                           >
                             Manage Skills
                           </Button>
                         </div>
-                        <CardDescription className="text-slate-500 font-medium">Core competencies and technical stack.</CardDescription>
+                        <CardDescription className="text-[#908fa0] font-medium">Core competencies and technical stack.</CardDescription>
                       </CardHeader>
                       <CardContent className="pt-8">
                         {profile.skills?.length > 0 ? (
@@ -565,22 +565,22 @@ const StudentProfile = () => {
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                               >
-                                <Badge className="px-4 py-2 text-xs font-black uppercase tracking-widest bg-blue-50 text-blue-700 hover:bg-blue-600 hover:text-white transition-all cursor-default rounded-2xl border-none shadow-sm">
+                                <Badge className="px-4 py-2 text-xs font-black uppercase tracking-widest bg-indigo-500/10 text-indigo-300 hover:bg-indigo-600 hover:text-white transition-all cursor-default rounded-2xl border-none shadow-sm">
                                   {skill.name}
                                 </Badge>
                               </motion.div>
                             ))}
                           </div>
                         ) : (
-                          <div className="flex flex-col items-center py-16 border-2 border-dashed rounded-[2rem] bg-slate-50/50 border-slate-200">
+                          <div className="flex flex-col items-center py-16 border-2 border-dashed rounded-[2rem] bg-[rgba(255,255,255,0.02)] border-slate-200">
                             <div className="h-20 w-20 rounded-[2rem] bg-white shadow-lg flex items-center justify-center mb-6">
                               <Lightbulb className="h-10 w-10 text-amber-500" />
                             </div>
-                            <h4 className="text-lg font-bold text-slate-900 mb-2">Build your technical profile</h4>
-                            <p className="text-sm text-slate-500 mb-8 max-w-sm text-center font-medium">Add programming languages, frameworks, and tools to catch the eye of top recruitment teams.</p>
+                            <h4 className="text-lg font-bold text-[#e2e2eb] mb-2">Build your technical profile</h4>
+                            <p className="text-sm text-[#908fa0] mb-8 max-w-sm text-center font-medium">Add programming languages, frameworks, and tools to catch the eye of top recruitment teams.</p>
                             <Button
                               onClick={() => setShowProfileEditDialog(true)}
-                              className="gap-2 rounded-2xl font-bold bg-blue-600 shadow-lg shadow-blue-600/20 px-8"
+                              className="gap-2 rounded-2xl font-bold bg-indigo-600 shadow-lg shadow-blue-600/20 px-8"
                             >
                               <Plus className="h-4 w-4" /> Add Skills
                             </Button>
@@ -595,8 +595,8 @@ const StudentProfile = () => {
                           <div className="p-3 rounded-2xl bg-indigo-50 text-indigo-600 mb-6 w-fit">
                             <Bell className="h-6 w-6" />
                           </div>
-                          <h3 className="text-lg font-bold text-slate-900 mb-2">Professional Journey</h3>
-                          <p className="text-slate-500 text-sm font-medium leading-relaxed">
+                          <h3 className="text-lg font-bold text-[#e2e2eb] mb-2">Professional Journey</h3>
+                          <p className="text-[#908fa0] text-sm font-medium leading-relaxed">
                             You have documented <span className="text-indigo-600 font-bold">{profile.experiences?.length || 0} work experiences</span>. Keeping this updated helps in career matching.
                           </p>
                        </Card>
@@ -604,8 +604,8 @@ const StudentProfile = () => {
                           <div className="p-3 rounded-2xl bg-emerald-50 text-emerald-600 mb-6 w-fit">
                             <CheckCircle className="h-6 w-6" />
                           </div>
-                          <h3 className="text-lg font-bold text-slate-900 mb-2">Projects & Impact</h3>
-                          <p className="text-slate-500 text-sm font-medium leading-relaxed">
+                          <h3 className="text-lg font-bold text-[#e2e2eb] mb-2">Projects & Impact</h3>
+                          <p className="text-[#908fa0] text-sm font-medium leading-relaxed">
                             Showcasing <span className="text-violet-600 font-bold">{profile.projects?.length || 0} key projects</span>. Real-world applications demonstrate your solving abilities.
                           </p>
                        </Card>
@@ -630,7 +630,7 @@ const StudentProfile = () => {
                           </CardTitle>
                           <CardDescription className="font-medium">Internships and professional roles.</CardDescription>
                         </div>
-                        <Button onClick={() => setShowExperienceModal(true)} className="gap-2 rounded-2xl bg-blue-600 font-black text-xs uppercase tracking-widest px-6 h-10 shadow-lg shadow-blue-600/20">
+                        <Button onClick={() => setShowExperienceModal(true)} className="gap-2 rounded-2xl bg-indigo-600 font-black text-xs uppercase tracking-widest px-6 h-10 shadow-lg shadow-blue-600/20">
                           <Plus className="h-4 w-4" /> Add Experience
                         </Button>
                       </CardHeader>
@@ -638,21 +638,21 @@ const StudentProfile = () => {
                         {profile.experiences?.length > 0 ? profile.experiences.map((exp: any, i: number) => (
                           <div key={i} className="group flex gap-6 relative">
                             <div className="shrink-0">
-                               <div className="h-14 w-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-blue-600 group-hover:text-white group-hover:border-transparent transition-all duration-300">
+                               <div className="h-14 w-14 rounded-2xl bg-[#191b22] border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-[#908fa0] group-hover:bg-indigo-600 group-hover:text-white group-hover:border-transparent transition-all duration-300">
                                   <Building2 className="h-7 w-7" />
                                </div>
                             </div>
                             <div className="flex-1 min-w-0 space-y-3">
                               <div className="flex items-start justify-between">
                                 <div className="space-y-1">
-                                  <h4 className="text-lg font-black text-slate-900 leading-tight">{exp.companyName}</h4>
-                                  <p className="text-blue-600 font-black text-xs uppercase tracking-widest flex items-center gap-2">
+                                  <h4 className="text-lg font-black text-[#e2e2eb] leading-tight">{exp.companyName}</h4>
+                                  <p className="text-indigo-400 font-black text-xs uppercase tracking-widest flex items-center gap-2">
                                     {exp.role} 
                                     <span className="h-1 w-1 rounded-full bg-slate-300"></span>
                                     <span className="text-slate-400">{exp.startDate} — {exp.endDate || 'Present'}</span>
                                   </p>
                                 </div>
-                                <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-300 hover:bg-rose-50 hover:text-rose-600 rounded-xl transition-all"
+                                <Button variant="ghost" size="icon" className="h-10 w-10 text-[#908fa0] hover:bg-rose-50 hover:text-rose-600 rounded-xl transition-all"
                                   onClick={() => {
                                     const expId = profile.experiences[i]?.id;
                                     const updated = profile.experiences.filter((e: any) => e.id !== expId);
@@ -664,12 +664,12 @@ const StudentProfile = () => {
                                 </Button>
                               </div>
                               {exp.description && (
-                                <p className="text-slate-500 text-[14px] leading-relaxed font-medium bg-slate-50/50 p-4 rounded-2xl border border-slate-50">{exp.description}</p>
+                                <p className="text-[#908fa0] text-[14px] leading-relaxed font-medium bg-[rgba(255,255,255,0.02)] p-4 rounded-2xl border border-slate-50">{exp.description}</p>
                               )}
                             </div>
                           </div>
                         )) : (
-                          <div className="text-center py-12 border-2 border-dashed rounded-[2rem] bg-slate-50/30 text-slate-400 font-bold">
+                          <div className="text-center py-12 border-2 border-dashed rounded-[2rem] bg-[rgba(255,255,255,0.02)] text-[#908fa0] font-bold">
                             No professional experience listed yet.
                           </div>
                         )}
@@ -696,19 +696,19 @@ const StudentProfile = () => {
                             <motion.div 
                               key={i} 
                               whileHover={{ y: -5 }}
-                              className="group p-6 rounded-[2rem] border border-slate-100 bg-white hover:shadow-2xl hover:shadow-slate-200/50 transition-all flex flex-col h-full"
+                              className="group p-6 rounded-[2rem] border border-[rgba(255,255,255,0.06)] bg-white hover:shadow-2xl hover:shadow-slate-200/50 transition-all flex flex-col h-full"
                             >
                               <div className="flex justify-between items-start mb-4">
-                                <h4 className="text-lg font-black text-slate-900 line-clamp-1">{proj.title}</h4>
+                                <h4 className="text-lg font-black text-[#e2e2eb] line-clamp-1">{proj.title}</h4>
                                 <div className="flex gap-2">
-                                  {proj.githubUrl && <a href={proj.githubUrl} className="p-2 bg-slate-50 rounded-xl text-slate-400 hover:text-slate-900 transition-colors"><Code2 className="h-4 w-4" /></a>}
-                                  {proj.liveUrl && <a href={proj.liveUrl} className="p-2 bg-blue-50 rounded-xl text-blue-400 hover:text-blue-600 transition-colors"><ExternalLink className="h-4 w-4" /></a>}
+                                  {proj.githubUrl && <a href={proj.githubUrl} className="p-2 bg-[#191b22] rounded-xl text-[#908fa0] hover:text-[#e2e2eb] transition-colors"><Code2 className="h-4 w-4" /></a>}
+                                  {proj.liveUrl && <a href={proj.liveUrl} className="p-2 bg-indigo-500/10 rounded-xl text-blue-400 hover:text-indigo-400 transition-colors"><ExternalLink className="h-4 w-4" /></a>}
                                 </div>
                               </div>
-                              <p className="text-slate-500 text-sm font-medium mb-6 flex-1 line-clamp-3">{proj.description}</p>
+                              <p className="text-[#908fa0] text-sm font-medium mb-6 flex-1 line-clamp-3">{proj.description}</p>
                               <div className="flex flex-wrap gap-2 mb-6">
                                 {proj.techStack?.split(',').map((tag: string) => tag.trim()).filter(Boolean).slice(0, 3).map((tag: string, idx: number) => (
-                                  <span key={`${tag}-${idx}`} className="px-3 py-1 bg-slate-50 text-slate-500 rounded-lg text-[10px] font-black uppercase tracking-widest">{tag}</span>
+                                  <span key={`${tag}-${idx}`} className="px-3 py-1 bg-[#191b22] text-[#908fa0] rounded-lg text-[10px] font-black uppercase tracking-widest">{tag}</span>
                                 ))}
                               </div>
                               <Button variant="ghost" size="sm" className="w-full justify-between font-black text-xs uppercase tracking-widest text-rose-500 hover:bg-rose-50 rounded-xl h-10 px-4"
@@ -723,7 +723,7 @@ const StudentProfile = () => {
                               </Button>
                             </motion.div>
                           )) : (
-                            <div className="col-span-full text-center py-12 border-2 border-dashed rounded-[2rem] bg-slate-50/30 text-slate-400 font-bold">
+                            <div className="col-span-full text-center py-12 border-2 border-dashed rounded-[2rem] bg-[rgba(255,255,255,0.02)] text-[#908fa0] font-bold">
                               Add projects to showcase your practical skills.
                             </div>
                           )}
@@ -745,10 +745,10 @@ const StudentProfile = () => {
                       <div className="p-8 flex flex-col md:flex-row items-center justify-between gap-8 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
                         <div className="text-center md:text-left space-y-2">
                            <h3 className="text-2xl font-black">Official Resume</h3>
-                           <p className="text-slate-400 font-medium">Upload your latest PDF resume for recruiters.</p>
+                           <p className="text-[#908fa0] font-medium">Upload your latest PDF resume for recruiters.</p>
                         </div>
                         <label className="shrink-0 w-full md:w-auto">
-                          <Button asChild className="w-full md:w-auto gap-3 rounded-2xl bg-blue-600 px-8 py-7 font-black shadow-xl shadow-blue-600/20 transition-all hover:bg-blue-700 active:scale-95 cursor-pointer">
+                          <Button asChild className="w-full md:w-auto gap-3 rounded-2xl bg-indigo-600 px-8 py-7 font-black shadow-xl shadow-blue-600/20 transition-all hover:bg-indigo-700 active:scale-95 cursor-pointer">
                             <span>
                               {isUploadingResume ? <Loader size="sm" /> : <Upload className="h-5 w-5" />}
                               {profile.resumeUrl ? "Update Resume" : "Upload Resume"}
@@ -759,25 +759,25 @@ const StudentProfile = () => {
                       </div>
                       <CardContent className="p-8">
                         {profile.resumeUrl ? (
-                          <div className="flex items-center justify-between p-6 border border-slate-100 rounded-[2rem] bg-slate-50/50">
+                          <div className="flex items-center justify-between p-6 border border-[rgba(255,255,255,0.06)] rounded-[2rem] bg-[rgba(255,255,255,0.02)]">
                              <div className="flex items-center gap-6">
-                                <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-slate-100 flex items-center justify-center text-rose-500">
+                                <div className="h-16 w-16 bg-white rounded-2xl shadow-sm border border-[rgba(255,255,255,0.06)] flex items-center justify-center text-rose-500">
                                    <FileText className="h-8 w-8" />
                                 </div>
                                 <div>
                                    <p className="font-black text-slate-900">current_resume.pdf</p>
-                                   <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Uploaded to secure cloud</p>
+                                   <p className="text-xs font-bold text-[#908fa0] uppercase tracking-widest mt-1">Uploaded to secure cloud</p>
                                 </div>
                              </div>
                              <Button 
                               onClick={() => openFile(profile.resumeUrl, "Resume.pdf")}
-                              className="rounded-xl font-bold bg-white text-slate-900 border border-slate-200 hover:bg-slate-50 px-6 h-12 shadow-sm"
+                              className="rounded-xl font-bold bg-white text-[#e2e2eb] border border-[rgba(255,255,255,0.08)] hover:bg-[#191b22] px-6 h-12 shadow-sm"
                              >
                                 Preview <ArrowRight className="ml-2 h-4 w-4" />
                              </Button>
                           </div>
                         ) : (
-                          <div className="text-center py-12 border-2 border-dashed rounded-[2rem] bg-slate-50/30 text-slate-400 font-bold">
+                          <div className="text-center py-12 border-2 border-dashed rounded-[2rem] bg-[rgba(255,255,255,0.02)] text-[#908fa0] font-bold">
                             No resume found. Uploading a resume is critical for placements.
                           </div>
                         )}
@@ -801,8 +801,8 @@ const StudentProfile = () => {
                        <CardContent className="p-8">
                           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {profile.certificates?.length > 0 ? profile.certificates.map((cert: any, i: number) => (
-                              <div key={i} className="group p-6 rounded-[2rem] border border-slate-100 bg-white flex flex-col h-full relative">
-                                <Button variant="ghost" size="icon" className="h-8 w-8 absolute right-4 top-4 text-slate-300 hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-all"
+                              <div key={i} className="group p-6 rounded-[2rem] border border-[rgba(255,255,255,0.06)] bg-white flex flex-col h-full relative">
+                                <Button variant="ghost" size="icon" className="h-8 w-8 absolute right-4 top-4 text-[#908fa0] hover:bg-rose-50 hover:text-rose-600 rounded-lg transition-all"
                                   onClick={() => {
                                     const certId = profile.certificates[i]?.id;
                                     const updated = profile.certificates.filter((c: any) => c.id !== certId);
@@ -816,16 +816,16 @@ const StudentProfile = () => {
                                   <div className="h-12 w-12 rounded-xl bg-amber-50 flex items-center justify-center text-amber-500 mb-4">
                                     <FileText className="h-6 w-6" />
                                   </div>
-                                  <h4 className="font-black text-slate-900 leading-tight pr-8">{cert.title}</h4>
+                                  <h4 className="font-black text-[#e2e2eb] leading-tight pr-8">{cert.title}</h4>
                                   <p className="text-amber-600 font-bold text-sm">{cert.issuer}</p>
                                 </div>
                                 <div className="mt-6 pt-4 border-t border-slate-50">
-                                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Issued Date</p>
-                                   <p className="text-sm font-bold text-slate-700 mt-1">{cert.issuedDate}</p>
+                                   <p className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest">Issued Date</p>
+                                   <p className="text-sm font-bold text-[#c7c4d7] mt-1">{cert.issuedDate}</p>
                                 </div>
                               </div>
                             )) : (
-                              <div className="col-span-full text-center py-12 border-2 border-dashed rounded-[2rem] bg-slate-50/30 text-slate-400 font-bold">
+                              <div className="col-span-full text-center py-12 border-2 border-dashed rounded-[2rem] bg-[rgba(255,255,255,0.02)] text-[#908fa0] font-bold">
                                 No certifications added yet.
                               </div>
                             )}
@@ -878,7 +878,7 @@ const StudentProfile = () => {
                 </div>
               </div>
             </DialogHeader>
-            <div className="flex-1 bg-slate-100 overflow-hidden relative">
+            <div className="flex-1 bg-[rgba(255,255,255,0.06)] overflow-hidden relative">
               <iframe
                 src={`${previewUrl}#toolbar=0`}
                 className="w-full h-full border-none"
