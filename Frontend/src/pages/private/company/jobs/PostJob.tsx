@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import {
   Briefcase,
-  DollarSign,
+  IndianRupee,
   MapPin,
   GraduationCap,
   AlignLeft,
@@ -156,7 +156,7 @@ const PostJob: React.FC = () => {
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-[#c7c4d7] ml-1">Annual Salary</label>
                 <div className="relative group">
-                  <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-[#908fa0] group-focus-within:text-indigo-400 transition-colors" size={18} />
+                  <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 text-[#908fa0] group-focus-within:text-indigo-400 transition-colors" size={18} />
                   <input type="number" name="salary" value={formData.salary} onChange={handleInputChange}
                     placeholder="e.g. 1200000" className={inputBase} required />
                 </div>

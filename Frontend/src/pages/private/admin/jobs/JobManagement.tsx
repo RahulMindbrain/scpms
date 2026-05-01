@@ -1,11 +1,11 @@
-﻿import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   Briefcase,
   Building2,
   CheckCircle,
   XCircle,
   MapPin,
-  DollarSign,
+  IndianRupee,
   Search,
   Clock,
   ExternalLink,
@@ -346,7 +346,7 @@ const JobCard = ({ job, onStatusUpdate, activeTab }: any) => {
             {job.location || '-'}
           </div>
           <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg">
-            <DollarSign className="w-3.5 h-3.5" />
+            <IndianRupee className="w-3.5 h-3.5" />
             {job.salary}
           </div>
         </div>

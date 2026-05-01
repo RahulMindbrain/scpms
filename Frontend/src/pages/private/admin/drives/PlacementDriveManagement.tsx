@@ -1,4 +1,4 @@
-﻿import React, { useState, useRef, useEffect, useMemo } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import {
   MapPin,
   GraduationCap,
@@ -7,7 +7,7 @@ import {
   AlertCircle,
   Search,
   Filter,
-  DollarSign,
+  IndianRupee,
   ChevronRight,
   Target,
   Clock,
@@ -381,7 +381,7 @@ const PlacementDriveManagement: React.FC = () => {
                                     <div className="grid grid-cols-2 lg:grid-cols-5 gap-6 pt-2">
                                       <div className="flex flex-col gap-1.5">
                                         <span className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest flex items-center gap-1.5">
-                                          <DollarSign className="w-3.5 h-3.5 text-emerald-500" /> Salary
+                                          <IndianRupee className="w-3.5 h-3.5 text-emerald-500" /> Salary
                                         </span>
                                         <span className="text-lg font-bold text-[#e2e2eb]">{job.formattedSalary}</span>
                                       </div>
@@ -486,7 +486,7 @@ const PlacementDriveManagement: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="p-6 bg-[#111319] rounded-3xl border border-[rgba(255,255,255,0.06)] space-y-1">
                 <div className="flex items-center gap-2 text-[10px] font-black text-[#908fa0] uppercase tracking-widest">
-                  <DollarSign className="w-3.5 h-3.5 text-emerald-500" /> Package
+                  <IndianRupee className="w-3.5 h-3.5 text-emerald-500" /> Package
                 </div>
                 <p className="text-xl font-black text-[#e2e2eb]">{selectedJob.formattedSalary}</p>
               </div>
