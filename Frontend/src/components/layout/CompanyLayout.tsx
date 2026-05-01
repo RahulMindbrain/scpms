@@ -20,7 +20,9 @@ const CompanyLayout: React.FC = () => {
         <SidebarInset className="bg-[#111319]">
           <SiteHeader />
           <main className="flex flex-1 flex-col bg-[#111319] min-h-0">
-            <Outlet />
+            <div className="flex-1 p-4 sm:p-6 lg:p-8 max-w-[1400px] w-full mx-auto">
+              <Outlet />
+            </div>
           </main>
         </SidebarInset>
       </SidebarProvider>

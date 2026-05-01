@@ -148,7 +148,7 @@ const CompanyNotificationPage = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#111319] p-4 sm:p-6 lg:p-8">
+    <div className="space-y-6">
       <motion.main
         initial="hidden"
         animate="visible"

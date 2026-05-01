@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import {
@@ -127,7 +127,7 @@ const PostJob: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#111319] py-12 px-4 sm:px-6 lg:px-8 font-sans">
+    <div className="font-sans">
       <div className="max-w-4xl mx-auto bg-[#1e1f26] rounded-[2rem] border border-[rgba(255,255,255,0.07)] overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
         {/* Header */}
         <header className="p-8 sm:p-10 border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]">

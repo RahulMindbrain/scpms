@@ -59,7 +59,7 @@ const Shortlist: React.FC = () => {
       </div>
 
       {/* Filters Card */}
-      <div className="bg-white p-4 rounded-2xl shadow-sm border border-[rgba(255,255,255,0.07)]">
+      <div className="bg-[#1e1f26] p-4 rounded-2xl border border-[rgba(255,255,255,0.07)]">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
@@ -68,7 +68,7 @@ const Shortlist: React.FC = () => {
               placeholder="Search by name or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-[rgba(255,255,255,0.02)] border-none rounded-xl focus:ring-2 focus:ring-blue-500 transition-all"
+              className="w-full pl-10 pr-4 py-3 bg-[#0c0e14] border border-[rgba(255,255,255,0.08)] rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-[#e2e2eb] placeholder:text-[#908fa0] transition-all outline-none"
             />
           </div>
 
@@ -77,7 +77,7 @@ const Shortlist: React.FC = () => {
             <select
               value={branchFilter}
               onChange={(e) => setBranchFilter(e.target.value)}
-              className="bg-[rgba(255,255,255,0.02)] border-none px-4 py-3 rounded-xl focus:ring-2 focus:ring-blue-500 min-w-[120px]"
+              className="bg-[#0c0e14] border border-[rgba(255,255,255,0.08)] text-[#c7c4d7] px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500/20 min-w-[120px] outline-none"
             >
               <option value="All">All Departments</option>
               {uniqueBranches.map((branch: any) => (
@@ -89,7 +89,7 @@ const Shortlist: React.FC = () => {
       </div>
 
       {/* Responsive Content: Table for Desktop, Cards for Mobile */}
-      <div className="hidden md:block bg-white rounded-2xl shadow-sm border border-[rgba(255,255,255,0.07)] overflow-hidden">
+      <div className="hidden md:block bg-[#1e1f26] rounded-2xl border border-[rgba(255,255,255,0.07)] overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-[rgba(255,255,255,0.02)] border-b border-[rgba(255,255,255,0.07)]">
             <tr>
@@ -99,17 +99,17 @@ const Shortlist: React.FC = () => {
               <th className="px-6 py-4 text-sm font-semibold text-[#c7c4d7]">Email</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-50">
+          <tbody className="divide-y divide-[rgba(255,255,255,0.05)]">
             {filteredData?.length === 0 ? (
               <tr>
                 <td colSpan={4} className="text-center py-12 text-[#908fa0]">No candidates found</td>
               </tr>
             ) : (
               filteredData?.map((item: any) => (
-                <tr key={item.applicationId} className="hover:bg-blue-50/30 transition-colors">
+                <tr key={item.applicationId} className="hover:bg-[rgba(255,255,255,0.025)] transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold">
+                      <div className="w-10 h-10 bg-indigo-500/15 text-indigo-400 rounded-full flex items-center justify-center font-bold">
                         {item.name.charAt(0).toUpperCase()}
                       </div>
                       <span className="font-medium text-[#e2e2eb]">{item.name}</span>
@@ -122,7 +122,7 @@ const Shortlist: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 border-none px-3 py-1">
+                    <Badge variant="secondary" className="bg-emerald-500/15 text-emerald-400 border-emerald-500/20 px-3 py-1">
                       {item.status}
                     </Badge>
                   </td>
@@ -137,9 +137,9 @@ const Shortlist: React.FC = () => {
       {/* Mobile Card View */}
       <div className="grid grid-cols-1 gap-4 md:hidden">
         {filteredData?.map((item: any) => (
-          <div key={item.applicationId} className="bg-white p-5 rounded-2xl border border-[rgba(255,255,255,0.07)] shadow-sm space-y-4">
+          <div key={item.applicationId} className="bg-[#1e1f26] p-5 rounded-2xl border border-[rgba(255,255,255,0.07)] space-y-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center font-bold text-lg">
+              <div className="w-12 h-12 bg-indigo-500/15 text-indigo-400 rounded-full flex items-center justify-center font-bold text-lg">
                 {item.name.charAt(0).toUpperCase()}
               </div>
               <div>
@@ -148,12 +148,12 @@ const Shortlist: React.FC = () => {
               </div>
             </div>
 
-            <div className="flex justify-between items-center pt-2 border-t border-gray-50">
+            <div className="flex justify-between items-center pt-2 border-t border-[rgba(255,255,255,0.05)]">
               <div className="flex items-center gap-2 text-sm text-[#c7c4d7]">
                 <GraduationCap className="w-4 h-4" />
                 {item.branch}
               </div>
-              <Badge className="bg-green-100 text-green-700 border-none">{item.status}</Badge>
+              <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/20">{item.status}</Badge>
             </div>
           </div>
         ))}

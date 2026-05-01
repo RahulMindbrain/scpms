@@ -145,15 +145,15 @@ const CompanyInterviewManager: React.FC = () => {
   }), [schedules]);
 
   return (
-    <div className="min-h-screen bg-[#FDFDFE] p-4 sm:p-6 lg:p-10 space-y-10 font-sans selection:bg-indigo-100 selection:text-indigo-900">
+    <div className="space-y-8 font-sans">
 
       {/* Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
         <div className="space-y-3">
-          <div className="inline-flex items-center gap-2.5 px-3 py-1 rounded-full bg-indigo-50 text-indigo-600 border border-indigo-100/50">
+          <div className="inline-flex items-center gap-2.5 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-600"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-400"></span>
             </span>
             <span className="text-[10px] font-bold uppercase tracking-wider">Interview Pipeline</span>
           </div>
@@ -163,15 +163,15 @@ const CompanyInterviewManager: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-4 bg-white px-5 py-2.5 rounded-2xl border border-[rgba(255,255,255,0.07)] shadow-sm">
+        <div className="flex items-center gap-4 bg-[#1e1f26] px-5 py-2.5 rounded-2xl border border-[rgba(255,255,255,0.07)]">
           <div className="flex -space-x-2">
             {coordinators.slice(0, 3).map((name, i) => (
-              <div key={i} className="w-9 h-9 rounded-full border-2 border-white bg-indigo-100 flex items-center justify-center ring-1 ring-slate-100" title={name}>
-                <span className="text-[10px] font-bold text-indigo-600">{name.charAt(0)}</span>
+              <div key={i} className="w-9 h-9 rounded-full border-2 border-[#1e1f26] bg-indigo-500/15 flex items-center justify-center" title={name}>
+                <span className="text-[10px] font-bold text-indigo-400">{name.charAt(0)}</span>
               </div>
             ))}
           </div>
-          <div className="h-6 w-px bg-slate-200" />
+          <div className="h-6 w-px bg-[rgba(255,255,255,0.1)]" />
           <div className="flex flex-col">
             <span className="text-[10px] font-bold text-[#908fa0] uppercase tracking-widest leading-none mb-1">Admins</span>
             <span className="text-xs font-black text-[#e2e2eb] flex items-center gap-1">
@@ -189,20 +189,20 @@ const CompanyInterviewManager: React.FC = () => {
           { label: 'Pending', value: stats.pending, color: 'amber', icon: Clock },
           { label: 'Candidates', value: stats.activeCandidates, color: 'emerald', icon: User }
         ].map((stat, idx) => (
-          <div key={idx} className="bg-white border border-[rgba(255,255,255,0.07)] rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
+          <div key={idx} className="bg-[#1e1f26] border border-[rgba(255,255,255,0.07)] rounded-2xl p-6 hover:border-indigo-500/20 transition-all">
             <div className="flex items-center justify-between mb-4">
               <div className={cn(
                 "w-10 h-10 rounded-xl flex items-center justify-center",
-                stat.color === 'indigo' ? "bg-indigo-50 text-indigo-600" : 
-                stat.color === 'amber' ? "bg-amber-50 text-amber-600" : 
-                "bg-emerald-50 text-emerald-600"
+                stat.color === 'indigo' ? "bg-indigo-500/10 text-indigo-400" : 
+                stat.color === 'amber' ? "bg-amber-500/10 text-amber-400" : 
+                "bg-emerald-500/10 text-emerald-400"
               )}>
                 <stat.icon className="w-5 h-5" />
               </div>
               <span className="text-[10px] font-bold text-[#c7c4d7] uppercase tracking-widest">Real-time</span>
             </div>
             <p className="text-[#908fa0] font-bold text-xs uppercase tracking-widest mb-1">{stat.label}</p>
-            <p className="text-3xl font-black">{stat.value}</p>
+            <p className="text-3xl font-black text-[#e2e2eb]">{stat.value}</p>
           </div>
         ))}
       </div>
@@ -210,14 +210,14 @@ const CompanyInterviewManager: React.FC = () => {
       {/* Main Content Area */}
       <div className="space-y-8">
         {/* Toolbar & Filters */}
-        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 bg-white p-2 rounded-2xl border border-[rgba(255,255,255,0.07)] shadow-sm">
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 bg-[#1e1f26] p-2 rounded-2xl border border-[rgba(255,255,255,0.07)]">
           <div className="flex items-center gap-1 bg-[#111319] p-1 rounded-xl overflow-x-auto no-scrollbar">
             {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map((type) => (
               <button
                 key={type}
                 onClick={() => setFilterType(type as any)}
                 className={`px-4 py-2 rounded-lg text-[10px] font-black tracking-widest transition-all whitespace-nowrap ${filterType === type
-                    ? 'bg-white text-indigo-600 shadow-sm'
+                    ? 'bg-indigo-600 text-white shadow-sm'
                     : 'text-[#908fa0] hover:text-[#c7c4d7]'
                   }`}
               >
@@ -248,11 +248,11 @@ const CompanyInterviewManager: React.FC = () => {
           ) : filteredSchedules.length > 0 ? (
             filteredSchedules.map((schedule) => (
               <div key={schedule.id} className="group relative">
-                <div className="relative bg-white border border-[rgba(255,255,255,0.07)] rounded-3xl p-6 lg:p-8 flex flex-col lg:flex-row items-center gap-8 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
+                <div className="relative bg-[#1e1f26] border border-[rgba(255,255,255,0.07)] rounded-2xl p-5 lg:p-7 flex flex-col lg:flex-row items-start lg:items-center gap-6 hover:border-indigo-500/20 hover:shadow-xl hover:shadow-indigo-900/20 transition-all duration-300">
                   
                   {/* Left Side: Date Block */}
-                  <div className="flex flex-col items-center justify-center bg-[rgba(255,255,255,0.02)] rounded-2xl min-w-[100px] h-[100px] text-center p-4 border border-[rgba(255,255,255,0.07)] group-hover:bg-indigo-50/50 transition-colors">
-                    <span className="text-3xl font-black text-indigo-600 leading-none mb-1">
+                  <div className="flex flex-col items-center justify-center bg-[rgba(255,255,255,0.02)] rounded-2xl min-w-[100px] h-[100px] text-center p-4 border border-[rgba(255,255,255,0.07)] group-hover:bg-indigo-500/10 transition-colors">
+                    <span className="text-3xl font-black text-indigo-400 leading-none mb-1">
                       {new Date(schedule.startTime).getDate()}
                     </span>
                     <span className="text-[10px] font-black uppercase tracking-wider text-[#908fa0]">
@@ -266,7 +266,7 @@ const CompanyInterviewManager: React.FC = () => {
                   {/* Center Content: Main Info */}
                   <div className="flex-1 space-y-4 text-center lg:text-left w-full">
                     <div className="flex flex-wrap justify-center lg:justify-start items-center gap-2">
-                      <Badge className="bg-indigo-50 text-indigo-600 border-indigo-100 px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider">
+                      <Badge className="bg-indigo-500/10 text-indigo-400 border-indigo-500/20 px-3 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider">
                         {schedule.jobTitle}
                       </Badge>
                       <span className="text-[10px] font-bold text-[#c7c4d7] uppercase tracking-widest">
@@ -295,20 +295,20 @@ const CompanyInterviewManager: React.FC = () => {
                     <div className="flex items-center justify-center lg:justify-start gap-3 pt-1">
                       <button
                         onClick={() => handleOpenApplications(schedule)}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(255,255,255,0.02)] hover:bg-indigo-50 border border-[rgba(255,255,255,0.07)] transition-colors group/btn"
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(255,255,255,0.02)] hover:bg-indigo-500/10 border border-[rgba(255,255,255,0.07)] transition-colors group/btn"
                       >
-                        <User className="w-3.5 h-3.5 text-[#908fa0] group-hover/btn:text-indigo-500" />
-                        <span className="text-[11px] font-bold text-[#c7c4d7] group-hover/btn:text-indigo-600">
+                        <User className="w-3.5 h-3.5 text-[#908fa0] group-hover/btn:text-indigo-400" />
+                        <span className="text-[11px] font-bold text-[#c7c4d7] group-hover/btn:text-indigo-400">
                           {schedule.applications?.length || 0} Candidates
                         </span>
                       </button>
 
                       <button
                         onClick={() => handleOpenMessages(schedule)}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(255,255,255,0.02)] hover:bg-amber-50 border border-[rgba(255,255,255,0.07)] transition-colors group/btn"
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[rgba(255,255,255,0.02)] hover:bg-amber-500/10 border border-[rgba(255,255,255,0.07)] transition-colors group/btn"
                       >
-                        <MessageSquare className="w-3.5 h-3.5 text-[#908fa0] group-hover/btn:text-amber-500" />
-                        <span className="text-[11px] font-bold text-[#c7c4d7] group-hover/btn:text-amber-600">
+                        <MessageSquare className="w-3.5 h-3.5 text-[#908fa0] group-hover/btn:text-amber-400" />
+                        <span className="text-[11px] font-bold text-[#c7c4d7] group-hover/btn:text-amber-400">
                           Notes {(schedule.messages?.length || 0) > 0 && `(${schedule.messages.length})`}
                         </span>
                       </button>
@@ -329,7 +329,7 @@ const CompanyInterviewManager: React.FC = () => {
                         <Button 
                           variant="ghost"
                           onClick={() => { setSelectedSchedule(schedule); setIsRejectModalOpen(true); }}
-                          className="flex-1 text-rose-600 hover:bg-rose-50 rounded-xl font-bold py-5 text-xs uppercase tracking-widest transition-all"
+                          className="flex-1 text-rose-400 hover:bg-rose-500/10 rounded-xl font-bold py-5 text-xs uppercase tracking-widest transition-all"
                         >
                           Decline
                         </Button>
@@ -337,7 +337,7 @@ const CompanyInterviewManager: React.FC = () => {
                     ) : (
                       <div className={cn(
                         "w-full py-3 text-center rounded-xl font-black text-[10px] uppercase tracking-[0.2em] border",
-                        schedule.companyApprovalStatus === 'APPROVED' ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-rose-50 text-rose-600 border-rose-100"
+                        schedule.companyApprovalStatus === 'APPROVED' ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border-rose-500/20"
                       )}>
                         {schedule.companyApprovalStatus}
                       </div>
@@ -347,7 +347,7 @@ const CompanyInterviewManager: React.FC = () => {
               </div>
             ))
           ) : (
-            <div className="bg-white rounded-3xl p-16 text-center border border-[rgba(255,255,255,0.07)] border-dashed">
+            <div className="bg-[#1e1f26] rounded-2xl p-16 text-center border border-dashed border-[rgba(255,255,255,0.1)]">
               <Calendar className="w-12 h-12 text-[#c7c4d7] mx-auto mb-4" />
               <p className="text-xl font-black text-[#e2e2eb] mb-2">No schedules found</p>
               <p className="text-[#908fa0] font-bold text-sm max-w-sm mx-auto mb-6">
@@ -356,7 +356,7 @@ const CompanyInterviewManager: React.FC = () => {
               <Button
                 variant="outline"
                 onClick={() => { setFilterType('ALL'); setSearchQuery(''); }}
-                className="text-indigo-600 border-indigo-100 hover:bg-indigo-50 rounded-xl"
+                className="text-indigo-400 border-indigo-500/20 hover:bg-indigo-500/10 rounded-xl"
               >
                 Clear Filters
               </Button>
@@ -382,10 +382,10 @@ const CompanyInterviewManager: React.FC = () => {
           ) : activeSchedule?.applications && activeSchedule.applications.length > 0 ? (
             <div className="max-h-[400px] overflow-y-auto pr-2 space-y-2 no-scrollbar">
               {activeSchedule.applications.map((app: any) => (
-                <div key={app.id} className="flex items-center justify-between p-4 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.07)] rounded-2xl hover:bg-white hover:border-indigo-100 transition-all">
+                <div key={app.id} className="flex items-center justify-between p-4 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.07)] rounded-2xl hover:bg-indigo-500/5 hover:border-indigo-500/20 transition-all">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center border border-indigo-100">
-                      <User className="w-5 h-5 text-indigo-600" />
+                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
+                      <User className="w-5 h-5 text-indigo-400" />
                     </div>
                     <div>
                       <p className="text-sm font-bold text-[#e2e2eb]">{app.student?.user?.name || app.studentName || 'Candidate'}</p>
@@ -410,7 +410,7 @@ const CompanyInterviewManager: React.FC = () => {
           <div className="pt-4 border-t border-[rgba(255,255,255,0.07)]">
             <Button
               onClick={() => setIsApplicationsModalOpen(false)}
-              className="w-full py-4 bg-slate-900 hover:bg-black text-white rounded-xl font-bold text-xs uppercase tracking-widest"
+              className="w-full py-4 bg-[rgba(255,255,255,0.06)] hover:bg-[rgba(255,255,255,0.1)] text-[#c7c4d7] rounded-xl font-bold text-xs uppercase tracking-widest"
             >
               Close
             </Button>
@@ -426,9 +426,9 @@ const CompanyInterviewManager: React.FC = () => {
         subtitle="Provide reasoning for rejecting this schedule"
       >
         <div className="space-y-6 pt-4">
-          <div className="bg-amber-50 p-4 rounded-xl border border-amber-100 flex items-start gap-3">
+          <div className="bg-amber-500/10 p-4 rounded-xl border border-amber-500/20 flex items-start gap-3">
             <Info className="text-amber-500 w-4 h-4 shrink-0 mt-0.5" />
-            <p className="text-xs text-amber-800 font-medium leading-relaxed">
+            <p className="text-xs text-amber-300 font-medium leading-relaxed">
               Rescheduling may impact the placement timeline. Clear reasoning helps the admin find better slots.
             </p>
           </div>
@@ -475,13 +475,13 @@ const CompanyInterviewManager: React.FC = () => {
               [...activeSchedule.messages].reverse().map((msg: any) => (
                 <div key={msg.id} className={cn(
                   "p-4 rounded-2xl border transition-all",
-                  msg.isAdmin ? "bg-indigo-50/30 border-indigo-100 mr-8" : "bg-white border-[rgba(255,255,255,0.07)] ml-8"
+                  msg.isAdmin ? "bg-indigo-500/[0.07] border-indigo-500/20 mr-8" : "bg-[rgba(255,255,255,0.04)] border-[rgba(255,255,255,0.07)] ml-8"
                 )}>
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className={cn(
                         "w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-bold",
-                        msg.isAdmin ? "bg-indigo-100 text-indigo-600" : "bg-emerald-100 text-emerald-600"
+                        msg.isAdmin ? "bg-indigo-500/15 text-indigo-400" : "bg-emerald-500/15 text-emerald-400"
                       )}>
                         {msg.isAdmin ? 'A' : 'C'}
                       </div>
