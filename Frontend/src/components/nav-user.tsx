@@ -37,7 +37,6 @@ export function NavUser({
 
   const handleLogout = () => {
     dispatch(logoutUser())
-    navigate("/login")
   }
 
   return (
