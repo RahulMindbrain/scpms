@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter, Download } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobApplications, updateJobApplicationStatus } from '@/redux/thunks/companyThunk';
@@ -10,7 +10,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import Loader from '@/components/Loader';
@@ -23,8 +23,14 @@ const Applicants: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = React.useState('ALL');
   const [selectedJob, setSelectedJob] = React.useState('All Jobs');
 
+  const STATUS_FLOW = ['APPLIED', 'SHORTLISTED', 'SELECTED', 'REJECTED'];
+
+  const isBackward = (current: string, next: string) => {
+    return STATUS_FLOW.indexOf(next) < STATUS_FLOW.indexOf(current);
+  };
+
   React.useEffect(() => {
-    const params: { status?: string; page?: number; limit?: number } = {};
+    const params: { status?: string } = {};
     if (selectedStatus !== 'ALL') {
       params.status = selectedStatus;
     }
@@ -38,10 +44,21 @@ const Applicants: React.FC = () => {
     return matchesSearch && matchesJob;
   });
 
-  // Get unique job titles for filter
-  const uniqueJobs = Array.from(new Set(applications.map((app: any) => app.job?.title))).filter(Boolean);
+  const uniqueJobs = Array.from(
+    new Set(applications.map((app: any) => app.job?.title))
+  ).filter(Boolean);
 
-  const handleStatusUpdate = async (id: number, newStatus: string) => {
+  const handleStatusUpdate = async (id: number, newStatus: string, currentStatus: string) => {
+    const currentIndex = STATUS_FLOW.indexOf(currentStatus);
+    const newIndex = STATUS_FLOW.indexOf(newStatus);
+
+    if (newIndex < currentIndex) {
+      toast.error("Status cannot be moved backward!");
+      return;
+    }
+
+    if (newIndex === currentIndex) return;
+
     const toastId = toast.loading(`Updating status to ${newStatus}...`);
     try {
       await dispatch(updateJobApplicationStatus({ id, status: newStatus })).unwrap();
@@ -53,14 +70,10 @@ const Applicants: React.FC = () => {
 
   return (
     <div className="space-y-9 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-end gap-4">
-        {/* <Button variant="outline" className="font-bold border-slate-200 hover:border-blue-600 hover:text-blue-600 px-6 py-6 rounded-2xl transition-all">
-          <Download className="w-5 h-5 mr-2" /> Download All Resumes
-        </Button> */}
-      </div>
 
       <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 space-y-6">
         <div className="flex flex-col md:flex-row gap-4">
+
           <div className="relative flex-1 group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
             <input
@@ -71,7 +84,9 @@ const Applicants: React.FC = () => {
               className="w-full pl-12 pr-4 py-3 rounded-2xl border border-slate-100 bg-slate-50/50 focus:outline-none focus:ring-2 focus:ring-blue-500/10 focus:border-blue-500 transition-all font-medium text-slate-800"
             />
           </div>
+
           <div className="flex items-center gap-3">
+
             <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
               <Filter className="w-4 h-4 text-slate-400" />
               <select
@@ -81,10 +96,13 @@ const Applicants: React.FC = () => {
               >
                 <option>All Jobs</option>
                 {uniqueJobs.map((job) => (
-                  <option key={job as string} value={job as string}>{job as string}</option>
+                  <option key={job as string} value={job as string}>
+                    {job as string}
+                  </option>
                 ))}
               </select>
             </div>
+
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
@@ -96,6 +114,7 @@ const Applicants: React.FC = () => {
               <option value="SELECTED">Selected</option>
               <option value="REJECTED">Rejected</option>
             </select>
+
           </div>
         </div>
 
@@ -103,76 +122,76 @@ const Applicants: React.FC = () => {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-slate-50">
-                <th className="px-4 py-4 text-xs font-bold text-slate-400 border-none uppercase tracking-widest">Name</th>
-                <th className="px-4 py-4 text-xs font-bold text-slate-400 border-none uppercase tracking-widest">Branch</th>
-                <th className="px-4 py-4 text-xs font-bold text-slate-400 border-none uppercase tracking-widest">CGPA</th>
-                <th className="px-4 py-4 text-xs font-bold text-slate-400 border-none uppercase tracking-widest">Applied For</th>
-                <th className="px-4 py-4 text-xs font-bold text-slate-400 border-none uppercase tracking-widest">Status</th>
-                <th className="px-4 py-4 text-xs font-bold text-slate-400 border-none uppercase tracking-widest text-right">Resume</th>
+                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">Name</th>
+                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">Branch</th>
+                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">CGPA</th>
+                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">Applied For</th>
+                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">Status</th>
               </tr>
             </thead>
+
             <tbody className="divide-y divide-slate-50">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center">
+                  <td colSpan={5} className="px-4 py-10 text-center">
                     <Loader text="Loading applicants..." />
                   </td>
                 </tr>
               ) : filteredApplicants.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-sm font-medium text-slate-500">
-                    No applicants found matching your criteria.
+                  <td colSpan={5} className="px-4 py-10 text-center text-sm text-slate-500">
+                    No applicants found.
                   </td>
                 </tr>
               ) : (
-                filteredApplicants.map((app: any, index: number) => (
-                  <tr key={index} className="hover:bg-slate-50/80 transition-all group rounded-xl">
+                filteredApplicants.map((app: any) => (
+                  <tr key={app.id} className="hover:bg-slate-50 transition">
+
                     <td className="px-4 py-5 font-bold text-slate-800">
                       {app.student?.user?.firstname || 'N/A'} {app.student?.user?.lastname || ''}
                     </td>
-                    <td className="px-4 py-5 text-sm font-medium text-slate-500">{app.student?.department?.name || `Dept ${app.student?.departmentId || 'N/A'}`}</td>
-                    <td className="px-4 py-5 text-sm font-black text-slate-700">{app.student?.cgpa || 'N/A'}</td>
-                    <td className="px-4 py-5 text-sm font-medium text-slate-600">{app.job?.title || 'N/A'}</td>
-                    <td className="px-4 py-5 font-bold">
+
+                    <td className="px-4 py-5 text-sm text-slate-500">
+                      {app.student?.department?.name || 'N/A'}
+                    </td>
+
+                    <td className="px-4 py-5 text-sm font-bold text-slate-700">
+                      {app.student?.cgpa || 'N/A'}
+                    </td>
+
+                    <td className="px-4 py-5 text-sm text-slate-600">
+                      {app.job?.title || 'N/A'}
+                    </td>
+
+                    <td className="px-4 py-5">
                       <Select
                         value={app.status}
-                        onValueChange={(value) => handleStatusUpdate(app.id, value)}
+                        onValueChange={(value) =>
+                          handleStatusUpdate(app.id, value, app.status)
+                        }
                       >
-                        <SelectTrigger className="w-[140px] h-9 border-slate-100 bg-slate-50/50 rounded-xl hover:bg-slate-100 transition-colors">
+                        <SelectTrigger className="w-[140px] h-9 rounded-xl">
                           <SelectValue>
                             <Badge variant={
                               app.status === 'SELECTED' ? 'success' :
-                                app.status === 'REJECTED' ? 'danger' :
-                                  app.status === 'SHORTLISTED' ? 'default' :
-                                    app.status === 'INTERVIEW' ? 'warning' : 'outline'
+                              app.status === 'REJECTED' ? 'danger' :
+                              app.status === 'SHORTLISTED' ? 'default' :
+                              'outline'
                             }>
                               {app.status}
                             </Badge>
                           </SelectValue>
                         </SelectTrigger>
-                        <SelectContent className="rounded-2xl border-slate-100 shadow-xl p-1">
-                          <SelectItem value="APPLIED" className="rounded-lg mb-1">Applied</SelectItem>
-                          <SelectItem value="SHORTLISTED" className="rounded-lg mb-1">Shortlisted</SelectItem>
-                          <SelectItem value="INTERVIEW" className="rounded-lg mb-1">Interview</SelectItem>
-                          <SelectItem value="SELECTED" className="rounded-lg mb-1">Selected</SelectItem>
-                          <SelectItem value="REJECTED" className="rounded-lg">Rejected</SelectItem>
+
+                        <SelectContent>
+                          <SelectItem value="APPLIED" disabled={isBackward(app.status, 'APPLIED')}>Applied</SelectItem>
+                          <SelectItem value="SHORTLISTED" disabled={isBackward(app.status, 'SHORTLISTED')}>Shortlisted</SelectItem>
+                          <SelectItem value="SELECTED" disabled={isBackward(app.status, 'SELECTED')}>Selected</SelectItem>
+                          <SelectItem value="REJECTED" disabled={isBackward(app.status, 'REJECTED')}>Rejected</SelectItem>
                         </SelectContent>
                       </Select>
                     </td>
-                    <td className="px-4 py-5 text-right">
-                      {app.student?.resumeUrl ? (
-                        <a
-                          href={app.student.resumeUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-blue-600 transition-colors px-3 py-2 rounded-lg hover:bg-blue-50"
-                        >
-                          <Download className="w-4 h-4" /> View Resume
-                        </a>
-                      ) : (
-                        <span className="text-xs text-slate-400 italic">No resume</span>
-                      )}
-                    </td>
+
                   </tr>
                 ))
               )}
