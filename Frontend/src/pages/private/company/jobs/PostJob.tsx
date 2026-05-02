@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import {
   Briefcase, 
-  DollarSign, 
   MapPin, 
   GraduationCap, 
   AlignLeft, 
@@ -13,7 +12,8 @@ import {
   Code2,
   FileText,
   ChevronDown,
-  X
+  IndianRupee,
+  X,
 } from 'lucide-react';
 import { postJob } from '@/redux/thunks/companyThunk';
 import { fetchDepartments } from '@/redux/thunks/departmentThunk';
@@ -134,8 +134,8 @@ const PostJob: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50/50 py-12 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className="max-w-4xl mx-auto bg-white rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
+    <div className="min-h-screen bg-slate-50/50 py-7 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className=" bg-white rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
         <header className="p-8 sm:p-10 border-b border-slate-100 bg-gradient-to-r from-white to-slate-50/50">
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Create New Job Drive</h1>
           <p className="mt-2 text-slate-500 text-lg">Configure your recruitment requirements to find the best talent.</p>
@@ -169,7 +169,7 @@ const PostJob: React.FC = () => {
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-700 ml-1">Annual Salary</label>
                 <div className="relative group">
-                  <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
+                  <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
                   <input
                     type="number"
                     name="salary"
