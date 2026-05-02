@@ -87,23 +87,23 @@ const SignUp: React.FC = () => {
     e.preventDefault();
 
     // Custom Validation
-    if (!form.fullName.trim()) return toast.error("Full name is required");
-    if (!form.email.trim()) return toast.error("Email address is required");
-    if (!form.password) return toast.error("Password is required");
+    if (!form.fullName.trim()) return toast.error("Full name is required", { id: "register-toast" });
+    if (!form.email.trim()) return toast.error("Email address is required", { id: "register-toast" });
+    if (!form.password) return toast.error("Password is required", { id: "register-toast" });
 
     const names = form.fullName.trim().split(/\s+/);
     if (names.length < 2) {
-      toast.error("Please enter your full name (First and Last name)");
+      toast.error("Please enter your full name (First and Last name)", { id: "register-toast" });
       return;
     }
 
     if (form.password !== form.confirmPassword) {
-      toast.error("Passwords do not match");
+      toast.error("Passwords do not match", { id: "register-toast" });
       return;
     }
 
     if (form.password.length < 6) {
-      toast.error("Password must be at least 6 characters long");
+      toast.error("Password must be at least 6 characters long", { id: "register-toast" });
       return;
     }
 
@@ -121,13 +121,13 @@ const SignUp: React.FC = () => {
     setIsSubmitting(true);
     try {
       await dispatch(registerUser(payload)).unwrap();
-      toast.success("Registration successful! Please sign in to continue.");
+      toast.success("Registration successful! Please sign in to continue.", { id: "register-toast" });
       setTimeout(() => {
         navigate("/login");
       }, 1500);
     } catch (err: any) {
       const message = typeof err === 'string' ? err : (err?.message || "Registration failed. Please try again.");
-      toast.error(message);
+      toast.error(message, { id: "register-toast" });
     } finally {
       setIsSubmitting(false);
     }

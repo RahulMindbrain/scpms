@@ -58,8 +58,8 @@ const SignIn: React.FC = () => {
     if (e) e.preventDefault();
     
     // Custom Validation
-    if (!email) return toast.error("Please enter your email address");
-    if (!password) return toast.error("Please enter your password");
+    if (!email) return toast.error("Please enter your email address", { id: "auth-toast" });
+    if (!password) return toast.error("Please enter your password", { id: "auth-toast" });
     
     if (isLoading) return;
     setIsLoading(true);
@@ -74,18 +74,19 @@ const SignIn: React.FC = () => {
       if (user.role.toLowerCase() !== activeRole) {
         dispatch(logout());
         toast.error(
-          `Unauthorized: This account is registered as ${user.role.toLowerCase()}, but you are trying to sign in as ${activeRole}.`
+          `Unauthorized: This account is registered as ${user.role.toLowerCase()}, but you are trying to sign in as ${activeRole}.`,
+          { id: "auth-toast" }
         );
         setIsLoading(false);
         return;
       }
 
-      toast.success(`Signed in as a ${activeRole}.`);
+      toast.success(`Signed in as a ${activeRole}.`, { id: "auth-toast" });
     } catch (error: any) {
       console.error("Login error:", error);
       // error is now a string or has a message property due to our thunk update
       const message = typeof error === 'string' ? error : (error?.message || "Invalid email or password");
-      toast.error(message);
+      toast.error(message, { id: "auth-toast" });
     } finally {
       setIsLoading(false);
     }

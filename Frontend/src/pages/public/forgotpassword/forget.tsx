@@ -43,12 +43,12 @@ const ForgotPassword: React.FC = () => {
     setIsLoading(true);
     try {
       await dispatch(forgotPassword(email)).unwrap();
-      toast.success("OTP sent successfully to your email");
+      toast.success("OTP sent successfully to your email", { id: "otp-toast" });
       setStep('OTP');
       setTimer(30);
       setCanResend(false);
     } catch (error: any) {
-      toast.error(error || "Failed to send OTP");
+      toast.error(error || "Failed to send OTP", { id: "otp-toast" });
     } finally {
       setIsLoading(false);
     }
@@ -61,10 +61,10 @@ const ForgotPassword: React.FC = () => {
     setIsLoading(true);
     try {
       await dispatch(verifyOTP({ email, otp })).unwrap();
-      toast.success("OTP verified successfully");
+      toast.success("OTP verified successfully", { id: "otp-toast" });
       setStep('RESET');
     } catch (error: any) {
-      toast.error(error || "Invalid OTP");
+      toast.error(error || "Invalid OTP", { id: "otp-toast" });
     } finally {
       setIsLoading(false);
     }
@@ -75,11 +75,16 @@ const ForgotPassword: React.FC = () => {
     setIsLoading(true);
     try {
       await dispatch(forgotPassword(email)).unwrap();
-      toast.success("OTP resent successfully");
+      toast.success("OTP resent successfully", { id: "otp-toast" });
       setTimer(30);
       setCanResend(false);
     } catch (error: any) {
-      toast.error(error || "Failed to resend OTP");
+      toast.error(error || "Failed to resend OTP", { id: "otp-toast" });
+      // If OTP was already sent, we should still start the timer to prevent immediate spamming
+      if (error === "OTP already sent. Please wait.") {
+        setTimer(30);
+        setCanResend(false);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -97,10 +102,10 @@ const ForgotPassword: React.FC = () => {
     setIsLoading(true);
     try {
       await dispatch(resetPassword({ email, newpassword: newPassword })).unwrap();
-      toast.success("Password reset successful. Please login with your new password.");
+      toast.success("Password reset successful. Please login with your new password.", { id: "otp-toast" });
       navigate('/login');
     } catch (error: any) {
-      toast.error(error || "Failed to reset password");
+      toast.error(error || "Failed to reset password", { id: "otp-toast" });
     } finally {
       setIsLoading(false);
     }
