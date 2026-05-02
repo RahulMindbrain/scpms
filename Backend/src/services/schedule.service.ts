@@ -27,6 +27,7 @@ import { runInBackground } from "../utils/Background.task";
 import { emitToUsers } from "../socket";
 import { SOCKET_EVENTS } from "../socket.event";
 import { normalizeText } from "../utils/normalize.utils";
+import prisma from "../config/db";
 
 type CreateInterviewScheduleInput = {
   title: string;
@@ -225,15 +226,33 @@ export const updateScheduleService = async (
 };
 
 export const deleteScheduleService = async (id: number) => {
-  const existing = await getScheduleById(id);
-  if (!existing) throw new Error("Schedule not found");
+  return prisma.$transaction(async (tx) => {
+    const schedule = await tx.interviewSchedule.findUnique({
+      where: { id },
+      select: {
+        jobs: { select: { id: true } },
+      },
+    });
 
-  if (existing.jobs?.length) {
-    const jobIds = existing.jobs.map((j) => j.id);
-    await detachJobsFromSchedule(jobIds);
-  }
+    if (!schedule) throw new Error("Schedule not found");
 
-  return deleteSchedule(id);
+    const jobIds = schedule.jobs.map((j) => j.id);
+
+    if (jobIds.length) {
+      await tx.job.updateMany({
+        where: { id: { in: jobIds } },
+        data: { interviewScheduleId: null },
+      });
+    }
+
+    await tx.scheduleMessage.deleteMany({
+      where: { scheduleId: id },
+    });
+
+    await tx.interviewSchedule.delete({
+      where: { id },
+    });
+  });
 };
 
 export const addJobsToScheduleService = async (

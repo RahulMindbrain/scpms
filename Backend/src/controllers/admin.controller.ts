@@ -55,8 +55,16 @@ export const registerAdminController = async (req: Request, res: Response) => {
 
 export const getStudentsController = async (req: Request, res: Response) => {
   try {
-    const { page, limit, passingYear, year, minCgpa, maxCgpa, departmentId } =
-      req.query;
+    const {
+      page,
+      limit,
+      passingYear,
+      year,
+      minCgpa,
+      maxCgpa,
+      departmentId,
+      status,
+    } = req.query;
 
     const parseNumber = (value: any) => {
       if (value === undefined) return undefined;

@@ -225,6 +225,11 @@ export const getStudents = async (params: {
   page?: number;
   limit?: number;
   status?: "ACTIVE" | "INACTIVE";
+  passingYear?: number;
+  year?: number;
+  minCgpa?: number;
+  maxCgpa?: number;
+  departmentId?: number;
 }) => {
   const { page, limit, status } = params;
 
@@ -232,9 +237,30 @@ export const getStudents = async (params: {
   const safeLimit = Math.max(1, limit ?? 1);
   const skip = (safePage - 1) * safeLimit;
 
-  const where = {
+  const where: any = {
     role: Role.STUDENT,
+
     ...(status && { status }),
+
+    student: {
+      ...(params.year !== undefined && { year: params.year }),
+      ...(params.passingYear !== undefined && {
+        passingYear: params.passingYear,
+      }),
+
+      ...(params.minCgpa !== undefined || params.maxCgpa !== undefined
+        ? {
+            cgpa: {
+              ...(params.minCgpa !== undefined && { gte: params.minCgpa }),
+              ...(params.maxCgpa !== undefined && { lte: params.maxCgpa }),
+            },
+          }
+        : {}),
+
+      ...(params.departmentId !== undefined && {
+        departmentId: params.departmentId,
+      }),
+    },
   };
 
   const [data, total] = await Promise.all([
