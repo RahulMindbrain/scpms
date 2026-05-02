@@ -229,21 +229,32 @@ export const deleteScheduleService = async (id: number) => {
   return prisma.$transaction(async (tx) => {
     const schedule = await tx.interviewSchedule.findUnique({
       where: { id },
-      select: { jobs: { select: { id: true } } },
+      select: {
+        jobs: { select: { id: true } },
+      },
     });
-
+ 
     if (!schedule) throw new Error("Schedule not found");
-
-    const jobIds = schedule.jobs.map(j => j.id);
-
+ 
+    const jobIds = schedule.jobs.map((j) => j.id);
+ 
+   
     if (jobIds.length) {
       await tx.job.updateMany({
         where: { id: { in: jobIds } },
         data: { interviewScheduleId: null },
       });
     }
-
-    await tx.interviewSchedule.delete({ where: { id } });
+ 
+   
+    await tx.scheduleMessage.deleteMany({
+      where: { scheduleId: id },
+    });
+ 
+   
+    await tx.interviewSchedule.delete({
+      where: { id },
+    });
   });
 };
 
