@@ -21,6 +21,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser } from '@/redux/thunks/logoutThunk';
 import type { RootState } from '@/redux/reducers/rootReducer';
+import { toast } from 'sonner';
 
 const HomePage: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,7 +39,8 @@ const HomePage: React.FC = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser() as any);
-    navigate('/');
+    toast.success("Logged out successfully", { id: "logout-toast" });
+    navigate('/', { replace: true });
   };
 
   const getDashboardLink = () => {

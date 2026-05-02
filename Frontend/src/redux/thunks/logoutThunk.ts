@@ -8,17 +8,15 @@ import { logout } from "../slices/authSlice";
 export const logoutUser = createAsyncThunk(
     "auth/logoutUser",
     async (_, { dispatch, rejectWithValue }) => {
+        // 🔥 Clear local state IMMEDIATELY to prevent flickering/stale redirects
+        // This ensures isAuthenticated becomes false before the next render cycle
+        dispatch(logout());
+
         try {
             const response = await postAPI<any>("/auth/logout", {});
-            
-            // Clear local state regardless of whether the API call succeeded 
-            // (the user wants to be logged out anyway)
-            dispatch(logout());
-            
             return response;
         } catch (error: any) {
-            // Even if API fails (e.g. token already expired), we still want to clear local state
-            dispatch(logout());
+            // Even if API fails (e.g. token already expired), state is already cleared
             return rejectWithValue(error?.message || "Logout failed");
         }
     }

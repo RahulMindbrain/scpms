@@ -21,6 +21,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { EllipsisVerticalIcon, LogOutIcon } from "lucide-react"
+import { toast } from "sonner"
 
 export function NavUser({
   user,
@@ -36,8 +37,12 @@ export function NavUser({
   const navigate = useNavigate()
 
   const handleLogout = () => {
+    // Dispatch thunk (which now clears state synchronously)
     dispatch(logoutUser())
-    navigate("/login")
+    // Visual feedback
+    toast.success("Logged out successfully", { id: "logout-toast" })
+    // Navigate immediately to login page
+    navigate("/login", { replace: true })
   }
 
   return (
