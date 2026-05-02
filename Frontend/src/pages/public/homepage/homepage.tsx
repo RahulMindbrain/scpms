@@ -128,30 +128,65 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* Mobile Navigation Menu */}
-        <div className={`md:hidden fixed inset-0 z-40 bg-white transition-all duration-300 ease-in-out ${isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
-          }`}>
-          <div className="flex flex-col h-full pt-20 px-6 pb-10">
-            <div className="flex flex-col gap-6 mb-auto">
-              {['Features', 'Portals', 'Stats'].map((item) => (
-                <button key={item}
-                  type="button"
-                  onClick={() => { scrollToSection(item.toLowerCase()); setIsMenuOpen(false); }}
-                  className="text-2xl font-bold text-slate-800 hover:text-blue-600 transition-colors">
-                  {item}
-                </button>
-              ))}
+        <div className={`md:hidden fixed inset-0 z-[60] bg-white transition-all duration-300 ease-in-out ${isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'}`}>
+          <div className="h-[100dvh] flex flex-col justify-between p-4 bg-gradient-to-b from-white via-blue-50 to-white relative overflow-hidden">
+            {/* Dedicated Close Button */}
+            <button 
+              onClick={() => setIsMenuOpen(false)}
+              className="absolute top-6 right-6 p-3 rounded-2xl bg-white shadow-xl border border-slate-100 text-slate-900 active:scale-95 transition-all z-50"
+            >
+              <X size={24} />
+            </button>
+
+            {/* Top Content Area */}
+            <div className="space-y-6 pt-12">
+              {/* Header */}
+              <div className="mt-4 space-y-3 text-center">
+                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-blue-50 border border-blue-100">
+                  <GraduationCap size={14} className="text-blue-600" />
+                  <span className="text-[10px] font-bold text-blue-600 uppercase tracking-widest">Portal Navigation</span>
+                </div>
+                <h1 className="text-3xl font-bold text-slate-900 tracking-tight">Smart CPMS</h1>
+              </div>
+
+              {/* Glassmorphism Card */}
+              <div className="bg-white/90 backdrop-blur-md shadow-2xl border border-white/40 rounded-[2.5rem] p-3">
+                {[
+                  { label: 'Features', icon: Zap, color: 'text-blue-600', bg: 'bg-blue-50', desc: 'Core platform capabilities' },
+                  { label: 'Portals', icon: Users, color: 'text-indigo-600', bg: 'bg-indigo-50', desc: 'Access stakeholder dashboards' },
+                  { label: 'Stats', icon: BarChart3, color: 'text-teal-600', bg: 'bg-teal-50', desc: 'Real-time placement data' }
+                ].map((item) => (
+                  <button key={item.label}
+                    type="button"
+                    onClick={() => { scrollToSection(item.label.toLowerCase()); setIsMenuOpen(false); }}
+                    className="flex items-center justify-between p-4 rounded-2xl hover:bg-slate-50 active:scale-[0.98] transition-all w-full group">
+                    <div className="flex items-center gap-4">
+                      <div className={`w-14 h-14 rounded-2xl ${item.bg} ${item.color} flex items-center justify-center shadow-inner group-active:scale-90 transition-transform`}>
+                        <item.icon size={26} />
+                      </div>
+                      <div className="text-left">
+                        <span className="text-lg font-bold text-slate-800 block leading-tight">{item.label}</span>
+                        <span className="text-xs text-slate-400 font-medium">{item.desc}</span>
+                      </div>
+                    </div>
+                    <ChevronRight className="text-slate-200 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" size={20} />
+                  </button>
+                ))}
+              </div>
             </div>
-            <div className="flex flex-col gap-4">
+
+            {/* Bottom CTA Section */}
+            <div className="space-y-3 pb-6">
               {!isAuthenticated ? (
                 <>
                   <Link to="/login"
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center justify-center py-4 text-lg font-bold text-slate-900 border border-slate-200 rounded-2xl">
+                    className="flex items-center justify-center py-4 text-lg font-bold text-slate-900 border border-slate-200 rounded-2xl active:scale-95 transition-all">
                     Sign In
                   </Link>
                   <button
                     onClick={() => { setIsMenuOpen(false); navigate('/signup'); }}
-                    className="py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-2xl text-lg font-bold shadow-xl shadow-blue-500/20">
+                    className="py-4 bg-gradient-to-r from-blue-600 to-teal-500 text-white rounded-2xl text-lg font-bold shadow-xl shadow-blue-500/25 active:scale-95 transition-all w-full">
                     Get Started Now
                   </button>
                 </>
@@ -160,22 +195,22 @@ const HomePage: React.FC = () => {
                   <Link
                     to={getDashboardLink()}
                     onClick={() => setIsMenuOpen(false)}
-                    className="flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-2xl group"
+                    className="flex items-center justify-between p-5 bg-blue-50 border border-blue-100 rounded-2xl group active:scale-95 transition-all"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center text-white font-bold text-xl">
+                      <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-2xl shadow-lg shadow-blue-500/20">
                         {user?.firstname?.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="text-sm text-blue-600 font-bold uppercase tracking-wider">{userType}</p>
-                        <p className="text-lg font-bold text-slate-900">{user?.firstname} {user?.lastname}</p>
+                        <p className="text-[10px] text-blue-600 font-bold uppercase tracking-widest mb-0.5">{userType}</p>
+                        <p className="text-xl font-bold text-slate-900 leading-none">{user?.firstname} {user?.lastname}</p>
                       </div>
                     </div>
-                    <ChevronRight size={20} className="text-blue-600 group-hover:translate-x-1 transition-transform" />
+                    <ChevronRight size={24} className="text-blue-600 group-hover:translate-x-1 transition-transform" />
                   </Link>
                   <button
                     onClick={() => { handleLogout(); setIsMenuOpen(false); }}
-                    className="flex items-center justify-center gap-2 py-4 text-lg font-bold text-red-600 border border-red-100 bg-red-50 rounded-2xl"
+                    className="flex items-center justify-center gap-2 py-4 text-lg font-bold text-red-600 border border-red-100 bg-red-50 rounded-2xl active:scale-95 transition-all w-full"
                   >
                     <LogOut size={20} /> Sign Out
                   </button>
@@ -187,7 +222,7 @@ const HomePage: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <header className="relative min-h-[90vh] flex items-center pt-24 pb-16 sm:pt-28 sm:pb-20 md:pt-20 overflow-hidden">
+      <header className="relative min-h-[100dvh] flex items-center pt-20 pb-12 sm:pt-28 sm:pb-20 md:pt-20 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             src="/hero-bg.png"
@@ -199,16 +234,16 @@ const HomePage: React.FC = () => {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 mb-8">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-teal-500/10 border border-teal-500/20 mb-6 sm:mb-8">
               <Zap size={14} className="text-blue-400" />
-              <span className="text-xs font-bold text-blue-400 uppercase tracking-wider">Next-Gen Placement Platform</span>
+              <span className="text-[10px] sm:text-xs font-bold text-blue-400 uppercase tracking-wider">Next-Gen Placement Platform</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-5 sm:mb-6 leading-[1.1]">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4 sm:mb-6 leading-[1.1]">
               Placements, <span className="text-blue-400">Simplified</span>
             </h1>
 
-            <p className="text-base sm:text-lg md:text-xl text-slate-300 mb-8 sm:mb-10 leading-relaxed max-w-2xl">
+            <p className="text-sm sm:text-lg md:text-xl text-slate-300 mb-6 sm:mb-10 leading-relaxed max-w-2xl">
               A unified digital hub for Admins, students, and Company.
               Automate drives, track applications, and boost placement rates
               — all from one platform.
@@ -250,9 +285,9 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* "Everything You Need" Feature Grid */}
-      <section id="features" className="py-16 sm:py-20 md:py-32">
+      <section id="features" className="py-12 sm:py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 sm:mb-16 md:mb-20">
+          <div className="text-center mb-8 sm:mb-16 md:mb-20">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-4 sm:mb-6">Everything You Need</h2>
             <p className="text-base sm:text-lg text-slate-500 max-w-2xl mx-auto">
               A complete suite of tools to digitize and automate your campus placement process.
@@ -307,9 +342,9 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* "Built for Everyone" Portals Section */}
-      <section id="portals" className="py-16 sm:py-20 md:py-24 bg-slate-50/50">
+      <section id="portals" className="py-12 sm:py-20 md:py-24 bg-slate-50/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10 sm:mb-16">
+          <div className="text-center mb-8 sm:mb-16">
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3 sm:mb-4">Built for Everyone</h2>
             <p className="text-slate-500 max-w-2xl mx-auto text-sm sm:text-base">
               Dedicated portals tailored for each stakeholder in the placement ecosystem.
@@ -348,7 +383,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* "Why Go Digital?" Section */}
-      <section className="py-16 sm:py-20 md:py-24 bg-white">
+      <section className="py-12 sm:py-20 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-10 sm:gap-16 items-center">
             <div className="flex-1 w-full">
@@ -387,7 +422,7 @@ const HomePage: React.FC = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-[#0f172a] relative overflow-hidden">
+      <section className="py-16 sm:py-24 bg-[#0f172a] relative overflow-hidden">
         <div className="absolute top-0 left-0 w-full h-full opacity-10">
           <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-600 blur-[120px] rounded-full"></div>
           <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-500 blur-[120px] rounded-full"></div>
