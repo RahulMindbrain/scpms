@@ -58,48 +58,43 @@ const CompanyManagement: React.FC = () => {
   const { jobs: companyJobs, meta: jobsMeta } = useSelector((state: RootState) => state.company);
   const [jobsStatusFilter, setJobsStatusFilter] = useState('APPROVED');
 
-  useEffect(() => {
-    dispatch(fetchCompanies({}));
-    dispatch(fetchInactiveCompanies({}));
-  }, [dispatch]);
+useEffect(() => {
+  dispatch(fetchCompanies({}));
+}, [dispatch]);
+const companies = useMemo<Company[]>(() => {
+  const mapCompany = (c: any): Company => {
+    const userStatus = c.user?.status || 'UNKNOWN';
 
-  const companies = useMemo<Company[]>(() => {
-    const active = reduxCompanies.map((c: any): Company => ({
+    return {
       id: c.id,
       userId: c.user?.id,
       name: c.name || 'N/A',
-      status: 'active',
-      approval: 'Approved',
+      status: userStatus === 'ACTIVE' ? 'active' : 'inactive',
+      approval: userStatus === 'ACTIVE' ? 'Approved' : 'Pending',
       logo: undefined,
       email: c.user?.email || 'N/A',
       description: c.description || '',
       createdAt: c.createdAt,
-      userStatus: c.user?.status
-    }));
+      userStatus
+    };
+  };
 
-    const inactive = reduxInactiveCompanies.map((c: any): Company => ({
-      id: c.id,
-      userId: c.id,
-      name: c.firstname || 'N/A',
-      status: 'inactive',
-      approval: 'Pending',
-      logo: undefined,
-      email: c.email || 'N/A',
-      description: '',
-      createdAt: c.createdAt,
-      userStatus: c.status
-    }));
+  return reduxCompanies.map(mapCompany); // ✅ ONLY THIS
+}, [reduxCompanies]);
+const filteredCompanies = useMemo(() => {
+  return companies.filter((c) => {
+    const matchesSearch = c.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
 
-    return [...active, ...inactive];
-  }, [reduxCompanies, reduxInactiveCompanies]);
+    const matchesFilter =
+      filter === 'All' ||
+      (filter === 'Active' && c.userStatus === 'ACTIVE') ||
+      (filter === 'Inactive' && c.userStatus === 'INACTIVE');
 
-  const filteredCompanies = useMemo(() => {
-    return companies.filter(c => {
-      const matchesSearch = c.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesFilter = filter === 'All' || c.status.toLowerCase() === filter.toLowerCase();
-      return matchesSearch && matchesFilter;
-    });
-  }, [companies, searchTerm, filter]);
+    return matchesSearch && matchesFilter;
+  });
+}, [companies, searchTerm, filter]);
 
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();

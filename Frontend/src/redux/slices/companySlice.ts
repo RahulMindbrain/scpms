@@ -1,7 +1,7 @@
-import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { 
-  fetchCompanies, 
-  fetchInactiveCompanies, 
+import { createSlice } from "@reduxjs/toolkit";
+import {
+  fetchCompanies,
+  fetchInactiveCompanies,
   activateCompanies,
   fetchCompanyProfile,
   createCompanyProfile,
@@ -11,7 +11,7 @@ import {
   fetchJobApplications,
   updateJobApplicationStatus,
   fetchJobsByCompanyId,
-  sendBulkMail
+  sendBulkMail,
 } from "../thunks/companyThunk";
 
 interface CompanyState {
@@ -23,12 +23,7 @@ interface CompanyState {
   statusCounts: any[];
   loading: boolean;
   error: string | null;
-  meta: {
-    total: number;
-    page: number;
-    limit: number;
-    totalPages: number;
-  } | null;
+  meta: any;
 }
 
 const initialState: CompanyState = {
@@ -49,166 +44,84 @@ const companySlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Active Companies
+
+      // ✅ Companies
       .addCase(fetchCompanies.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
-      .addCase(fetchCompanies.fulfilled, (state, action: PayloadAction<any>) => {
+      .addCase(fetchCompanies.fulfilled, (state, action) => {
         state.loading = false;
-        state.companies = action.payload.data.data;
-        state.meta = action.payload.data.meta;
+        state.companies = action.payload.companies;
+        state.meta = action.payload.meta;
       })
       .addCase(fetchCompanies.rejected, (state, action) => {
         state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch companies";
+        state.error = action.payload as string;
       })
-      // Fetch Inactive Companies
-      .addCase(fetchInactiveCompanies.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchInactiveCompanies.fulfilled, (state, action: PayloadAction<any>) => {
+
+      // ✅ Inactive Companies
+      .addCase(fetchInactiveCompanies.fulfilled, (state, action) => {
         state.loading = false;
-        state.inactiveCompanies = action.payload.data.data;
-        // Optionally update meta if inactive companies call also returns it
-        if (action.payload.data.meta) {
-          state.meta = action.payload.data.meta;
-        }
+        state.inactiveCompanies = action.payload.inactiveCompanies;
+        state.meta = action.payload.meta;
       })
-      .addCase(fetchInactiveCompanies.rejected, (state, action) => {
-        state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch inactive companies";
-      })
-      // Activate Companies
+
+      // ✅ Activate
       .addCase(activateCompanies.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
       .addCase(activateCompanies.fulfilled, (state) => {
         state.loading = false;
-        // After activation, we typically might want to refresh lists, 
-        // but here we just stop loading. The component should probably re-fetch.
       })
-      .addCase(activateCompanies.rejected, (state, action) => {
-        state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to activate companies";
+
+      // ✅ Profile
+      .addCase(fetchCompanyProfile.fulfilled, (state, action) => {
+        state.profile = action.payload;
       })
-      // Fetch Company Profile
-      .addCase(fetchCompanyProfile.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      .addCase(createCompanyProfile.fulfilled, (state, action) => {
+        state.profile = action.payload;
       })
-      .addCase(fetchCompanyProfile.fulfilled, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.profile = action.payload?.data || action.payload; // accommodate API response
+      .addCase(updateCompanyProfile.fulfilled, (state, action) => {
+        state.profile = action.payload;
       })
-      .addCase(fetchCompanyProfile.rejected, (state, action) => {
-        state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch company profile";
+
+      // ✅ Jobs
+      .addCase(fetchCompanyJobs.fulfilled, (state, action) => {
+        state.jobs = action.payload.jobs;
+        state.meta = action.payload.meta;
       })
-      // Create Company Profile
-      .addCase(createCompanyProfile.pending, (state) => {
-        state.loading = true;
-        state.error = null;
+      .addCase(fetchJobsByCompanyId.fulfilled, (state, action) => {
+        state.jobs = action.payload.jobs;
+        state.meta = action.payload.meta;
       })
-      .addCase(createCompanyProfile.fulfilled, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.profile = action.payload?.data || action.payload;
+
+      // ✅ Applications
+      .addCase(fetchJobApplications.fulfilled, (state, action) => {
+        state.applications = action.payload.applications;
+        state.statusCounts = action.payload.statusCounts;
+        state.meta = action.payload.meta;
       })
-      .addCase(createCompanyProfile.rejected, (state, action) => {
-        state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to create company profile";
+
+      // ✅ Update Status
+      .addCase(updateJobApplicationStatus.fulfilled, (state, action) => {
+        const updated = action.payload;
+
+        state.applications = state.applications.map((app) =>
+          app.id === updated.id ? { ...app, status: updated.status } : app
+        );
       })
-      // Update Company Profile
-      .addCase(updateCompanyProfile.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateCompanyProfile.fulfilled, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.profile = action.payload?.data || action.payload;
-      })
-      .addCase(updateCompanyProfile.rejected, (state, action) => {
-        state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to update company profile";
-      })
-      // Post Job
-      .addCase(postJob.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(postJob.fulfilled, (state) => {
-        state.loading = false;
-      })
-      .addCase(postJob.rejected, (state, action) => {
-        state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to post job";
-      })
-      // Fetch Company Jobs
-      .addCase(fetchCompanyJobs.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchCompanyJobs.fulfilled, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.jobs = action.payload.data.data;
-        state.meta = action.payload.data.meta;
-      })
-      .addCase(fetchCompanyJobs.rejected, (state, action) => {
-        state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch company jobs";
-      })
-      // Fetch Job Applications
-      .addCase(fetchJobApplications.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchJobApplications.fulfilled, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.applications = action.payload.data.applications;
-        state.statusCounts = action.payload.data.statusCounts;
-        state.meta = action.payload.data.pagination;
-      })
-      .addCase(fetchJobApplications.rejected, (state, action) => {
-        state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch job applications";
-      })
-      // Update Job Application Status
-      .addCase(updateJobApplicationStatus.fulfilled, (state, action: PayloadAction<any>) => {
-        const updatedApp = action.payload.data;
-        if (updatedApp && updatedApp.id) {
-          state.applications = state.applications.map((app: any) => 
-            app.id === updatedApp.id ? { ...app, status: updatedApp.status } : app
-          );
-        }
-      })
-      // Fetch Jobs By Company ID
-      .addCase(fetchJobsByCompanyId.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchJobsByCompanyId.fulfilled, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.jobs = action.payload.data.data;
-        state.meta = action.payload.data.meta;
-      })
-      .addCase(fetchJobsByCompanyId.rejected, (state, action) => {
-        state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch jobs for company";
-      })
-      // Send Bulk Mail
+
+      // ✅ Mail
       .addCase(sendBulkMail.pending, (state) => {
         state.loading = true;
-        state.error = null;
       })
       .addCase(sendBulkMail.fulfilled, (state) => {
         state.loading = false;
       })
       .addCase(sendBulkMail.rejected, (state, action) => {
         state.loading = false;
-        state.error = typeof action.payload === 'string' ? action.payload : "Failed to send bulk emails";
-      })
+        state.error = action.payload as string;
+      });
   },
 });
 
