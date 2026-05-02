@@ -12,6 +12,7 @@ import {
   updateScheduleApprovalStatus,
   getSchedulesByCompanyIdRepo,
 } from "../repository/schedule.repository";
+import prisma from "../config/db";
 
 import {
   getCompanyById,
