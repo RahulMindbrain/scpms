@@ -102,6 +102,7 @@ export const updateScheduleController = async (req: Request, res: Response) => {
 
 export const deleteScheduleController = async (req: Request, res: Response) => {
   try {
+    console.log("HI")
     const id = Number(req.params.id);
 
     await deleteScheduleService(id);

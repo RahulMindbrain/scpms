@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Plus, Edit3, Building2, Clock, 
   MapPin, Briefcase, ChevronDown, ChevronUp, 
-  Search, MessageSquare, Send
+  Search, MessageSquare, Send, Trash2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -266,6 +266,21 @@ const InterviewSchedulerPage: React.FC = () => {
                         <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all" onClick={(e) => handleOpenMessages(e, drive)}>
                           <MessageSquare size={18} />
                         </Button>
+                         <Button 
+    variant="ghost" 
+    size="icon" 
+    className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all" 
+    onClick={(e) => {
+      e.stopPropagation();
+      // TODO: call delete API here
+      dispatch(deleteSchedule(drive.id))
+        .unwrap()
+        .then(() => toast.success("Schedule deleted"))
+        .catch((err) => toast.error(err || "Delete failed"));
+    }}
+  >
+    <Trash2 size={18} />
+  </Button>
                       </div>
                       <div className="w-10 h-10 rounded-xl bg-slate-200/50 flex items-center justify-center text-slate-500">
                          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
