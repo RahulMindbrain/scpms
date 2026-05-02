@@ -3,9 +3,10 @@ import { getAPI, postAPI, putAPI, deleteAPI } from "../../apis/api";
 
 export const fetchSchedules = createAsyncThunk(
   "interview/fetchSchedules",
-  async (_, { rejectWithValue }) => {
+  async (companyId: number | undefined, { rejectWithValue }) => {
     try {
-      const response = await getAPI<any>("/interview-schedule/");
+      const params = companyId ? { companyId } : {};
+      const response = await getAPI<any>("/interview-schedule/", params);
       return response;
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch schedules");

@@ -43,6 +43,7 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { companies, jobs } = useSelector((state: RootState) => state.company);
+  const { schedules } = useSelector((state: RootState) => state.interview);
   const isCreate = mode === 'create';
 
   const [formData, setFormData] = useState({
@@ -69,7 +70,7 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
           message: ""
         });
         if (schedule.companyId) {
-          dispatch(fetchJobsByCompanyId({ id: schedule.companyId }));
+          dispatch(fetchJobsByCompanyId({ id: schedule.companyId, params: { status: 'APPROVED' } }));
         }
       }
     }
@@ -77,7 +78,7 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
 
   const handleCompanyChange = (value: string) => {
     setFormData(prev => ({ ...prev, companyId: value, jobIds: [] }));
-dispatch(fetchJobsByCompanyId({ id: Number(value) }));
+    dispatch(fetchJobsByCompanyId({ id: Number(value), params: { status: 'APPROVED' } }));
   };
 
   const handleJobToggle = (jobId: number) => {
@@ -223,21 +224,32 @@ dispatch(fetchJobsByCompanyId({ id: Number(value) }));
               <Briefcase className="w-4 h-4 text-slate-400" /> Target Job Roles
             </label>
             <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border bg-slate-50/30">
-              {jobs.length > 0 ? jobs.map((job) => (
-                <div key={job.id} className="flex items-center space-x-3 p-2 rounded-lg transition-colors hover:bg-white">
-                  <Checkbox
-                    id={`job-${job.id}`}
-                    checked={formData.jobIds.includes(job.id)}
-                    disabled={!isCreate}
-                    onCheckedChange={() => handleJobToggle(job.id)}
-                  />
-                  <label htmlFor={`job-${job.id}`} className="text-sm font-medium leading-none cursor-pointer">
-                    {job.title}
-                  </label>
-                </div>
-              )) : (
-                <p className="col-span-2 text-xs text-center text-slate-400 py-2 italic">Select a company to see available jobs</p>
-              )}
+              {(() => {
+                const filteredJobs = jobs.filter(job => {
+                  const isAlreadyInOtherSchedule = (schedules || []).some(s => 
+                    s.id !== schedule?.id && s.jobs?.some((j: any) => j.id === job.id)
+                  );
+                  return !isAlreadyInOtherSchedule;
+                });
+
+                return filteredJobs.length > 0 ? filteredJobs.map((job) => (
+                  <div key={job.id} className="flex items-center space-x-3 p-2 rounded-lg transition-colors hover:bg-white">
+                    <Checkbox
+                      id={`job-${job.id}`}
+                      checked={formData.jobIds.includes(job.id)}
+                      disabled={!isCreate}
+                      onCheckedChange={() => handleJobToggle(job.id)}
+                    />
+                    <label htmlFor={`job-${job.id}`} className="text-sm font-medium leading-none cursor-pointer">
+                      {job.title}
+                    </label>
+                  </div>
+                )) : (
+                  <p className="col-span-2 text-xs text-center text-slate-400 py-2 italic">
+                    {jobs.length > 0 ? "All approved jobs are already scheduled" : "Select a company to see available jobs"}
+                  </p>
+                );
+              })()}
             </div>
           </div>
 

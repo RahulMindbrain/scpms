@@ -31,7 +31,7 @@ const InterviewSchedulerPage: React.FC = () => {
 
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('all');
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
@@ -46,8 +46,12 @@ const InterviewSchedulerPage: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    dispatch(fetchSchedules());
-  }, [dispatch]);
+    if (selectedCompanyId) {
+      dispatch(fetchSchedules(Number(selectedCompanyId)));
+    } else if (companies.length > 0) {
+      setSelectedCompanyId(companies[0].id.toString());
+    }
+  }, [selectedCompanyId, companies, dispatch]);
 
   const toggleExpand = (id: number) => {
     setExpandedId(expandedId === id ? null : id);
@@ -165,10 +169,9 @@ const InterviewSchedulerPage: React.FC = () => {
             <div className="flex flex-col sm:flex-row items-center gap-2">
               <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
                 <SelectTrigger className="w-full sm:w-[180px] border-none bg-white shadow-sm ring-1 ring-slate-200 rounded-xl h-11">
-                  <SelectValue placeholder="All Companies" />
+                  <SelectValue placeholder="Select Company" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Companies</SelectItem>
                   {companies.map((company) => (
                     <SelectItem key={company.id} value={company.id.toString()}>
                       {company.name}
