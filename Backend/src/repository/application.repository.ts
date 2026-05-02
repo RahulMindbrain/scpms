@@ -15,23 +15,15 @@ export const getApplications = async (
     console.log(user);
     let where: any = {};
 
-    // =========================
-    // ROLE BASE FILTER
-    // =========================
-
     if (user.role === "STUDENT") {
-      where.studentId = user.studentId; // ✅ correct
+      where.studentId = user.studentId;
     } else if (user.role === "COMPANY") {
       where.job = {
-        companyId: user.companyId, // ✅ correct
+        companyId: user.companyId,
       };
     } else if (user.role === "ADMIN") {
-      // no restriction
     }
     console.log("WHERE:", where);
-    // =========================
-    // FILTERS
-    // =========================
 
     if (filters.studentId) {
       where.studentId = filters.studentId;
@@ -65,7 +57,6 @@ export const getApplications = async (
         take: limit,
         orderBy: { createdAt: "desc" },
 
-        // ✅ FIXED SELECT
         select: {
           id: true,
           status: true,
@@ -97,7 +88,7 @@ export const getApplications = async (
               department: {
                 select: {
                   id: true,
-                  name: true, // ✅ THIS IS WHAT YOU WANTED
+                  name: true,
                 },
               },
 
@@ -282,7 +273,6 @@ export const getApplicationsBySchedule = async (
     }));
   }
 
-  // 🔹 PAGINATED → return data + meta
   const skip = (page - 1) * limit;
 
   const [applications, total] = await Promise.all([

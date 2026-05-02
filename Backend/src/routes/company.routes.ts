@@ -14,6 +14,7 @@ import authenticateUser from "../middlewares/authenticateUser";
 import {
   createJobController,
   getJobsController,
+  updateJobController,
 } from "../controllers/job.controller";
 import { createJobSchema } from "../validators/job.validator";
 import {
