@@ -48,13 +48,25 @@ export const createAdminController = async (req: Request, res: Response) => {
 
 export const getStudentsController = async (req: Request, res: Response) => {
   try {
-    const { page, limit, passingYear, year, minCgpa, maxCgpa, departmentId } =
-      req.query;
+    const {
+      page,
+      limit,
+      passingYear,
+      year,
+      minCgpa,
+      maxCgpa,
+      departmentId,
+      status,
+    } = req.query;
 
     const parseNumber = (value: any) => {
       if (value === undefined) return undefined;
       const num = Number(value);
       return Number.isFinite(num) ? num : undefined;
+    };
+    const parseStatus = (value: unknown): "ACTIVE" | "INACTIVE" | undefined => {
+      if (value === "ACTIVE" || value === "INACTIVE") return value;
+      return undefined;
     };
 
     const parsedPage = parseNumber(page) ?? 1;
@@ -86,6 +98,7 @@ export const getStudentsController = async (req: Request, res: Response) => {
       ...(parseNumber(departmentId) !== undefined && {
         departmentId: parseNumber(departmentId),
       }),
+      ...(parseStatus(status) && { status: parseStatus(status) }),
     };
 
     const students = await getStudentsService(params);
