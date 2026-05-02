@@ -31,10 +31,10 @@ export function NavSecondary({
             const isActive = location.pathname === item.url || location.pathname.startsWith(item.url + '/');
             return (
               <SidebarMenuItem key={item.title}>
-                <SidebarMenuButton asChild isActive={isActive}>
-                  <Link to={item.url}>
+                <SidebarMenuButton asChild tooltip={item.title} isActive={isActive}>
+                  <Link to={item.url} className="flex items-center w-full gap-2 relative cursor-pointer">
                     {item.icon}
-                    <span>{item.title}</span>
+                    <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>

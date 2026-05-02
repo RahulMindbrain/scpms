@@ -29,9 +29,9 @@ export function NavMain({
               <SidebarMenuButton asChild tooltip={item.title} isActive={isActive} className={isActive ? "bg-indigo-50 text-indigo-700 font-semibold" : ""}>
                 <NavLink to={item.url} className="flex items-center w-full gap-2 relative cursor-pointer">
                   {item.icon}
-                  <span>{item.title}</span>
+                  <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
                   {isActive && (
-                    <div className="absolute left-[-8px] w-1.5 h-6 bg-indigo-600 rounded-r-full" />
+                    <div className="absolute left-[-8px] w-1.5 h-6 bg-indigo-600 rounded-r-full group-data-[collapsible=icon]:hidden" />
                   )}
                 </NavLink>
               </SidebarMenuButton>
