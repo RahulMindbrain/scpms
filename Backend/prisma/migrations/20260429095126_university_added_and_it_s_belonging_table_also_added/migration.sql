@@ -2,7 +2,7 @@
 CREATE TYPE "Status" AS ENUM ('ACTIVE', 'INACTIVE');
 
 -- CreateEnum
-CREATE TYPE "Role" AS ENUM ('STUDENT', 'COMPANY', 'ADMIN');
+CREATE TYPE "Role" AS ENUM ('STUDENT', 'COMPANY', 'ADMIN', 'SUPER_ADMIN');
 
 -- CreateEnum
 CREATE TYPE "CompanyApprovalStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
@@ -56,6 +56,7 @@ CREATE TABLE "Student" (
     "portfolioUrl" TEXT,
     "isPlaced" BOOLEAN NOT NULL DEFAULT false,
     "placedAt" TIMESTAMP(3),
+    "universityId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Student_pkey" PRIMARY KEY ("id")
@@ -117,6 +118,9 @@ CREATE TABLE "Company" (
     "userId" INTEGER NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
+    "isVerified" BOOLEAN NOT NULL DEFAULT false,
+    "verifiedAt" TIMESTAMP(3),
+    "verifiedBy" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Company_pkey" PRIMARY KEY ("id")
@@ -126,8 +130,24 @@ CREATE TABLE "Company" (
 CREATE TABLE "Admin" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
+    "universityId" INTEGER NOT NULL,
 
     CONSTRAINT "Admin_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "University" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "code" TEXT,
+    "city" TEXT,
+    "state" TEXT,
+    "country" TEXT,
+    "status" "Status" NOT NULL DEFAULT 'ACTIVE',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "University_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -174,6 +194,30 @@ CREATE TABLE "Application" (
 );
 
 -- CreateTable
+CREATE TABLE "CompanyUniversity" (
+    "id" SERIAL NOT NULL,
+    "companyId" INTEGER NOT NULL,
+    "universityId" INTEGER NOT NULL,
+    "status" "CompanyApprovalStatus" NOT NULL DEFAULT 'PENDING',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "approvedAt" TIMESTAMP(3),
+    "rejectedAt" TIMESTAMP(3),
+    "approvedBy" INTEGER,
+    "reason" TEXT,
+
+    CONSTRAINT "CompanyUniversity_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "JobUniversity" (
+    "id" SERIAL NOT NULL,
+    "jobId" INTEGER NOT NULL,
+    "universityId" INTEGER NOT NULL,
+
+    CONSTRAINT "JobUniversity_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Token" (
     "id" SERIAL NOT NULL,
     "refreshToken" TEXT NOT NULL,
@@ -198,6 +242,7 @@ CREATE TABLE "InterviewSchedule" (
     "rejectedAt" TIMESTAMP(3),
     "rejectionReason" TEXT,
     "createdBy" INTEGER NOT NULL,
+    "universityId" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -262,6 +307,9 @@ CREATE INDEX "Student_passingYear_idx" ON "Student"("passingYear");
 CREATE INDEX "Student_isPlaced_idx" ON "Student"("isPlaced");
 
 -- CreateIndex
+CREATE INDEX "Student_universityId_idx" ON "Student"("universityId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Skill_name_key" ON "Skill"("name");
 
 -- CreateIndex
@@ -280,7 +328,19 @@ CREATE INDEX "Project_studentId_idx" ON "Project"("studentId");
 CREATE UNIQUE INDEX "Company_userId_key" ON "Company"("userId");
 
 -- CreateIndex
+CREATE INDEX "Company_verifiedBy_idx" ON "Company"("verifiedBy");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Admin_userId_key" ON "Admin"("userId");
+
+-- CreateIndex
+CREATE INDEX "Admin_universityId_idx" ON "Admin"("universityId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "University_name_key" ON "University"("name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "University_code_key" ON "University"("code");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Department_name_key" ON "Department"("name");
@@ -304,6 +364,30 @@ CREATE INDEX "Application_jobId_idx" ON "Application"("jobId");
 CREATE UNIQUE INDEX "Application_studentId_jobId_key" ON "Application"("studentId", "jobId");
 
 -- CreateIndex
+CREATE INDEX "CompanyUniversity_companyId_idx" ON "CompanyUniversity"("companyId");
+
+-- CreateIndex
+CREATE INDEX "CompanyUniversity_universityId_idx" ON "CompanyUniversity"("universityId");
+
+-- CreateIndex
+CREATE INDEX "CompanyUniversity_status_idx" ON "CompanyUniversity"("status");
+
+-- CreateIndex
+CREATE INDEX "CompanyUniversity_approvedBy_idx" ON "CompanyUniversity"("approvedBy");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "CompanyUniversity_companyId_universityId_key" ON "CompanyUniversity"("companyId", "universityId");
+
+-- CreateIndex
+CREATE INDEX "JobUniversity_universityId_idx" ON "JobUniversity"("universityId");
+
+-- CreateIndex
+CREATE INDEX "JobUniversity_jobId_idx" ON "JobUniversity"("jobId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "JobUniversity_jobId_universityId_key" ON "JobUniversity"("jobId", "universityId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Token_refreshToken_key" ON "Token"("refreshToken");
 
 -- CreateIndex
@@ -320,6 +404,9 @@ CREATE INDEX "InterviewSchedule_status_idx" ON "InterviewSchedule"("status");
 
 -- CreateIndex
 CREATE INDEX "InterviewSchedule_companyApprovalStatus_idx" ON "InterviewSchedule"("companyApprovalStatus");
+
+-- CreateIndex
+CREATE INDEX "InterviewSchedule_universityId_idx" ON "InterviewSchedule"("universityId");
 
 -- CreateIndex
 CREATE INDEX "ScheduleMessage_scheduleId_idx" ON "ScheduleMessage"("scheduleId");
@@ -352,6 +439,9 @@ ALTER TABLE "Student" ADD CONSTRAINT "Student_userId_fkey" FOREIGN KEY ("userId"
 ALTER TABLE "Student" ADD CONSTRAINT "Student_departmentId_fkey" FOREIGN KEY ("departmentId") REFERENCES "Department"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Student" ADD CONSTRAINT "Student_universityId_fkey" FOREIGN KEY ("universityId") REFERENCES "University"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Experience" ADD CONSTRAINT "Experience_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -364,7 +454,13 @@ ALTER TABLE "Project" ADD CONSTRAINT "Project_studentId_fkey" FOREIGN KEY ("stud
 ALTER TABLE "Company" ADD CONSTRAINT "Company_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "Company" ADD CONSTRAINT "Company_verifiedBy_fkey" FOREIGN KEY ("verifiedBy") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Admin" ADD CONSTRAINT "Admin_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Admin" ADD CONSTRAINT "Admin_universityId_fkey" FOREIGN KEY ("universityId") REFERENCES "University"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Job" ADD CONSTRAINT "Job_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -382,6 +478,21 @@ ALTER TABLE "Application" ADD CONSTRAINT "Application_studentId_fkey" FOREIGN KE
 ALTER TABLE "Application" ADD CONSTRAINT "Application_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
+ALTER TABLE "CompanyUniversity" ADD CONSTRAINT "CompanyUniversity_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CompanyUniversity" ADD CONSTRAINT "CompanyUniversity_universityId_fkey" FOREIGN KEY ("universityId") REFERENCES "University"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "CompanyUniversity" ADD CONSTRAINT "CompanyUniversity_approvedBy_fkey" FOREIGN KEY ("approvedBy") REFERENCES "Admin"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "JobUniversity" ADD CONSTRAINT "JobUniversity_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "Job"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "JobUniversity" ADD CONSTRAINT "JobUniversity_universityId_fkey" FOREIGN KEY ("universityId") REFERENCES "University"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Token" ADD CONSTRAINT "Token_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
@@ -389,6 +500,9 @@ ALTER TABLE "InterviewSchedule" ADD CONSTRAINT "InterviewSchedule_companyId_fkey
 
 -- AddForeignKey
 ALTER TABLE "InterviewSchedule" ADD CONSTRAINT "InterviewSchedule_createdBy_fkey" FOREIGN KEY ("createdBy") REFERENCES "Admin"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "InterviewSchedule" ADD CONSTRAINT "InterviewSchedule_universityId_fkey" FOREIGN KEY ("universityId") REFERENCES "University"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ScheduleMessage" ADD CONSTRAINT "ScheduleMessage_scheduleId_fkey" FOREIGN KEY ("scheduleId") REFERENCES "InterviewSchedule"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

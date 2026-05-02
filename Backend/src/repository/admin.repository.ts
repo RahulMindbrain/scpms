@@ -1,20 +1,95 @@
-import { JobStatus, Prisma, Role } from "@prisma/client";
+import { JobStatus, Prisma, Role, Status } from "@prisma/client";
 import prisma from "../config/db";
 
 export const getAdminCount = async () => {
   return prisma.admin.count();
 };
 
-export const createAdmin = async (userId: number) => {
-  return prisma.admin.create({
-    data: { userId },
+export const createAdminWithUniversity = async (
+  tx: any,
+  userData: {
+    firstname: string;
+    lastname?: string;
+    email: string;
+    password: string;
+  },
+  universityData: {
+    name: string;
+    code?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+  },
+) => {
+  const user = await tx.user.create({
+    data: {
+      ...userData,
+      role: Role.ADMIN,
+      status: Status.INACTIVE,
+    },
+    select: {
+      id: true,
+      firstname: true,
+      email: true,
+      role: true,
+      status: true,
+    },
   });
+
+  const university = await tx.university.create({
+    data: {
+      ...universityData,
+      status: Status.INACTIVE,
+    },
+    select: {
+      id: true,
+      name: true,
+      code: true,
+      city: true,
+      state: true,
+      country: true,
+      status: true,
+    },
+  });
+
+  const admin = await tx.admin.create({
+    data: {
+      userId: user.id,
+      universityId: university.id,
+    },
+    select: {
+      id: true,
+      userId: true,
+      universityId: true,
+    },
+  });
+
+  return {
+    user,
+    university,
+    admin,
+  };
 };
 
 export const getAdminByUserId = async (userId: number) => {
   return prisma.admin.findUnique({
     where: { userId },
     select: { id: true },
+  });
+};
+
+export const getAdminsByIds = async (ids: number[]) => {
+  return prisma.user.findMany({
+    where: {
+      id: { in: ids },
+      role: "ADMIN",
+    },
+    select: {
+      id: true,
+      firstname: true,
+      email: true,
+      status: true,
+    },
   });
 };
 

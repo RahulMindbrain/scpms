@@ -2,7 +2,6 @@ import { Router } from "express";
 import {
   activateCompaniesController,
   activateUsersController,
-  createAdminController,
   getCompaniesController,
   getDashboardStatsController,
   getInactiveCompaniesController,
@@ -10,8 +9,10 @@ import {
   getJobsByCompanyIdController,
   getStudentsController,
   updateJobStatusByAdminController,
+  registerAdminController,
+  getCompanyRequestsController,
+  updateCompanyRequestsController,
 } from "../controllers/admin.controller";
-import { createUserController } from "../controllers/user.controller";
 import { validate } from "../middlewares/validate";
 import { adminSchema } from "../validators/auth.validator";
 import authenticateUser from "../middlewares/authenticateUser";
@@ -26,7 +27,7 @@ import { getCompanyById } from "../repository/company.repository";
 
 const adminRoutes = Router();
 
-adminRoutes.post("/register", validate(adminSchema), createAdminController);
+adminRoutes.post("/register", validate(adminSchema), registerAdminController);
 
 adminRoutes.get(
   "/get-students",
@@ -47,6 +48,20 @@ adminRoutes.get(
   authenticateUser,
   authorizeRoles("ADMIN"),
   getInactiveStudentsController,
+);
+
+adminRoutes.get(
+  "/company-requests",
+  authenticateUser,
+  authorizeRoles("ADMIN"),
+  getCompanyRequestsController,
+);
+
+adminRoutes.put(
+  "/company-requests",
+  authenticateUser,
+  authorizeRoles("ADMIN"),
+  updateCompanyRequestsController,
 );
 
 adminRoutes.put(

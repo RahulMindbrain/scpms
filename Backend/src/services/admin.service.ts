@@ -1,15 +1,20 @@
 import bcrypt from "bcrypt";
 import {
   Company,
+  CompanyApprovalStatus,
   Job,
   JobStatus,
   NotificationType,
   Role,
 } from "@prisma/client";
-import { createUser, getUsersByIds } from "../repository/user.repository";
+import {
+  createUser,
+  findUserByEmail,
+  getUsersByIds,
+} from "../repository/user.repository";
 import {
   activateUsers,
-  createAdmin,
+  createAdminWithUniversity,
   getActiveStudentsByYear,
   getAdminCount,
   getJobs,
@@ -48,35 +53,54 @@ import {
   normalizeName,
   normalizeText,
 } from "../utils/normalize.utils";
+import prisma from "../config/db";
+import {
+  getRequestsByUniversity,
+  updateCompanyRequestStatus,
+} from "../repository/compnay.university.repository";
+import { updateCompanyUniversityStatus } from "../repository/superadmin.repository";
+import { getUniversityByAdminId } from "../repository/university.repository";
 
-export const createAdminService = async (
-  firstname: string,
-  lastname: string,
-  email: string,
-  password: string,
-) => {
+export const registerAdminService = async (data: {
+  firstname: string;
+  lastname?: string;
+  email: string;
+  password: string;
+  university: {
+    name: string;
+    code?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+  };
+}) => {
+  let { firstname, lastname, email, password, university } = data;
+
   firstname = normalizeName(firstname);
-  lastname = normalizeName(lastname);
+  lastname = lastname ? normalizeName(lastname) : undefined;
   email = normalizeEmails(email);
-  const count = await getAdminCount();
 
-  if (count > 0) {
-    throw new Error("Admin already exists");
+  if (!university?.name) {
+    throw new Error("University name is required");
+  }
+
+  const existing = await findUserByEmail(email);
+  if (existing) {
+    throw new Error("Email already exists");
   }
 
   const hashedPassword = await hashPassword(password);
 
-  const user = await createUser({
+  const userData = {
     firstname,
-    lastname,
+    ...(lastname ? { lastname } : {}),
     email,
     password: hashedPassword,
-    role: Role.ADMIN,
+  };
+
+  return prisma.$transaction(async (tx) => {
+    return createAdminWithUniversity(tx, userData, university);
   });
-
-  const admin = await createAdmin(user.id);
-
-  return admin;
 };
 
 export const getStudentsService = async (params: {
@@ -507,4 +531,34 @@ export const getJobsByCompanyIdServices = async (params: {
     console.log(error);
     throw error;
   }
+};
+
+export const getCompanyRequestsService = async (
+  universityId: number,
+  status?: CompanyApprovalStatus,
+) => {
+  if (!universityId) {
+    throw new Error("UniversityId required");
+  }
+
+  return getRequestsByUniversity(universityId, status);
+};
+
+export const updateCompanyRequestsService = async (
+  ids: number[],
+  status: "APPROVED" | "REJECTED",
+  adminId: number,
+) => {
+  const admin = await getUniversityByAdminId(adminId);
+
+  if (!admin) {
+    throw new Error("Admin not found");
+  }
+
+  return updateCompanyUniversityStatus(
+    ids,
+    status,
+    adminId,
+    admin.university.id,
+  );
 };
