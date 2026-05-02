@@ -11,7 +11,9 @@ import {
   Sparkles,
   MapPin,
   Clock3,
+  Timer,
 } from "lucide-react"
+import CountdownTimer from "@/components/CountdownTimer"
 import type { AppDispatch } from "@/redux/store/store"
 import type { RootState } from "@/redux/reducers/rootReducer"
 import { fetchUpcomingEvents, fetchUnreadCount } from "@/redux/thunks/notificationThunks"
@@ -125,12 +127,17 @@ export default function StudentDashboard() {
                 <p className="text-sm text-slate-500">Next Event</p>
                 <ChevronRight className="h-4 w-4 text-emerald-600" />
               </div>
-              <p className="mt-3 line-clamp-1 text-base font-semibold text-slate-900">
-                {nextEvent ? nextEvent.title : "No event scheduled"}
-              </p>
-              <p className="mt-1 text-xs text-slate-500">
-                {nextEvent ? new Date(nextEvent.startTime).toLocaleString() : "You are all caught up"}
-              </p>
+              <div className="mt-3">
+                <p className="line-clamp-1 text-base font-semibold text-slate-900">
+                  {nextEvent ? nextEvent.title : "No event scheduled"}
+                </p>
+                <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                  <p className="text-xs text-slate-500">
+                    {nextEvent ? new Date(nextEvent.startTime).toLocaleString() : "You are all caught up"}
+                  </p>
+                  {nextEvent && <CountdownTimer targetDate={nextEvent.startTime} />}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -155,9 +162,12 @@ export default function StudentDashboard() {
                           <p className="font-semibold text-slate-900">{event.title}</p>
                           <p className="text-sm text-slate-600">{event.company}</p>
                         </div>
-                        <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 group-hover:bg-blue-100">
-                          Event
-                        </span>
+                        <div className="flex flex-col items-end gap-2">
+                          <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 group-hover:bg-blue-100">
+                            Event
+                          </span>
+                          <CountdownTimer targetDate={event.startTime} />
+                        </div>
                       </div>
                       <div className="mt-3 grid gap-2 text-sm text-slate-500 md:grid-cols-2">
                         <p className="inline-flex items-center gap-1.5">
