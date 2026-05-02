@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Plus, Edit3, Building2, Clock, 
   MapPin, Briefcase, ChevronDown, ChevronUp, 
-  Trash2, Search, Users, MessageSquare, Send
+  Search, MessageSquare, Send
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -78,17 +78,6 @@ const InterviewSchedulerPage: React.FC = () => {
     setIsEditModalOpen(true);
   };
 
-  const handleDelete = async (e: React.MouseEvent, id: number) => {
-    e.stopPropagation();
-    if (window.confirm("Are you sure you want to delete this schedule?")) {
-      try {
-        await dispatch(deleteSchedule(id)).unwrap();
-        toast.success("Schedule deleted successfully");
-      } catch (err) {
-        toast.error("Failed to delete schedule");
-      }
-    }
-  };
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -122,10 +111,6 @@ const InterviewSchedulerPage: React.FC = () => {
     }
   };
 
-  const handleOpenApplications = (e: React.MouseEvent, scheduleId: number) => {
-    e.stopPropagation();
-    navigate(`/admin/applications/${scheduleId}`);
-  };
 
   const handleSendMessage = async () => {
     if (!activeSchedule || !messageText.trim()) return;
@@ -275,19 +260,8 @@ const InterviewSchedulerPage: React.FC = () => {
                     {/* Action Bar / Stack */}
                     <div className="bg-slate-50/50 p-4 sm:p-6 lg:w-44 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-slate-100">
                       <div className="flex items-center gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-sky-600 hover:bg-sky-50 rounded-xl transition-all"
-                          onClick={(e) => handleOpenApplications(e, drive.id)}
-                        >
-                          <Users size={18} />
-                        </Button>
                         <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all" onClick={(e) => handleOpenEdit(e, drive)}>
                           <Edit3 size={18} />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all" onClick={(e) => handleDelete(e, drive.id)}>
-                          <Trash2 size={18} />
                         </Button>
                         <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all" onClick={(e) => handleOpenMessages(e, drive)}>
                           <MessageSquare size={18} />
@@ -325,10 +299,6 @@ const InterviewSchedulerPage: React.FC = () => {
                                 </div>
                                 <div className="flex items-center justify-between pt-4 border-t border-slate-50">
                                   <Badge variant="outline" className="rounded-lg text-[8px] sm:text-[9px] font-black tracking-widest border-slate-200">{job.status}</Badge>
-                                  <div className="flex items-center gap-1.5 text-slate-500">
-                                    <Users size={12} />
-                                    <span className="text-[9px] font-black uppercase tracking-tight">{job._count?.applications || 0} Candidates</span>
-                                  </div>
                                 </div>
                               </div>
                             )) || <div className="col-span-full py-8 text-slate-400 font-bold text-center italic text-sm">No jobs linked.</div>}

@@ -225,12 +225,9 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
             </label>
             <div className="grid grid-cols-2 gap-3 p-4 rounded-xl border bg-slate-50/30">
               {(() => {
-                const filteredJobs = jobs.filter(job => {
-                  const isAlreadyInOtherSchedule = (schedules || []).some(s => 
-                    s.id !== schedule?.id && s.jobs?.some((j: any) => j.id === job.id)
-                  );
-                  return !isAlreadyInOtherSchedule;
-                });
+                const filteredJobs = jobs.filter(job => 
+                  !job.interviewScheduleId || job.interviewScheduleId === schedule?.id
+                );
 
                 return filteredJobs.length > 0 ? filteredJobs.map((job) => (
                   <div key={job.id} className="flex items-center space-x-3 p-2 rounded-lg transition-colors hover:bg-white">
