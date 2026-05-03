@@ -2,18 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import {
-  Briefcase,
-  IndianRupee,
-  MapPin,
-  GraduationCap,
-  AlignLeft,
-  CheckCircle2,
-  Zap,
-  BookOpen,
+  Briefcase, 
+  MapPin, 
+  GraduationCap, 
+  AlignLeft, 
+  CheckCircle2, 
+  Zap, 
+  BookOpen, 
   Code2,
   FileText,
   ChevronDown,
-  X
+  IndianRupee,
+  X,
 } from 'lucide-react';
 import { postJob } from '@/redux/thunks/companyThunk';
 import { fetchDepartments } from '@/redux/thunks/departmentThunk';
@@ -127,12 +127,11 @@ const PostJob: React.FC = () => {
   );
 
   return (
-    <div className="font-sans">
-      <div className="bg-[#1e1f26] rounded-[2rem] border border-[rgba(255,255,255,0.07)] overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
-        {/* Header */}
-        <header className="p-5 sm:p-6 border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]">
-          <h1 className="text-2xl font-extrabold text-[#e2e2eb] tracking-tight">Create New Job Drive</h1>
-          <p className="mt-1 text-[#908fa0] text-sm">Configure your recruitment requirements to find the best talent.</p>
+    <div className="min-h-screen bg-slate-50/50 py-7 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className=" bg-white rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <header className="p-8 sm:p-10 border-b border-slate-100 bg-gradient-to-r from-white to-slate-50/50">
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Create New Job Drive</h1>
+          <p className="mt-2 text-slate-500 text-lg">Configure your recruitment requirements to find the best talent.</p>
         </header>
 
         <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-6">
@@ -156,9 +155,16 @@ const PostJob: React.FC = () => {
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-[#c7c4d7] ml-1">Annual Salary</label>
                 <div className="relative group">
-                  <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 text-[#908fa0] group-focus-within:text-indigo-400 transition-colors" size={18} />
-                  <input type="number" name="salary" value={formData.salary} onChange={handleInputChange}
-                    placeholder="e.g. 1200000" className={inputBase} required />
+                  <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
+                  <input
+                    type="number"
+                    name="salary"
+                    value={formData.salary}
+                    onChange={handleInputChange}
+                    placeholder="e.g. 1200000"
+                    className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/30 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 font-medium"
+                    required
+                  />
                 </div>
               </div>
 

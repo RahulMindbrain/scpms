@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Mail, ChevronLeft, ArrowRight, GraduationCap, Lock, ShieldCheck, KeyRound } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Mail, ChevronLeft, ArrowRight, GraduationCap, Lock, ShieldCheck, KeyRound, RotateCcw, Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import forgot from '../../../assets/forgot.png';
 import { useDispatch } from 'react-redux';
@@ -19,6 +19,22 @@ const ForgotPassword: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [timer, setTimer] = useState(30);
+  const [canResend, setCanResend] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  useEffect(() => {
+    let interval: any;
+    if (step === 'OTP' && timer > 0) {
+      interval = setInterval(() => {
+        setTimer((prev) => prev - 1);
+      }, 1000);
+    } else if (timer === 0) {
+      setCanResend(true);
+    }
+    return () => clearInterval(interval);
+  }, [step, timer]);
 
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,10 +43,12 @@ const ForgotPassword: React.FC = () => {
     setIsLoading(true);
     try {
       await dispatch(forgotPassword(email)).unwrap();
-      toast.success("OTP sent successfully to your email");
+      toast.success("OTP sent successfully to your email", { id: "otp-toast" });
       setStep('OTP');
+      setTimer(30);
+      setCanResend(false);
     } catch (error: any) {
-      toast.error(error || "Failed to send OTP");
+      toast.error(error || "Failed to send OTP", { id: "otp-toast" });
     } finally {
       setIsLoading(false);
     }
@@ -43,10 +61,30 @@ const ForgotPassword: React.FC = () => {
     setIsLoading(true);
     try {
       await dispatch(verifyOTP({ email, otp })).unwrap();
-      toast.success("OTP verified successfully");
+      toast.success("OTP verified successfully", { id: "otp-toast" });
       setStep('RESET');
     } catch (error: any) {
-      toast.error(error || "Invalid OTP");
+      toast.error(error || "Invalid OTP", { id: "otp-toast" });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendOTP = async () => {
+    if (!canResend) return;
+    setIsLoading(true);
+    try {
+      await dispatch(forgotPassword(email)).unwrap();
+      toast.success("OTP resent successfully", { id: "otp-toast" });
+      setTimer(30);
+      setCanResend(false);
+    } catch (error: any) {
+      toast.error(error || "Failed to resend OTP", { id: "otp-toast" });
+      // If OTP was already sent, we should still start the timer to prevent immediate spamming
+      if (error === "OTP already sent. Please wait.") {
+        setTimer(30);
+        setCanResend(false);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -64,10 +102,10 @@ const ForgotPassword: React.FC = () => {
     setIsLoading(true);
     try {
       await dispatch(resetPassword({ email, newpassword: newPassword })).unwrap();
-      toast.success("Password reset successful. Please login with your new password.");
+      toast.success("Password reset successful. Please login with your new password.", { id: "otp-toast" });
       navigate('/login');
     } catch (error: any) {
-      toast.error(error || "Failed to reset password");
+      toast.error(error || "Failed to reset password", { id: "otp-toast" });
     } finally {
       setIsLoading(false);
     }
@@ -132,13 +170,68 @@ const ForgotPassword: React.FC = () => {
               <span>{isLoading ? "Verifying..." : "Verify OTP"}</span>
               {!isLoading && <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />}
             </button>
-            <button
-              type="button"
-              onClick={() => setStep('EMAIL')}
-              className="w-full text-slate-500 text-sm font-medium hover:text-slate-700 transition-colors"
-            >
-              Resend OTP or Change Email
-            </button>
+            <div className="flex flex-col gap-4 mt-4">
+              <button
+                type="button"
+                disabled={!canResend || isLoading}
+                onClick={handleResendOTP}
+                className={`w-full py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-3 active:scale-[0.98] ${
+                  canResend 
+                    ? "bg-blue-50 text-blue-600 hover:bg-blue-100 shadow-md shadow-blue-900/5 animate-in zoom-in-95 duration-300" 
+                    : "bg-slate-50 text-slate-400 cursor-not-allowed border border-slate-100"
+                }`}
+              >
+                {canResend ? (
+                  <>
+                    <RotateCcw size={18} className="animate-in spin-in-180 duration-700" />
+                    <span>Resend OTP</span>
+                  </>
+                ) : (
+                  <>
+                    <div className="relative flex items-center justify-center w-6 h-6">
+                      <svg className="w-full h-full transform -rotate-90">
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          fill="transparent"
+                          className="text-slate-200"
+                        />
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          fill="transparent"
+                          strokeDasharray={2 * Math.PI * 10}
+                          strokeDashoffset={2 * Math.PI * 10 * (1 - timer / 30)}
+                          strokeLinecap="round"
+                          className="text-blue-500 transition-all duration-1000 ease-linear"
+                        />
+                      </svg>
+                    </div>
+                    <span className="text-sm font-medium">
+                      Didn't receive code? Retry in <span className="text-blue-600 font-bold tabular-nums">{timer}s</span>
+                    </span>
+                  </>
+                )}
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => {
+                  setStep('EMAIL');
+                  setTimer(30);
+                  setCanResend(false);
+                }}
+                className="text-slate-400 text-xs font-medium hover:text-slate-600 transition-colors flex items-center justify-center gap-1"
+              >
+                Entered wrong email? <span className="text-blue-500 hover:underline">Change Email Address</span>
+              </button>
+            </div>
           </form>
         );
       case 'RESET':
@@ -152,13 +245,20 @@ const ForgotPassword: React.FC = () => {
                     <Lock size={20} strokeWidth={2} />
                   </div>
                   <input
-                    type="password"
+                    type={showNewPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="••••••••"
                     required
-                    className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium"
+                    className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(!showNewPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+                  >
+                    {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
               <div className="space-y-2">
@@ -168,13 +268,20 @@ const ForgotPassword: React.FC = () => {
                     <KeyRound size={20} strokeWidth={2} />
                   </div>
                   <input
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
                     required
-                    className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium"
+                    className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
               </div>
             </div>

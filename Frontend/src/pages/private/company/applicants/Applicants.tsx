@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter, Download } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobApplications, updateJobApplicationStatus } from '@/redux/thunks/companyThunk';
@@ -10,7 +10,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
+} from "@/components/ui/select";
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import Loader from '@/components/Loader';
@@ -23,8 +23,14 @@ const Applicants: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = React.useState('ALL');
   const [selectedJob, setSelectedJob] = React.useState('All Jobs');
 
+  const STATUS_FLOW = ['APPLIED', 'SHORTLISTED', 'SELECTED', 'REJECTED'];
+
+  const isBackward = (current: string, next: string) => {
+    return STATUS_FLOW.indexOf(next) < STATUS_FLOW.indexOf(current);
+  };
+
   React.useEffect(() => {
-    const params: { status?: string; page?: number; limit?: number } = {};
+    const params: { status?: string } = {};
     if (selectedStatus !== 'ALL') {
       params.status = selectedStatus;
     }
@@ -38,9 +44,21 @@ const Applicants: React.FC = () => {
     return matchesSearch && matchesJob;
   });
 
-  const uniqueJobs = Array.from(new Set(applications.map((app: any) => app.job?.title))).filter(Boolean);
+  const uniqueJobs = Array.from(
+    new Set(applications.map((app: any) => app.job?.title))
+  ).filter(Boolean);
 
-  const handleStatusUpdate = async (id: number, newStatus: string) => {
+  const handleStatusUpdate = async (id: number, newStatus: string, currentStatus: string) => {
+    const currentIndex = STATUS_FLOW.indexOf(currentStatus);
+    const newIndex = STATUS_FLOW.indexOf(newStatus);
+
+    if (newIndex < currentIndex) {
+      toast.error("Status cannot be moved backward!");
+      return;
+    }
+
+    if (newIndex === currentIndex) return;
+
     const toastId = toast.loading(`Updating status to ${newStatus}...`);
     try {
       await dispatch(updateJobApplicationStatus({ id, status: newStatus })).unwrap();
@@ -51,11 +69,11 @@ const Applicants: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-700">
-      {/* Filters + Search */}
-      <div className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#1e1f26] p-5 space-y-4">
+    <div className="space-y-9 animate-in fade-in duration-700">
+
+      <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 space-y-6">
         <div className="flex flex-col md:flex-row gap-4">
-          {/* Search */}
+
           <div className="relative flex-1 group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0] group-focus-within:text-indigo-400 transition-colors" />
             <input
@@ -67,10 +85,10 @@ const Applicants: React.FC = () => {
             />
           </div>
 
-          {/* Filters */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0c0e14]">
-              <Filter className="w-4 h-4 text-[#908fa0]" />
+
+            <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
+              <Filter className="w-4 h-4 text-slate-400" />
               <select
                 value={selectedJob}
                 onChange={(e) => setSelectedJob(e.target.value)}
@@ -78,10 +96,13 @@ const Applicants: React.FC = () => {
               >
                 <option>All Jobs</option>
                 {uniqueJobs.map((job) => (
-                  <option key={job as string} value={job as string}>{job as string}</option>
+                  <option key={job as string} value={job as string}>
+                    {job as string}
+                  </option>
                 ))}
               </select>
             </div>
+
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
@@ -93,6 +114,7 @@ const Applicants: React.FC = () => {
               <option value="SELECTED">Selected</option>
               <option value="REJECTED">Rejected</option>
             </select>
+
           </div>
         </div>
 
@@ -100,77 +122,77 @@ const Applicants: React.FC = () => {
         <div className="overflow-x-auto rounded-xl border border-[rgba(255,255,255,0.05)]">
           <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)]">
-                <th className="px-4 py-3.5 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Name</th>
-                <th className="px-4 py-3.5 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Branch</th>
-                <th className="px-4 py-3.5 text-xs font-bold text-[#908fa0] uppercase tracking-widest">CGPA</th>
-                <th className="px-4 py-3.5 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Applied For</th>
-                <th className="px-4 py-3.5 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Status</th>
-                <th className="px-4 py-3.5 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-right">Resume</th>
+              <tr className="border-b border-slate-50">
+                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">Name</th>
+                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">Branch</th>
+                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">CGPA</th>
+                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">Applied For</th>
+                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">Status</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[rgba(255,255,255,0.04)]">
+
+            <tbody className="divide-y divide-slate-50">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center">
+                  <td colSpan={5} className="px-4 py-10 text-center">
                     <Loader text="Loading applicants..." />
                   </td>
                 </tr>
               ) : filteredApplicants.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-10 text-center text-sm font-medium text-[#908fa0]">
-                    No applicants found matching your criteria.
+                  <td colSpan={5} className="px-4 py-10 text-center text-sm text-slate-500">
+                    No applicants found.
                   </td>
                 </tr>
               ) : (
-                filteredApplicants.map((app: any, index: number) => (
-                  <tr key={index} className="hover:bg-[rgba(255,255,255,0.025)] transition-all group">
-                    <td className="px-4 py-3 font-bold text-[#e2e2eb] text-sm">
+                filteredApplicants.map((app: any) => (
+                  <tr key={app.id} className="hover:bg-slate-50 transition">
+
+                    <td className="px-4 py-5 font-bold text-slate-800">
                       {app.student?.user?.firstname || 'N/A'} {app.student?.user?.lastname || ''}
                     </td>
-                    <td className="px-4 py-3 text-xs font-medium text-[#908fa0]">{app.student?.department?.name || `Dept ${app.student?.departmentId || 'N/A'}`}</td>
-                    <td className="px-4 py-3 text-xs font-black text-[#c7c4d7]">{app.student?.cgpa || 'N/A'}</td>
-                    <td className="px-4 py-3 text-xs font-medium text-[#c7c4d7]">{app.job?.title || 'N/A'}</td>
-                    <td className="px-4 py-3 font-bold">
+
+                    <td className="px-4 py-5 text-sm text-slate-500">
+                      {app.student?.department?.name || 'N/A'}
+                    </td>
+
+                    <td className="px-4 py-5 text-sm font-bold text-slate-700">
+                      {app.student?.cgpa || 'N/A'}
+                    </td>
+
+                    <td className="px-4 py-5 text-sm text-slate-600">
+                      {app.job?.title || 'N/A'}
+                    </td>
+
+                    <td className="px-4 py-5">
                       <Select
                         value={app.status}
-                        onValueChange={(value) => handleStatusUpdate(app.id, value)}
+                        onValueChange={(value) =>
+                          handleStatusUpdate(app.id, value, app.status)
+                        }
                       >
-                        <SelectTrigger className="w-[120px] h-7 border-[rgba(255,255,255,0.1)] bg-[rgba(255,255,255,0.04)] rounded-lg hover:bg-[rgba(255,255,255,0.07)] transition-colors text-[11px] text-[#e2e2eb]">
+                        <SelectTrigger className="w-[140px] h-9 rounded-xl">
                           <SelectValue>
                             <Badge className="text-[10px] py-0 px-2" variant={
                               app.status === 'SELECTED' ? 'success' :
-                                app.status === 'REJECTED' ? 'danger' :
-                                  app.status === 'SHORTLISTED' ? 'default' :
-                                    app.status === 'INTERVIEW' ? 'warning' : 'outline'
+                              app.status === 'REJECTED' ? 'danger' :
+                              app.status === 'SHORTLISTED' ? 'default' :
+                              'outline'
                             }>
                               {app.status}
                             </Badge>
                           </SelectValue>
                         </SelectTrigger>
-                        <SelectContent className="rounded-xl border-[rgba(255,255,255,0.1)] bg-[#1e1f26] shadow-2xl p-1">
-                          <SelectItem value="APPLIED" className="rounded-lg mb-1 text-[#c7c4d7] focus:bg-indigo-500/10 focus:text-indigo-300">Applied</SelectItem>
-                          <SelectItem value="SHORTLISTED" className="rounded-lg mb-1 text-[#c7c4d7] focus:bg-indigo-500/10 focus:text-indigo-300">Shortlisted</SelectItem>
-                          <SelectItem value="INTERVIEW" className="rounded-lg mb-1 text-[#c7c4d7] focus:bg-indigo-500/10 focus:text-indigo-300">Interview</SelectItem>
-                          <SelectItem value="SELECTED" className="rounded-lg mb-1 text-[#c7c4d7] focus:bg-indigo-500/10 focus:text-indigo-300">Selected</SelectItem>
-                          <SelectItem value="REJECTED" className="rounded-lg text-[#c7c4d7] focus:bg-rose-500/10 focus:text-rose-300">Rejected</SelectItem>
+
+                        <SelectContent>
+                          <SelectItem value="APPLIED" disabled={isBackward(app.status, 'APPLIED')}>Applied</SelectItem>
+                          <SelectItem value="SHORTLISTED" disabled={isBackward(app.status, 'SHORTLISTED')}>Shortlisted</SelectItem>
+                          <SelectItem value="SELECTED" disabled={isBackward(app.status, 'SELECTED')}>Selected</SelectItem>
+                          <SelectItem value="REJECTED" disabled={isBackward(app.status, 'REJECTED')}>Rejected</SelectItem>
                         </SelectContent>
                       </Select>
                     </td>
-                    <td className="px-4 py-4 text-right">
-                      {app.student?.resumeUrl ? (
-                        <a
-                          href={app.student.resumeUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 text-sm font-bold text-[#908fa0] hover:text-indigo-400 transition-colors px-3 py-2 rounded-lg hover:bg-indigo-500/10"
-                        >
-                          <Download className="w-4 h-4" /> View Resume
-                        </a>
-                      ) : (
-                        <span className="text-xs text-[#908fa0] italic">No resume</span>
-                      )}
-                    </td>
+
                   </tr>
                 ))
               )}

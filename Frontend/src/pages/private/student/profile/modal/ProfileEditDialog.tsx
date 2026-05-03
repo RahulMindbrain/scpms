@@ -28,11 +28,11 @@ const profileSchema = z.object({
   githubUrl: z.string().url("Invalid GitHub URL").or(z.literal("")).nullable(),
   portfolioUrl: z.string().url("Invalid Portfolio URL").or(z.literal("")).nullable(),
   stats: z.object({
-    cgpa: z.coerce.number().min(0, "CGPA cannot be negative").max(10, "CGPA must be 10 or less"),
-    year: z.coerce.number().min(1, "Year must be at least 1").max(5, "Year must be 5 or less"),
-    passingYear: z.coerce.number().min(2000, "Invalid year").max(2100, "Invalid year"),
-    departmentId: z.coerce.number().min(1, "Required"),
-    activeBacklogs: z.coerce.number().min(0, "Cannot be negative"),
+    cgpa: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(0, "CGPA cannot be negative").max(10, "CGPA must be 10 or less").optional()),
+    year: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(1, "Year must be at least 1").max(5, "Year must be 5 or less")),
+    passingYear: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(2000, "Invalid year").max(2100, "Invalid year")),
+    departmentId: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(1, "Required")),
+    activeBacklogs: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(0, "Cannot be negative").default(0)),
   }),
   resumeUrl: z.string().url("Invalid Resume URL").or(z.literal("")).nullable(),
 });
@@ -54,32 +54,36 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
   const [isUploading, setIsUploading] = useState(false);
   const [resumeName, setResumeName] = useState("");
   const [skillInput, setSkillInput] = useState("");
-  const [allSkillsList, setAllSkillsList] = useState<string[]>([]);
+  const [allSkillsList, setAllSkillsList] = useState<SkillOption[]>([]);
   const [allDepartmentsList, setAllDepartmentsList] = useState<any[]>([]);
 
   const { upload } = useCloudinaryUpload();
 
   useEffect(() => {
-    if (isOpen) {
-      setFormData({
-        ...profile,
-        linkedinUrl: profile.linkedinUrl || "",
-        githubUrl: profile.githubUrl || "",
-        portfolioUrl: profile.portfolioUrl || "",
+    if (isOpen && profile) {
+      const newFormData = {
+        name: profile.name || "",
+        email: profile.email || "",
         stats: {
-          ...profile.stats,
           activeBacklogs: profile.stats?.activeBacklogs ?? profile.activeBacklogs ?? '',
           cgpa: profile.stats?.cgpa ?? profile.cgpa ?? '',
           year: profile.stats?.year ?? profile.year ?? '',
           passingYear: profile.stats?.passingYear ?? profile.passingYear ?? '',
           departmentId: profile.stats?.departmentId || profile.departmentId || "",
         },
-        resumeUrl: profile.resumeUrl || ""
-      });
+        linkedinUrl: profile.linkedinUrl || "",
+        githubUrl: profile.githubUrl || "",
+        portfolioUrl: profile.portfolioUrl || "",
+        resumeUrl: profile.resumeUrl || "",
+        skills: profile.skills || [],
+        experiences: profile.experiences || [],
+        certificates: profile.certificates || [],
+        projects: profile.projects || [],
+      };
+      setFormData(newFormData);
       setResumeName(profile.resumeUrl ? "Current Resume" : "");
-      setErrors({});
     }
-  }, [profile, isOpen]);
+  }, [isOpen, profile]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,10 +94,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
         ]);
 
         if (skillsRes) {
-          const skillNames = Array.isArray(skillsRes.data)
-            ? skillsRes.data.map((skill) => skill.name)
-            : [];
-          setAllSkillsList(skillNames);
+          setAllSkillsList(Array.isArray(skillsRes.data) ? skillsRes.data : []);
         }
 
         if (deptRes) {
@@ -138,16 +139,20 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
     }
   };
 
-  const addSkill = (skillName: string) => {
-    const trimmed = skillName.trim();
-    if (!trimmed) return;
-    if (formData.skills?.some((s: any) => s.name.toLowerCase() === trimmed.toLowerCase())) {
+  const addSkill = (skill: string | SkillOption) => {
+    const skillName = typeof skill === 'string' ? skill.trim() : skill.name;
+    const skillId = typeof skill === 'string' ? undefined : skill.id;
+
+    if (!skillName) return;
+    
+    if (formData.skills?.some((s: any) => s.name.toLowerCase() === skillName.toLowerCase())) {
       toast.error("Skill already added");
       return;
     }
+
     setFormData((prev: any) => ({
       ...prev,
-      skills: [...(prev.skills || []), { name: trimmed, color: 'bg-indigo-500/100' }]
+      skills: [...(prev.skills || []), { id: skillId, name: skillName, color: 'bg-blue-500' }]
     }));
     setSkillInput("");
   };
@@ -163,19 +168,26 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
     e.preventDefault();
 
     try {
+      console.log("Submitting formData:", formData);
       profileSchema.parse(formData);
       const res = await onSave(formData);
       if (res?.success) onClose();
     } catch (err: any) {
       if (err instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
-        //@ts-ignore
-        err.errors.forEach((e: any) => {
+        const errorPaths: string[] = [];
+        
+        const issues = err.issues || (err as any).errors || [];
+        issues.forEach((e: any) => {
           const path = e.path.join(".");
           newErrors[path] = e.message;
+          errorPaths.push(path);
         });
+        
         setErrors(newErrors);
-        toast.error("Please fix the errors in the form");
+        toast.error(`Please fix errors in: ${errorPaths.join(", ")}`);
+      } else {
+        console.error("Submission error:", err);
       }
     }
   };
@@ -212,8 +224,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       <User className="absolute left-3 top-3 h-4 w-4 text-[#908fa0]" />
                       <Input
                         id="name"
-                        placeholder="e.g. John Doe"
-                        className={`pl-10 h-11 rounded-xl ${errors.name ? 'border-red-500 focus-visible:ring-red-500' : 'border-[rgba(255,255,255,0.08)]'}`}
+                        placeholder="Enter full name"
+                        className={`pl-10 h-11 rounded-xl ${errors.name ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                         value={formData.name || ""}
                         onChange={(e) => updateField("name", e.target.value)}
                       />
@@ -226,8 +238,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     <Input
                       id="email"
                       type="email"
-                      placeholder="john@example.com"
-                      className={`h-11 rounded-xl ${errors.email ? 'border-red-500 focus-visible:ring-red-500' : 'border-[rgba(255,255,255,0.08)]'}`}
+                      placeholder="Enter email address"
+                      className={`h-11 rounded-xl ${errors.email ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                       value={formData.email || ""}
                       onChange={(e) => updateField("email", e.target.value)}
                     />
@@ -246,8 +258,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       id="cgpa"
                       type="number"
                       step="0.01"
-                      placeholder="0.00"
-                      className={`h-11 rounded-xl ${errors['stats.cgpa'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-[rgba(255,255,255,0.08)]'}`}
+                      placeholder="0.0"
+                      className={`h-11 rounded-xl ${errors['stats.cgpa'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                       value={formData.stats?.cgpa || ""}
                       onChange={(e) => updateStat("cgpa", e.target.value)}
                     />
@@ -259,9 +271,9 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     <Input
                       id="backlogs"
                       type="number"
-                      placeholder="0"
-                      className={`h-11 rounded-xl ${errors['stats.activeBacklogs'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-[rgba(255,255,255,0.08)]'}`}
-                      value={formData.stats?.activeBacklogs || 0}
+                      placeholder="Enter active backlogs"
+                      className={`h-11 rounded-xl ${errors['stats.activeBacklogs'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
+                      value={formData.stats?.activeBacklogs ?? ""}
                       onChange={(e) => updateStat("activeBacklogs", e.target.value)}
                     />
                     {errors['stats.activeBacklogs'] && <p className="text-xs text-red-500 font-medium ml-1">{errors['stats.activeBacklogs']}</p>}
@@ -272,8 +284,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     <Input
                       id="year"
                       type="number"
-                      placeholder="3"
-                      className={`h-11 rounded-xl ${errors['stats.year'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-[rgba(255,255,255,0.08)]'}`}
+                      placeholder="Enter current year"
+                      className={`h-11 rounded-xl ${errors['stats.year'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                       value={formData.stats?.year || ""}
                       onChange={(e) => updateStat("year", e.target.value)}
                     />
@@ -285,8 +297,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     <Input
                       id="passingYear"
                       type="number"
-                      placeholder="2026"
-                      className={`h-11 rounded-xl ${errors['stats.passingYear'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-[rgba(255,255,255,0.08)]'}`}
+                      placeholder="Enter passing year"
+                      className={`h-11 rounded-xl ${errors['stats.passingYear'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                       value={formData.stats?.passingYear || ""}
                       onChange={(e) => updateStat("passingYear", e.target.value)}
                     />
@@ -320,8 +332,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       {/* <Linkedin className="absolute left-3 top-3 h-4 w-4 text-[#0077B5]" /> */}
                       <Input
                         id="linkedinUrl"
-                        placeholder="https://linkedin.com/in/username"
-                        className={`pl-10 h-11 rounded-xl ${errors.linkedinUrl ? 'border-red-500 focus-visible:ring-red-500' : 'border-[rgba(255,255,255,0.08)]'}`}
+                        placeholder="LinkedIn Profile URL"
+                        className={`pl-10 h-11 rounded-xl ${errors.linkedinUrl ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                         value={formData.linkedinUrl || ""}
                         onChange={(e) => updateField("linkedinUrl", e.target.value)}
                       />
@@ -335,8 +347,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       {/* <Github className="absolute left-3 top-3 h-4 w-4 text-[#333]" /> */}
                       <Input
                         id="githubUrl"
-                        placeholder="https://github.com/username"
-                        className={`pl-10 h-11 rounded-xl ${errors.githubUrl ? 'border-red-500 focus-visible:ring-red-500' : 'border-[rgba(255,255,255,0.08)]'}`}
+                        placeholder="GitHub Profile URL"
+                        className={`pl-10 h-11 rounded-xl ${errors.githubUrl ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                         value={formData.githubUrl || ""}
                         onChange={(e) => updateField("githubUrl", e.target.value)}
                       />
@@ -350,8 +362,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       <Globe className="absolute left-3 top-3 h-4 w-4 text-[#908fa0]" />
                       <Input
                         id="portfolioUrl"
-                        placeholder="https://yourportfolio.com"
-                        className={`pl-10 h-11 rounded-xl ${errors.portfolioUrl ? 'border-red-500 focus-visible:ring-red-500' : 'border-[rgba(255,255,255,0.08)]'}`}
+                        placeholder="Portfolio Website URL"
+                        className={`pl-10 h-11 rounded-xl ${errors.portfolioUrl ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                         value={formData.portfolioUrl || ""}
                         onChange={(e) => updateField("portfolioUrl", e.target.value)}
                       />
@@ -368,15 +380,16 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     <Label className="text-sm font-semibold text-[#c7c4d7] ml-1">Add Skills</Label>
                     <div className="flex gap-2">
                       <select
-                        className="flex h-11 w-full rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0c0e14] text-[#e2e2eb] px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
-                        value={skillInput}
+                        className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        value=""
                         onChange={(e) => {
-                          if (e.target.value) addSkill(e.target.value);
+                          const selectedSkill = allSkillsList.find(s => s.id === parseInt(e.target.value));
+                          if (selectedSkill) addSkill(selectedSkill);
                         }}
                       >
                         <option value="">Select a skill...</option>
                         {allSkillsList.map(skill => (
-                          <option key={skill} value={skill}>{skill}</option>
+                          <option key={skill.id} value={skill.id}>{skill.name}</option>
                         ))}
                       </select>
                       <div className="relative flex-1">

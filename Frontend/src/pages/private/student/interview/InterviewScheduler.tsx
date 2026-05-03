@@ -2,8 +2,10 @@
 import {
   Calendar,
   Clock, MapPin,
-  ExternalLink
+  ExternalLink,
+  Timer
 } from 'lucide-react';
+import CountdownTimer from '@/components/CountdownTimer';
 
 interface Interview {
   id: number;
@@ -109,28 +111,31 @@ const InterviewSchedule: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="flex flex-row sm:flex-col items-end justify-between sm:justify-center gap-2 border-t sm:border-t-0 pt-4 sm:pt-0">
-                    <div className="flex items-center gap-4 text-[#c7c4d7]">
-                      <div className="flex items-center gap-1.5 text-sm font-semibold">
-                        <Calendar size={14} className="text-blue-500" />
-                        {item.date}
+                    <div className="flex flex-row sm:flex-col items-end justify-between sm:justify-center gap-3 border-t sm:border-t-0 pt-4 sm:pt-0">
+                      <div className="flex flex-col items-end gap-2">
+                        <div className="flex items-center gap-4 text-slate-600">
+                          <div className="flex items-center gap-1.5 text-sm font-semibold">
+                            <Calendar size={14} className="text-blue-500" />
+                            {item.date}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-sm font-semibold">
+                            <Clock size={14} className="text-blue-500" />
+                            {item.time}
+                          </div>
+                        </div>
+                        <CountdownTimer targetDate={`${item.date} ${item.time}`} />
                       </div>
-                      <div className="flex items-center gap-1.5 text-sm font-semibold">
-                        <Clock size={14} className="text-blue-500" />
-                        {item.time}
-                      </div>
+                      
+                      {item.type === 'online' ? (
+                        <a href={`https://${item.location}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-all shadow-sm">
+                          Join Meeting <ExternalLink size={12} />
+                        </a>
+                      ) : (
+                        <button className="flex items-center gap-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg transition-all">
+                          View Map <MapPin size={12} />
+                        </button>
+                      )}
                     </div>
-                    
-                    {item.type === 'online' ? (
-                      <a href={`https://${item.location}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-all shadow-sm">
-                        Join Meeting <ExternalLink size={12} />
-                      </a>
-                    ) : (
-                      <button className="flex items-center gap-2 text-xs font-bold text-[#c7c4d7] bg-[rgba(255,255,255,0.06)] hover:bg-slate-200 px-4 py-2 rounded-lg transition-all">
-                        View Map <MapPin size={12} />
-                      </button>
-                    )}
-                  </div>
                 </div>
               </div>
             ))}

@@ -2,6 +2,7 @@
 import { Search, Building2, Briefcase, Info } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchScheduleApplications, fetchSchedules } from '@/redux/thunks/interviewThunk';
+import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import type { RootState, AppDispatch } from '@/redux/store/store';
 import { useParams } from "react-router-dom";
 import Loader from '@/components/Loader';
@@ -9,6 +10,7 @@ import Loader from '@/components/Loader';
 const ApplicationsManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const dispatch = useDispatch<AppDispatch>();
+  const { companies } = useSelector((state: RootState) => state.company);
   const { applications = [], schedules = [], loading } = useSelector((state: RootState) => state.interview);
   const { id } = useParams<{ id?: string }>();
   const routeScheduleId = id ? Number(id) : null;
@@ -18,10 +20,16 @@ const ApplicationsManagement: React.FC = () => {
     : fallbackScheduleId;
 
   useEffect(() => {
-    if (!routeScheduleId) {
-      dispatch(fetchSchedules());
+    if (!routeScheduleId && companies.length === 0) {
+      dispatch(fetchCompanies({ page: 1, limit: 100 }));
     }
-  }, [dispatch, routeScheduleId]);
+  }, [dispatch, routeScheduleId, companies.length]);
+
+  useEffect(() => {
+    if (!routeScheduleId && companies.length > 0) {
+      dispatch(fetchSchedules(companies[0].id));
+    }
+  }, [dispatch, routeScheduleId, companies]);
 
   useEffect(() => {
     if (scheduleId && Number.isFinite(scheduleId)) {
@@ -29,9 +37,11 @@ const ApplicationsManagement: React.FC = () => {
     }
   }, [dispatch, scheduleId]);
 
-  const filteredApplications = applications.filter((app: any) =>
-    app.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    app.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+  const applicationList = Array.isArray(applications) ? applications : [];
+
+  const filteredApplications = applicationList.filter((app: any) =>
+    app.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    app.jobTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     app.department?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 

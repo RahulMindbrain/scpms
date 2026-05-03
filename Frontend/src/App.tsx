@@ -13,7 +13,7 @@ function App() {
   return (
     <>
       <ScrollToTop />
-      <Toaster position="top-right" />
+      <Toaster position="top-right" visibleToasts={1} richColors />
 
       <Routes>
         {/* Private routes first - when authenticated, these will be matched */}

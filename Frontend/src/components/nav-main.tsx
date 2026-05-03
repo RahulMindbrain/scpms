@@ -28,6 +28,10 @@ export function NavMain({
           const isActive = location.pathname === item.url || location.pathname.startsWith(item.url + '/')
           return (
             <SidebarMenuItem key={item.title}>
+              <SidebarMenuButton asChild tooltip={item.title} isActive={isActive} className={isActive ? "bg-indigo-50 text-indigo-700 font-semibold" : ""}>
+                <NavLink to={item.url} className="flex items-center w-full gap-2 relative cursor-pointer">
+                  {item.icon}
+                  <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
               <SidebarMenuButton
                 asChild
                 tooltip={item.title}
@@ -44,7 +48,7 @@ export function NavMain({
                   </span>
                   <span className="text-sm group-data-[collapsible=icon]:hidden">{item.title}</span>
                   {isActive && (
-                    <div className="absolute left-[-8px] w-[3px] h-5 bg-primary rounded-r-full shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
+                    <div className="absolute left-[-8px] w-1.5 h-6 bg-indigo-600 rounded-r-full group-data-[collapsible=icon]:hidden" />
                   )}
                 </NavLink>
               </SidebarMenuButton>

@@ -66,12 +66,11 @@ scheduleRoute.post(
 );
 
 scheduleRoute.delete(
-  "/jobs",
+  "/:id",
   authenticateUser,
   requireActiveUser,
   authorizeRoles("ADMIN"),
-
-  removeJobsController,
+deleteScheduleController,
 );
 
 scheduleRoute.get(

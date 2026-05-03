@@ -58,48 +58,43 @@ const CompanyManagement: React.FC = () => {
   const { jobs: companyJobs, meta: jobsMeta } = useSelector((state: RootState) => state.company);
   const [jobsStatusFilter, setJobsStatusFilter] = useState('APPROVED');
 
-  useEffect(() => {
-    dispatch(fetchCompanies({}));
-    dispatch(fetchInactiveCompanies({}));
-  }, [dispatch]);
+useEffect(() => {
+  dispatch(fetchCompanies({}));
+}, [dispatch]);
+const companies = useMemo<Company[]>(() => {
+  const mapCompany = (c: any): Company => {
+    const userStatus = c.user?.status || 'UNKNOWN';
 
-  const companies = useMemo<Company[]>(() => {
-    const active = reduxCompanies.map((c: any): Company => ({
+    return {
       id: c.id,
       userId: c.user?.id,
       name: c.name || 'N/A',
-      status: 'active',
-      approval: 'Approved',
+      status: userStatus === 'ACTIVE' ? 'active' : 'inactive',
+      approval: userStatus === 'ACTIVE' ? 'Approved' : 'Pending',
       logo: undefined,
       email: c.user?.email || 'N/A',
       description: c.description || '',
       createdAt: c.createdAt,
-      userStatus: c.user?.status
-    }));
+      userStatus
+    };
+  };
 
-    const inactive = reduxInactiveCompanies.map((c: any): Company => ({
-      id: c.id,
-      userId: c.id,
-      name: c.firstname || 'N/A',
-      status: 'inactive',
-      approval: 'Pending',
-      logo: undefined,
-      email: c.email || 'N/A',
-      description: '',
-      createdAt: c.createdAt,
-      userStatus: c.status
-    }));
+  return reduxCompanies.map(mapCompany); // ✅ ONLY THIS
+}, [reduxCompanies]);
+const filteredCompanies = useMemo(() => {
+  return companies.filter((c) => {
+    const matchesSearch = c.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
 
-    return [...active, ...inactive];
-  }, [reduxCompanies, reduxInactiveCompanies]);
+    const matchesFilter =
+      filter === 'All' ||
+      (filter === 'Active' && c.userStatus === 'ACTIVE') ||
+      (filter === 'Inactive' && c.userStatus === 'INACTIVE');
 
-  const filteredCompanies = useMemo(() => {
-    return companies.filter(c => {
-      const matchesSearch = c.name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesFilter = filter === 'All' || c.status.toLowerCase() === filter.toLowerCase();
-      return matchesSearch && matchesFilter;
-    });
-  }, [companies, searchTerm, filter]);
+    return matchesSearch && matchesFilter;
+  });
+}, [companies, searchTerm, filter]);
 
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -322,19 +317,26 @@ const CompanyManagement: React.FC = () => {
                     </span>
                   </div>
 
-                  <button
-                    onClick={() => toggleApproval(company.id, company.userId, company.approval)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${company.approval === 'Approved'
-                      ? 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100'
-                      : 'bg-amber-50 text-amber-600 hover:bg-amber-100 border border-amber-100'
-                      }`}
-                  >
-                    {company.approval === 'Approved' ? (
-                      <><CheckCircle2 className="w-3.5 h-3.5" /> Approved</>
-                    ) : (
-                      <><XCircle className="w-3.5 h-3.5" /> Pending</>
-                    )}
-                  </button>
+                  {company.approval === 'Approved' ? (
+                    <div className="flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest bg-emerald-50 text-emerald-600 border border-emerald-100">
+                      <CheckCircle2 className="w-3.5 h-3.5" /> Approved
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => toggleApproval(company.id, company.userId, 'Pending')}
+                        className="px-4 py-2 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 border border-emerald-100 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 shadow-sm shadow-emerald-500/5 active:scale-95"
+                      >
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Accept
+                      </button>
+                      <button
+                        onClick={() => toast.info("Rejection feature coming soon")}
+                        className="px-4 py-2 bg-rose-50 text-rose-600 hover:bg-rose-100 border border-rose-100 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-1.5 shadow-sm shadow-rose-500/5 active:scale-95"
+                      >
+                        <XCircle className="w-3.5 h-3.5" /> Reject
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* Hover Action Layer */}

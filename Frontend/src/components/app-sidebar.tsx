@@ -103,8 +103,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar collapsible="icon" {...props}>
-      {/* ── Header / Logo ── */}
-      <SidebarHeader className="border-b border-sidebar-border pb-3">
+      <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -116,12 +115,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <div className={`flex aspect-square size-9 items-center justify-center rounded-xl bg-gradient-to-br ${gradientClass} shadow-lg shadow-indigo-500/25 shrink-0`}>
                   <GraduationCap className="size-5 text-white" />
                 </div>
-                <div className="flex flex-col gap-0.5 leading-none min-w-0 group-data-[collapsible=icon]:hidden">
-                  <span className="text-[15px] font-bold text-sidebar-foreground tracking-tight">Smart CPMS</span>
-                  <span className="text-[10px] text-muted-foreground uppercase tracking-[0.1em] flex items-center gap-1">
-                    <Zap className="size-2.5 text-primary" />
-                    {role} Portal
-                  </span>
+                <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
+                  <span className="text-[16px] font-semibold">Smart CPMS</span>
+                  <span className="text-xs text-muted-foreground uppercase tracking-wider">{role} Portal</span>
                 </div>
               </a>
             </SidebarMenuButton>

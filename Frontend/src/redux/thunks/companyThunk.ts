@@ -1,151 +1,178 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { getAPI, putAPI, postAPI } from "../../apis/api";
 
+// ✅ Fetch Active Companies
 export const fetchCompanies = createAsyncThunk(
-    "company/fetchCompanies",
-    async (params: any, { rejectWithValue }) => {
-        try {
-            const response = await getAPI<any>("/admin/get-companies", params);
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error?.message || "Failed to fetch companies");
-        }
-    }
-);
-
-export const fetchInactiveCompanies = createAsyncThunk(
-    "company/fetchInactiveCompanies",
-    async (params: any, { rejectWithValue }) => {
-        try {
-            const response = await getAPI<any>("/admin/get-inactive-companies", params);
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error?.message || "Failed to fetch inactive companies");
-        }
-    }
-);
-
-export const activateCompanies = createAsyncThunk(
-    "company/activateCompanies",
-    async (userIds: number[], { rejectWithValue }) => {
-        try {
-            const response = await putAPI<any>("/admin/activate-companies", { userIds });
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error?.message || "Failed to activate companies");
-        }
-    }
-);
-
-export const fetchCompanyProfile = createAsyncThunk(
-    "company/fetchCompanyProfile",
-    async (_, { rejectWithValue }) => {
-        try {
-            const response = await getAPI<any>("/company/profile");
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error?.message || "Failed to fetch company profile");
-        }
-    }
-);
-
-export const createCompanyProfile = createAsyncThunk(
-    "company/createCompanyProfile",
-    async (data: any, { rejectWithValue }) => {
-        try {
-            const response = await postAPI<any>("/company/profile", data);
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error?.message || "Failed to create company profile");
-        }
-    }
-);
-
-export const updateCompanyProfile = createAsyncThunk(
-    "company/updateCompanyProfile",
-    async (data: any, { rejectWithValue }) => {
-        try {
-            const response = await putAPI<any>("/company/profile", data);
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error?.message || "Failed to update company profile");
-        }
-    }
-);
-
-export const postJob = createAsyncThunk(
-    "company/postJob",
-    async (data: any, { rejectWithValue }) => {
-        try {
-            const response = await postAPI<any>("/company/post-job", data);
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error?.message || "Failed to post job");
-        }
-    }
-);
-
-export const fetchCompanyJobs = createAsyncThunk(
-    "company/fetchCompanyJobs",
-    async (params: { page?: number; limit?: number }, { rejectWithValue }) => {
-        try {
-            const response = await getAPI<any>("/company/get-jobs", params);
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error?.message || "Failed to fetch company jobs");
-        }
-    }
-);
-
-export const fetchJobApplications = createAsyncThunk(
-    "company/fetchJobApplications",
-    async (params: { status?: string; page?: number; }, { rejectWithValue }) => {
-        try {
-            const response = await getAPI<any>("/company/get-job-application", params);
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error?.message || "Failed to fetch job applications");
-        }
-    }
-);
-
-export const updateJobApplicationStatus = createAsyncThunk(
-    "company/updateJobApplicationStatus",
-    async ({ id, status }: { id: number; status: string }, { rejectWithValue }) => {
-        try {
-            const response = await putAPI<any>(`/company/update-job-status/${id}`, { status });
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error?.message || "Failed to update status");
-        }
-    }
-);
-
-export const fetchJobsByCompanyId = createAsyncThunk(
-  "company/fetchJobsByCompanyId",
-  async ({ id, params }: { id: number; params?: { page?: number; limit?: number; status?: string } }, { rejectWithValue }) => {
+  "company/fetchCompanies",
+  async (params: any, { rejectWithValue }) => {
     try {
-      const response = await getAPI<any>(
-        `/admin/get-jobs-company/${id}`,
-        params
-      );
-      return response;
+      const res = await getAPI<any>("/admin/get-companies", params);
+
+      return {
+        companies: res.data.data,
+        meta: res.data.meta,
+      };
     } catch (error: any) {
-      return rejectWithValue(
-        error?.message || "Failed to fetch jobs for company"
-      );
+      return rejectWithValue(error?.message || "Failed to fetch companies");
     }
   }
 );
 
-export const sendBulkMail = createAsyncThunk(
-    "admin/sendBulkMail",
-    async (data: { companyId: number; jobIds: number[]; subject?: string; message?: string; }, { rejectWithValue }) => {
-        try {
-            const response = await postAPI<any>("/admin/send-mails", data);
-            return response;
-        } catch (error: any) {
-            return rejectWithValue(error?.message || "Failed to send bulk emails");
-        }
+// ✅ Fetch Inactive Companies
+export const fetchInactiveCompanies = createAsyncThunk(
+  "company/fetchInactiveCompanies",
+  async (params: any, { rejectWithValue }) => {
+    try {
+      const res = await getAPI<any>("/admin/get-inactive-companies", params);
+
+      return {
+        inactiveCompanies: res.data.data,
+        meta: res.data.meta,
+      };
+    } catch (error: any) {
+      return rejectWithValue(error?.message || "Failed to fetch inactive companies");
     }
+  }
+);
+
+// ✅ Activate Companies
+export const activateCompanies = createAsyncThunk(
+  "company/activateCompanies",
+  async (userIds: number[], { rejectWithValue }) => {
+    try {
+      await putAPI("/admin/activate-companies", { userIds });
+      return { success: true };
+    } catch (error: any) {
+      return rejectWithValue(error?.message || "Failed to activate companies");
+    }
+  }
+);
+
+// ✅ Company Profile
+export const fetchCompanyProfile = createAsyncThunk(
+  "company/fetchCompanyProfile",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await getAPI<any>("/company/profile");
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue(error?.message);
+    }
+  }
+);
+
+export const createCompanyProfile = createAsyncThunk(
+  "company/createCompanyProfile",
+  async (data: any, { rejectWithValue }) => {
+    try {
+      const res = await postAPI<any>("/company/profile", data);
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue(error?.message);
+    }
+  }
+);
+
+export const updateCompanyProfile = createAsyncThunk(
+  "company/updateCompanyProfile",
+  async (data: any, { rejectWithValue }) => {
+    try {
+      const res = await putAPI<any>("/company/profile", data);
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue(error?.message);
+    }
+  }
+);
+
+// ✅ Jobs
+export const postJob = createAsyncThunk(
+  "company/postJob",
+  async (data: any, { rejectWithValue }) => {
+    try {
+      await postAPI("/company/post-job", data);
+      return { success: true };
+    } catch (error: any) {
+      return rejectWithValue(error?.message);
+    }
+  }
+);
+
+export const fetchCompanyJobs = createAsyncThunk(
+  "company/fetchCompanyJobs",
+  async (params: any, { rejectWithValue }) => {
+    try {
+      const res = await getAPI<any>("/company/get-jobs", params);
+
+      return {
+        jobs: res.data.data,
+        meta: res.data.meta,
+      };
+    } catch (error: any) {
+      return rejectWithValue(error?.message);
+    }
+  }
+);
+
+export const fetchJobsByCompanyId = createAsyncThunk(
+  "company/fetchJobsByCompanyId",
+  async ({ id, params }: any, { rejectWithValue }) => {
+    try {
+      const res = await getAPI<any>(`/admin/get-jobs-company/${id}`, params);
+
+      return {
+        jobs: res.data.data,
+        meta: res.data.meta,
+      };
+    } catch (error: any) {
+      return rejectWithValue(error?.message);
+    }
+  }
+);
+
+// ✅ Applications
+export const fetchJobApplications = createAsyncThunk(
+  "company/fetchJobApplications",
+  async (params: any, { rejectWithValue }) => {
+    try {
+      const res = await getAPI<any>("/company/get-job-application", params);
+
+      return {
+        applications: res.data.applications,
+        statusCounts: res.data.statusCounts,
+        meta: res.data.pagination,
+      };
+    } catch (error: any) {
+      return rejectWithValue(error?.message);
+    }
+  }
+);
+
+export const updateJobApplicationStatus = createAsyncThunk(
+  "company/updateJobApplicationStatus",
+  async ({ id, status }: any, { rejectWithValue }) => {
+    try {
+      const res = await putAPI<any>(
+        `/company/update-job-status/${id}`,
+        { status }
+      );
+
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue(error?.message);
+    }
+  }
+);
+
+// ✅ Bulk Mail
+export const sendBulkMail = createAsyncThunk(
+  "company/sendBulkMail",
+  async (data: any, { rejectWithValue }) => {
+    try {
+      await postAPI("/admin/send-mails", data);
+      return { success: true };
+    } catch (error: any) {
+      return rejectWithValue(error?.message);
+    }
+  }
 );

@@ -8,9 +8,10 @@ import { logout } from "../slices/authSlice";
 export const logoutUser = createAsyncThunk(
     "auth/logoutUser",
     async (_, { dispatch, rejectWithValue }) => {
-        // 1. Immediately clear local auth state to provide instant feedback and prevent flickering
+        // 🔥 Clear local state IMMEDIATELY to prevent flickering/stale redirects
+        // This ensures isAuthenticated becomes false before the next render cycle
         dispatch(logout());
-        
+
         try {
             const response = await postAPI<any>("/auth/logout", {});
             return response;

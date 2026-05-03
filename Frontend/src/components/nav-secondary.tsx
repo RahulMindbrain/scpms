@@ -35,6 +35,10 @@ export function NavSecondary({
             const isActive = location.pathname === item.url || location.pathname.startsWith(item.url + '/')
             return (
               <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton asChild tooltip={item.title} isActive={isActive}>
+                  <Link to={item.url} className="flex items-center w-full gap-2 relative cursor-pointer">
+                    {item.icon}
+                    <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
                 <SidebarMenuButton
                   asChild
                   isActive={isActive}

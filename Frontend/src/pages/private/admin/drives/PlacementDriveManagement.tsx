@@ -168,9 +168,9 @@ const PlacementDriveManagement: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen bg-[#111319]">
+    <div className="min-h-screen bg-[#F8FAFC]">
       <div className=" px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-
+        
         {/* Header Section */}
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
           <div className="space-y-2">
@@ -254,7 +254,7 @@ const PlacementDriveManagement: React.FC = () => {
         </div>
 
         {/* Status Content */}
-        {error && (
+        {/* {error && (
           <div className="flex flex-col items-center justify-center p-12 bg-rose-50 border border-rose-100 rounded-[2rem] text-center space-y-4">
             <div className="w-12 h-12 bg-[#1e1f26] rounded-2xl flex items-center justify-center shadow-sm mx-auto">
               <AlertCircle className="w-6 h-6 text-rose-500" />
@@ -270,7 +270,7 @@ const PlacementDriveManagement: React.FC = () => {
               Retry Connection
             </button>
           </div>
-        )}
+        )} */}
 
         {loading && reduxJobs.length === 0 ? (
           <div className="py-20">
@@ -335,7 +335,7 @@ const PlacementDriveManagement: React.FC = () => {
                           exit={{ height: 0, opacity: 0 }}
                           className="overflow-hidden"
                         >
-                          <div className="grid grid-cols-1 gap-5  pr-2">
+                          <div className="grid grid-cols-1 gap-5 pl-0  pr-2">
                             {group.jobs.map((job) => (
                               <motion.div
                                 key={job.id}

@@ -30,6 +30,9 @@ async function seedSkills() {
     { name: "Prisma" },
     { name: "Mongoose" },
     { name: "Type-ORM" },
+    { name: "Prisma-ORM" },
+    { name: "Nest.js" },
+    { name: "Next.js" },
   ];
 
   await prisma.skill.deleteMany({});
