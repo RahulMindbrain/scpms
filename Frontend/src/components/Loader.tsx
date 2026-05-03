@@ -14,8 +14,8 @@ const Loader: React.FC<LoaderProps> = ({ fullScreen = false, size = "md", text }
   };
 
   const containerClasses = fullScreen
-    ? "fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#111319]/90 backdrop-blur-sm"
-    : `flex flex-col items-center justify-center ${size === 'sm' ? 'p-2' : 'p-8'} w-full h-full ${size === 'sm' ? '' : 'min-h-[200px]'}`;
+    ? "absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/60 backdrop-blur-xl transition-all duration-300"
+    : `flex flex-col items-center justify-center ${size === 'sm' ? 'p-2' : 'p-8'} w-full h-full ${size === 'sm' ? '' : 'min-h-[400px]'}`;
 
   return (
     <div className={containerClasses}>
@@ -34,7 +34,7 @@ const Loader: React.FC<LoaderProps> = ({ fullScreen = false, size = "md", text }
       </div>
       
       {text && (
-        <p className="mt-6 text-xs font-bold text-indigo-300/80 uppercase tracking-widest">
+        <p className="mt-6 text-xs font-black text-indigo-500/80 uppercase tracking-[0.2em] animate-pulse">
           {text}
         </p>
       )}

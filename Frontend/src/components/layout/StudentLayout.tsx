@@ -19,7 +19,7 @@ const StudentLayout: React.FC = () => {
         <AppSidebar variant="inset" />
         <SidebarInset className="bg-background">
           <SiteHeader />
-          <main className="flex flex-1 flex-col bg-background min-h-0">
+          <main className="relative flex flex-1 flex-col bg-background min-h-0">
             <div className="flex-1 px-0 pt-0 pb-10 w-full mx-auto">
               <Outlet />
             </div>
