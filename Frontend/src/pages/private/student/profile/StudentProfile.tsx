@@ -142,7 +142,7 @@ const StudentProfile = () => {
     try {
       const cleanUrl = (url: any) => {
         const trimmed = typeof url === 'string' ? url.trim() : '';
-        return trimmed ? trimmed : undefined;
+        return trimmed || undefined;
       };
 
       const yearInt = parseInt(updatedProfile.stats?.year);
@@ -160,11 +160,19 @@ const StudentProfile = () => {
       };
 
       if (backendProfile) {
+        // Calculate which skills to add and remove
+        const backendSkillIds = backendProfile.skills?.map((s: any) => s.id) || [];
+        const updatedSkillIds = updatedProfile.skills
+          ?.map((s: any) => s.id)
+          ?.filter((id: any) => typeof id === "number") || [];
+
+        const addSkillIds = updatedSkillIds.filter((id: number) => !backendSkillIds.includes(id));
+        const removeSkillIds = backendSkillIds.filter((id: number) => !updatedSkillIds.includes(id));
+
         const putPayload = {
           ...commonPayload,
-          addSkillIds: updatedProfile.skills
-            ?.map((s: any) => s.id)
-            ?.filter((id: any) => typeof id === "number") || [],
+          addSkillIds,
+          removeSkillIds,
 
           addExperiences: updatedProfile.experiences
             ?.filter((exp: any) => !exp.id)
@@ -273,7 +281,13 @@ const StudentProfile = () => {
       }
       return { success: true };
     } catch (err: any) {
-      toast.error(err?.message || err?.toString() || "Update failed");
+      console.error("Profile save error:", err);
+      const errorMsg = err?.message || "Update failed";
+      const validationErrors = err?.errors
+        ? err.errors.map((e: any) => `${e.path}: ${e.message}`).join(", ")
+        : "";
+      
+      toast.error(validationErrors ? `${errorMsg} (${validationErrors})` : errorMsg);
       return { success: false };
     }
   };

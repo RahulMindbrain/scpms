@@ -54,32 +54,36 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
   const [isUploading, setIsUploading] = useState(false);
   const [resumeName, setResumeName] = useState("");
   const [skillInput, setSkillInput] = useState("");
-  const [allSkillsList, setAllSkillsList] = useState<string[]>([]);
+  const [allSkillsList, setAllSkillsList] = useState<SkillOption[]>([]);
   const [allDepartmentsList, setAllDepartmentsList] = useState<any[]>([]);
 
   const { upload } = useCloudinaryUpload();
 
   useEffect(() => {
-    if (isOpen) {
-      setFormData({
-        ...profile,
-        linkedinUrl: profile.linkedinUrl || "",
-        githubUrl: profile.githubUrl || "",
-        portfolioUrl: profile.portfolioUrl || "",
+    if (isOpen && profile) {
+      const newFormData = {
+        name: profile.name || "",
+        email: profile.email || "",
         stats: {
-          ...profile.stats,
           activeBacklogs: profile.stats?.activeBacklogs ?? profile.activeBacklogs ?? '',
           cgpa: profile.stats?.cgpa ?? profile.cgpa ?? '',
           year: profile.stats?.year ?? profile.year ?? '',
           passingYear: profile.stats?.passingYear ?? profile.passingYear ?? '',
           departmentId: profile.stats?.departmentId || profile.departmentId || "",
         },
-        resumeUrl: profile.resumeUrl || ""
-      });
+        linkedinUrl: profile.linkedinUrl || "",
+        githubUrl: profile.githubUrl || "",
+        portfolioUrl: profile.portfolioUrl || "",
+        resumeUrl: profile.resumeUrl || "",
+        skills: profile.skills || [],
+        experiences: profile.experiences || [],
+        certificates: profile.certificates || [],
+        projects: profile.projects || [],
+      };
+      setFormData(newFormData);
       setResumeName(profile.resumeUrl ? "Current Resume" : "");
-      setErrors({});
     }
-  }, [profile, isOpen]);
+  }, [isOpen, profile]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -90,10 +94,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
         ]);
 
         if (skillsRes) {
-          const skillNames = Array.isArray(skillsRes.data)
-            ? skillsRes.data.map((skill) => skill.name)
-            : [];
-          setAllSkillsList(skillNames);
+          setAllSkillsList(Array.isArray(skillsRes.data) ? skillsRes.data : []);
         }
 
         if (deptRes) {
@@ -138,16 +139,20 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
     }
   };
 
-  const addSkill = (skillName: string) => {
-    const trimmed = skillName.trim();
-    if (!trimmed) return;
-    if (formData.skills?.some((s: any) => s.name.toLowerCase() === trimmed.toLowerCase())) {
+  const addSkill = (skill: string | SkillOption) => {
+    const skillName = typeof skill === 'string' ? skill.trim() : skill.name;
+    const skillId = typeof skill === 'string' ? undefined : skill.id;
+
+    if (!skillName) return;
+    
+    if (formData.skills?.some((s: any) => s.name.toLowerCase() === skillName.toLowerCase())) {
       toast.error("Skill already added");
       return;
     }
+
     setFormData((prev: any) => ({
       ...prev,
-      skills: [...(prev.skills || []), { name: trimmed, color: 'bg-blue-500' }]
+      skills: [...(prev.skills || []), { id: skillId, name: skillName, color: 'bg-blue-500' }]
     }));
     setSkillInput("");
   };
@@ -163,19 +168,25 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
     e.preventDefault();
 
     try {
+      console.log("Submitting formData:", formData);
       profileSchema.parse(formData);
       const res = await onSave(formData);
       if (res?.success) onClose();
     } catch (err: any) {
       if (err instanceof z.ZodError) {
         const newErrors: Record<string, string> = {};
-        //@ts-ignore
+        const errorPaths: string[] = [];
+        
         err.errors.forEach((e: any) => {
           const path = e.path.join(".");
           newErrors[path] = e.message;
+          errorPaths.push(path);
         });
+        
         setErrors(newErrors);
-        toast.error("Please fix the errors in the form");
+        toast.error(`Please fix errors in: ${errorPaths.join(", ")}`);
+      } else {
+        console.error("Submission error:", err);
       }
     }
   };
@@ -369,14 +380,15 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     <div className="flex gap-2">
                       <select
                         className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                        value={skillInput}
+                        value=""
                         onChange={(e) => {
-                          if (e.target.value) addSkill(e.target.value);
+                          const selectedSkill = allSkillsList.find(s => s.id === parseInt(e.target.value));
+                          if (selectedSkill) addSkill(selectedSkill);
                         }}
                       >
                         <option value="">Select a skill...</option>
                         {allSkillsList.map(skill => (
-                          <option key={skill} value={skill}>{skill}</option>
+                          <option key={skill.id} value={skill.id}>{skill.name}</option>
                         ))}
                       </select>
                       <div className="relative flex-1">
