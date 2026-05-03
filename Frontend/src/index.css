@@ -77,11 +77,11 @@
   --popover:                   #ffffff;
   --popover-foreground:        #0f172a;
 
-  /* ── Primary — Electric Indigo ── */
-  --primary:                   #6366f1;
+  /* ── Primary — Vibrant Blue ── */
+  --primary:                   #2563eb;
   --primary-foreground:        #ffffff;
-  --primary-container:         #e0e7ff;
-  --inverse-primary:           #818cf8;
+  --primary-container:         #dbeafe;
+  --inverse-primary:           #60a5fa;
 
   /* ── Secondary ── */
   --secondary:                 #f1f5f9;
@@ -123,7 +123,7 @@
   --sidebar-accent-foreground: #101828;
   --sidebar-border:            #eaecf0;
   --sidebar-ring:              #6366f1;
-  --sidebar-gradient:          none;
+  --sidebar-gradient:          linear-gradient(180deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0) 100%);
 }
 
 /* ── Global Transitions ── */
@@ -137,35 +137,36 @@ html, body, #root {
   color: var(--foreground);
 }
 
+
 .dark {
-  --background:                #0c0e12;
-  --foreground:                #f9fafb;
-  --card:                      #161b22;
-  --card-foreground:           #f9fafb;
-  --popover:                   #161b22;
-  --popover-foreground:        #f9fafb;
-  --primary:                   #6366f1;
+  --background:                #080a0f;
+  --foreground:                #f8fafc;
+  --card:                      #0f172a;
+  --card-foreground:           #f8fafc;
+  --popover:                   #0f172a;
+  --popover-foreground:        #f8fafc;
+  --primary:                   #3b82f6;
   --primary-foreground:        #ffffff;
-  --secondary:                 #161b22;
-  --secondary-foreground:      #f9fafb;
-  --muted:                     #161b22;
-  --muted-foreground:          #8b949e;
-  --accent:                    #21262d;
-  --accent-foreground:         #f9fafb;
-  --destructive:               #f85149;
+  --secondary:                 #1e293b;
+  --secondary-foreground:      #f8fafc;
+  --muted:                     #1e293b;
+  --muted-foreground:          #94a3b8;
+  --accent:                    #334155;
+  --accent-foreground:         #f8fafc;
+  --destructive:               #ef4444;
   --destructive-foreground:    #ffffff;
-  --border:                    #30363d;
-  --input:                     #0d1117;
-  --ring:                      #6366f1;
-  --sidebar:                   #0d1117;
-  --sidebar-foreground:        #8b949e;
-  --sidebar-primary:           #6366f1;
+  --border:                    #1e293b;
+  --input:                     #020617;
+  --ring:                      #3b82f6;
+  --sidebar:                   #020617;
+  --sidebar-foreground:        #94a3b8;
+  --sidebar-primary:           #3b82f6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent:            #21262d;
-  --sidebar-accent-foreground: #f9fafb;
-  --sidebar-border:            #30363d;
-  --sidebar-ring:              #6366f1;
-  --sidebar-gradient:          none;
+  --sidebar-accent:            #1e293b;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border:            #1e293b;
+  --sidebar-ring:              #3b82f6;
+  --sidebar-gradient:          linear-gradient(180deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0) 100%);
 }
 
 /* ── Global Theme Overrides for Hardcoded Styles ── */
@@ -280,10 +281,26 @@ html, body, #root {
    GLASSMORPHISM UTILITIES
    ============================================================ */
 .glass-card {
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.bg-blue-gradient {
+  background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+}
+
+.bg-blue-mesh {
+  background-color: #020617;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(37, 99, 235, 0.15) 0, transparent 50%), 
+    radial-gradient(at 100% 0%, rgba(29, 78, 216, 0.1) 0, transparent 50%),
+    radial-gradient(at 50% 100%, rgba(30, 58, 138, 0.2) 0, transparent 50%);
+}
+
+.blue-glow {
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
 }
 .glass-modal {
   background: rgba(255, 255, 255, 0.08);
