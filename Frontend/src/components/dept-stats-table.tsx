@@ -32,40 +32,45 @@ function PlacementBadge({ pct }: { pct: number }) {
 
 export function DeptStatsTable({ deptStats }: DeptStatsTableProps) {
   return (
-    <div className="saas-table-container border-0 shadow-none">
+    <div className="w-full">
       <Table className="saas-table">
         <TableHeader>
-          <TableRow className="bg-muted/30 hover:bg-muted/30 border-0">
-            <TableHead className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground h-10">
+          <TableRow className="bg-transparent hover:bg-transparent border-b border-border/50">
+            <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 h-12">
               Department
             </TableHead>
-            <TableHead className="text-right text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground h-10">
+            <TableHead className="text-right text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 h-12">
               Total
             </TableHead>
-            <TableHead className="text-right text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground h-10">
+            <TableHead className="text-right text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 h-12">
               Placed
             </TableHead>
-            <TableHead className="text-right text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground h-10">
+            <TableHead className="text-right text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50 h-12">
               Success
             </TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="divide-y divide-border/30">
+        <TableBody>
           {deptStats.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={4} className="h-24 text-center text-muted-foreground text-xs font-medium">
-                No department data available.
+              <TableCell colSpan={4} className="h-32 text-center text-muted-foreground text-xs font-bold uppercase tracking-widest opacity-50">
+                No data points
               </TableCell>
             </TableRow>
           ) : (
             deptStats.map((stat) => (
               <TableRow
                 key={stat.department}
-                className="hover:bg-muted/20 transition-colors border-0"
+                className="group/row hover:bg-primary/[0.02] transition-colors border-b border-border/30 last:border-0"
               >
-                <TableCell className="font-bold text-foreground py-3 text-xs">{stat.department}</TableCell>
-                <TableCell className="text-right text-muted-foreground font-medium tabular-nums text-xs">{stat.totalStudents}</TableCell>
-                <TableCell className="text-right text-muted-foreground font-medium tabular-nums text-xs">{stat.placedStudents}</TableCell>
+                <TableCell className="py-4">
+                  <div className="flex flex-col">
+                    <span className="font-black text-foreground text-xs tracking-tight">{stat.department}</span>
+                    <span className="text-[9px] text-muted-foreground font-bold uppercase tracking-wider">Engineering</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-right text-muted-foreground font-black tabular-nums text-xs">{stat.totalStudents}</TableCell>
+                <TableCell className="text-right text-foreground font-black tabular-nums text-xs">{stat.placedStudents}</TableCell>
                 <TableCell className="text-right">
                   <PlacementBadge pct={stat.percentage} />
                 </TableCell>
@@ -77,3 +82,4 @@ export function DeptStatsTable({ deptStats }: DeptStatsTableProps) {
     </div>
   )
 }
+

@@ -148,7 +148,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="@container/main flex flex-1 flex-col gap-6">
+      <div className="@container/main flex flex-1 flex-col gap-8">
         <SectionCards
           totalPlaced={metrics.totalPlaced}
           avgSalary={metrics.avgSalary}
@@ -156,20 +156,41 @@ export default function Dashboard() {
           totalDepartments={metrics.deptStats.length}
         />
         
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-          <div className="xl:col-span-7 saas-card">
-            <ChartAreaInteractive data={metrics.deptStats} />
+        <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+          <div className="xl:col-span-7 saas-card flex flex-col">
+            <div className="flex items-center justify-between mb-8">
+              <div>
+                <h3 className="text-xl font-black text-foreground tracking-tight">Placement Performance</h3>
+                <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mt-1">Analytics Overview</p>
+              </div>
+              <div className="p-2 bg-primary/5 rounded-xl border border-primary/10">
+                <Sparkles className="size-5 text-primary" />
+              </div>
+            </div>
+            <div className="flex-1">
+              <ChartAreaInteractive data={metrics.deptStats} />
+            </div>
           </div>
+          
           <div className="xl:col-span-5 saas-card p-0 overflow-hidden flex flex-col">
-             <div className="px-6 py-4 border-b border-border/50 bg-muted/20">
-                <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Department Statistics</h3>
+             <div className="px-8 py-6 border-b border-border/50 bg-muted/10 flex items-center justify-between">
+                <div>
+                   <h3 className="text-sm font-black text-foreground uppercase tracking-[0.15em]">Dept Insights</h3>
+                   <p className="text-[10px] text-muted-foreground font-bold mt-0.5">Real-time status</p>
+                </div>
+                <div className="flex -space-x-2">
+                   {[1,2,3].map(i => (
+                      <div key={i} className="size-6 rounded-full border-2 border-card bg-muted animate-pulse" />
+                   ))}
+                </div>
              </div>
-             <div className="flex-1 overflow-auto">
+             <div className="flex-1 overflow-auto p-2">
                 <DeptStatsTable deptStats={metrics.deptStats} />
              </div>
           </div>
         </div>
       </div>
+
     </div>
   )
 }

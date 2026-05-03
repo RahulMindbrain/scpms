@@ -34,15 +34,9 @@ const chartConfig = {
 
 export function ChartAreaInteractive({ data }: PlacementChartProps) {
   return (
-    <div className="w-full">
-      <div className="flex flex-col gap-1 mb-6">
-        <h3 className="text-base font-bold text-foreground">Placement Overview</h3>
-        <p className="text-xs text-muted-foreground font-medium">
-          Comparison of total students vs placed students across departments
-        </p>
-      </div>
-
+    <div className="w-full h-full min-h-[300px]">
       <div className="px-0">
+
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"

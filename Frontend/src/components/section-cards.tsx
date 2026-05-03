@@ -67,38 +67,57 @@ export function SectionCards({ totalPlaced, avgSalary, totalStudents, totalDepar
   const values = { totalPlaced, avgSalary, totalStudents, totalDepartments }
 
   return (
-    <div className="grid grid-cols-1 gap-4 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      {cards.map(({ label, sub, footer, icon: Icon, gradient, border, iconBg, key, format }) => (
-        <Card
-          key={key}
-          className={`
-            @container/card relative overflow-hidden
-            bg-card
-            ${border}
-            border border-border/50
-            hover:shadow-xl hover:shadow-primary/5
-            transition-all duration-500 group
-          `}
-        >
-          <CardHeader className="flex flex-row items-start justify-between gap-4">
-            <div className="flex-1 min-w-0">
-              <CardDescription className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider mb-1">
+    <div className="grid grid-cols-1 gap-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
+      {cards.map(({ label, sub, footer, icon: Icon, iconBg, key, format }) => {
+        const glowClass = 
+          key === "totalPlaced" ? "stat-glow-indigo" :
+          key === "avgSalary" ? "stat-glow-emerald" :
+          key === "totalStudents" ? "stat-glow-cyan" :
+          "stat-glow-amber";
+
+        return (
+          <div
+            key={key}
+            className={`premium-stat-card ${glowClass} group`}
+          >
+            <div className="flex items-start justify-between mb-6">
+              <div className={`stat-icon-box ${iconBg}`}>
+                <Icon className="size-6 transition-transform duration-500 group-hover:scale-110" />
+              </div>
+              <div className="flex flex-col items-end">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-1">
+                  Metric ID: {key.slice(0, 5).toUpperCase()}
+                </span>
+                <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/5 border border-primary/10">
+                   <div className="size-1.5 rounded-full bg-primary animate-pulse" />
+                   <span className="text-[9px] font-bold text-primary uppercase">Live Data</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-1 mb-6">
+              <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 {label}
-              </CardDescription>
-              <CardTitle className="text-2xl font-black tabular-nums text-foreground @[250px]/card:text-3xl">
+              </p>
+              <h2 className="stat-value-text tabular-nums">
                 {format(values[key])}
-              </CardTitle>
+              </h2>
             </div>
-            <div className={`p-2.5 rounded-xl shrink-0 ${iconBg}`}>
-              <Icon className="size-5" />
+
+            <div className="flex flex-col gap-1 pt-4 border-t border-border/50">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold text-foreground">{sub}</span>
+                <span className="text-[10px] font-medium text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity">View Details</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground/70">{footer}</p>
             </div>
-          </CardHeader>
-          <CardFooter className="flex-col items-start gap-1 text-sm pt-0">
-            <div className="font-bold text-foreground text-xs">{sub}</div>
-            <div className="text-muted-foreground text-[10px]">{footer}</div>
-          </CardFooter>
-        </Card>
-      ))}
+            
+            {/* Decorative mesh background element */}
+            <div className="absolute -bottom-6 -right-6 size-24 bg-primary/5 rounded-full blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
+          </div>
+        );
+      })}
     </div>
   )
 }
+
