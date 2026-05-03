@@ -42,19 +42,19 @@ export const Modal: React.FC<ModalProps> = ({
         className={cn(
           maxWidth,
           "rounded-[1.5rem] p-0 overflow-hidden shadow-2xl",
-          "bg-[#1e1f26] border border-[rgba(255,255,255,0.08)]",
+          "bg-white dark:bg-[#1e1f26] border border-slate-200 dark:border-white/10",
           className
         )}
       >
         {(title || subtitle) && (
-          <DialogHeader className="p-7 pb-4 space-y-1 border-b border-[rgba(255,255,255,0.06)]">
+          <DialogHeader className="p-7 pb-4 space-y-1 border-b border-slate-100 dark:border-white/10">
             {title && (
-              <DialogTitle className="text-xl font-bold text-[#e2e2eb] tracking-tight">
+              <DialogTitle className="text-xl font-bold text-slate-900 dark:text-[#e2e2eb] tracking-tight">
                 {title}
               </DialogTitle>
             )}
             {subtitle && (
-              <DialogDescription className="text-[#908fa0] font-medium text-sm">
+              <DialogDescription className="text-slate-500 dark:text-[#908fa0] font-medium text-sm">
                 {subtitle}
               </DialogDescription>
             )}
@@ -64,7 +64,7 @@ export const Modal: React.FC<ModalProps> = ({
           {children}
         </div>
         {footer && (
-          <div className="p-7 pt-0 flex items-center justify-end gap-3 border-t border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] mt-2">
+          <div className="p-7 pt-0 flex items-center justify-end gap-3 border-t border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-white/5 mt-2">
             {footer}
           </div>
         )}
