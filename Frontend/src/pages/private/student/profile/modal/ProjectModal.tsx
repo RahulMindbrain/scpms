@@ -1,10 +1,10 @@
-﻿import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Globe, Code2 } from "lucide-react";
+import { Globe, Code2, Plus } from "lucide-react";
 
 type ProjectModalProps = {
   isOpen: boolean;
@@ -45,67 +45,75 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[520px] rounded-2xl p-0 overflow-hidden bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] shadow-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-black uppercase tracking-tight text-[#e2e2eb]">Add New Project</DialogTitle>
+      <DialogContent className="sm:max-w-[550px] rounded-2xl p-0 overflow-hidden bg-white border-none shadow-2xl flex flex-col">
+        <DialogHeader className="p-8 pb-4 bg-slate-50 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-indigo-100 rounded-lg">
+              <Code2 className="h-5 w-5 text-indigo-600" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl font-bold text-slate-800">Add Project</DialogTitle>
+              <DialogDescription className="text-slate-500 text-sm">Showcase your technical builds and innovations</DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-6 py-4 px-7">
+        <div className="p-8 space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="title" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Project Title</Label>
+            <Label htmlFor="title" className="text-sm font-bold text-slate-700 ml-1">Project Title</Label>
             <Input
               id="title"
-              placeholder="Enter project title"
-              className="rounded-2xl border-slate-200 focus:ring-blue-500/10 h-12 font-bold"
+              placeholder="What did you build?"
+              className="h-11 rounded-xl border-slate-200 focus:ring-blue-500"
               value={project.title}
               onChange={(e) => setProject({ ...project, title: e.target.value })}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Project Description</Label>
+            <Label htmlFor="description" className="text-sm font-bold text-slate-700 ml-1">Description</Label>
             <Textarea
               id="description"
-              placeholder="Tell us about your project..."
-              className="rounded-2xl border-[rgba(255,255,255,0.08)] focus:ring-indigo-500/10 min-h-[100px] font-medium"
+              placeholder="A brief overview of your project's features and goals..."
+              className="rounded-xl border-slate-200 focus:ring-blue-500 min-h-[120px] resize-none"
               value={project.description}
               onChange={(e) => setProject({ ...project, description: e.target.value })}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="techStack" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Tech Stack (e.g. React, Nodejs)</Label>
+            <Label htmlFor="techStack" className="text-sm font-bold text-slate-700 ml-1">Tech Stack</Label>
             <Input
               id="techStack"
-              placeholder="e.g. React, Nodejs, Tailwind"
-              className="rounded-2xl border-slate-200 focus:ring-blue-500/10 h-12 font-bold"
+              placeholder="e.g. React, Node.js, PostgreSQL (comma separated)"
+              className="h-11 rounded-xl border-slate-200 focus:ring-blue-500"
               value={project.techStack}
               onChange={(e) => setProject({ ...project, techStack: e.target.value })}
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="githubUrl" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">GitHub Link</Label>
+              <Label htmlFor="githubUrl" className="text-sm font-bold text-slate-700 ml-1">Source Code URL</Label>
               <div className="relative">
-                <Code2 className="absolute left-3 top-3.5 h-4 w-4 text-[#908fa0]" />
+                <Code2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input
                   id="githubUrl"
-                  placeholder="https://github.com..."
-                  className="rounded-2xl border-[rgba(255,255,255,0.08)] focus:ring-indigo-500/10 h-12 font-bold pl-10"
+                  placeholder="GitHub link"
+                  className="pl-10 h-11 rounded-xl border-slate-200 focus:ring-blue-500"
                   value={project.githubUrl}
                   onChange={(e) => setProject({ ...project, githubUrl: e.target.value })}
                 />
               </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="liveUrl" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Live Demo</Label>
+              <Label htmlFor="liveUrl" className="text-sm font-bold text-slate-700 ml-1">Live Demo URL</Label>
               <div className="relative">
-                <Globe className="absolute left-3 top-3.5 h-4 w-4 text-[#908fa0]" />
+                <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input
                   id="liveUrl"
-                  placeholder="https://project.com..."
-                  className="rounded-2xl border-[rgba(255,255,255,0.08)] focus:ring-indigo-500/10 h-12 font-bold pl-10"
+                  placeholder="Deployment link"
+                  className="pl-10 h-11 rounded-xl border-slate-200 focus:ring-blue-500"
                   value={project.liveUrl}
                   onChange={(e) => setProject({ ...project, liveUrl: e.target.value })}
                 />
@@ -114,19 +122,15 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
           </div>
         </div>
 
-        <DialogFooter className="flex-row gap-3 mt-4">
-          <Button
-            variant="outline"
-            onClick={onClose}
-            className="flex-1 rounded-xl h-11 font-bold border-[rgba(255,255,255,0.1)] text-[#c7c4d7] hover:bg-[rgba(255,255,255,0.05)]"
-          >
+        <DialogFooter className="p-8 bg-slate-50 border-t border-slate-100 flex gap-3">
+          <Button variant="ghost" onClick={onClose} className="flex-1 rounded-xl h-12 font-bold text-slate-500 hover:bg-slate-200/50">
             Cancel
           </Button>
           <Button
             onClick={handleSubmit}
-            className="flex-1 rounded-xl h-11 font-bold bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-500/20"
+            className="flex-1 rounded-xl h-12 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 active:scale-95 transition-all"
           >
-            Add Project
+            Ship Project
           </Button>
         </DialogFooter>
       </DialogContent>

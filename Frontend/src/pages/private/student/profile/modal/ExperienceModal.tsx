@@ -1,9 +1,10 @@
-﻿import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { useState } from "react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Briefcase, Calendar } from "lucide-react";
 
 type ExperienceModalProps = {
   isOpen: boolean;
@@ -36,76 +37,93 @@ const ExperienceModal = ({ isOpen, onClose, onAddExperience }: ExperienceModalPr
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[520px] rounded-2xl p-0 overflow-hidden bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] shadow-2xl">
-        <DialogHeader>
-          <DialogTitle className="text-2xl font-black uppercase tracking-tight text-[#e2e2eb]">Add Experience</DialogTitle>
+      <DialogContent className="sm:max-w-[550px] rounded-2xl p-0 overflow-hidden bg-white border-none shadow-2xl flex flex-col">
+        <DialogHeader className="p-8 pb-4 bg-slate-50 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-100 rounded-lg">
+              <Briefcase className="h-5 w-5 text-blue-600" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl font-bold text-slate-800">Add Experience</DialogTitle>
+              <DialogDescription className="text-slate-500 text-sm">Professional roles, internships, or volunteering</DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-6 py-4 px-7">
-          <div className="grid grid-cols-2 gap-4">
+        <div className="p-8 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="company" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Company</Label>
+              <Label htmlFor="company" className="text-sm font-bold text-slate-700 ml-1">Company Name</Label>
               <Input
                 id="company"
-                placeholder="Enter company name"
-                className="rounded-2xl h-11 border-slate-200"
+                placeholder="e.g. Google, Startup Inc."
+                className="h-11 rounded-xl border-slate-200 focus:ring-blue-500"
                 value={experience.companyName}
                 onChange={(e) => setExperience({ ...experience, companyName: e.target.value })}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="role" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Role</Label>
+              <Label htmlFor="role" className="text-sm font-bold text-slate-700 ml-1">Your Role</Label>
               <Input
                 id="role"
-                placeholder="Enter job role"
-                className="rounded-2xl h-11 border-slate-200"
+                placeholder="e.g. SDE Intern"
+                className="h-11 rounded-xl border-slate-200 focus:ring-blue-500"
                 value={experience.role}
                 onChange={(e) => setExperience({ ...experience, role: e.target.value })}
               />
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
-              <Label htmlFor="startDate" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Start Date</Label>
-              <Input
-                id="startDate"
-                type="date"
-                className="rounded-2xl h-11 border-[rgba(255,255,255,0.08)]"
-                value={experience.startDate}
-                onChange={(e) => setExperience({ ...experience, startDate: e.target.value })}
-              />
+              <Label htmlFor="startDate" className="text-sm font-bold text-slate-700 ml-1">Start Date</Label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  id="startDate"
+                  type="date"
+                  className="pl-10 h-11 rounded-xl border-slate-200 focus:ring-blue-500"
+                  value={experience.startDate}
+                  onChange={(e) => setExperience({ ...experience, startDate: e.target.value })}
+                />
+              </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="endDate" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">End Date (Optional)</Label>
-              <Input
-                id="endDate"
-                type="date"
-                className="rounded-2xl h-11 border-[rgba(255,255,255,0.08)]"
-                value={experience.endDate}
-                onChange={(e) => setExperience({ ...experience, endDate: e.target.value })}
-              />
+              <Label htmlFor="endDate" className="text-sm font-bold text-slate-700 ml-1">End Date (Optional)</Label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Input
+                  id="endDate"
+                  type="date"
+                  className="pl-10 h-11 rounded-xl border-slate-200 focus:ring-blue-500"
+                  value={experience.endDate}
+                  onChange={(e) => setExperience({ ...experience, endDate: e.target.value })}
+                />
+              </div>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description" className="text-xs font-black uppercase tracking-widest text-[#908fa0]">Description</Label>
+            <Label htmlFor="description" className="text-sm font-bold text-slate-700 ml-1">Key Responsibilities</Label>
             <Textarea
               id="description"
-              placeholder="Describe your role and impact..."
-              className="rounded-2xl border-[rgba(255,255,255,0.08)] min-h-[100px]"
+              placeholder="What were your main achievements and contributions?"
+              className="rounded-xl border-slate-200 focus:ring-blue-500 min-h-[120px] resize-none"
               value={experience.description}
               onChange={(e) => setExperience({ ...experience, description: e.target.value })}
             />
           </div>
         </div>
 
-        <DialogFooter className="flex-row gap-3 mt-2 px-7 pb-7">
-          <Button variant="outline" onClick={onClose} className="flex-1 rounded-xl h-11 font-bold border-[rgba(255,255,255,0.1)] text-[#c7c4d7] hover:bg-[rgba(255,255,255,0.05)]">
+        <DialogFooter className="p-8 bg-slate-50 border-t border-slate-100 flex gap-3">
+          <Button variant="ghost" onClick={onClose} className="flex-1 rounded-xl h-12 font-bold text-slate-500 hover:bg-slate-200/50">
             Cancel
           </Button>
-          <Button onClick={handleSubmit} className="flex-1 rounded-2xl h-12 font-black uppercase tracking-widest bg-blue-600">
-            Add
+          <Button
+            onClick={handleSubmit}
+            className="flex-1 rounded-xl h-12 font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 active:scale-95 transition-all"
+          >
+            Record Entry
           </Button>
         </DialogFooter>
       </DialogContent>
