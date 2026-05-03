@@ -27,9 +27,16 @@ import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import Loader from '@/components/Loader';
 
+import { useSearchParams, useNavigate } from 'react-router-dom';
+import { updateCompanyJob } from '@/redux/thunks/companyThunk';
+
 const PostJob: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { loading: isSubmitting } = useSelector((state: RootState) => state.company);
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const editJobId = searchParams.get('jobId');
+  
+  const { loading: isSubmitting, jobs } = useSelector((state: RootState) => state.company);
   const { departments, loading: loadingDepts } = useSelector((state: RootState) => state.department);
   const { skills, loading: loadingSkills } = useSelector((state: RootState) => state.skill);
 
@@ -59,6 +66,23 @@ const PostJob: React.FC = () => {
   useEffect(() => {
     dispatch(fetchDepartments());
     dispatch(fetchSkills());
+
+    // If editing, find the job in state or fetch it
+    if (editJobId) {
+      const jobToEdit = jobs?.find((j: any) => j.id === parseInt(editJobId));
+      if (jobToEdit) {
+        setFormData({
+          title: jobToEdit.title || '',
+          salary: jobToEdit.salary?.toString() || '',
+          location: jobToEdit.location || '',
+          minCgpa: jobToEdit.minCgpa?.toString() || '',
+          maxCgpa: jobToEdit.maxCgpa?.toString() || '',
+          description: jobToEdit.description || '',
+        });
+        setSelectedBranches(jobToEdit.eligibleDepartments?.map((d: any) => d.id) || jobToEdit.eligibleDepartmentIds || []);
+        setSelectedSkills(jobToEdit.skills?.map((s: any) => s.id) || jobToEdit.skillIds || []);
+      }
+    }
 
     const handleClickOutside = (event: MouseEvent) => {
       if (branchRef.current && !branchRef.current.contains(event.target as Node)) setIsBranchOpen(false);
@@ -152,17 +176,25 @@ const PostJob: React.FC = () => {
         skillIds: selectedSkills
       };
 
-      await dispatch(postJob(payload)).unwrap();
-      toast.success("Job Drive published!", {
-        description: `${formData.title} is now live.`,
-        icon: <Rocket className="text-emerald-500" size={20} />,
-      });
-
-      setFormData({ title: '', salary: '', location: '', minCgpa: '', maxCgpa: '', description: '' });
-      setSelectedBranches([]);
-      setSelectedSkills([]);
-      setFormErrors({});
-      setCurrentStep(1);
+      if (editJobId) {
+        await dispatch(updateCompanyJob({ id: parseInt(editJobId), data: payload })).unwrap();
+        toast.success("Job Drive Updated!", {
+          description: `${formData.title} has been refined.`,
+          icon: <Rocket className="text-emerald-500" size={20} />,
+        });
+        navigate('/company/jobs');
+      } else {
+        await dispatch(postJob(payload)).unwrap();
+        toast.success("Job Drive published!", {
+          description: `${formData.title} is now live.`,
+          icon: <Rocket className="text-emerald-500" size={20} />,
+        });
+        setFormData({ title: '', salary: '', location: '', minCgpa: '', maxCgpa: '', description: '' });
+        setSelectedBranches([]);
+        setSelectedSkills([]);
+        setFormErrors({});
+        setCurrentStep(1);
+      }
     } catch (error: any) {
       console.error("Job Posting Error:", error);
       
@@ -241,12 +273,14 @@ const PostJob: React.FC = () => {
               Recruitment Wizard
             </div>
             <h1 className="hero-title">
-              Publish a <br />
+              {editJobId ? 'Refine' : 'Publish'} a <br />
               <span>Job Drive</span>
             </h1>
             <p className="hero-description max-w-xl">
-              Follow our professional recruitment wizard to configure your job posting. 
-              Break down requirements into logical steps for maximum precision.
+              {editJobId 
+                ? "Update the parameters, eligibility, and description of your existing recruitment drive."
+                : "Follow our professional recruitment wizard to configure your job posting. Break down requirements into logical steps for maximum precision."
+              }
             </p>
           </div>
         </div>
@@ -591,9 +625,9 @@ const PostJob: React.FC = () => {
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shine_1.5s_infinite] transition-transform" />
                 {isSubmitting ? (
-                  <><Loader size="sm" /> Publishing...</>
+                  <><Loader size="sm" /> {editJobId ? 'Updating...' : 'Publishing...'}</>
                 ) : (
-                  <>Publish Drive <Rocket size={16} /></>
+                  <>{editJobId ? 'Update Drive' : 'Publish Drive'} <Rocket size={16} /></>
                 )}
               </button>
             )}
