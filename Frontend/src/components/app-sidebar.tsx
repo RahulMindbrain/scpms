@@ -25,9 +25,6 @@ import {
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar"
 import useAuth from "@/redux/hooks/useAuth"
@@ -93,12 +90,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     avatar: initials,
   }
 
-  const roleColors: Record<string, string> = {
-    admin: "from-blue-700 via-blue-600 to-blue-800",
-    student: "from-blue-600 via-blue-500 to-blue-700",
-    company: "from-blue-800 via-blue-600 to-cyan-600",
-  }
-  const gradientClass = roleColors[role ?? ""] ?? "from-blue-700 via-blue-600 to-blue-800"
+
+
 
   return (
     <Sidebar
