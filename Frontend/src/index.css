@@ -115,7 +115,7 @@
   --chart-5:                   #ef4444;
 
   /* ── Sidebar ── */
-  --sidebar:                   #ffffff;
+  --sidebar:                   #f8fafb;
   --sidebar-foreground:        #0f172a;
   --sidebar-primary:           #6366f1;
   --sidebar-primary-foreground: #ffffff;
@@ -156,14 +156,14 @@ html, body, #root {
   --border:                    rgba(255, 255, 255, 0.08);
   --input:                     #0c0e14;
   --ring:                      #6366f1;
-  --sidebar:                   #0c0e14;
-  --sidebar-foreground:        #e2e2eb;
-  --sidebar-primary:           #6366f1;
+  --sidebar:                   #0f172a;
+  --sidebar-foreground:        #94a3b8;
+  --sidebar-primary:           #38bdf8;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent:            rgba(99, 102, 241, 0.12);
-  --sidebar-accent-foreground: #c0c1ff;
-  --sidebar-border:            rgba(255, 255, 255, 0.06);
-  --sidebar-ring:              #6366f1;
+  --sidebar-accent:            #1e293b;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border:            rgba(255, 255, 255, 0.05);
+  --sidebar-ring:              #38bdf8;
 }
 
 /* ── Global Theme Overrides for Hardcoded Styles ── */

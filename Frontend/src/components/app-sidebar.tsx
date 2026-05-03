@@ -101,36 +101,37 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const gradientClass = roleColors[role ?? ""] ?? "from-indigo-500 to-violet-600"
 
   return (
-    <Sidebar collapsible="icon" className="border-r border-white/5 bg-[#0c0e14]" {...props}>
-      <SidebarHeader className="h-20 flex flex-row items-center px-4 shrink-0 overflow-hidden">
-        <div className="flex items-center gap-3 w-full">
-          {/* Premium Logo Icon */}
-          <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20 shrink-0 transition-all duration-300 group-data-[collapsible=icon]:mx-auto">
-             <GraduationCap className="size-6 text-white" />
+    <Sidebar collapsible="icon" className="border-r border-sidebar-border bg-sidebar transition-all duration-300" {...props}>
+      <SidebarHeader className="h-20 flex items-center justify-center px-4 shrink-0 overflow-hidden relative">
+        {/* Soft Background Glow for Logo Area */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-32 bg-cyan-500/5 rounded-full blur-[40px] pointer-events-none" />
+        
+        <div className="flex items-center gap-3 w-full justify-start group-data-[collapsible=icon]:justify-center relative z-10">
+          {/* Premium Logo Icon with vibrant gradient */}
+          <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-400 via-cyan-500 to-blue-600 shadow-lg shadow-cyan-500/20 shrink-0 transition-all duration-500">
+             <GraduationCap className="size-5 text-white" />
           </div>
           <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden animate-in fade-in slide-in-from-left-4 duration-500">
-            <span className="text-[17px] font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">Smart CPMS</span>
+            <span className="text-[18px] font-black tracking-tight text-cyan-400">CPMS</span>
             <div className="flex items-center gap-1.5 mt-0.5">
-              <span className="size-1.5 rounded-full bg-indigo-500 animate-pulse" />
-              <span className="text-[10px] text-indigo-400/80 uppercase font-bold tracking-widest">{role} Portal</span>
+              <span className="size-1.5 rounded-full bg-cyan-500 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.4)]" />
+              <span className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.1em]">{role} Portal</span>
             </div>
           </div>
         </div>
       </SidebarHeader>
 
       {/* ── Navigation ── */}
-      <SidebarContent className="px-2 py-4 gap-4 bg-[#0c0e14]">
-        <div className="space-y-6">
-          <NavMain items={navigation.main} />
-          <div className="px-4">
-             <div className="h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
-          </div>
-          <NavSecondary items={navigation.secondary} className="mt-0" />
+      <SidebarContent className="px-2 py-2 gap-1 no-scrollbar">
+        <NavMain items={navigation.main} />
+        <div className="px-4 py-2 group-data-[collapsible=icon]:px-2">
+           <div className="h-[1px] bg-gradient-to-r from-transparent via-sidebar-border to-transparent w-full" />
         </div>
+        <NavSecondary items={navigation.secondary} />
       </SidebarContent>
 
       {/* ── Footer / User ── */}
-      <SidebarFooter className="border-t border-white/5 p-4 bg-[#0c0e14]">
+      <SidebarFooter className="border-t border-sidebar-border/50 p-2 bg-sidebar/50 backdrop-blur-sm">
         <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
