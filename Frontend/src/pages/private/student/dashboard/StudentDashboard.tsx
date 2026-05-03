@@ -84,10 +84,10 @@ export default function StudentDashboard() {
               <Sparkles className="h-3.5 w-3.5" /> 
               <span>Student Overview</span>
             </div>
-            <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Welcome back, <span className="text-blue-600">{user?.firstname || "Student"}</span> 👋
+            <h1 className="student-hero-title text-3xl md:text-5xl">
+              Welcome back, <span className="text-primary">{user?.firstname || "Student"}</span> 👋
             </h1>
-            <p className="mt-4 max-w-xl text-lg text-slate-500 dark:text-slate-400 font-medium">
+            <p className="student-hero-description mt-4 text-base md:text-lg">
               Your personalized workspace for tracking interviews, applications, and upcoming placement milestones.
             </p>
           </div>
@@ -123,34 +123,34 @@ export default function StudentDashboard() {
           ].map((stat, idx) => (
             <div
               key={idx}
-              className="bg-card dark:bg-[#11141B] rounded-[1.5rem] p-7 shadow-sm border border-border dark:border-white/5 transition-all hover:shadow-md group"
+              className="bg-card rounded-[1.5rem] p-7 shadow-sm border border-border transition-all hover:shadow-md group"
             >
               <div className="flex items-center justify-between">
-                <div className={`p-3 rounded-xl ${stat.bg} dark:bg-white/5 transition-transform group-hover:scale-110`}>
-                  <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
+                <div className={`p-3 rounded-xl ${stat.bg} dark:bg-primary/10 transition-transform group-hover:scale-110`}>
+                  <stat.icon className={`h-6 w-6 ${stat.iconColor} dark:text-primary`} />
                 </div>
                 {stat.isNext && nextEvent && (
-                  <div className="text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-500/10 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                  <div className="text-[10px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full uppercase tracking-wider">
                     Next Up
                   </div>
                 )}
               </div>
               
               <div className="mt-6">
-                <p className="text-sm font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                   {stat.label}
                 </p>
                 {stat.isNext ? (
                   <div className="mt-2">
-                    <p className="text-xl font-bold text-slate-900 dark:text-white truncate">
+                    <p className="text-xl font-bold text-foreground truncate">
                       {nextEvent ? nextEvent.title : "No events"}
                     </p>
-                    <p className="text-xs font-medium text-slate-500 mt-1">
+                    <p className="text-xs font-medium text-muted-foreground mt-1">
                       {nextEvent ? new Date(nextEvent.startTime).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) : "All caught up"}
                     </p>
                   </div>
                 ) : (
-                  <p className="mt-2 text-4xl font-extrabold text-slate-900 dark:text-white">
+                  <p className="mt-2 text-4xl font-extrabold text-foreground">
                     {stat.value}
                   </p>
                 )}
@@ -165,20 +165,20 @@ export default function StudentDashboard() {
           {/* Upcoming Schedule */}
           <div className="lg:col-span-8 space-y-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Upcoming Schedule</h3>
-              <Link to="/student/calendar" className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
+              <h3 className="text-2xl font-bold text-foreground tracking-tight">Upcoming Schedule</h3>
+              <Link to="/student/calendar" className="text-sm font-semibold text-primary hover:opacity-80 transition-opacity">
                 View All
               </Link>
             </div>
 
             <div className="space-y-4">
               {upcomingEvents.length === 0 ? (
-                <div className="border-2 border-dashed border-gray-200 dark:border-white/5 rounded-[2.5rem] py-24 flex flex-col items-center justify-center text-center bg-gray-50/20">
-                  <div className="bg-white dark:bg-white/5 p-6 rounded-3xl shadow-sm mb-6 transition-transform hover:scale-105">
-                    <Calendar className="h-10 w-10 text-indigo-400/40" />
+                <div className="border-2 border-dashed border-border rounded-[2.5rem] py-24 flex flex-col items-center justify-center text-center bg-muted/20">
+                  <div className="bg-card p-6 rounded-3xl shadow-sm mb-6 transition-transform hover:scale-105">
+                    <Calendar className="h-10 w-10 text-primary/40" />
                   </div>
-                  <p className="text-slate-500 dark:text-slate-400 font-bold text-lg tracking-tight">Your schedule is clear</p>
-                  <p className="text-sm text-slate-400 dark:text-slate-500 mt-2 max-w-xs mx-auto">
+                  <p className="text-foreground font-bold text-lg tracking-tight">Your schedule is clear</p>
+                  <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto">
                     We couldn't find any upcoming events. Stay tuned for new placement activities and interviews!
                   </p>
                 </div>
@@ -186,24 +186,24 @@ export default function StudentDashboard() {
                 upcomingEvents.map((event) => (
                   <div
                     key={event.id}
-                    className="bg-card dark:bg-[#11141B] border border-border dark:border-white/5 rounded-2xl p-5 flex items-center gap-5 transition-all hover:border-blue-100 dark:hover:border-blue-500/20 group shadow-sm"
+                    className="bg-card border border-border rounded-2xl p-5 flex items-center gap-5 transition-all hover:border-primary/50 group shadow-sm"
                   >
-                    <div className="h-14 w-14 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                    <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
                       <Briefcase className="h-6 w-6" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">{event.title}</h4>
-                      <p className="text-sm text-slate-500 font-medium">{event.company}</p>
+                      <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">{event.title}</h4>
+                      <p className="text-sm text-muted-foreground font-medium">{event.company}</p>
                     </div>
                     <div className="text-right hidden sm:block">
-                      <p className="text-sm font-bold text-slate-900 dark:text-white">
+                      <p className="text-sm font-bold text-foreground">
                         {new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </p>
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">
                         {new Date(event.startTime).toLocaleDateString([], { day: 'numeric', month: 'short' })}
                       </p>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-slate-300 group-hover:text-indigo-400 transition-all group-hover:translate-x-1" />
+                    <ChevronRight className="h-5 w-5 text-muted-foreground/40 group-hover:text-primary transition-all group-hover:translate-x-1" />
                   </div>
                 ))
               )}
@@ -212,7 +212,7 @@ export default function StudentDashboard() {
 
           {/* Quick Navigation */}
           <div className="lg:col-span-4 space-y-6">
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Navigation</h3>
+            <h3 className="text-2xl font-bold text-foreground tracking-tight">Navigation</h3>
             <div className="grid gap-4">
               {[
                 { to: "/student/profile", icon: User, label: "My Profile", color: "blue", bg: "bg-blue-50" },
@@ -223,29 +223,29 @@ export default function StudentDashboard() {
                 <Link
                   key={nav.to}
                   to={nav.to}
-                  className="bg-card dark:bg-[#11141B] border border-border dark:border-white/5 rounded-2xl p-4 flex items-center gap-4 transition-all hover:shadow-md hover:translate-y-[-2px] group"
+                  className="bg-card border border-border rounded-2xl p-4 flex items-center gap-4 transition-all hover:shadow-md hover:translate-y-[-2px] group"
                 >
-                  <div className={`h-11 w-11 rounded-xl ${nav.bg} dark:bg-white/5 flex items-center justify-center transition-transform group-hover:scale-110`}>
-                    <nav.icon className={`h-5 w-5 text-${nav.color}-500`} />
+                  <div className={`h-11 w-11 rounded-xl ${nav.bg} dark:bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-110`}>
+                    <nav.icon className={`h-5 w-5 text-${nav.color}-500 dark:text-primary`} />
                   </div>
-                  <span className="font-bold text-slate-700 dark:text-slate-300 flex-1">{nav.label}</span>
-                  <ArrowUpRight className="h-4 w-4 text-slate-300 group-hover:text-indigo-500 transition-colors" />
+                  <span className="font-bold text-foreground/80 dark:text-foreground flex-1">{nav.label}</span>
+                  <ArrowUpRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
                 </Link>
               ))}
             </div>
 
             {/* Recruiter Insight Card */}
-            <div className="bg-blue-600 rounded-[2rem] p-8 text-white relative overflow-hidden group">
+            <div className="bg-primary rounded-[2rem] p-8 text-white relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-6 opacity-10 transition-transform group-hover:scale-110">
                 <Sparkles size={80} />
               </div>
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-4">
-                  <Sparkles className="h-4 w-4 text-blue-200" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-200">Pro Insight</span>
+                  <Sparkles className="h-4 w-4 text-primary-foreground/60" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary-foreground/60">Pro Insight</span>
                 </div>
                 <p className="text-sm font-medium leading-relaxed opacity-90">
-                  Update your skills bi-weekly to increase visibility by <span className="font-bold text-blue-200">40%</span> to top recruiters.
+                  Update your skills bi-weekly to increase visibility by <span className="font-bold text-primary-foreground">40%</span> to top recruiters.
                 </p>
               </div>
             </div>
