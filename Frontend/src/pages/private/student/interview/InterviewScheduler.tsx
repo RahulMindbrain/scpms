@@ -1,9 +1,8 @@
-﻿import React from 'react';
+import React from 'react';
 import {
   Calendar,
   Clock, MapPin,
   ExternalLink,
-  Timer
 } from 'lucide-react';
 import CountdownTimer from '@/components/CountdownTimer';
 

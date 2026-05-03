@@ -15,7 +15,6 @@ import {
   PlusCircle,
   GraduationCap,
   Wrench,
-  Zap,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"

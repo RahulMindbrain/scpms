@@ -19,13 +19,11 @@ import { fetchSchedules, deleteSchedule, fetchScheduleMessages, sendScheduleMess
 import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useNavigate } from 'react-router-dom';
 
 import Loader from '@/components/Loader';
 
 const InterviewSchedulerPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
   const { schedules, loading } = useSelector((state: RootState) => state.interview);
   const { companies } = useSelector((state: RootState) => state.company);
 

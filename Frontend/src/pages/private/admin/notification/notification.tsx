@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowUpRight,
   Bell,
@@ -46,7 +46,6 @@ const AdminNotificationPage = () => {
   const {
     items: notifications = [],
     loading = false,
-    pagination = { page: 1, limit: 10, totalPages: 0 },
   } = useSelector((state: RootState) => state.notification || {});
 
   useEffect(() => {

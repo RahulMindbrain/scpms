@@ -1,10 +1,8 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowUpRight,
   Bell,
   Clock,
-  Info,
-  Sparkles,
   Trash2,
   X,
   Search,
@@ -46,7 +44,6 @@ const CompanyNotificationPage = () => {
   const {
     items: notifications = [],
     loading = false,
-    pagination = { page: 1, limit: 10, totalPages: 0 },
   } = useSelector((state: RootState) => state.notification || {});
 
   useEffect(() => {

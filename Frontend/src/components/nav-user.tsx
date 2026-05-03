@@ -18,7 +18,6 @@ import {
 import {
   SidebarMenu,
   SidebarMenuButton,
-  SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
@@ -34,7 +33,7 @@ export function NavUser({
     avatar: string
   }
 }) {
-  const { isMobile, state } = useSidebar()
+  const { isMobile } = useSidebar()
   const dispatch = useDispatch<AppDispatch>()
   const navigate = useNavigate()
 

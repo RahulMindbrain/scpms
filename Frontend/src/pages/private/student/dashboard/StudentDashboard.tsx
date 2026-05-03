@@ -11,7 +11,6 @@ import {
   Sparkles,
   MapPin,
   Clock3,
-  Timer,
 } from "lucide-react"
 import CountdownTimer from "@/components/CountdownTimer"
 import type { AppDispatch } from "@/redux/store/store"

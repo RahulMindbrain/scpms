@@ -40,7 +40,7 @@ import Loader from '@/components/Loader';
 
 const CompanyManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { companies: reduxCompanies, inactiveCompanies: reduxInactiveCompanies, loading, error } = useSelector((state: RootState) => state.company);
+  const { companies: reduxCompanies, loading, error } = useSelector((state: RootState) => state.company);
 
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [filter, setFilter] = useState('All');

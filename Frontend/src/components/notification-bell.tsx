@@ -5,7 +5,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { useSocket } from "@/socket/SocketProvider";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";

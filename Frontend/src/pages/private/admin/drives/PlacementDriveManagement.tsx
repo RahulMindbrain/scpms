@@ -4,7 +4,6 @@ import {
   GraduationCap,
   ChevronDown,
   Building2,
-  AlertCircle,
   Search,
   Filter,
   IndianRupee,
@@ -76,7 +75,7 @@ const PlacementDriveManagement: React.FC = () => {
 
   const filterRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch<AppDispatch>();
-  const { jobs: reduxJobs, loading, error } = useSelector((state: RootState) => state.drive);
+  const { jobs: reduxJobs, loading } = useSelector((state: RootState) => state.drive);
 
   useEffect(() => {
     dispatch(fetchJobs({ status: 'APPROVED' }));

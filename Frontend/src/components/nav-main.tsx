@@ -28,10 +28,6 @@ export function NavMain({
           const isActive = location.pathname === item.url || location.pathname.startsWith(item.url + '/')
           return (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild tooltip={item.title} isActive={isActive} className={isActive ? "bg-indigo-50 text-indigo-700 font-semibold" : ""}>
-                <NavLink to={item.url} className="flex items-center w-full gap-2 relative cursor-pointer">
-                  {item.icon}
-                  <span className="group-data-[collapsible=icon]:hidden">{item.title}</span>
               <SidebarMenuButton
                 asChild
                 tooltip={item.title}

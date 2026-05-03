@@ -6,7 +6,6 @@ import {
   fetchCompanyProfile,
   createCompanyProfile,
   updateCompanyProfile,
-  postJob,
   fetchCompanyJobs,
   fetchJobApplications,
   updateJobApplicationStatus,

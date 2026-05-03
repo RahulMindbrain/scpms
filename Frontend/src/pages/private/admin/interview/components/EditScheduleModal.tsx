@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dialog, DialogContent, DialogDescription,
   DialogHeader, DialogTitle
@@ -43,7 +43,6 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
 }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { companies, jobs } = useSelector((state: RootState) => state.company);
-  const { schedules } = useSelector((state: RootState) => state.interview);
   const isCreate = mode === 'create';
 
   const [formData, setFormData] = useState({
