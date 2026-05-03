@@ -69,44 +69,45 @@ const Applicants: React.FC = () => {
   };
 
   return (
-    <div className="space-y-9 animate-in fade-in duration-700">
+    <div className="flex flex-col gap-6 p-4 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">Drive Applicants</h1>
+          <p className="text-sm text-muted-foreground font-medium">Review and manage student applications for your job drives.</p>
+        </div>
+      </div>
 
-      <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-6 space-y-6">
+      <div className="saas-card p-4 space-y-4">
         <div className="flex flex-col md:flex-row gap-4">
-
           <div className="relative flex-1 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0] group-focus-within:text-indigo-400 transition-colors" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
               type="text"
-              placeholder="Search by name..."
+              placeholder="Search students by name..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0c0e14] text-[#e2e2eb] placeholder:text-[#908fa0] focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all text-sm font-medium"
+              className="saas-input pl-10"
             />
           </div>
 
           <div className="flex items-center gap-3">
-
-            <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
-              <Filter className="w-4 h-4 text-slate-400" />
-              <select
-                value={selectedJob}
-                onChange={(e) => setSelectedJob(e.target.value)}
-                className="bg-transparent text-sm font-bold text-[#c7c4d7] focus:outline-none cursor-pointer"
-              >
-                <option>All Jobs</option>
-                {uniqueJobs.map((job) => (
-                  <option key={job as string} value={job as string}>
-                    {job as string}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <select
+              value={selectedJob}
+              onChange={(e) => setSelectedJob(e.target.value)}
+              className="saas-input w-full md:w-[200px]"
+            >
+              <option>All Jobs</option>
+              {uniqueJobs.map((job) => (
+                <option key={job as string} value={job as string}>
+                  {job as string}
+                </option>
+              ))}
+            </select>
 
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="px-3 py-2.5 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0c0e14] text-sm font-bold text-[#c7c4d7] focus:outline-none cursor-pointer"
+              className="saas-input w-full md:w-[150px]"
             >
               <option value="ALL">All Status</option>
               <option value="APPLIED">Applied</option>
@@ -114,76 +115,59 @@ const Applicants: React.FC = () => {
               <option value="SELECTED">Selected</option>
               <option value="REJECTED">Rejected</option>
             </select>
-
           </div>
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto rounded-xl border border-[rgba(255,255,255,0.05)]">
-          <table className="w-full text-left">
+        <div className="saas-table-container mt-4">
+          <table className="saas-table">
             <thead>
-              <tr className="border-b border-slate-50">
-                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">Name</th>
-                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">Branch</th>
-                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">CGPA</th>
-                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">Applied For</th>
-                <th className="px-4 py-4 text-xs font-bold text-slate-400 uppercase">Status</th>
+              <tr>
+                <th>Student Name</th>
+                <th>Department</th>
+                <th>CGPA</th>
+                <th>Applied For</th>
+                <th className="text-center">Status</th>
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-slate-50">
+            <tbody className="divide-y divide-border/30">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center">
+                  <td colSpan={5} className="py-20 text-center">
                     <Loader text="Loading applicants..." />
                   </td>
                 </tr>
               ) : filteredApplicants.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center text-sm text-slate-500">
-                    No applicants found.
+                  <td colSpan={5} className="py-20 text-center text-muted-foreground font-medium">
+                    No applicants found matching your criteria.
                   </td>
                 </tr>
               ) : (
                 filteredApplicants.map((app: any) => (
-                  <tr key={app.id} className="hover:bg-slate-50 transition">
-
-                    <td className="px-4 py-5 font-bold text-slate-800">
+                  <tr key={app.id}>
+                    <td className="font-bold text-foreground">
                       {app.student?.user?.firstname || 'N/A'} {app.student?.user?.lastname || ''}
                     </td>
-
-                    <td className="px-4 py-5 text-sm text-slate-500">
+                    <td className="text-xs text-muted-foreground">
                       {app.student?.department?.name || 'N/A'}
                     </td>
-
-                    <td className="px-4 py-5 text-sm font-bold text-slate-700">
+                    <td className="text-xs font-bold text-primary">
                       {app.student?.cgpa || 'N/A'}
                     </td>
-
-                    <td className="px-4 py-5 text-sm text-slate-600">
+                    <td className="text-xs">
                       {app.job?.title || 'N/A'}
                     </td>
-
-                    <td className="px-4 py-5">
+                    <td className="text-center">
                       <Select
                         value={app.status}
                         onValueChange={(value) =>
                           handleStatusUpdate(app.id, value, app.status)
                         }
                       >
-                        <SelectTrigger className="w-[140px] h-9 rounded-xl">
-                          <SelectValue>
-                            <Badge className="text-[10px] py-0 px-2" variant={
-                              app.status === 'SELECTED' ? 'success' :
-                              app.status === 'REJECTED' ? 'danger' :
-                              app.status === 'SHORTLISTED' ? 'default' :
-                              'outline'
-                            }>
-                              {app.status}
-                            </Badge>
-                          </SelectValue>
+                        <SelectTrigger className="w-[130px] mx-auto h-8 rounded-lg text-[10px] font-bold">
+                          <SelectValue />
                         </SelectTrigger>
-
                         <SelectContent>
                           <SelectItem value="APPLIED" disabled={isBackward(app.status, 'APPLIED')}>Applied</SelectItem>
                           <SelectItem value="SHORTLISTED" disabled={isBackward(app.status, 'SHORTLISTED')}>Shortlisted</SelectItem>
@@ -192,7 +176,6 @@ const Applicants: React.FC = () => {
                         </SelectContent>
                       </Select>
                     </td>
-
                   </tr>
                 ))
               )}

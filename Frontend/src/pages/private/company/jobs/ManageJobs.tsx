@@ -34,76 +34,75 @@ const ManageJobs: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 px-5 py-3 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-center justify-end gap-4">
-        {/* <Button className="font-bold px-6 py-6 rounded-2xl shadow-lg shadow-blue-500/20">
-          <Plus className="w-5 h-5 mr-2" /> Post New Job
-        </Button> */}
+    <div className="flex flex-col gap-6 p-4 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">Manage Job Drives</h1>
+          <p className="text-sm text-muted-foreground font-medium">View and manage all your active and past recruitment drives.</p>
+        </div>
       </div>
 
-      <div className="bg-[#1e1f26] rounded-2xl border border-[rgba(255,255,255,0.07)] overflow-hidden">
-        <div className="p-5 border-b border-[rgba(255,255,255,0.06)]">
-          <h2 className="text-lg font-bold text-[#e2e2eb]">Your Job Postings</h2>
+      <div className="saas-table-container">
+        <div className="px-6 py-4 border-b border-border/50 bg-muted/20">
+          <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider">Your Job Postings</h2>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left">
+          <table className="saas-table">
             <thead>
-              <tr className="bg-[rgba(255,255,255,0.03)]">
-                <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Job Title</th>
-                <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Package</th>
-                <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Location</th>
-                {/* <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-center">Applicants</th> */}
-                <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Deadline</th>
-                <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Status</th>
-                {/* <th className="px-6 py-4 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-right">Actions</th> */}
+              <tr>
+                <th>Job Title</th>
+                <th>Package</th>
+                <th>Location</th>
+                <th>Deadline</th>
+                <th>Status</th>
+                <th className="text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[rgba(255,255,255,0.05)]">
+            <tbody className="divide-y divide-border/30">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center">
+                  <td colSpan={6} className="py-20 text-center">
                     <Loader text="Loading your job postings..." />
                   </td>
                 </tr>
               ) : jobs?.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-6 py-10 text-center text-[#908fa0] font-medium">
+                  <td colSpan={6} className="py-20 text-center text-muted-foreground font-medium">
                     No jobs found. Post a new job to get started.
                   </td>
                 </tr>
               ) : (
                 jobs?.map((job: any) => (
-                  <tr key={job.id} className="hover:bg-[rgba(255,255,255,0.02)] transition-colors group border-b border-[rgba(255,255,255,0.04)] last:border-0">
-                    <td className="px-6 py-3.5 font-bold text-[#e2e2eb]">{job.title}</td>
-                    <td className="px-6 py-3.5 text-xs font-medium text-[#c7c4d7]">{formatSalary(job.salary)}</td>
-                    <td className="px-6 py-3.5 text-xs font-medium text-[#c7c4d7]">{job.location}</td>
-                    <td className="px-6 py-3.5 text-xs font-bold text-[#c7c4d7] text-center">0</td>
-                    <td className="px-6 py-3.5 text-xs font-medium text-[#908fa0]">
+                  <tr key={job.id}>
+                    <td className="font-bold text-foreground">{job.title}</td>
+                    <td className="text-xs">{formatSalary(job.salary)}</td>
+                    <td className="text-xs">{job.location}</td>
+                    <td className="text-xs text-muted-foreground">
                       {job.createdAt ? new Date(job.createdAt).toLocaleDateString('en-US', {
                         month: 'short',
                         day: '2-digit',
                         year: 'numeric'
                       }) : 'N/A'}
                     </td>
-                    <td className="px-6 py-3.5">
+                    <td>
                       <Badge variant={
                         job.status === 'APPROVED' || job.status === 'Active' ? 'default' : 
-                        job.status === 'REJECTED' || job.status === 'Closed' ? 'danger' : 
+                        job.status === 'REJECTED' || job.status === 'Closed' ? 'destructive' : 
                         'outline'
-                      } className="px-2 py-0.5 text-[10px]">
+                      } className="px-2 py-0.5 text-[10px] font-bold">
                         {job.status}
                       </Badge>
                     </td>
-                    <td className="px-6 py-3.5">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button className="p-1.5 text-[#908fa0] hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-all">
-                          <Eye className="w-3.5 h-3.5" />
+                    <td>
+                      <div className="flex items-center justify-end gap-2">
+                        <button className="p-2 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-xl transition-all">
+                          <Eye className="w-4 h-4" />
                         </button>
-                        <button className="p-1.5 text-[#908fa0] hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-all">
-                          <Edit2 className="w-3.5 h-3.5" />
+                        <button className="p-2 text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10 rounded-xl transition-all">
+                          <Edit2 className="w-4 h-4" />
                         </button>
-                        <button className="p-1.5 text-[#908fa0] hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all">
-                          <Trash2 className="w-3.5 h-3.5" />
+                        <button className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all">
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
                     </td>

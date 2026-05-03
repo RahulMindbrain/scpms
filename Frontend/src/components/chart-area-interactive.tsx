@@ -28,92 +28,98 @@ const chartConfig = {
   },
   placedStudents: {
     label: "Placed Students",
-    color: "#4edea3",
+    color: "#10b981",
   },
 } satisfies ChartConfig
 
 export function ChartAreaInteractive({ data }: PlacementChartProps) {
   return (
-    <Card className="@container/card bg-[#1e1f26] border border-[rgba(255,255,255,0.07)] shadow-none">
-      <CardHeader className="border-b border-[rgba(255,255,255,0.06)] pb-3">
-        <CardTitle className="text-sm font-semibold text-[#e2e2eb]">Placement Overview by Department</CardTitle>
-        <CardDescription className="text-xs text-[#908fa0]">
+    <div className="w-full">
+      <div className="flex flex-col gap-1 mb-6">
+        <h3 className="text-base font-bold text-foreground">Placement Overview</h3>
+        <p className="text-xs text-muted-foreground font-medium">
           Comparison of total students vs placed students across departments
-        </CardDescription>
-      </CardHeader>
+        </p>
+      </div>
 
-      <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
+      <div className="px-0">
         <ChartContainer
           config={chartConfig}
           className="aspect-auto h-[250px] w-full"
         >
-          <AreaChart data={data}>
+          <AreaChart data={data} margin={{ left: -20, right: 0, top: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="fillTotal" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
                   stopColor="var(--color-totalStudents)"
-                  stopOpacity={0.3}
+                  stopOpacity={0.15}
                 />
                 <stop
                   offset="95%"
                   stopColor="var(--color-totalStudents)"
-                  stopOpacity={0.1}
+                  stopOpacity={0.01}
                 />
               </linearGradient>
               <linearGradient id="fillPlaced" x1="0" y1="0" x2="0" y2="1">
                 <stop
                   offset="5%"
                   stopColor="var(--color-placedStudents)"
-                  stopOpacity={0.8}
+                  stopOpacity={0.25}
                 />
                 <stop
                   offset="95%"
                   stopColor="var(--color-placedStudents)"
-                  stopOpacity={0.1}
+                  stopOpacity={0.01}
                 />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} stroke="rgba(255,255,255,0.05)" />
+            <CartesianGrid vertical={false} stroke="var(--border)" strokeDasharray="3 3" opacity={0.5} />
             <XAxis
               dataKey="department"
               tickLine={false}
               axisLine={false}
-              tickMargin={8}
-              tick={{ fill: "#908fa0", fontSize: 11 }}
-              tickFormatter={(value) => value.length > 10 ? `${value.substring(0, 10)}...` : value}
+              tickMargin={12}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: 600 }}
+              tickFormatter={(value) => value.length > 8 ? `${value.substring(0, 8)}...` : value}
             />
             <YAxis
                 tickLine={false}
                 axisLine={false}
-                tickMargin={8}
-                tick={{ fill: "#908fa0", fontSize: 11 }}
+                tickMargin={12}
+                tick={{ fill: "var(--muted-foreground)", fontSize: 10, fontWeight: 600 }}
             />
             <ChartTooltip
               cursor={false}
               content={
                 <ChartTooltipContent
-                  indicator="dot"
+                  indicator="line"
+                  className="bg-card border-border/50 shadow-xl"
                 />
               }
             />
             <Area
               dataKey="totalStudents"
-              type="natural"
+              type="monotone"
               fill="url(#fillTotal)"
               stroke="var(--color-totalStudents)"
+              strokeWidth={2}
               stackId="a"
+              animationDuration={1500}
             />
             <Area
               dataKey="placedStudents"
-              type="natural"
+              type="monotone"
               fill="url(#fillPlaced)"
               stroke="var(--color-placedStudents)"
+              strokeWidth={4}
               stackId="b"
+              animationDuration={2000}
+              strokeLinecap="round"
             />
           </AreaChart>
         </ChartContainer>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

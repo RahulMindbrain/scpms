@@ -14,17 +14,17 @@ interface DeptStatsTableProps {
 
 function PlacementBadge({ pct }: { pct: number }) {
   if (pct >= 70) return (
-    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/25">
+    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
       {pct.toFixed(1)}%
     </span>
   )
   if (pct >= 40) return (
-    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-amber-500/15 text-amber-400 ring-1 ring-amber-500/25">
+    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
       {pct.toFixed(1)}%
     </span>
   )
   return (
-    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-rose-500/15 text-rose-400 ring-1 ring-rose-500/25">
+    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20">
       {pct.toFixed(1)}%
     </span>
   )
@@ -32,54 +32,48 @@ function PlacementBadge({ pct }: { pct: number }) {
 
 export function DeptStatsTable({ deptStats }: DeptStatsTableProps) {
   return (
-    <div className="">
-      <div className="rounded-xl border border-[rgba(255,255,255,0.07)] bg-[#1e1f26] overflow-hidden">
-        <div className="px-4 py-3 border-b border-[rgba(255,255,255,0.06)] flex items-center gap-2">
-          <h3 className="text-sm font-semibold text-[#e2e2eb]">Department-wise Placement Stats</h3>
-          <span className="ml-auto text-xs text-[#908fa0]">{deptStats.length} departments</span>
-        </div>
-        <Table>
-          <TableHeader>
-            <TableRow className="border-[rgba(255,255,255,0.06)] hover:bg-transparent">
-              <TableHead className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#908fa0] bg-[#191b22] h-10">
-                Department
-              </TableHead>
-              <TableHead className="text-right text-[10px] font-semibold uppercase tracking-[0.08em] text-[#908fa0] bg-[#191b22] h-10">
-                Total Students
-              </TableHead>
-              <TableHead className="text-right text-[10px] font-semibold uppercase tracking-[0.08em] text-[#908fa0] bg-[#191b22] h-10">
-                Placed Students
-              </TableHead>
-              <TableHead className="text-right text-[10px] font-semibold uppercase tracking-[0.08em] text-[#908fa0] bg-[#191b22] h-10">
-                Placement %
-              </TableHead>
+    <div className="saas-table-container border-0 shadow-none">
+      <Table className="saas-table">
+        <TableHeader>
+          <TableRow className="bg-muted/30 hover:bg-muted/30 border-0">
+            <TableHead className="text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground h-10">
+              Department
+            </TableHead>
+            <TableHead className="text-right text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground h-10">
+              Total
+            </TableHead>
+            <TableHead className="text-right text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground h-10">
+              Placed
+            </TableHead>
+            <TableHead className="text-right text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground h-10">
+              Success
+            </TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody className="divide-y divide-border/30">
+          {deptStats.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={4} className="h-24 text-center text-muted-foreground text-xs font-medium">
+                No department data available.
+              </TableCell>
             </TableRow>
-          </TableHeader>
-          <TableBody>
-            {deptStats.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="h-24 text-center text-[#908fa0] text-sm">
-                  No department data available.
+          ) : (
+            deptStats.map((stat) => (
+              <TableRow
+                key={stat.department}
+                className="hover:bg-muted/20 transition-colors border-0"
+              >
+                <TableCell className="font-bold text-foreground py-3 text-xs">{stat.department}</TableCell>
+                <TableCell className="text-right text-muted-foreground font-medium tabular-nums text-xs">{stat.totalStudents}</TableCell>
+                <TableCell className="text-right text-muted-foreground font-medium tabular-nums text-xs">{stat.placedStudents}</TableCell>
+                <TableCell className="text-right">
+                  <PlacementBadge pct={stat.percentage} />
                 </TableCell>
               </TableRow>
-            ) : (
-              deptStats.map((stat) => (
-                <TableRow
-                  key={stat.department}
-                  className="border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.025)] transition-colors"
-                >
-                  <TableCell className="font-medium text-[#e2e2eb] py-3">{stat.department}</TableCell>
-                  <TableCell className="text-right text-[#c7c4d7] tabular-nums">{stat.totalStudents}</TableCell>
-                  <TableCell className="text-right text-[#c7c4d7] tabular-nums">{stat.placedStudents}</TableCell>
-                  <TableCell className="text-right">
-                    <PlacementBadge pct={stat.percentage} />
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+            ))
+          )}
+        </TableBody>
+      </Table>
     </div>
   )
 }

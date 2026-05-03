@@ -55,9 +55,9 @@
 
 :root {
   /* ── Premium Blue Light Theme ── */
-  --background:                #f4f8ff; 
+  --background:                #f8faff; 
   --surface:                   #ffffff;
-  --foreground:                #020617; 
+  --foreground:                #0f172a; 
   --muted-foreground:          #64748b;
 
   /* ── Card & UI Components ── */
@@ -106,32 +106,32 @@
 }
 
 .dark {
-  --background:                #080a0f;
+  --background:                #02040a; /* Deeper dark */
   --foreground:                #f8fafc;
-  --card:                      #0f172a;
+  --card:                      #0b0f1a; /* Sophisticated card color */
   --card-foreground:           #f8fafc;
-  --popover:                   #0f172a;
+  --popover:                   #0b0f1a;
   --popover-foreground:        #f8fafc;
   --primary:                   #3b82f6;
   --primary-foreground:        #ffffff;
   --secondary:                 #1e293b;
   --secondary-foreground:      #f8fafc;
-  --muted:                     #1e293b;
+  --muted:                     #111827;
   --muted-foreground:          #94a3b8;
-  --accent:                    #334155;
+  --accent:                    #1e293b;
   --accent-foreground:         #f8fafc;
   --destructive:               #ef4444;
   --destructive-foreground:    #ffffff;
-  --border:                    #1e293b;
+  --border:                    rgba(255, 255, 255, 0.08);
   --input:                     #020617;
-  --ring:                      #3b82f6;
-  --sidebar:                   #020617;
+  --ring:                      rgba(59, 130, 246, 0.5);
+  --sidebar:                   #02040a;
   --sidebar-foreground:        #94a3b8;
   --sidebar-primary:           #3b82f6;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent:            #1e293b;
+  --sidebar-accent:            #111827;
   --sidebar-accent-foreground: #f8fafc;
-  --sidebar-border:            #1e293b;
+  --sidebar-border:            rgba(255, 255, 255, 0.06);
   --sidebar-ring:              #3b82f6;
   --sidebar-gradient:          linear-gradient(180deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0) 100%);
 }
@@ -140,85 +140,213 @@
    SaaS HERO — "AIRY GRADIENT" SYSTEM
    ============================================================ */
 
-.student-hero-banner {
-  @apply relative overflow-hidden rounded-[3rem] p-8 md:p-14 transition-all duration-700;
-  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 50%, #f4f8ff 100%);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+.hero-banner {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2rem;
+  padding: 2.5rem;
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+  border: 1px solid rgba(0, 82, 255, 0.05);
   box-shadow: 
-    0 20px 25px -5px rgba(0, 82, 255, 0.08),
-    0 40px 60px -20px rgba(0, 82, 255, 0.15);
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 20px 25px -5px rgba(0, 82, 255, 0.05);
 }
 
-.dark .student-hero-banner {
-  @apply bg-gradient-to-br from-[#0f172a] to-[#0f172a];
-  @apply border border-white/5;
+.dark .hero-banner {
+  background: linear-gradient(135deg, #0b0f1a 0%, #02040a 100%);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: none;
 }
 
-.student-hero-mesh {
-  @apply absolute inset-0 pointer-events-none;
+.student-hero-banner {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2rem;
+  padding: 2.5rem;
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, #ffffff 0%, #f0f7ff 100%);
+  border: 1px solid rgba(0, 82, 255, 0.05);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 0, 0, 0.05),
+    0 20px 25px -5px rgba(0, 82, 255, 0.05);
 }
 
-.student-hero-mesh .bubble-indigo {
-  @apply absolute top-[-40%] left-[-20%] w-[100%] h-[100%] rounded-full blur-[150px] opacity-40;
-  background: radial-gradient(circle, #0052FF 0%, transparent 70%);
+.company-hero-banner {
+  position: relative;
+  overflow: hidden;
+  border-radius: 2rem;
+  padding: 2.5rem;
+  transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(135deg, #0052FF 0%, #1e40af 100%);
+  color: white;
 }
 
-.student-hero-mesh .bubble-sky {
-  @apply absolute bottom-[-40%] right-[-20%] w-[100%] h-[100%] rounded-full blur-[150px] opacity-40;
-  background: radial-gradient(circle, #3B82F6 0%, transparent 70%);
+.dark .company-hero-banner {
+  background: linear-gradient(135deg, #1e3a8a 0%, #020617 100%);
 }
 
-.student-hero-texture {
-  @apply absolute inset-0 pointer-events-none opacity-[0.03];
-  background-image: radial-gradient(#6366f1 1px, transparent 1px);
+.hero-mesh {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero-mesh .bubble-primary {
+  position: absolute;
+  top: -40%;
+  left: -20%;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  filter: blur(150px);
+  opacity: 0.3;
+  background: radial-gradient(circle, #ffffff 0%, transparent 70%);
+}
+
+.hero-mesh .bubble-secondary {
+  position: absolute;
+  bottom: -40%;
+  right: -20%;
+  width: 100%;
+  height: 100%;
+  border-radius: 9999px;
+  filter: blur(150px);
+  opacity: 0.2;
+  background: radial-gradient(circle, #60a5fa 0%, transparent 70%);
+}
+
+.hero-texture {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  background-image: radial-gradient(white 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
-.student-hero-badge {
-  @apply inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white/60 px-3 py-1.5 text-[11px] font-bold text-indigo-600 shadow-sm backdrop-blur-md;
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.25rem 0.75rem;
+  font-size: 10px;
+  font-weight: 700;
+  color: white;
+  backdrop-filter: blur(8px);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.dark .student-hero-badge {
-  @apply border-white/10 bg-white/5 text-indigo-300;
+.hero-title {
+  margin-top: 1rem;
+  font-size: 1.875rem;
+  font-weight: 900;
+  color: white;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
-.student-hero-title {
-  @apply mt-6 text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight;
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 2.5rem;
+  }
 }
 
-.dark .student-hero-title {
-  @apply text-white;
+.hero-title span {
+  color: #93c5fd;
 }
 
-.student-hero-title span {
-  color: var(--primary);
+.hero-description {
+  margin-top: 0.75rem;
+  max-width: 32rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  line-height: 1.6;
+  font-weight: 500;
 }
 
-.student-hero-description {
-  @apply mt-4 max-w-lg text-base text-slate-500 leading-relaxed font-medium;
+/* Legacy support - mapped to new system */
+.student-hero-mesh { position: absolute; inset: 0; pointer-events: none; }
+.student-hero-mesh .bubble-indigo {
+  position: absolute; top: -40%; left: -20%; width: 100%; height: 100%; border-radius: 9999px; filter: blur(150px); opacity: 0.3;
+  background: radial-gradient(circle, var(--primary) 0%, transparent 70%);
 }
-
-.dark .student-hero-description {
-  @apply text-slate-400;
+.student-hero-mesh .bubble-sky {
+  position: absolute; bottom: -40%; right: -20%; width: 100%; height: 100%; border-radius: 9999px; filter: blur(150px); opacity: 0.2;
+  background: radial-gradient(circle, #60a5fa 0%, transparent 70%);
 }
+.student-hero-texture { position: absolute; inset: 0; pointer-events: none; opacity: 0.05; background-image: radial-gradient(white 1px, transparent 1px); background-size: 24px 24px; }
+.student-hero-badge { 
+  display: inline-flex; align-items: center; gap: 0.5rem; border-radius: 9999px; border: 1px solid rgba(255, 255, 255, 0.2); 
+  background: rgba(255, 255, 255, 0.1); padding: 0.25rem 0.75rem; font-size: 10px; font-weight: 700; color: white; backdrop-filter: blur(8px); 
+}
+.student-hero-title { margin-top: 1rem; font-size: 1.875rem; font-weight: 900; color: white; letter-spacing: -0.02em; line-height: 1.2; }
+.student-hero-description { margin-top: 0.75rem; max-width: 32rem; font-size: 0.875rem; color: rgba(255, 255, 255, 0.8); line-height: 1.6; font-weight: 500; }
 
 /* ============================================================
    CARD UTILITIES
    ============================================================ */
 .saas-card {
-  @apply bg-white border border-gray-200 shadow-sm rounded-2xl p-6 transition-all duration-300;
-}
-
-.dark .saas-card {
-  @apply bg-[#11141B] border-white/5 shadow-none;
+  background-color: var(--card);
+  border-radius: 1.5rem;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 10px 15px -3px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  padding: 1.5rem;
 }
 
 .saas-card:hover {
-  @apply shadow-md translate-y-[-2px];
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border-color: var(--primary);
 }
 
-.saas-shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
-.saas-shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+.dark .saas-card {
+  background-color: #0b0f1a;
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow: none;
+}
+
+.saas-table-container {
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background-color: var(--card);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.saas-table {
+  @apply w-full text-left text-sm;
+}
+
+.saas-table thead tr {
+  @apply bg-muted/30 border-b border-border;
+}
+
+.saas-table th {
+  @apply px-4 py-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground;
+}
+
+.saas-table td {
+  @apply px-4 py-3 border-b border-border/50 text-foreground font-medium transition-colors;
+}
+
+.saas-table tbody tr:hover {
+  @apply bg-muted/20;
+}
+
+.saas-input {
+  @apply w-full px-4 py-2 rounded-xl border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-sm font-medium;
+}
+
+.saas-label {
+  @apply text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1 mb-1 block;
+}
 .light .bg-\[\#111319\],
 .light .bg-\[\#111827\],
 .light .bg-\[\#0c0e14\],
@@ -436,11 +564,11 @@
 /* ============================================================
    STATUS BADGES
    ============================================================ */
-.badge-success { background: #ecfdf5; color: #065f46; border: 1px solid rgba(5, 150, 105, 0.08); }
-.badge-warning { background: #fffbeb; color: #92400e; border: 1px solid rgba(217, 119, 6, 0.08); }
-.badge-error   { background: #fef2f2; color: #991b1b; border: 1px solid rgba(220, 38, 38, 0.08); }
-.badge-indigo  { background: #f0f7ff; color: var(--primary); border: 1px solid rgba(0, 82, 255, 0.08); }
-.badge-cyan    { background: #f0f9ff; color: #1e40af; border: 1px solid rgba(30, 64, 175, 0.08); }
+.badge-success { background: #ecfdf5; color: #059669; border: 1px solid rgba(5, 150, 105, 0.15); font-weight: 700; }
+.badge-warning { background: #fffbeb; color: #d97706; border: 1px solid rgba(217, 119, 6, 0.15); font-weight: 700; }
+.badge-error   { background: #fef2f2; color: #dc2626; border: 1px solid rgba(220, 38, 38, 0.15); font-weight: 700; }
+.badge-indigo  { background: #f0f7ff; color: var(--primary); border: 1px solid rgba(0, 82, 255, 0.15); font-weight: 700; }
+.badge-cyan    { background: #f0f9ff; color: #0284c7; border: 1px solid rgba(2, 132, 199, 0.15); font-weight: 700; }
 
 /* ============================================================
    PRIMARY BUTTON GLOW

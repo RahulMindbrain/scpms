@@ -18,48 +18,48 @@ interface SectionCardsProps {
 
 const cards = [
   {
-    label:    "Total Placed",
-    sub:      "Overall Placement Status",
-    footer:   "Current academic year",
-    icon:     GraduationCap,
+    label: "Total Placed",
+    sub: "Overall Placement Status",
+    footer: "Current academic year",
+    icon: GraduationCap,
     gradient: "from-indigo-500/10 to-indigo-500/0",
-    border:   "border-t-2 border-t-indigo-500/80",
-    iconBg:   "bg-indigo-500/10 text-indigo-400",
-    key:      "totalPlaced" as const,
-    format:   (v: number) => String(v),
+    border: "border-t-2 border-t-indigo-500/80",
+    iconBg: "bg-indigo-500/10 text-indigo-400",
+    key: "totalPlaced" as const,
+    format: (v: number) => String(v),
   },
   {
-    label:    "Average Salary",
-    sub:      "Average CTC offered",
-    footer:   "Across all departments",
-    icon:     TrendingUp,
+    label: "Average Salary",
+    sub: "Average CTC offered",
+    footer: "Across all departments",
+    icon: TrendingUp,
     gradient: "from-emerald-500/10 to-emerald-500/0",
-    border:   "border-t-2 border-t-emerald-500/80",
-    iconBg:   "bg-emerald-500/10 text-emerald-400",
-    key:      "avgSalary" as const,
-    format:   (v: number) => `₹${(v / 100000).toFixed(2)} LPA`,
+    border: "border-t-2 border-t-emerald-500/80",
+    iconBg: "bg-emerald-500/10 text-emerald-400",
+    key: "avgSalary" as const,
+    format: (v: number) => `₹${(v / 100000).toFixed(2)} LPA`,
   },
   {
-    label:    "Total Students",
-    sub:      "Registered Students",
-    footer:   "Total student database",
-    icon:     Users,
+    label: "Total Students",
+    sub: "Registered Students",
+    footer: "Total student database",
+    icon: Users,
     gradient: "from-cyan-500/10 to-cyan-500/0",
-    border:   "border-t-2 border-t-cyan-500/80",
-    iconBg:   "bg-cyan-500/10 text-cyan-400",
-    key:      "totalStudents" as const,
-    format:   (v: number) => String(v),
+    border: "border-t-2 border-t-cyan-500/80",
+    iconBg: "bg-cyan-500/10 text-cyan-400",
+    key: "totalStudents" as const,
+    format: (v: number) => String(v),
   },
   {
-    label:    "Departments",
-    sub:      "Active Departments",
-    footer:   "Academic divisions",
-    icon:     Building2,
+    label: "Departments",
+    sub: "Active Departments",
+    footer: "Academic divisions",
+    icon: Building2,
     gradient: "from-amber-500/10 to-amber-500/0",
-    border:   "border-t-2 border-t-amber-500/80",
-    iconBg:   "bg-amber-500/10 text-amber-400",
-    key:      "totalDepartments" as const,
-    format:   (v: number) => String(v),
+    border: "border-t-2 border-t-amber-500/80",
+    iconBg: "bg-amber-500/10 text-amber-400",
+    key: "totalDepartments" as const,
+    format: (v: number) => String(v),
   },
 ]
 
@@ -73,21 +73,19 @@ export function SectionCards({ totalPlaced, avgSalary, totalStudents, totalDepar
           key={key}
           className={`
             @container/card relative overflow-hidden
-            bg-gradient-to-b ${gradient}
+            bg-card
             ${border}
-            border border-[rgba(255,255,255,0.07)]
-            shadow-none
-            hover:border-[rgba(255,255,255,0.12)]
-            hover:shadow-lg hover:shadow-black/20
-            transition-all duration-300
+            border border-border/50
+            hover:shadow-xl hover:shadow-primary/5
+            transition-all duration-500 group
           `}
         >
           <CardHeader className="flex flex-row items-start justify-between gap-4">
             <div className="flex-1 min-w-0">
-              <CardDescription className="text-[#908fa0] text-xs font-medium uppercase tracking-wider mb-1">
+              <CardDescription className="text-muted-foreground text-[10px] font-bold uppercase tracking-wider mb-1">
                 {label}
               </CardDescription>
-              <CardTitle className="text-2xl font-bold tabular-nums text-[#e2e2eb] @[250px]/card:text-3xl">
+              <CardTitle className="text-2xl font-black tabular-nums text-foreground @[250px]/card:text-3xl">
                 {format(values[key])}
               </CardTitle>
             </div>
@@ -96,8 +94,8 @@ export function SectionCards({ totalPlaced, avgSalary, totalStudents, totalDepar
             </div>
           </CardHeader>
           <CardFooter className="flex-col items-start gap-1 text-sm pt-0">
-            <div className="font-medium text-[#e2e2eb] text-sm">{sub}</div>
-            <div className="text-[#908fa0] text-xs">{footer}</div>
+            <div className="font-bold text-foreground text-xs">{sub}</div>
+            <div className="text-muted-foreground text-[10px]">{footer}</div>
           </CardFooter>
         </Card>
       ))}

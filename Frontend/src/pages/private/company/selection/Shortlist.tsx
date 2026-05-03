@@ -47,37 +47,32 @@ const Shortlist: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
-
-      {/* Header Section */}
+    <div className="flex flex-col gap-6 p-4 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-[#e2e2eb]">Shortlisted Candidates</h1>
-          <p className="text-sm text-[#908fa0]">Manage and move candidates to the next stage.</p>
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground">Shortlisted Candidates</h1>
+          <p className="text-sm text-muted-foreground font-medium">Review and manage students who have been shortlisted for further rounds.</p>
         </div>
-
       </div>
 
-      {/* Filters Card */}
-      <div className="bg-[#1e1f26] p-4 rounded-2xl border border-[rgba(255,255,255,0.07)]">
+      <div className="saas-card p-4 space-y-4">
         <div className="flex flex-col md:flex-row gap-4">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
+          <div className="relative flex-1 group">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
             <input
               type="text"
               placeholder="Search by name or email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-[#0c0e14] border border-[rgba(255,255,255,0.08)] rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-[#e2e2eb] placeholder:text-[#908fa0] transition-all outline-none"
+              className="saas-input pl-11"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <Filter className="w-4 h-4 text-[#908fa0]" />
             <select
               value={branchFilter}
               onChange={(e) => setBranchFilter(e.target.value)}
-              className="bg-[#0c0e14] border border-[rgba(255,255,255,0.08)] text-[#c7c4d7] px-4 py-3 rounded-xl focus:ring-2 focus:ring-indigo-500/20 min-w-[120px] outline-none"
+              className="saas-input min-w-[180px]"
             >
               <option value="All">All Departments</option>
               {uniqueBranches.map((branch: any) => (
@@ -86,80 +81,51 @@ const Shortlist: React.FC = () => {
             </select>
           </div>
         </div>
-      </div>
 
-      {/* Responsive Content: Table for Desktop, Cards for Mobile */}
-      <div className="hidden md:block bg-[#1e1f26] rounded-2xl border border-[rgba(255,255,255,0.07)] overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-[rgba(255,255,255,0.02)] border-b border-[rgba(255,255,255,0.07)]">
-            <tr>
-              <th className="px-6 py-4 text-sm font-semibold text-[#c7c4d7]">Candidate</th>
-              <th className="px-6 py-4 text-sm font-semibold text-[#c7c4d7]">Department</th>
-              <th className="px-6 py-4 text-sm font-semibold text-[#c7c4d7]">Status</th>
-              <th className="px-6 py-4 text-sm font-semibold text-[#c7c4d7]">Email</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[rgba(255,255,255,0.05)]">
-            {filteredData?.length === 0 ? (
+        <div className="saas-table-container mt-4">
+          <table className="saas-table">
+            <thead>
               <tr>
-                <td colSpan={4} className="text-center py-12 text-[#908fa0]">No candidates found</td>
+                <th>Candidate</th>
+                <th>Department</th>
+                <th>Status</th>
+                <th>Email Address</th>
               </tr>
-            ) : (
-              filteredData?.map((item: any) => (
-                <tr key={item.applicationId} className="hover:bg-[rgba(255,255,255,0.025)] transition-colors">
-                  <td className="px-6 py-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-indigo-500/15 text-indigo-400 rounded-full flex items-center justify-center font-bold">
-                        {item.name.charAt(0).toUpperCase()}
-                      </div>
-                      <span className="font-medium text-[#e2e2eb]">{item.name}</span>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <div className="flex items-center gap-2 text-[#c7c4d7]">
-                      <GraduationCap className="w-4 h-4" />
-                      {item.branch}
-                    </div>
-                  </td>
-                  <td className="px-6 py-3">
-                    <Badge variant="secondary" className="bg-emerald-500/15 text-emerald-400 border-emerald-500/20 px-3 py-1">
-                      {item.status}
-                    </Badge>
-                  </td>
-                  <td className="px-6 py-3 text-[#908fa0] text-sm">{item.email}</td>
+            </thead>
+            <tbody className="divide-y divide-border/30">
+              {filteredData?.length === 0 ? (
+                <tr>
+                  <td colSpan={4} className="text-center py-20 text-muted-foreground font-medium">No candidates found</td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Mobile Card View */}
-      <div className="grid grid-cols-1 gap-4 md:hidden">
-        {filteredData?.map((item: any) => (
-          <div key={item.applicationId} className="bg-[#1e1f26] p-5 rounded-2xl border border-[rgba(255,255,255,0.07)] space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-indigo-500/15 text-indigo-400 rounded-full flex items-center justify-center font-bold text-lg">
-                {item.name.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <h3 className="font-bold text-[#e2e2eb]">{item.name}</h3>
-                <p className="text-xs text-[#908fa0]">{item.email}</p>
-              </div>
-            </div>
-
-            <div className="flex justify-between items-center pt-2 border-t border-[rgba(255,255,255,0.05)]">
-              <div className="flex items-center gap-2 text-sm text-[#c7c4d7]">
-                <GraduationCap className="w-4 h-4" />
-                {item.branch}
-              </div>
-              <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/20">{item.status}</Badge>
-            </div>
-          </div>
-        ))}
-        {filteredData?.length === 0 && (
-          <p className="text-center py-10 text-[#908fa0]">No candidates found</p>
-        )}
+              ) : (
+                filteredData?.map((item: any) => (
+                  <tr key={item.applicationId}>
+                    <td>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary flex items-center justify-center text-xs font-bold">
+                          {item.name.charAt(0).toUpperCase()}
+                        </div>
+                        <span className="font-bold text-foreground text-sm">{item.name}</span>
+                      </div>
+                    </td>
+                    <td className="text-xs">
+                      <div className="flex items-center gap-2">
+                        <GraduationCap size={14} className="text-muted-foreground" />
+                        {item.branch}
+                      </div>
+                    </td>
+                    <td>
+                      <Badge variant="success" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 px-2 py-0 h-5 text-[10px] font-bold">
+                        {item.status}
+                      </Badge>
+                    </td>
+                    <td className="text-xs text-muted-foreground font-medium">{item.email}</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

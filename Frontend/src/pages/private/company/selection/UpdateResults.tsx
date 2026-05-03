@@ -6,6 +6,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface Result {
   id: number;
@@ -48,129 +49,131 @@ const UpdateResults: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8">
-        
-        {/* Header - More Spacing */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-4 border-b border-[rgba(255,255,255,0.08)]">
-          <div>
-            <h1 className="text-3xl font-black text-[#e2e2eb] flex items-center gap-3">
-              <Briefcase className="text-blue-600 w-9 h-9" />
-              Recruitment <span className="text-blue-600">Drive</span>
-            </h1>
-            <p className="text-[#908fa0] mt-2 font-medium">Software Engineer Role • Final Review Phase</p>
-          </div>
-          <Button className="bg-blue-600 hover:bg-blue-700 h-14 px-10 rounded-2xl font-bold shadow-xl shadow-blue-200">
-            <Send className="w-5 h-5 mr-2" /> Publish Results
-          </Button>
+    <div className="flex flex-col gap-6 p-4 md:p-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      
+      {/* Header */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight text-foreground flex items-center gap-3">
+            <Briefcase className="text-primary" size={24} />
+            Recruitment Drive
+          </h1>
+          <p className="text-sm text-muted-foreground font-medium">Software Engineer Role • Final Review & Results Management</p>
         </div>
+        <Button className="rounded-xl font-extrabold text-[10px] uppercase tracking-widest px-8 shadow-lg shadow-primary/20 h-11">
+          <Send size={16} className="mr-2" /> Publish Results
+        </Button>
+      </div>
 
-        {/* Main Table - De-congested for Web */}
-        <div className="bg-white rounded-[2.5rem] border border-[rgba(255,255,255,0.08)]/60 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-separate border-spacing-0">
-              <thead>
-                <tr className="bg-[rgba(255,255,255,0.03)]">
-                  <th className="px-8 py-6 text-xs font-bold text-[#908fa0] uppercase tracking-widest">Candidate Details</th>
-                  <th className="px-8 py-6 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-center">Technical</th>
-                  <th className="px-8 py-6 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-center">HR Round</th>
-                  <th className="px-8 py-6 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-center">Total Score</th>
-                  <th className="px-8 py-6 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-center">Result</th>
-                  <th className="px-8 py-6 text-xs font-bold text-[#908fa0] uppercase tracking-widest text-right">Actions</th>
+      {/* Main Table */}
+      <div className="saas-card p-0 overflow-hidden shadow-sm border-border/50">
+        <div className="saas-table-container">
+          <table className="saas-table">
+            <thead>
+              <tr>
+                <th>Candidate</th>
+                <th className="text-center">Technical</th>
+                <th className="text-center">HR Round</th>
+                <th className="text-center">Total Score</th>
+                <th className="text-center">Result Status</th>
+                <th className="text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-border/30">
+              {results.map((row) => (
+                <tr key={row.id}>
+                  <td>
+                    <div className="flex flex-col">
+                      <span className="font-bold text-foreground">{row.name}</span>
+                      <span className="text-[10px] font-extrabold text-muted-foreground/60 uppercase tracking-wider">{row.branch}</span>
+                    </div>
+                  </td>
+
+                  <td className="text-center">
+                    <div className="inline-flex items-center gap-2 bg-muted/40 border border-border/50 rounded-lg px-2 py-1 focus-within:border-primary/50 transition-all">
+                      <input 
+                        type="number" 
+                        value={row.technical} 
+                        onChange={(e) => updateScore(row.id, 'technical', e.target.value)}
+                        className="w-8 bg-transparent text-center font-bold text-foreground text-xs outline-none"
+                      />
+                      <span className="text-muted-foreground/40 text-[10px] font-bold">/ 100</span>
+                    </div>
+                  </td>
+
+                  <td className="text-center">
+                    <div className="inline-flex items-center gap-2 bg-muted/40 border border-border/50 rounded-lg px-2 py-1 focus-within:border-primary/50 transition-all">
+                      <input 
+                        type="number" 
+                        value={row.hr} 
+                        onChange={(e) => updateScore(row.id, 'hr', e.target.value)}
+                        className="w-8 bg-transparent text-center font-bold text-foreground text-xs outline-none"
+                      />
+                      <span className="text-muted-foreground/40 text-[10px] font-bold">/ 100</span>
+                    </div>
+                  </td>
+
+                  <td className="text-center">
+                    <div className="font-extrabold text-sm text-primary">{row.total}<span className="text-muted-foreground/40 text-[10px] font-bold"> / 200</span></div>
+                  </td>
+
+                  <td className="text-center">
+                    <Badge 
+                      className={cn(
+                        "rounded-full px-3 py-0 h-5 text-[10px] font-bold border-0 shadow-none",
+                        row.status === 'Selected' ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' : 
+                        row.status === 'Rejected' ? 'bg-destructive/10 text-destructive' : 
+                        'bg-muted text-muted-foreground'
+                      )}
+                    >
+                      {row.status}
+                    </Badge>
+                  </td>
+
+                  <td className="text-right">
+                    <button 
+                      onClick={() => { setSelectedResult(row); setIsUpdateModalOpen(true); }}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border/50 text-[10px] font-extrabold text-muted-foreground uppercase tracking-widest hover:border-primary hover:text-primary transition-all bg-muted/20"
+                    >
+                      Update <ChevronDown size={12} />
+                    </button>
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-[rgba(255,255,255,0.05)]">
-                {results.map((row) => (
-                  <tr key={row.id} className="group hover:bg-blue-50/30 transition-all duration-300">
-                    {/* Name & Branch */}
-                    <td className="px-8 py-7">
-                      <div className="font-bold text-[#e2e2eb] text-lg leading-none mb-1">{row.name}</div>
-                      <Badge variant="secondary" className="bg-[rgba(255,255,255,0.04)] text-[#908fa0] text-[10px] uppercase">{row.branch}</Badge>
-                    </td>
-
-                    {/* Technical Score - Editable Inline */}
-                    <td className="px-8 py-7 text-center">
-                      <div className="inline-flex items-center gap-2 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] rounded-xl px-3 py-2 group-hover:bg-white transition-colors">
-                        <input 
-                          type="number" 
-                          value={row.technical} 
-                          onChange={(e) => updateScore(row.id, 'technical', e.target.value)}
-                          className="w-10 bg-transparent text-center font-bold text-[#c7c4d7] outline-none"
-                        />
-                        <span className="text-[#c7c4d7] text-xs">/100</span>
-                      </div>
-                    </td>
-
-                    {/* HR Score - Editable Inline */}
-                    <td className="px-8 py-7 text-center">
-                      <div className="inline-flex items-center gap-2 bg-[rgba(255,255,255,0.02)] border border-[rgba(255,255,255,0.08)] rounded-xl px-3 py-2 group-hover:bg-white transition-colors">
-                        <input 
-                          type="number" 
-                          value={row.hr} 
-                          onChange={(e) => updateScore(row.id, 'hr', e.target.value)}
-                          className="w-10 bg-transparent text-center font-bold text-[#c7c4d7] outline-none"
-                        />
-                        <span className="text-[#c7c4d7] text-xs">/100</span>
-                      </div>
-                    </td>
-
-                    {/* Total - Highlighted */}
-                    <td className="px-8 py-7 text-center">
-                      <div className="font-black text-xl text-blue-600">{row.total}<span className="text-[#c7c4d7] text-sm font-normal"> / 200</span></div>
-                    </td>
-
-                    {/* Status Badge */}
-                    <td className="px-8 py-7 text-center">
-                      <Badge 
-                        className="rounded-full px-5 py-2 font-bold text-sm shadow-sm"
-                        variant={row.status === 'Selected' ? 'success' : row.status === 'Rejected' ? 'danger' : 'outline'}
-                      >
-                        {row.status}
-                      </Badge>
-                    </td>
-
-                    {/* Action Button */}
-                    <td className="px-8 py-7 text-right">
-                      <button 
-                        onClick={() => { setSelectedResult(row); setIsUpdateModalOpen(true); }}
-                        className="inline-flex items-center gap-2 px-5 py-3 bg-white border border-[rgba(255,255,255,0.08)] rounded-2xl text-sm font-black text-[#c7c4d7] hover:border-blue-600 hover:text-blue-600 hover:shadow-lg hover:shadow-blue-100 transition-all"
-                      >
-                        UPDATE STATUS <ChevronDown className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
-      {/* MODAL - Status Update (Dropdown functionality) */}
+      </div>
+
+      {/* Status Modal */}
       {isUpdateModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-md" onClick={() => setIsUpdateModalOpen(false)} />
-          <div className="relative bg-white w-full max-w-md rounded-[2.5rem] shadow-2xl p-10 animate-in slide-in-from-bottom-4 duration-300">
-            <div className="flex justify-between items-center mb-8">
-              <h3 className="text-2xl font-black">Set Result</h3>
-              <button onClick={() => setIsUpdateModalOpen(false)} className="p-2 hover:bg-[rgba(255,255,255,0.04)] rounded-full transition-colors">
-                <X className="w-6 h-6 text-[#908fa0]" />
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setIsUpdateModalOpen(false)} />
+          <div className="relative bg-card w-full max-w-sm rounded-3xl border border-border shadow-2xl p-6 animate-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-lg font-extrabold tracking-tight text-foreground">Set Result Status</h3>
+              <button onClick={() => setIsUpdateModalOpen(false)} className="rounded-lg p-1 text-muted-foreground hover:bg-muted hover:text-foreground transition-all">
+                <X size={18} />
               </button>
             </div>
-            <div className="space-y-4">
+            
+            <div className="grid gap-3">
               {[
-                { id: 'Selected', icon: CheckCircle2, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'hover:border-emerald-500' },
-                { id: 'Rejected', icon: XCircle, color: 'text-red-600', bg: 'bg-red-50', border: 'hover:border-red-500' },
-                { id: 'Pending', icon: Clock, color: 'text-[#908fa0]', bg: 'bg-[rgba(255,255,255,0.02)]', border: 'hover:border-slate-400' }
+                { id: 'Selected', icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-500/10', desc: 'Confirm candidate for selection' },
+                { id: 'Rejected', icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/10', desc: 'Mark as not suitable' },
+                { id: 'Pending', icon: Clock, color: 'text-muted-foreground', bg: 'bg-muted', desc: 'Keep in evaluation phase' }
               ].map((opt) => (
                 <button
                   key={opt.id}
                   onClick={() => handleUpdateStatus(opt.id)}
-                  className={`w-full flex items-center gap-5 p-5 rounded-3xl border-2 border-[rgba(255,255,255,0.04)] transition-all text-left ${opt.border} hover:shadow-md group`}
+                  className="w-full flex items-center gap-4 p-4 rounded-2xl border border-border/50 hover:border-primary/30 hover:bg-primary/[0.02] transition-all group text-left"
                 >
-                  <div className={`w-14 h-14 ${opt.bg} ${opt.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                    <opt.icon className="w-7 h-7" />
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110", opt.bg, opt.color)}>
+                    <opt.icon size={20} />
                   </div>
                   <div>
-                    <div className="font-black text-[#e2e2eb] text-lg">{opt.id}</div>
-                    <div className="text-sm text-[#908fa0] font-medium">Finalize candidate as {opt.id.toLowerCase()}</div>
+                    <div className="font-bold text-foreground text-sm leading-none mb-1">{opt.id}</div>
+                    <div className="text-[10px] text-muted-foreground font-medium">{opt.desc}</div>
                   </div>
                 </button>
               ))}

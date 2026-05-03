@@ -22,8 +22,6 @@ import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import Loader from '@/components/Loader';
 
-const inputBase = "w-full pl-11 pr-4 py-2.5 rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#0c0e14] focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-[#e2e2eb] placeholder:text-[#908fa0] text-sm font-medium";
-
 const PostJob: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { loading: isSubmitting } = useSelector((state: RootState) => state.company);
@@ -127,98 +125,98 @@ const PostJob: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-slate-50/50 py-7 px-4 sm:px-6 lg:px-8 font-sans">
-      <div className=" bg-white rounded-[32px] shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-8 duration-700">
-        <header className="p-8 sm:p-10 border-b border-slate-100 bg-gradient-to-r from-white to-slate-50/50">
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Create New Job Drive</h1>
-          <p className="mt-2 text-slate-500 text-lg">Configure your recruitment requirements to find the best talent.</p>
+    <div className="min-h-screen p-4 md:p-8 animate-in fade-in duration-700">
+      <div className="saas-card max-w-5xl mx-auto overflow-hidden p-0">
+        <header className="p-8 border-b border-border/50 bg-muted/20">
+          <h1 className="text-3xl font-extrabold text-foreground tracking-tight">Create New Job Drive</h1>
+          <p className="mt-2 text-muted-foreground text-sm font-medium">Configure your recruitment requirements to find the best talent.</p>
         </header>
 
-        <form onSubmit={handleSubmit} className="p-5 sm:p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-6 md:p-10 space-y-10">
           {/* Basic Information */}
           <section className="space-y-6">
-            <h2 className="flex items-center gap-3 text-xl font-bold text-[#e2e2eb]">
-              <span className="p-2 bg-indigo-500/10 text-indigo-400 rounded-xl"><Briefcase size={22} /></span>
+            <h2 className="flex items-center gap-3 text-lg font-bold text-foreground">
+              <span className="p-2 bg-primary/10 text-primary rounded-xl"><Briefcase size={20} /></span>
               Basic Information
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wider text-[#908fa0] ml-1">Job Title</label>
+              <div className="space-y-1">
+                <label className="saas-label">Job Title</label>
                 <div className="relative group">
-                  <Zap className="absolute left-4 top-1/2 -translate-y-1/2 text-[#908fa0] group-focus-within:text-indigo-400 transition-colors" size={18} />
+                  <Zap className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
                   <input type="text" name="title" value={formData.title} onChange={handleInputChange}
-                    placeholder="e.g. Full Stack Engineer" className={inputBase} required />
+                    placeholder="e.g. Full Stack Engineer" className="saas-input pl-11" required />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#c7c4d7] ml-1">Annual Salary</label>
+              <div className="space-y-1">
+                <label className="saas-label">Annual Salary (INR)</label>
                 <div className="relative group">
-                  <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
+                  <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
                   <input
                     type="number"
                     name="salary"
                     value={formData.salary}
                     onChange={handleInputChange}
                     placeholder="e.g. 1200000"
-                    className="w-full pl-12 pr-4 py-3.5 rounded-2xl border border-slate-200 bg-slate-50/30 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all text-slate-800 placeholder:text-slate-400 font-medium"
+                    className="saas-input pl-11"
                     required
                   />
                 </div>
               </div>
 
-              <div className="space-y-2 md:col-span-2">
-                <label className="text-sm font-semibold text-[#c7c4d7] ml-1">Work Location</label>
+              <div className="space-y-1 md:col-span-2">
+                <label className="saas-label">Work Location</label>
                 <div className="relative group">
-                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-[#908fa0] group-focus-within:text-indigo-400 transition-colors" size={18} />
+                  <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
                   <input type="text" name="location" value={formData.location} onChange={handleInputChange}
-                    placeholder="e.g. Bangalore, India (Remote / Hybrid)" className={inputBase} required />
+                    placeholder="e.g. Bangalore, India (Remote / Hybrid)" className="saas-input pl-11" required />
                 </div>
               </div>
             </div>
           </section>
 
           {/* Eligibility */}
-          <section className="space-y-8">
-            <h2 className="flex items-center gap-3 text-xl font-bold text-[#e2e2eb]">
-              <span className="p-2 bg-violet-500/10 text-violet-400 rounded-xl"><GraduationCap size={22} /></span>
+          <section className="space-y-6">
+            <h2 className="flex items-center gap-3 text-lg font-bold text-foreground">
+              <span className="p-2 bg-violet-500/10 text-violet-500 rounded-xl"><GraduationCap size={20} /></span>
               Eligibility Criteria
             </h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#c7c4d7] ml-1">Minimum CGPA</label>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-1">
+                <label className="saas-label">Minimum CGPA</label>
                 <div className="relative group">
-                  <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 text-[#908fa0] group-focus-within:text-violet-400 transition-colors" size={18} />
+                  <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-violet-500 transition-colors" size={16} />
                   <input type="number" step="0.01" name="minCgpa" value={formData.minCgpa} onChange={handleInputChange}
-                    placeholder="e.g. 7.50" className={`${inputBase} focus:ring-violet-500/20 focus:border-violet-500`} required />
+                    placeholder="e.g. 7.50" className="saas-input pl-11 focus:ring-violet-500/20 focus:border-violet-500" required />
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-[#c7c4d7] ml-1">Maximum CGPA</label>
+              <div className="space-y-1">
+                <label className="saas-label">Maximum CGPA</label>
                 <div className="relative group">
-                  <CheckCircle2 className="absolute left-4 top-1/2 -translate-y-1/2 text-[#908fa0] group-focus-within:text-violet-400 transition-colors" size={18} />
+                  <CheckCircle2 className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-violet-500 transition-colors" size={16} />
                   <input type="number" step="0.01" name="maxCgpa" value={formData.maxCgpa} onChange={handleInputChange}
-                    placeholder="e.g. 10.00" className={`${inputBase} focus:ring-violet-500/20 focus:border-violet-500`} required />
+                    placeholder="e.g. 10.00" className="saas-input pl-11 focus:ring-violet-500/20 focus:border-violet-500" required />
                 </div>
               </div>
             </div>
           </section>
 
           {/* Description */}
-          <section className="space-y-8">
-            <h2 className="flex items-center gap-3 text-xl font-bold text-[#e2e2eb]">
-              <span className="p-2 bg-amber-500/10 text-amber-400 rounded-xl"><FileText size={22} /></span>
+          <section className="space-y-6">
+            <h2 className="flex items-center gap-3 text-lg font-bold text-foreground">
+              <span className="p-2 bg-amber-500/10 text-amber-500 rounded-xl"><FileText size={20} /></span>
               Job Description
             </h2>
-            <div className="space-y-2">
+            <div className="space-y-1">
               <div className="relative group">
-                <AlignLeft className="absolute left-4 top-4 text-[#908fa0] group-focus-within:text-amber-400 transition-colors" size={18} />
+                <AlignLeft className="absolute left-4 top-4 text-muted-foreground group-focus-within:text-amber-500 transition-colors" size={16} />
                 <textarea name="description" value={formData.description} onChange={handleInputChange} rows={5}
                   placeholder="Describe the role, responsibilities, and key expectations from the candidate..."
-                  className="w-full pl-12 pr-4 py-4 rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#0c0e14] focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 transition-all text-[#e2e2eb] placeholder:text-[#908fa0] font-medium resize-none"
+                  className="saas-input pl-11 py-3 focus:ring-amber-500/20 focus:border-amber-500 resize-none"
                   required />
               </div>
             </div>
@@ -226,45 +224,45 @@ const PostJob: React.FC = () => {
 
           {/* Target Branches */}
           <section className="space-y-6">
-            <h2 className="flex items-center gap-3 text-xl font-bold text-[#e2e2eb]">
-              <span className="p-2 bg-emerald-500/10 text-emerald-400 rounded-xl"><Briefcase size={22} /></span>
+            <h2 className="flex items-center gap-3 text-lg font-bold text-foreground">
+              <span className="p-2 bg-emerald-500/10 text-emerald-500 rounded-xl"><Briefcase size={20} /></span>
               Target Branches
             </h2>
 
             <div className="relative" ref={branchRef}>
               <div
                 onClick={() => setIsBranchOpen(!isBranchOpen)}
-                className={`flex flex-wrap gap-2 p-3 min-h-[56px] rounded-2xl border-2 transition-all cursor-pointer bg-[#0c0e14] ${isBranchOpen ? 'border-emerald-500 ring-2 ring-emerald-500/15' : 'border-[rgba(255,255,255,0.08)] hover:border-emerald-500/40'}`}
+                className={`flex flex-wrap gap-2 p-2 min-h-[44px] rounded-xl border transition-all cursor-pointer bg-background ${isBranchOpen ? 'border-emerald-500 ring-2 ring-emerald-500/15' : 'border-border hover:border-emerald-500/40'}`}
               >
                 {selectedBranches.length === 0 && !branchSearch && (
-                  <span className="text-[#908fa0] font-medium ml-2 self-center">Search and select branches...</span>
+                  <span className="text-muted-foreground text-sm font-medium ml-2 self-center">Search and select branches...</span>
                 )}
                 {selectedBranches.map(id => {
                   const dept = departments.find((d: any) => d.id === id);
                   return (
-                    <span key={id} className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/15 text-emerald-400 rounded-full text-sm font-bold animate-in zoom-in-95 duration-200">
+                    <span key={id} className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 rounded-lg text-xs font-bold animate-in zoom-in-95 duration-200">
                       {dept?.name || dept?.deptName}
-                      <X size={14} className="hover:text-emerald-200 cursor-pointer" onClick={(e) => { e.stopPropagation(); toggleBranch(id); }} />
+                      <X size={12} className="hover:text-emerald-800 cursor-pointer" onClick={(e) => { e.stopPropagation(); toggleBranch(id); }} />
                     </span>
                   );
                 })}
                 <input
                   type="text"
-                  className="flex-1 bg-transparent border-none outline-none text-[#e2e2eb] font-medium min-w-[120px] ml-2 placeholder:text-[#908fa0]"
+                  className="flex-1 bg-transparent border-none outline-none text-foreground font-medium text-sm min-w-[120px] ml-2 placeholder:text-muted-foreground"
                   value={branchSearch}
                   onChange={(e) => { setBranchSearch(e.target.value); setIsBranchOpen(true); }}
                   onClick={(e) => e.stopPropagation()}
                 />
-                <ChevronDown className={`text-[#908fa0] transition-transform duration-200 mr-2 self-center ${isBranchOpen ? 'rotate-180' : ''}`} size={20} />
+                <ChevronDown className={`text-muted-foreground transition-transform duration-200 mr-2 self-center ${isBranchOpen ? 'rotate-180' : ''}`} size={16} />
               </div>
 
               {isBranchOpen && (
-                <div className="absolute z-50 w-full mt-2 bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-top-2 duration-200">
-                  <div className="max-h-60 overflow-y-auto p-2 space-y-1">
+                <div className="absolute z-50 w-full mt-2 bg-card border border-border rounded-xl shadow-xl overflow-hidden animate-in slide-in-from-top-2 duration-200">
+                  <div className="max-h-60 overflow-y-auto p-1 space-y-1">
                     {loadingDepts ? (
-                      <Loader size="sm" text="Loading..." />
+                      <div className="p-4 text-center"><Loader size="sm" /></div>
                     ) : filteredBranches.length === 0 ? (
-                      <div className="p-4 text-center text-[#908fa0]">No branches found</div>
+                      <div className="p-4 text-center text-muted-foreground text-sm">No branches found</div>
                     ) : (
                       filteredBranches.map((dept: any) => {
                         const isSelected = selectedBranches.includes(dept.id);
@@ -272,10 +270,10 @@ const PostJob: React.FC = () => {
                           <div
                             key={dept.id}
                             onClick={() => toggleBranch(dept.id)}
-                            className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-colors ${isSelected ? 'bg-emerald-500/10 text-emerald-400' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#c7c4d7]'}`}
+                            className={`flex items-center justify-between px-4 py-2 rounded-lg cursor-pointer transition-colors text-sm ${isSelected ? 'bg-emerald-500/10 text-emerald-600 font-bold' : 'hover:bg-muted/50 text-foreground font-medium'}`}
                           >
-                            <span className="font-semibold">{dept.name || dept.deptName}</span>
-                            {isSelected && <CheckCircle2 size={18} className="text-emerald-500" />}
+                            <span>{dept.name || dept.deptName}</span>
+                            {isSelected && <CheckCircle2 size={16} className="text-emerald-500" />}
                           </div>
                         );
                       })
@@ -288,45 +286,45 @@ const PostJob: React.FC = () => {
 
           {/* Required Skills */}
           <section className="space-y-6">
-            <h2 className="flex items-center gap-3 text-xl font-bold text-[#e2e2eb]">
-              <span className="p-2 bg-rose-500/10 text-rose-400 rounded-xl"><Code2 size={22} /></span>
+            <h2 className="flex items-center gap-3 text-lg font-bold text-foreground">
+              <span className="p-2 bg-rose-500/10 text-rose-500 rounded-xl"><Code2 size={20} /></span>
               Required Skills
             </h2>
 
             <div className="relative" ref={skillRef}>
               <div
                 onClick={() => setIsSkillOpen(!isSkillOpen)}
-                className={`flex flex-wrap gap-2 p-3 min-h-[56px] rounded-2xl border-2 transition-all cursor-pointer bg-[#0c0e14] ${isSkillOpen ? 'border-rose-500 ring-2 ring-rose-500/15' : 'border-[rgba(255,255,255,0.08)] hover:border-rose-500/40'}`}
+                className={`flex flex-wrap gap-2 p-2 min-h-[44px] rounded-xl border transition-all cursor-pointer bg-background ${isSkillOpen ? 'border-rose-500 ring-2 ring-rose-500/15' : 'border-border hover:border-rose-500/40'}`}
               >
                 {selectedSkills.length === 0 && !skillSearch && (
-                  <span className="text-[#908fa0] font-medium ml-2 self-center">Search and select skills...</span>
+                  <span className="text-muted-foreground text-sm font-medium ml-2 self-center">Search and select skills...</span>
                 )}
                 {selectedSkills.map(id => {
                   const skill = skills.find((s: any) => s.id === id);
                   return (
-                    <span key={id} className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-500/15 text-rose-400 rounded-full text-sm font-bold animate-in zoom-in-95 duration-200">
+                    <span key={id} className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-500/10 text-rose-600 dark:text-rose-400 rounded-lg text-xs font-bold animate-in zoom-in-95 duration-200">
                       {skill?.name}
-                      <X size={14} className="hover:text-rose-200 cursor-pointer" onClick={(e) => { e.stopPropagation(); toggleSkill(id); }} />
+                      <X size={12} className="hover:text-rose-800 cursor-pointer" onClick={(e) => { e.stopPropagation(); toggleSkill(id); }} />
                     </span>
                   );
                 })}
                 <input
                   type="text"
-                  className="flex-1 bg-transparent border-none outline-none text-[#e2e2eb] font-medium min-w-[120px] ml-2 placeholder:text-[#908fa0]"
+                  className="flex-1 bg-transparent border-none outline-none text-foreground font-medium text-sm min-w-[120px] ml-2 placeholder:text-muted-foreground"
                   value={skillSearch}
                   onChange={(e) => { setSkillSearch(e.target.value); setIsSkillOpen(true); }}
                   onClick={(e) => e.stopPropagation()}
                 />
-                <ChevronDown className={`text-[#908fa0] transition-transform duration-200 mr-2 self-center ${isSkillOpen ? 'rotate-180' : ''}`} size={20} />
+                <ChevronDown className={`text-muted-foreground transition-transform duration-200 mr-2 self-center ${isSkillOpen ? 'rotate-180' : ''}`} size={16} />
               </div>
 
               {isSkillOpen && (
-                <div className="absolute z-50 w-full mt-2 bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-top-2 duration-200">
-                  <div className="max-h-60 overflow-y-auto p-2 space-y-1">
+                <div className="absolute z-50 w-full mt-2 bg-card border border-border rounded-xl shadow-xl overflow-hidden animate-in slide-in-from-top-2 duration-200">
+                  <div className="max-h-60 overflow-y-auto p-1 space-y-1">
                     {loadingSkills ? (
-                      <Loader size="sm" text="Loading..." />
+                      <div className="p-4 text-center"><Loader size="sm" /></div>
                     ) : filteredSkills.length === 0 ? (
-                      <div className="p-4 text-center text-[#908fa0]">No skills found</div>
+                      <div className="p-4 text-center text-muted-foreground text-sm">No skills found</div>
                     ) : (
                       filteredSkills.map((skill: any) => {
                         const isSelected = selectedSkills.includes(skill.id);
@@ -334,10 +332,10 @@ const PostJob: React.FC = () => {
                           <div
                             key={skill.id}
                             onClick={() => toggleSkill(skill.id)}
-                            className={`flex items-center justify-between px-4 py-3 rounded-xl cursor-pointer transition-colors ${isSelected ? 'bg-rose-500/10 text-rose-400' : 'hover:bg-[rgba(255,255,255,0.04)] text-[#c7c4d7]'}`}
+                            className={`flex items-center justify-between px-4 py-2 rounded-lg cursor-pointer transition-colors text-sm ${isSelected ? 'bg-rose-500/10 text-rose-600 font-bold' : 'hover:bg-muted/50 text-foreground font-medium'}`}
                           >
-                            <span className="font-semibold">{skill.name}</span>
-                            {isSelected && <CheckCircle2 size={18} className="text-rose-500" />}
+                            <span>{skill.name}</span>
+                            {isSelected && <CheckCircle2 size={16} className="text-rose-500" />}
                           </div>
                         );
                       })
@@ -348,19 +346,19 @@ const PostJob: React.FC = () => {
             </div>
           </section>
 
-          <footer className="pt-8 flex justify-end">
+          <footer className="pt-6 border-t border-border/50 flex justify-end">
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`group relative flex items-center gap-3 px-10 py-4 rounded-2xl font-bold text-white transition-all duration-300 ${isSubmitting
-                  ? 'bg-[rgba(255,255,255,0.08)] cursor-not-allowed text-[#908fa0]'
-                  : 'bg-gradient-to-br from-indigo-600 to-violet-700 hover:shadow-xl hover:shadow-indigo-500/30 hover:-translate-y-1 active:translate-y-0'
+              className={`group relative flex items-center gap-3 px-8 py-3.5 rounded-xl font-bold text-white transition-all duration-300 ${isSubmitting
+                  ? 'bg-muted cursor-not-allowed text-muted-foreground'
+                  : 'bg-primary hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0'
                 }`}
             >
               {isSubmitting ? (
                 <><Loader size="sm" /> Processing...</>
               ) : (
-                <>Publish Job Drive <Zap size={20} className="group-hover:animate-pulse" /></>
+                <>Publish Job Drive <Zap size={18} className="group-hover:animate-pulse" /></>
               )}
             </button>
           </footer>
