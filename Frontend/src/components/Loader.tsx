@@ -19,27 +19,22 @@ const Loader: React.FC<LoaderProps> = ({ fullScreen = false, size = "md", text }
 
   return (
     <div className={containerClasses}>
-      <div className="relative">
-        {/* Outer Ring */}
+      <div className="relative flex items-center justify-center">
+        {/* Main Spinning Ring (Required for loading) */}
         <div
-          className={`${sizeClasses[size]} rounded-full border-[rgba(99,102,241,0.2)] animate-pulse`}
-        ></div>
-        
-        {/* Spinning Ring */}
-        <div
-          className={`absolute top-0 left-0 ${sizeClasses[size]} rounded-full border-t-indigo-600 border-r-transparent border-b-transparent border-l-transparent animate-spin`}
+          className={`${sizeClasses[size]} rounded-full border-2 border-transparent border-t-indigo-500 border-l-indigo-500/30 animate-spin`}
         ></div>
 
-        {/* Inner Glow */}
+        {/* Inner Static Glow */}
         <div
-          className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 ${
-            size === "sm" ? "h-2 w-2" : size === "md" ? "h-4 w-4" : "h-6 w-6"
-          } bg-indigo-600/20 rounded-full blur-sm animate-pulse`}
+          className={`absolute ${
+            size === "sm" ? "h-1.5 w-1.5" : size === "md" ? "h-3 w-3" : "h-4 w-4"
+          } bg-indigo-500 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.8)]`}
         ></div>
       </div>
       
       {text && (
-        <p className="mt-4 text-sm font-medium text-[#c7c4d7] animate-pulse tracking-wide">
+        <p className="mt-6 text-xs font-bold text-indigo-300/80 uppercase tracking-widest">
           {text}
         </p>
       )}

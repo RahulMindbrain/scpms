@@ -53,29 +53,29 @@ const CountdownTimer: React.FC<CountdownTimerProps> = ({ targetDate, onComplete 
 
   return (
     <div className="flex items-center gap-2">
-      <div className="flex items-center gap-1 rounded-lg bg-slate-50/80 border border-slate-100 p-1 px-2">
-        <Timer className="h-3 w-3 text-blue-500" />
-        <div className="flex items-center gap-1 font-mono text-[11px]">
+      <div className="flex items-center gap-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 px-3 py-1.5 backdrop-blur-md shadow-inner">
+        <Timer className="h-3.5 w-3.5 text-indigo-400" />
+        <div className="flex items-center gap-1 font-mono text-[12px] font-bold tracking-tight">
           {timeLeft.days > 0 && (
             <div className="flex items-center">
-              <span className="font-bold text-slate-700">{timeLeft.days}</span>
-              <span className="ml-0.5 text-[9px] text-slate-400 uppercase">d</span>
-              <span className="mx-1 text-slate-300">:</span>
+              <span className="text-foreground">{timeLeft.days}</span>
+              <span className="ml-0.5 text-[9px] text-muted-foreground uppercase font-sans">d</span>
+              <span className="mx-1 text-white/20">:</span>
             </div>
           )}
           <div className="flex items-center">
-            <span className="font-bold text-slate-700">{timeLeft.hours.toString().padStart(2, '0')}</span>
-            <span className="ml-0.5 text-[9px] text-slate-400 uppercase">h</span>
-            <span className="mx-1 text-slate-300">:</span>
+            <span className="text-foreground">{timeLeft.hours.toString().padStart(2, '0')}</span>
+            <span className="ml-0.5 text-[9px] text-muted-foreground uppercase font-sans">h</span>
+            <span className="mx-1 text-white/20">:</span>
           </div>
           <div className="flex items-center">
-            <span className="font-bold text-slate-700">{timeLeft.minutes.toString().padStart(2, '0')}</span>
-            <span className="ml-0.5 text-[9px] text-slate-400 uppercase">m</span>
-            <span className="mx-1 text-slate-300">:</span>
+            <span className="text-foreground">{timeLeft.minutes.toString().padStart(2, '0')}</span>
+            <span className="ml-0.5 text-[9px] text-muted-foreground uppercase font-sans">m</span>
+            <span className="mx-1 text-white/20">:</span>
           </div>
           <div className="flex items-center">
-            <span className="font-bold text-blue-600">{timeLeft.seconds.toString().padStart(2, '0')}</span>
-            <span className="ml-0.5 text-[9px] text-blue-400 uppercase">s</span>
+            <span className="text-indigo-400">{timeLeft.seconds.toString().padStart(2, '0')}</span>
+            <span className="ml-0.5 text-[9px] text-indigo-400/70 uppercase font-sans">s</span>
           </div>
         </div>
       </div>
