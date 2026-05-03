@@ -54,50 +54,50 @@
    ============================================================ */
 
 :root {
-  /* ── Core SaaS Light Backgrounds ── */
-  --background:                #F8FAFC; /* Off-white / Very light gray */
-  --surface:                   #ffffff;
-  --foreground:                #0f172a;
-  --muted-foreground:          #64748b;
+  /* ── Premium Blue Light Theme ── */
+  --background:                #ffffff; /* Pure white */
+  --surface:                   #f8fafc;
+  --foreground:                #020617; /* Deep Navy */
+  --muted-foreground:          #475569;
 
   /* ── Card & UI Components ── */
   --card:                      #ffffff;
-  --card-foreground:           #0f172a;
+  --card-foreground:           #020617;
   --popover:                   #ffffff;
-  --popover-foreground:        #0f172a;
+  --popover-foreground:        #020617;
 
-  /* ── Primary — Professional Indigo ── */
-  --primary:                   #6366f1; /* Indigo-500 */
+  /* ── Primary — Premium Blue ── */
+  --primary:                   #0052FF; /* Vibrant, professional blue */
   --primary-foreground:        #ffffff;
-  --primary-container:         #EEF2FF;
+  --primary-container:         #f0f5ff;
 
   /* ── Borders & Inputs ── */
-  --border:                    #E5E7EB; /* Subtle borders */
+  --border:                    #e2e8f0;
   --input:                     #ffffff;
-  --ring:                      #6366f1;
+  --ring:                      #0052FF;
 
-  /* ── Radius — Softer Corners ── */
+  /* ── Radius ── */
   --radius:                    0.75rem;
 
-  /* ── Sidebar — Minimalist ── */
-  --sidebar:                   #F8FAFC;
-  --sidebar-foreground:        #475569;
-  --sidebar-primary:           #6366f1;
+  /* ── Sidebar — Professional ── */
+  --sidebar:                   #fbfcfd;
+  --sidebar-foreground:        #334155;
+  --sidebar-primary:           #0052FF;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent:            #EEF2FF;
-  --sidebar-accent-foreground: #6366f1;
-  --sidebar-border:            #E5E7EB;
-  --sidebar-ring:              #6366f1;
+  --sidebar-accent:            #f1f5f9;
+  --sidebar-accent-foreground: #0052FF;
+  --sidebar-border:            #e2e8f0;
+  --sidebar-ring:              #0052FF;
 
-  /* ── Status Colors (Pastel) ── */
-  --success-bg:                #F0FDF4;
-  --success-text:              #16A34A;
-  --warning-bg:                #FFFBEB;
-  --warning-text:              #D97706;
-  --error-bg:                  #FEF2F2;
-  --error-text:                #DC2626;
-  --info-bg:                   #EFF6FF;
-  --info-text:                 #2563EB;
+  /* ── Status Colors ── */
+  --success-bg:                #f0fdf4;
+  --success-text:              #166534;
+  --warning-bg:                #fffbeb;
+  --warning-text:              #92400e;
+  --error-bg:                  #fef2f2;
+  --error-text:                #991b1b;
+  --info-bg:                   #f0f9ff;
+  --info-text:                 #075985;
 }
 
 .dark {
@@ -136,10 +136,10 @@
    ============================================================ */
 
 .student-hero-banner {
-  @apply relative overflow-hidden rounded-[2rem] p-8 md:p-12 transition-all duration-500;
-  background: linear-gradient(135deg, #EEF2FF 0%, #E0F2FE 100%);
-  border: 1px solid rgba(99, 102, 241, 0.1);
-  box-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.05);
+  @apply relative overflow-hidden rounded-[2.5rem] p-8 md:p-14 transition-all duration-500;
+  background: linear-gradient(135deg, #f0f7ff 0%, #e0edff 100%);
+  border: 1px solid rgba(0, 82, 255, 0.1);
+  box-shadow: 0 20px 50px -12px rgba(0, 82, 255, 0.15);
 }
 
 .dark .student-hero-banner {
@@ -152,13 +152,13 @@
 }
 
 .student-hero-mesh .bubble-indigo {
-  @apply absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full blur-[80px] opacity-40;
-  background: radial-gradient(circle, #EEF2FF 0%, transparent 70%);
+  @apply absolute top-[-30%] left-[-10%] w-[80%] h-[80%] rounded-full blur-[120px] opacity-30;
+  background: radial-gradient(circle, #0052FF 0%, transparent 70%);
 }
 
 .student-hero-mesh .bubble-sky {
-  @apply absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] rounded-full blur-[80px] opacity-40;
-  background: radial-gradient(circle, #E0F2FE 0%, transparent 70%);
+  @apply absolute bottom-[-30%] right-[-10%] w-[80%] h-[80%] rounded-full blur-[120px] opacity-30;
+  background: radial-gradient(circle, #3B82F6 0%, transparent 70%);
 }
 
 .student-hero-texture {
@@ -184,7 +184,7 @@
 }
 
 .student-hero-title span {
-  @apply text-indigo-500;
+  color: var(--primary);
 }
 
 .student-hero-description {
@@ -253,9 +253,10 @@
 
 .light .glass-card,
 .light .glass-modal {
-  background: rgba(0, 0, 0, 0.02) !important;
-  border-color: rgba(0, 0, 0, 0.08) !important;
-  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.85) !important;
+  border-color: rgba(0, 82, 255, 0.05) !important;
+  backdrop-filter: blur(24px) saturate(180%);
+  box-shadow: 0 10px 40px 0 rgba(0, 82, 255, 0.03);
 }
 
 
@@ -312,11 +313,13 @@
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.35);
+  background: var(--primary);
+  opacity: 0.3;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.6);
+  background: var(--primary);
+  opacity: 0.6;
 }
 
 /* ============================================================
@@ -415,26 +418,26 @@
 /* ============================================================
    STAT CARD ACCENT BORDERS
    ============================================================ */
-.stat-card-indigo  { border-top: 2px solid #6366f1; }
-.stat-card-emerald { border-top: 2px solid #10b981; }
-.stat-card-amber   { border-top: 2px solid #f59e0b; }
-.stat-card-rose    { border-top: 2px solid #ef4444; }
-.stat-card-cyan    { border-top: 2px solid #06b6d4; }
+.stat-card-indigo  { border-top: 3px solid var(--primary); }
+.stat-card-emerald { border-top: 3px solid #10b981; }
+.stat-card-amber   { border-top: 3px solid #f59e0b; }
+.stat-card-rose    { border-top: 3px solid #ef4444; }
+.stat-card-cyan    { border-top: 3px solid #06b6d4; }
 
 /* ============================================================
    STATUS BADGES
    ============================================================ */
-.badge-success { background: rgba(16, 185, 129, 0.1); color: #10b981; }
-.badge-warning { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-.badge-error   { background: rgba(239, 68, 68, 0.1);  color: #ef4444; }
-.badge-indigo  { background: rgba(99, 102, 241, 0.1); color: #6366f1; }
-.badge-cyan    { background: rgba(6, 182, 212, 0.1); color: #06b6d4; }
+.badge-success { background: #F0FDF4; color: #15803D; border: 1px solid rgba(21, 128, 61, 0.1); }
+.badge-warning { background: #FFFBEB; color: #B45309; border: 1px solid rgba(180, 83, 9, 0.1); }
+.badge-error   { background: #FEF2F2; color: #B91C1C; border: 1px solid rgba(185, 28, 28, 0.1); }
+.badge-indigo  { background: #EFF6FF; color: var(--primary); border: 1px solid rgba(37, 99, 235, 0.1); }
+.badge-cyan    { background: #F0F9FF; color: #0369A1; border: 1px solid rgba(3, 105, 161, 0.1); }
 
 /* ============================================================
    PRIMARY BUTTON GLOW
    ============================================================ */
 .btn-primary-glow:hover {
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.45);
+  box-shadow: 0 0 25px rgba(37, 99, 235, 0.4);
 }
 
 /* ============================================================

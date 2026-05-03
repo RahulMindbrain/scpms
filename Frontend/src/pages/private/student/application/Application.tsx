@@ -24,11 +24,11 @@ type Status = 'APPLIED' | 'SHORTLISTED' | 'TECHNICAL_ROUND' | 'HR_ROUND' | 'SELE
 const STATUS_CONFIG: Record<Status, { label: string; color: string; bgColor: string; icon: any; shadow: string; accent: string }> = {
   APPLIED: { 
     label: 'Applied', 
-    color: 'text-indigo-400', 
-    bgColor: 'bg-indigo-500/10', 
+    color: 'text-blue-500', 
+    bgColor: 'bg-blue-500/10', 
     icon: Clock,
-    shadow: 'shadow-indigo-500/20',
-    accent: 'bg-indigo-500'
+    shadow: 'shadow-blue-500/20',
+    accent: 'bg-blue-600'
   },
   SHORTLISTED: { 
     label: 'Shortlisted', 
@@ -78,7 +78,7 @@ const STAGES: Status[] = ['APPLIED', 'SHORTLISTED', 'TECHNICAL_ROUND', 'HR_ROUND
 const CompanyIcon = ({ name, size = "md" }: { name: string, size?: "sm" | "md" | "lg" }) => {
   const firstLetter = name.charAt(0).toUpperCase();
   const gradients = [
-    'from-indigo-500 to-blue-600',
+    'from-blue-500 to-blue-700',
     'from-purple-500 to-indigo-600',
     'from-blue-500 to-cyan-600',
     'from-emerald-500 to-teal-600',
@@ -127,7 +127,7 @@ const ApplicationCard = ({
       layout
       className={cn(
         "group relative bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl rounded-[2rem] border border-slate-200/60 dark:border-white/[0.08] transition-all duration-500",
-        isExpanded ? "ring-2 ring-indigo-500/30 shadow-2xl z-10 scale-[1.01]" : "hover:shadow-xl hover:border-indigo-500/30 hover:translate-y-[-2px]"
+        isExpanded ? "ring-2 ring-blue-500/30 shadow-2xl z-10 scale-[1.01]" : "hover:shadow-xl hover:border-blue-500/30 hover:translate-y-[-2px]"
       )}
     >
       <div className="p-5 md:p-6">
@@ -140,7 +140,7 @@ const ApplicationCard = ({
             </h3>
             <div className="flex items-center justify-center md:justify-start gap-3 mt-1">
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                <Building2 size={12} className="text-indigo-500" />
+                <Building2 size={12} className="text-blue-500" />
                 {app.job?.company?.name}
               </span>
               <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-white/20" />
@@ -167,7 +167,7 @@ const ApplicationCard = ({
               onClick={onToggle}
               className={cn(
                 "w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-400 transition-all",
-                isExpanded ? "bg-indigo-500 text-white rotate-180 shadow-md shadow-indigo-500/20" : "hover:bg-indigo-50 dark:hover:bg-white/10 hover:text-indigo-500"
+                isExpanded ? "bg-blue-600 text-white rotate-180 shadow-md shadow-blue-500/20" : "hover:bg-blue-50 dark:hover:bg-white/10 hover:text-blue-600"
               )}
             >
               <ChevronDown size={18} strokeWidth={3} />
@@ -191,7 +191,7 @@ const ApplicationCard = ({
                     <motion.div
                       initial={{ width: 0 }}
                       animate={{ width: `calc(${(Math.max(0, STAGES.indexOf(status)) / (STAGES.length - 1)) * 100}% - 20px)` }}
-                      className="absolute top-4 left-8 h-px bg-indigo-500 z-0"
+                      className="absolute top-4 left-8 h-px bg-blue-600 z-0"
                     />
                   )}
                   
@@ -207,8 +207,8 @@ const ApplicationCard = ({
                         <div key={stage} className="flex flex-col items-center gap-2">
                           <div className={cn(
                             "w-8 h-8 rounded-lg flex items-center justify-center border transition-all duration-500",
-                            isPassed ? "bg-indigo-500 border-indigo-500 text-white shadow-md shadow-indigo-500/20" :
-                            isCurrent ? "bg-white dark:bg-[#1e1f26] border-indigo-500 text-indigo-500 scale-110 shadow-lg" :
+                            isPassed ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/20" :
+                            isCurrent ? "bg-white dark:bg-[#1e1f26] border-blue-600 text-blue-600 scale-110 shadow-lg" :
                             "bg-white dark:bg-[#1e1f26] border-slate-100 dark:border-white/10 text-slate-300 dark:text-slate-700"
                           )}>
                             {isPassed ? <CheckCircle2 size={14} strokeWidth={3} /> : <StageIcon size={14} strokeWidth={2.5} />}
@@ -228,7 +228,7 @@ const ApplicationCard = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.05]">
                     <div className="flex items-center gap-2 mb-3">
-                      <Activity size={14} className="text-indigo-500" />
+                      <Activity size={14} className="text-blue-600" />
                       <h4 className="text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Process Details</h4>
                     </div>
                     <div className="space-y-2">
@@ -280,12 +280,12 @@ const ApplicationCard = ({
                       </div>
                     </div>
                   ) : (
-                    <div className="p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/10">
-                      <div className="flex items-center gap-2 mb-3 text-indigo-600 dark:text-indigo-400">
+                    <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10">
+                      <div className="flex items-center gap-2 mb-3 text-blue-600 dark:text-blue-400">
                         <Zap size={14} />
                         <h4 className="text-[9px] font-black uppercase tracking-widest">Current Status</h4>
                       </div>
-                      <p className="text-[11px] text-indigo-800/80 dark:text-indigo-100/60 leading-relaxed font-medium">
+                      <p className="text-[11px] text-blue-800/80 dark:text-blue-100/60 leading-relaxed font-medium">
                         Your application is under review by the {app.job?.company?.name} hiring team.
                       </p>
                     </div>
@@ -303,7 +303,7 @@ const ApplicationCard = ({
 /* ─── Stat Card ─── */
 const StatCard = ({ title, value, icon: Icon, color, subValue }: { title: string, value: number | string, icon: any, color: 'indigo' | 'blue' | 'purple' | 'emerald', subValue?: string }) => {
   const colorMap = {
-    indigo: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-indigo-500/10',
+    blue: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-blue-500/10',
     blue: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-blue-500/10',
     purple: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 shadow-purple-500/10',
     emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-emerald-500/10',
@@ -410,7 +410,7 @@ const ApplicationStatus = () => {
         {/* Adaptive Hero Banner */}
         <div className="student-hero-banner group">
           <div className="student-hero-mesh">
-            <div className="bubble-indigo"></div>
+            <div className="bubble-blue"></div>
             <div className="bubble-sky"></div>
           </div>
 
@@ -434,7 +434,7 @@ const ApplicationStatus = () => {
               onClick={() => navigate('/student/jobs')}
               className="bg-white text-slate-900 hover:bg-slate-100 font-black rounded-2xl shadow-2xl px-10 h-16 text-sm transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-3 group whitespace-nowrap"
             >
-              Job Explorer <ArrowRight size={20} className="text-indigo-600 group-hover:translate-x-1 transition-transform" />
+              Job Explorer <ArrowRight size={20} className="text-blue-600 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </div>
@@ -445,7 +445,7 @@ const ApplicationStatus = () => {
             title="Total Applications"
             value={stats.total}
             icon={Briefcase}
-            color="indigo"
+            color="blue"
           />
           <StatCard
             title="Active Pipeline"
@@ -477,7 +477,7 @@ const ApplicationStatus = () => {
                 className={cn(
                   "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
                   activeFilter === filter
-                    ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-md border border-slate-200 dark:border-white/10 scale-[1.02]"
+                    ? "bg-white dark:bg-[#1e1f26] text-blue-600 dark:text-blue-400 shadow-md border border-slate-200 dark:border-white/10 scale-[1.02]"
                     : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
                 )}
               >
@@ -490,7 +490,7 @@ const ApplicationStatus = () => {
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <Input
               placeholder="Filter by company or role..."
-              className="pl-14 h-14 bg-white dark:bg-black/20 border-slate-200/60 dark:border-white/[0.1] rounded-2xl text-sm font-bold focus-visible:ring-indigo-500/30 transition-all"
+              className="pl-14 h-14 bg-white dark:bg-black/20 border-slate-200/60 dark:border-white/[0.1] rounded-2xl text-sm font-bold focus-visible:ring-blue-500/30 transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -501,7 +501,7 @@ const ApplicationStatus = () => {
         <div className="space-y-6">
           <div className="flex items-center justify-between px-4">
             <div className="flex items-center gap-3">
-              <div className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
+              <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
               <h2 className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Live Pipeline Status</h2>
             </div>
             <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-3 py-1 rounded-full">{filteredApplications.length} Entries Identified</span>
@@ -541,19 +541,19 @@ const ApplicationStatus = () => {
 
         {/* ─── Premium Footer Banner ─── */}
         <div className="group relative overflow-hidden rounded-[2.5rem] bg-white/40 dark:bg-[#161b22]/40 border border-slate-200/60 dark:border-white/[0.08] p-8 flex flex-col md:flex-row items-center gap-8 backdrop-blur-xl shadow-sm">
-          <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 shadow-inner">
+          <div className="w-16 h-16 rounded-2xl bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 shadow-inner">
             <Rocket size={32} className="group-hover:translate-y-[-4px] group-hover:translate-x-[4px] transition-transform duration-500" />
           </div>
           <div className="flex-1 text-center md:text-left">
             <h4 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-wider">Operational Velocity</h4>
             <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-1">
-              Data shows that candidates who respond within 24 hours increase their final interview success rate by <span className="text-indigo-600 dark:text-indigo-400 font-black">65%</span>. Keep your profile sharp.
+              Data shows that candidates who respond within 24 hours increase their final interview success rate by <span className="text-blue-600 dark:text-blue-400 font-black">65%</span>. Keep your profile sharp.
             </p>
           </div>
           <Button
             variant="outline"
             onClick={() => navigate('/student/profile')}
-            className="rounded-2xl px-8 h-14 font-black text-xs uppercase tracking-widest border-slate-200 dark:border-white/10 hover:bg-indigo-500 hover:text-white dark:hover:bg-indigo-500/20 transition-all shadow-sm"
+            className="rounded-2xl px-8 h-14 font-black text-xs uppercase tracking-widest border-slate-200 dark:border-white/10 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-500/20 transition-all shadow-sm"
           >
             Enhance Profile
           </Button>

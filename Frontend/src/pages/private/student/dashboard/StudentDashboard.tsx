@@ -85,7 +85,7 @@ export default function StudentDashboard() {
               <span>Student Overview</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-              Welcome back, <span className="text-indigo-500">{user?.firstname || "Student"}</span> 👋
+              Welcome back, <span className="text-blue-600">{user?.firstname || "Student"}</span> 👋
             </h1>
             <p className="mt-4 max-w-xl text-lg text-slate-500 dark:text-slate-400 font-medium">
               Your personalized workspace for tracking interviews, applications, and upcoming placement milestones.
@@ -100,9 +100,9 @@ export default function StudentDashboard() {
               label: "Upcoming Events", 
               value: upcomingEvents.length, 
               icon: CalendarClock, 
-              color: "indigo",
-              bg: "bg-indigo-50",
-              iconColor: "text-indigo-500"
+              color: "blue",
+              bg: "bg-blue-50",
+              iconColor: "text-blue-500"
             },
             { 
               label: "Unread Updates", 
@@ -130,7 +130,7 @@ export default function StudentDashboard() {
                   <stat.icon className={`h-6 w-6 ${stat.iconColor}`} />
                 </div>
                 {stat.isNext && nextEvent && (
-                  <div className="text-[10px] font-bold text-indigo-500 bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-1 rounded-full uppercase tracking-wider">
+                  <div className="text-[10px] font-bold text-blue-600 bg-blue-50 dark:bg-blue-500/10 px-2.5 py-1 rounded-full uppercase tracking-wider">
                     Next Up
                   </div>
                 )}
@@ -166,7 +166,7 @@ export default function StudentDashboard() {
           <div className="lg:col-span-8 space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Upcoming Schedule</h3>
-              <Link to="/student/calendar" className="text-sm font-semibold text-indigo-600 hover:text-indigo-700 transition-colors">
+              <Link to="/student/calendar" className="text-sm font-semibold text-blue-600 hover:text-blue-700 transition-colors">
                 View All
               </Link>
             </div>
@@ -186,13 +186,13 @@ export default function StudentDashboard() {
                 upcomingEvents.map((event) => (
                   <div
                     key={event.id}
-                    className="bg-white dark:bg-[#11141B] border border-gray-100 dark:border-white/5 rounded-2xl p-5 flex items-center gap-5 transition-all hover:border-indigo-100 dark:hover:border-indigo-500/20 group"
+                    className="bg-white dark:bg-[#11141B] border border-gray-100 dark:border-white/5 rounded-2xl p-5 flex items-center gap-5 transition-all hover:border-blue-100 dark:hover:border-blue-500/20 group"
                   >
-                    <div className="h-14 w-14 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
+                    <div className="h-14 w-14 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
                       <Briefcase className="h-6 w-6" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 transition-colors">{event.title}</h4>
+                      <h4 className="font-bold text-slate-900 dark:text-white group-hover:text-blue-600 transition-colors">{event.title}</h4>
                       <p className="text-sm text-slate-500 font-medium">{event.company}</p>
                     </div>
                     <div className="text-right hidden sm:block">
@@ -215,7 +215,7 @@ export default function StudentDashboard() {
             <h3 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">Navigation</h3>
             <div className="grid gap-4">
               {[
-                { to: "/student/profile", icon: User, label: "My Profile", color: "indigo", bg: "bg-indigo-50" },
+                { to: "/student/profile", icon: User, label: "My Profile", color: "blue", bg: "bg-blue-50" },
                 { to: "/student/jobs", icon: Briefcase, label: "Job Portal", color: "emerald", bg: "bg-emerald-50" },
                 { to: "/student/application", icon: FileText, label: "Applications", color: "cyan", bg: "bg-cyan-50" },
                 { to: "/student/notifications", icon: Bell, label: "Notifications", color: "amber", bg: "bg-amber-50" },
@@ -235,17 +235,17 @@ export default function StudentDashboard() {
             </div>
 
             {/* Recruiter Insight Card */}
-            <div className="bg-indigo-600 rounded-[2rem] p-8 text-white relative overflow-hidden group">
+            <div className="bg-blue-600 rounded-[2rem] p-8 text-white relative overflow-hidden group">
               <div className="absolute top-0 right-0 p-6 opacity-10 transition-transform group-hover:scale-110">
                 <Sparkles size={80} />
               </div>
               <div className="relative z-10">
                 <div className="flex items-center gap-2 mb-4">
-                  <Sparkles className="h-4 w-4 text-indigo-200" />
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-indigo-200">Pro Insight</span>
+                  <Sparkles className="h-4 w-4 text-blue-200" />
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-200">Pro Insight</span>
                 </div>
                 <p className="text-sm font-medium leading-relaxed opacity-90">
-                  Update your skills bi-weekly to increase visibility by <span className="font-bold text-indigo-200">40%</span> to top recruiters.
+                  Update your skills bi-weekly to increase visibility by <span className="font-bold text-blue-200">40%</span> to top recruiters.
                 </p>
               </div>
             </div>

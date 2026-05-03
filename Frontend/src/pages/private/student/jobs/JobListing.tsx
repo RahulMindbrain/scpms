@@ -131,13 +131,13 @@ const JobListing = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
+    <div className="flex-1 flex flex-col bg-background min-h-screen selection:bg-blue-500/30 selection:text-blue-200">
       <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
         
         {/* Adaptive Hero Banner */}
         <div className="student-hero-banner group">
           <div className="student-hero-mesh">
-            <div className="bubble-indigo"></div>
+            <div className="bubble-blue"></div>
             <div className="bubble-sky"></div>
           </div>
 
@@ -180,7 +180,7 @@ const JobListing = () => {
                   className={cn(
                     "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300",
                     activeTab === tab.id
-                      ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-xl border border-slate-200/50 dark:border-white/10 scale-105"
+                      ? "bg-white dark:bg-[#1e1f26] text-blue-600 dark:text-blue-400 shadow-xl border border-slate-200/50 dark:border-white/10 scale-105"
                       : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
                   )}
                 >
@@ -191,10 +191,10 @@ const JobListing = () => {
             
             <div className="flex items-center gap-4 w-full lg:w-auto">
               <div className="relative flex-1 lg:w-96 group">
-                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors" size={18} />
                 <Input
                   placeholder="Search by role, company, or tech stack..."
-                  className="pl-14 h-14 bg-slate-100 dark:bg-white/5 border-none rounded-2xl text-sm font-semibold focus-visible:ring-indigo-500/30 shadow-inner transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  className="pl-14 h-14 bg-slate-100 dark:bg-white/5 border-none rounded-2xl text-sm font-semibold focus-visible:ring-blue-500/30 shadow-inner transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -220,20 +220,20 @@ const JobListing = () => {
                   whileHover={{ y: -4 }}
                   className="group"
                 >
-                  <Card className="h-full border-none bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-200/60 dark:border-white/[0.08] hover:border-indigo-500/30">
+                  <Card className="h-full border-none bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-200/60 dark:border-white/[0.08] hover:border-blue-500/30">
                     <CardContent className="p-0 flex flex-col h-full">
                       {/* Top Info */}
                       <div className="p-8 flex-1 space-y-8">
                         <div className="flex items-start justify-between gap-4">
                           <div className={cn(
                             "w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl text-white shadow-2xl shrink-0 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3",
-                            isApplied ? "bg-indigo-500" : isEligible ? "bg-gradient-to-br from-indigo-500 to-blue-600" : "bg-slate-400 grayscale"
+                            isApplied ? "bg-blue-500" : isEligible ? "bg-gradient-to-br from-blue-500 to-blue-700" : "bg-slate-400 grayscale"
                           )}>
                             {job.company.name[0]}
                           </div>
                           <div className="flex flex-col items-end gap-3">
                             {isApplied ? (
-                              <Badge className="bg-indigo-500/10 text-indigo-500 border-indigo-500/20 text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-sm">
+                              <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20 text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-sm">
                                 Applied
                               </Badge>
                             ) : isEligible ? (
@@ -249,11 +249,11 @@ const JobListing = () => {
                         </div>
 
                         <div className="space-y-2">
-                          <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors tracking-tight">
+                          <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors tracking-tight">
                             {job.title}
                           </h3>
                           <p className="text-[10px] font-black text-slate-500 flex items-center gap-2 uppercase tracking-[0.15em]">
-                            <Building2 size={14} className="text-indigo-500" />
+                            <Building2 size={14} className="text-blue-500" />
                             {job.company.name}
                           </p>
                         </div>
@@ -284,9 +284,9 @@ const JobListing = () => {
                           className={cn(
                             "rounded-[1.25rem] font-black text-[10px] uppercase tracking-[0.2em] px-8 h-12 transition-all duration-500 border-none shadow-xl",
                             isApplied 
-                              ? "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-none hover:bg-indigo-500/20" 
+                              ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-none hover:bg-blue-500/20" 
                               : isEligible
-                              ? "bg-indigo-600 text-white shadow-indigo-500/30 hover:scale-105 hover:shadow-indigo-500/50"
+                              ? "bg-blue-600 text-white shadow-blue-500/30 hover:scale-105 hover:shadow-blue-500/50"
                               : "bg-slate-200 dark:bg-white/5 text-slate-400 cursor-not-allowed shadow-none"
                           )}
                         >
@@ -364,14 +364,14 @@ const JobListing = () => {
         >
           <div className="space-y-8 py-4">
             <div className="flex items-center gap-6">
-              <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-3xl flex items-center justify-center text-white font-black text-3xl shadow-xl border border-white/10">
+              <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl flex items-center justify-center text-white font-black text-3xl shadow-xl border border-white/10">
                 {selectedJob?.company.name[0]}
               </div>
               <div className="space-y-1">
-                <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">Company Overview</p>
+                <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Company Overview</p>
                 <h4 className="text-xl font-black text-slate-900 dark:text-white">{selectedJob?.company.name}</h4>
                 <div className="flex items-center gap-2 text-slate-500 font-bold text-sm">
-                  <MapPin size={14} className="text-indigo-500" />
+                  <MapPin size={14} className="text-blue-500" />
                   <span>{selectedJob?.location}</span>
                 </div>
               </div>
@@ -380,7 +380,7 @@ const JobListing = () => {
             <div className="grid grid-cols-2 gap-4">
               <div className="p-5 bg-slate-50 dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/5">
                 <div className="flex items-center gap-2 mb-2">
-                  <Calendar className="w-4 h-4 text-indigo-600" />
+                  <Calendar className="w-4 h-4 text-blue-600" />
                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Deadline</span>
                 </div>
                 <p className="text-sm font-black text-slate-900 dark:text-slate-100">{selectedJob?.deadline || 'Open'}</p>
@@ -405,7 +405,7 @@ const JobListing = () => {
 
             <div className="pt-2">
               <Button
-                className="w-full !bg-indigo-600 !text-white py-8 rounded-2xl font-black text-base uppercase tracking-widest shadow-xl shadow-indigo-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all border-none"
+                className="w-full !bg-blue-600 !text-white py-8 rounded-2xl font-black text-base uppercase tracking-widest shadow-xl shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all border-none"
                 onClick={handleApply}
                 disabled={isApplying || (selectedJob && appliedJobIds.has(Number(selectedJob.id)))}
               >
