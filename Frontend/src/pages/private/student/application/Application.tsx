@@ -1,10 +1,12 @@
-﻿import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import {
   CheckCircle2, Circle, Clock, XCircle, Briefcase,
   ChevronRight, Search, 
   ArrowRight, Sparkles, UserCircle,
   Rocket, TrendingUp, 
   Calendar, Building2, ChevronDown,
+  ArrowUpRight,
+  Filter,
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobApplications, updateApplicationStatus } from '@/redux/thunks/studentThunk';
@@ -16,16 +18,53 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import Loader from '@/components/Loader';
 import { toast } from 'sonner';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type Status = 'APPLIED' | 'SHORTLISTED' | 'TECHNICAL_ROUND' | 'HR_ROUND' | 'SELECTED' | 'REJECTED';
 
-const STATUS_CONFIG: Record<Status, { label: string; color: string; bgColor: string; icon: any }> = {
-  APPLIED: { label: 'Applied', color: 'text-indigo-400', bgColor: 'bg-indigo-500/10', icon: Clock },
-  SHORTLISTED: { label: 'Shortlisted', color: 'text-purple-600', bgColor: 'bg-purple-50', icon: CheckCircle2 },
-  TECHNICAL_ROUND: { label: 'Technical', color: 'text-orange-600', bgColor: 'bg-orange-50', icon: Rocket },
-  HR_ROUND: { label: 'HR Round', color: 'text-yellow-600', bgColor: 'bg-yellow-50', icon: UserCircle },
-  SELECTED: { label: 'Selected', color: 'text-emerald-600', bgColor: 'bg-emerald-50', icon: Sparkles },
-  REJECTED: { label: 'Rejected', color: 'text-red-600', bgColor: 'bg-red-50', icon: XCircle },
+const STATUS_CONFIG: Record<Status, { label: string; color: string; bgColor: string; icon: any; shadow: string }> = {
+  APPLIED: { 
+    label: 'Applied', 
+    color: 'text-indigo-400', 
+    bgColor: 'bg-indigo-500/10', 
+    icon: Clock,
+    shadow: 'shadow-indigo-500/20'
+  },
+  SHORTLISTED: { 
+    label: 'Shortlisted', 
+    color: 'text-purple-400', 
+    bgColor: 'bg-purple-500/10', 
+    icon: CheckCircle2,
+    shadow: 'shadow-purple-500/20'
+  },
+  TECHNICAL_ROUND: { 
+    label: 'Technical', 
+    color: 'text-blue-400', 
+    bgColor: 'bg-blue-500/10', 
+    icon: Rocket,
+    shadow: 'shadow-blue-500/20'
+  },
+  HR_ROUND: { 
+    label: 'HR Round', 
+    color: 'text-amber-400', 
+    bgColor: 'bg-amber-500/10', 
+    icon: UserCircle,
+    shadow: 'shadow-amber-500/20'
+  },
+  SELECTED: { 
+    label: 'Selected', 
+    color: 'text-emerald-400', 
+    bgColor: 'bg-emerald-500/10', 
+    icon: Sparkles,
+    shadow: 'shadow-emerald-500/20'
+  },
+  REJECTED: { 
+    label: 'Rejected', 
+    color: 'text-rose-400', 
+    bgColor: 'bg-rose-500/10', 
+    icon: XCircle,
+    shadow: 'shadow-rose-500/20'
+  },
 };
 
 const STAGES: Status[] = ['APPLIED', 'SHORTLISTED', 'TECHNICAL_ROUND', 'HR_ROUND', 'SELECTED'];
@@ -34,52 +73,22 @@ const STAGES: Status[] = ['APPLIED', 'SHORTLISTED', 'TECHNICAL_ROUND', 'HR_ROUND
 const StatusBadge = ({ status }: { status: Status }) => {
   const config = (status && STATUS_CONFIG[status]) || {
     label: status || 'Unknown',
-    color: 'text-[#c7c4d7]',
-    bgColor: 'bg-[#191b22]',
-    icon: Clock
+    color: 'text-slate-400',
+    bgColor: 'bg-slate-500/10',
+    icon: Clock,
+    shadow: ''
   };
   const Icon = config.icon || Clock;
   return (
-    <div className={cn("inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[11px] font-bold tracking-tight whitespace-nowrap", config.bgColor, config.color, "border-current/10")}>
-      <Icon size={12} strokeWidth={2.5} />
+    <div className={cn(
+      "inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-wider whitespace-nowrap transition-all", 
+      config.bgColor, 
+      config.color, 
+      "border-current/10 shadow-sm",
+      config.shadow
+    )}>
+      <Icon size={12} strokeWidth={3} />
       {config.label}
-    </div>
-  );
-};
-
-/* ─── Compact Step Indicator ─── */
-const StepIndicator = ({ currentStatus }: { currentStatus: Status }) => {
-  if (!currentStatus) return null;
-  
-  if (currentStatus === 'REJECTED') {
-    return (
-      <div className="flex items-center gap-1.5 text-red-500 text-[11px] font-bold uppercase tracking-wider">
-        <XCircle size={14} /> Application Closed
-      </div>
-    );
-  }
-
-  const currentIndex = STAGES.indexOf(currentStatus);
-  const nextStage = currentIndex !== -1 ? STAGES[currentIndex + 1] : null;
-
-  const currentLabel = (STATUS_CONFIG[currentStatus] && STATUS_CONFIG[currentStatus].label) || currentStatus;
-
-  return (
-    <div className="flex items-center gap-3">
-      <div className="flex items-center gap-2">
-        <div className="w-2.5 h-2.5 rounded-full bg-indigo-500/100 shadow-[0_0_8px_rgba(59,130,246,0.5)] animate-pulse" />
-        <span className="text-[#e2e2eb] font-bold text-[11px] uppercase tracking-wide">
-          {currentLabel}
-        </span>
-      </div>
-      {nextStage && STATUS_CONFIG[nextStage] && (
-        <>
-          <ChevronRight size={12} className="text-[#c7c4d7]" />
-          <span className="text-[#908fa0] font-medium text-[11px] uppercase tracking-wide">
-            Next: {STATUS_CONFIG[nextStage].label}
-          </span>
-        </>
-      )}
     </div>
   );
 };
@@ -87,8 +96,19 @@ const StepIndicator = ({ currentStatus }: { currentStatus: Status }) => {
 /* ─── Company Avatar ─── */
 const CompanyAvatar = ({ name }: { name: string }) => {
   const firstLetter = name.charAt(0).toUpperCase();
+  const gradients = [
+    'from-indigo-500 to-blue-600',
+    'from-purple-500 to-indigo-600',
+    'from-blue-500 to-cyan-600',
+    'from-emerald-500 to-teal-600',
+  ];
+  const gradient = gradients[name.length % gradients.length];
+  
   return (
-    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-50 to-slate-100 border border-[rgba(255,255,255,0.08)] flex items-center justify-center text-[#908fa0] font-bold text-lg shrink-0 overflow-hidden shadow-sm">
+    <div className={cn(
+      "w-12 h-12 rounded-2xl bg-gradient-to-br flex items-center justify-center text-white font-black text-xl shrink-0 overflow-hidden shadow-lg border border-white/10",
+      gradient
+    )}>
       {firstLetter}
     </div>
   );
@@ -113,170 +133,206 @@ const ApplicationRow = ({
   const isRejected = status === 'REJECTED';
 
   return (
-    <div className={cn(
-      "group bg-white rounded-2xl border border-[rgba(255,255,255,0.06)] transition-all duration-300 overflow-hidden",
-      isExpanded ? "shadow-xl shadow-slate-200/50 border-indigo-500/20 ring-1 ring-indigo-500/10" : "hover:border-[rgba(255,255,255,0.08)] hover:shadow-md hover:shadow-slate-200/30"
-    )}>
+    <motion.div 
+      layout
+      className={cn(
+        "group relative bg-white dark:bg-[#1e1f26] rounded-[2rem] border border-slate-200 dark:border-white/[0.05] transition-all duration-300 overflow-hidden",
+        isExpanded ? "shadow-2xl shadow-indigo-500/10 border-indigo-500/30 ring-1 ring-indigo-500/10 z-10" : "hover:border-indigo-500/20 hover:shadow-xl hover:shadow-slate-200/50 dark:hover:shadow-indigo-500/5 hover:translate-y-[-2px]"
+      )}
+    >
       {/* Table Row Content */}
       <div
-        className="flex flex-col sm:flex-row items-start sm:items-center p-4 gap-4 cursor-pointer"
+        className="flex flex-col sm:flex-row items-center p-5 md:p-6 gap-4 cursor-pointer"
         onClick={onToggle}
       >
-        <div className="flex items-center gap-4 flex-1 min-w-0">
+        <div className="flex items-center gap-5 flex-1 min-w-0 w-full">
           <CompanyAvatar name={app.job?.company?.name || "C"} />
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-0.5">
-              <h3 className="text-sm font-bold text-[#e2e2eb] truncate">{app.job?.title || "Role"}</h3>
-              <span className="text-[#908fa0] font-medium text-xs hidden md:inline">•</span>
-              <p className="text-[#c7c4d7] font-medium text-xs truncate hidden md:inline">{app.job?.company?.name}</p>
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-base font-bold text-slate-900 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                {app.job?.title || "Role"}
+              </h3>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 text-[10px] text-[#908fa0] font-medium">
-                <Calendar size={12} />
-                <span>{new Date(app.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-black uppercase tracking-widest">
+                <Building2 size={12} className="text-indigo-500" />
+                <span>{app.job?.company?.name}</span>
               </div>
-              <div className="md:hidden flex items-center gap-1 text-[10px] text-[#908fa0] font-medium truncate">
-                <Building2 size={12} />
-                <span className="truncate">{app.job?.company?.name}</span>
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-black uppercase tracking-widest">
+                <Calendar size={12} className="text-purple-500" />
+                <span>{new Date(app.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
               </div>
             </div>
           </div>
         </div>
 
-        <div className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-4 sm:gap-8">
+        <div className="w-full sm:w-auto flex items-center justify-between sm:justify-end gap-6 sm:gap-10">
           <div className="flex-1 sm:flex-none">
             <StatusBadge status={status} />
           </div>
-          <div className="hidden lg:block min-w-[180px]">
-            <StepIndicator currentStatus={status} />
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              className={cn(
-                "h-8 w-8 p-0 rounded-lg transition-transform",
-                isExpanded && "bg-[rgba(255,255,255,0.06)] rotate-180 text-blue-600"
-              )}
-            >
-              <ChevronDown size={16} />
-            </Button>
+          
+          <div className="flex items-center gap-3">
+            <div className={cn(
+              "p-2 rounded-xl bg-slate-100 dark:bg-white/5 text-slate-400 transition-all",
+              isExpanded && "bg-indigo-500/10 text-indigo-500 rotate-180"
+            )}>
+              <ChevronDown size={18} strokeWidth={3} />
+            </div>
           </div>
         </div>
       </div>
 
       {/* Expanded Details */}
-      {isExpanded && (
-        <div className="px-4 pb-5 pt-2 border-t border-[rgba(255,255,255,0.04)] bg-[rgba(255,255,255,0.015)] animate-in slide-in-from-top-2 duration-300">
-          <div className="w-full">
-            {/* Left: Tracker Detail */}
-            <div className="space-y-4">
-              <div className="bg-[#1e1f26] p-4 rounded-xl border border-[rgba(255,255,255,0.06)] shadow-sm">
-                <div className="flex items-center justify-between mb-4">
-                  <h4 className="text-xs font-bold text-[#e2e2eb] uppercase tracking-wider">Application Timeline</h4>
-                  <div className="flex items-center gap-2 text-[10px] font-bold text-[#908fa0]">
-                    <Clock size={12} /> LAST UPDATED: {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+      <AnimatePresence>
+        {isExpanded && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: "auto", opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+          >
+            <div className="px-6 pb-8 pt-2 border-t border-slate-100 dark:border-white/[0.05] bg-slate-50/50 dark:bg-white/[0.02]">
+              <div className="space-y-6 pt-4">
+                {/* Timeline Section */}
+                <div className="bg-white dark:bg-[#1e1f26]/50 p-6 rounded-3xl border border-slate-100 dark:border-white/[0.05] shadow-sm">
+                  <div className="flex items-center justify-between mb-8">
+                    <h4 className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-[0.2em]">Application Journey</h4>
+                    <div className="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase tracking-wider">
+                      <Clock size={12} className="text-indigo-500" /> 
+                      Last Updated: {new Date(app.updatedAt).toLocaleDateString()}
+                    </div>
                   </div>
-                </div>
 
-                <div className="relative flex items-center justify-between px-2 py-4">
-                  {/* Timeline Bar */}
-                  <div className="absolute top-1/2 left-0 right-0 h-0.5 bg-[rgba(255,255,255,0.06)] -translate-y-1/2" />
-                  <div
-                    className="absolute top-1/2 left-0 h-0.5 bg-indigo-500/100 -translate-y-1/2 transition-all duration-1000 ease-out"
-                    style={{ width: `${(Math.max(0, STAGES.indexOf(status)) / (STAGES.length - 1)) * 100}%` }}
-                  />
+                  <div className="relative flex items-center justify-between px-4 py-6">
+                    {/* Timeline Bar Background */}
+                    <div className="absolute top-[2.1rem] left-8 right-8 h-1 bg-slate-100 dark:bg-white/5 rounded-full" />
+                    
+                    {/* Progress Bar */}
+                    {!isRejected && (
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${(Math.max(0, STAGES.indexOf(status)) / (STAGES.length - 1)) * 100}%` }}
+                        className="absolute top-[2.1rem] left-8 h-1 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-full z-0 transition-all duration-1000 ease-out"
+                        style={{ maxWidth: 'calc(100% - 4rem)' }}
+                      />
+                    )}
 
-                  {STAGES.map((stage, idx) => {
-                    const stageIdx = STAGES.indexOf(status);
-                    const isPassed = idx < stageIdx || isSelected;
-                    const isCurrent = idx === stageIdx && !isRejected;
+                    {STAGES.map((stage, idx) => {
+                      const stageIdx = STAGES.indexOf(status);
+                      const isPassed = idx < stageIdx || isSelected;
+                      const isCurrent = idx === stageIdx && !isRejected;
+                      const config = STATUS_CONFIG[stage];
 
-                    return (
-                      <div key={stage} className="relative z-10 flex flex-col items-center gap-2">
-                        <div className={cn(
-                          "w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all duration-500",
-                          isPassed ? "bg-indigo-500/100 border-blue-500 text-white" :
-                          isCurrent ? "bg-[#1e1f26] border-blue-500 text-indigo-400 scale-125 shadow-lg shadow-blue-100" :
-                          "bg-[#1e1f26] border-[rgba(255,255,255,0.08)] text-[#c7c4d7]"
-                        )}>
-                          {isPassed ? <CheckCircle2 size={12} strokeWidth={3} /> : <Circle size={10} fill={isCurrent ? "currentColor" : "none"} />}
+                      return (
+                        <div key={stage} className="relative z-10 flex flex-col items-center gap-4">
+                          <div className={cn(
+                            "w-10 h-10 rounded-2xl flex items-center justify-center border-2 transition-all duration-500 shadow-sm",
+                            isPassed ? "bg-indigo-500 border-indigo-500 text-white shadow-indigo-500/20" :
+                            isCurrent ? "bg-white dark:bg-[#1e1f26] border-indigo-500 text-indigo-500 scale-110 shadow-lg shadow-indigo-500/10 ring-4 ring-indigo-500/5" :
+                            "bg-white dark:bg-[#1e1f26] border-slate-100 dark:border-white/10 text-slate-300 dark:text-slate-700"
+                          )}>
+                            {isPassed ? <CheckCircle2 size={18} strokeWidth={3} /> : <config.icon size={18} strokeWidth={2.5} />}
+                          </div>
+                          <span className={cn(
+                            "text-[10px] font-black uppercase tracking-wider whitespace-nowrap",
+                            isPassed || isCurrent ? "text-slate-900 dark:text-slate-200" : "text-slate-400"
+                          )}>
+                            {config.label}
+                          </span>
                         </div>
-                        <span className={cn(
-                          "text-[9px] font-bold uppercase tracking-tight whitespace-nowrap",
-                          isPassed || isCurrent ? "text-[#e2e2eb]" : "text-[#908fa0]"
-                        )}>
-                          {STATUS_CONFIG[stage]?.label || stage}
-                        </span>
-                      </div>
-                    );
-                  })}
+                      );
+                    })}
+                  </div>
+
+                  {/* Contextual Feedback */}
+                  <AnimatePresence mode="wait">
+                    {isRejected && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-8 p-5 bg-rose-50 dark:bg-rose-500/5 rounded-[1.5rem] border border-rose-100 dark:border-rose-500/10 flex items-start gap-4"
+                      >
+                        <div className="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-500 shrink-0">
+                          <XCircle size={20} strokeWidth={2.5} />
+                        </div>
+                        <div>
+                          <p className="text-xs font-black text-rose-900 dark:text-rose-300 uppercase tracking-wider">Status: Not Selected</p>
+                          <p className="text-sm text-rose-800/70 dark:text-rose-200/60 mt-1 leading-relaxed font-medium">
+                            {app.reason || "We appreciate your interest. Unfortunately, the team has decided not to proceed with your application at this time. Keep applying to other roles!"}
+                          </p>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {isSelected && (
+                      <motion.div 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-8 p-6 bg-emerald-50 dark:bg-emerald-500/5 rounded-[1.5rem] border border-emerald-100 dark:border-emerald-500/10"
+                      >
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                          <div className="flex items-start gap-4">
+                            <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 shrink-0">
+                              <Sparkles size={24} />
+                            </div>
+                            <div>
+                              <h4 className="text-base font-bold text-emerald-900 dark:text-emerald-300">Congratulations!</h4>
+                              <p className="text-sm text-emerald-800/70 dark:text-emerald-200/60 font-medium">You have received an official offer from {app.job?.company?.name}.</p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <Button
+                              size="lg"
+                              className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black px-8 shadow-lg shadow-emerald-500/20 h-12"
+                              disabled={updatingId === app.id}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onAction(app.id, "ACCEPT");
+                              }}
+                            >
+                              Accept Offer
+                            </Button>
+                            <Button
+                              size="lg"
+                              variant="outline"
+                              className="border-rose-200 text-rose-600 hover:bg-rose-50 dark:border-rose-500/20 dark:text-rose-400 dark:hover:bg-rose-500/10 rounded-xl font-black h-12"
+                              disabled={updatingId === app.id}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onAction(app.id, "REJECT");
+                              }}
+                            >
+                              Decline
+                            </Button>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-
-                {isRejected && (
-                  <div className="mt-4 p-3 bg-red-50 rounded-lg border border-red-100 flex items-start gap-3">
-                    <XCircle size={16} className="text-red-500 shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-xs font-bold text-red-900">Application Status: Rejected</p>
-                      <p className="text-[11px] text-red-700/80 mt-0.5 leading-relaxed">
-                        {app.reason || "We appreciate your interest. Unfortunately, the team has decided not to proceed with your application at this time."}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {isSelected && (
-                  <div className="mt-4 p-3 bg-emerald-50 rounded-lg border border-emerald-100">
-                    <p className="text-xs font-bold text-emerald-900 mb-3">
-                      Offer received. Choose to accept or reject.
-                    </p>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Button
-                        size="sm"
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white"
-                        disabled={updatingId === app.id}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onAction(app.id, "ACCEPT");
-                        }}
-                      >
-                        Accept
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="border-red-200 text-red-600 hover:bg-red-50"
-                        disabled={updatingId === app.id}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onAction(app.id, "REJECT");
-                        }}
-                      >
-                        Reject
-                      </Button>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
-          </div>
-        </div>
-      )}
-    </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
-
 /* ─── Quick Stat Card ─── */
-const StatCard = ({ title, value, icon: Icon, colorClass, bgColorClass }: any) => (
-  <div className="bg-[#1e1f26] p-4 rounded-2xl border border-[rgba(255,255,255,0.07)] flex items-center justify-between hover:border-indigo-500/20 transition-all group">
-    <div>
-      <p className="text-[10px] font-bold uppercase tracking-wider text-[#908fa0] mb-1">{title}</p>
-      <p className="text-2xl font-black text-[#e2e2eb] tabular-nums">{value}</p>
+const StatCard = ({ title, value, icon: Icon, colorClass, bgColorClass, shadowClass }: any) => (
+  <div className="group relative bg-white dark:bg-[#1e1f26] border border-slate-200 dark:border-white/[0.05] rounded-[2rem] p-6 transition-all duration-300 hover:shadow-xl dark:hover:bg-[#25262e] shadow-sm overflow-hidden">
+    <div className="relative z-10 flex items-start justify-between">
+      <div>
+        <p className="text-[11px] font-black text-slate-500 uppercase tracking-[0.15em] mb-2">{title}</p>
+        <p className="text-3xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">{value}</p>
+      </div>
+      <div className={cn("w-14 h-14 rounded-[1.25rem] flex items-center justify-center transition-all group-hover:scale-110 shadow-lg", bgColorClass, colorClass, shadowClass)}>
+        <Icon size={28} strokeWidth={2.5} />
+      </div>
     </div>
-    <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110", bgColorClass, colorClass)}>
-      <Icon size={24} />
-    </div>
+    {/* Subtle Background Glow */}
+    <div className={cn("absolute -bottom-6 -right-6 w-24 h-24 blur-[40px] opacity-0 group-hover:opacity-20 transition-opacity rounded-full", bgColorClass)} />
   </div>
 );
 
@@ -285,6 +341,7 @@ const ApplicationStatus = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { id: routeApplicationId } = useParams<{ id?: string }>();
+  const { user } = useSelector((state: RootState) => state.auth);
   const { applications = [], loading } = useSelector((state: RootState) => state.student);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -296,7 +353,6 @@ const ApplicationStatus = () => {
     dispatch(fetchJobApplications({}));
   }, [dispatch]);
 
-  // Set initial expanded ID from URL if provided
   useEffect(() => {
     if (routeApplicationId && applications.length > 0) {
       setExpandedId(Number(routeApplicationId));
@@ -355,170 +411,218 @@ const ApplicationStatus = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 md:p-8 max-w-6xl mx-auto space-y-6 sm:space-y-8 animate-in fade-in duration-700">
-      {/* ─── Header ─── */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-400 text-[10px] font-bold uppercase tracking-wider mb-2">
-            <Sparkles size={12} /> My Career Dashboard
+    <div className="flex-1 flex flex-col bg-background dark:bg-[#111319] min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
+      <div className="max-w-7xl mx-auto w-full p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        
+        {/* ─── Hero Header ─── */}
+        <div className="group relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-8 md:p-12 text-white shadow-2xl border border-white/5">
+          {/* Mesh Background Elements */}
+          <div className="absolute inset-0">
+            <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/20 rounded-full blur-[80px]"></div>
+            <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/15 rounded-full blur-[80px]"></div>
           </div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#e2e2eb] tracking-tight">Applications Tracking</h1>
-          <p className="text-[#908fa0] text-sm font-medium mt-1">Manage and track your recruitment journey in real-time.</p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button
-            onClick={() => navigate('/student/jobs')}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/20 px-6"
-          >
-            Find More Jobs <ArrowRight size={16} className="ml-2" />
-          </Button>
-        </div>
-      </div>
-
-      {/* ─── Stats Grid ─── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Applications"
-          value={stats.total}
-          icon={Briefcase}
-          colorClass="text-blue-600"
-          bgColorClass="bg-blue-50"
-        />
-        <StatCard
-          title="Active Pipeline"
-          value={stats.active}
-          icon={TrendingUp}
-          colorClass="text-indigo-600"
-          bgColorClass="bg-indigo-50"
-        />
-        <StatCard
-          title="Shortlisted"
-          value={stats.shortlisted}
-          icon={CheckCircle2}
-          colorClass="text-purple-600"
-          bgColorClass="bg-purple-50"
-        />
-        <StatCard
-          title="Offers Received"
-          value={stats.selected}
-          icon={Sparkles}
-          colorClass="text-emerald-600"
-          bgColorClass="bg-emerald-50"
-        />
-      </div>
-
-      {/* ─── Smart Status Section ─── */}
-      {latestApp && (
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl shadow-indigo-500/20 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
-          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="px-2 py-0.5 rounded bg-white/20 text-[10px] font-bold uppercase tracking-wider">Latest Update</span>
-                <span className="text-white/60 text-[10px] font-medium">• Last updated {new Date(latestApp.updatedAt).toLocaleDateString()}</span>
+          {/* Subtle Texture */}
+          <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest shadow-lg">
+                <Sparkles className="h-3 w-3 text-yellow-400" /> 
+                <span className="opacity-90">Career Management</span>
               </div>
-              <h2 className="text-xl font-bold">Your profile is currently under review for {latestApp.job?.title}</h2>
-              <p className="text-indigo-200 text-sm font-medium">Hiring team at {latestApp.job?.company?.name} is evaluating your profile for the next stage.</p>
+              <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-md">
+                {user?.firstname ? `${user.firstname}'s Applications` : "Application Tracking"}
+              </h1>
+              <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-medium">
+                {activeApps.length > 0 
+                  ? `You have ${activeApps.length} active applications in your pipeline. Stay focused on your goals!`
+                  : "Monitor your recruitment pipeline, track interview stages, and manage offers in your personalized dashboard."}
+              </p>
             </div>
-            <div className="flex flex-wrap items-center gap-4">
-              <div className="bg-white/10 backdrop-blur-md rounded-xl p-3 border border-white/20">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-white/60 mb-1 leading-none">Current Status</p>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="font-bold text-sm">{STATUS_CONFIG[latestApp.status as Status]?.label || latestApp.status}</span>
-                </div>
-              </div>
+            
+            <div className="flex flex-col gap-4">
               <Button
-                variant="secondary"
-                className="bg-white text-indigo-400 hover:bg-indigo-500/10 rounded-xl font-bold shadow-lg"
-                onClick={() => setExpandedId(latestApp.id)}
+                onClick={() => navigate('/student/jobs')}
+                size="lg"
+                className="bg-white text-slate-900 hover:bg-slate-50 font-black rounded-2xl shadow-xl px-8 h-14 transition-all hover:scale-105 active:scale-95 flex items-center gap-3"
               >
-                Track Journey
+                Find New Roles <ArrowRight size={20} className="text-indigo-600" />
               </Button>
             </div>
           </div>
         </div>
-      )}
 
-      {/* ─── Filters & Search ─── */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 py-2 border-b border-[rgba(255,255,255,0.07)]">
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-hide">
-          {["All", "Active", "Shortlisted", "Selected", "Rejected"].map((filter) => (
-            <button
-              key={filter}
-              onClick={() => setActiveFilter(filter)}
-              className={cn(
-                "px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap",
-                activeFilter === filter
-                  ? "bg-slate-900 text-white shadow-lg"
-                  : "bg-white text-[#908fa0] hover:bg-[#191b22] border border-[rgba(255,255,255,0.07)]"
-              )}
-            >
-              {filter}
-            </button>
-          ))}
-        </div>
-        <div className="relative w-full lg:w-72">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-[#908fa0]" size={16} />
-          <Input
-            placeholder="Search company or role..."
-            className="pl-10 h-10 bg-[#1e1f26] border-[rgba(255,255,255,0.06)] rounded-xl text-sm focus-visible:ring-indigo-500/100 shadow-sm"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+        {/* ─── Stats Grid ─── */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <StatCard
+            title="Total Applications"
+            value={stats.total}
+            icon={Briefcase}
+            colorClass="text-indigo-600 dark:text-indigo-400"
+            bgColorClass="bg-indigo-50 dark:bg-indigo-500/10"
+            shadowClass="shadow-indigo-500/10"
+          />
+          <StatCard
+            title="Active Pipeline"
+            value={stats.active}
+            icon={TrendingUp}
+            colorClass="text-blue-600 dark:text-blue-400"
+            bgColorClass="bg-blue-50 dark:bg-blue-500/10"
+            shadowClass="shadow-blue-500/10"
+          />
+          <StatCard
+            title="Shortlisted"
+            value={stats.shortlisted}
+            icon={CheckCircle2}
+            colorClass="text-purple-600 dark:text-purple-400"
+            bgColorClass="bg-purple-50 dark:bg-purple-500/10"
+            shadowClass="shadow-purple-500/10"
+          />
+          <StatCard
+            title="Offers Received"
+            value={stats.selected}
+            icon={Sparkles}
+            colorClass="text-emerald-600 dark:text-emerald-400"
+            bgColorClass="bg-emerald-50 dark:bg-emerald-500/10"
+            shadowClass="shadow-emerald-500/10"
           />
         </div>
-      </div>
 
-      {/* ─── Applications Results ─── */}
-      <div className="space-y-4">
-        {filteredApplications.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4">
-            {filteredApplications.map((app: any) => (
-              <ApplicationRow
-                key={app.id}
-                app={app}
-                isExpanded={expandedId === app.id}
-                onToggle={() => setExpandedId(expandedId === app.id ? null : app.id)}
-                onAction={handleApplicationAction}
-                updatingId={updatingId}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="py-20 flex flex-col items-center text-center">
-            <div className="w-20 h-20 bg-[#191b22] rounded-3xl flex items-center justify-center text-[#c7c4d7] mb-4 border border-[rgba(255,255,255,0.07)]">
-              <Search size={40} />
+        {/* ─── Smart Update Banner ─── */}
+        {latestApp && (
+          <div className="relative group overflow-hidden rounded-[2.5rem] p-8 md:p-10 border border-indigo-500/20 bg-gradient-to-br from-indigo-600 via-indigo-700 to-blue-800 text-white shadow-2xl">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+            
+            <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <span className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-md text-[10px] font-black uppercase tracking-widest border border-white/10">
+                    Latest Milestone
+                  </span>
+                  <div className="h-1 w-1 rounded-full bg-white/40" />
+                  <span className="text-white/60 text-xs font-bold">Updated {new Date(latestApp.updatedAt).toLocaleDateString()}</span>
+                </div>
+                <h2 className="text-2xl md:text-3xl font-black leading-tight max-w-2xl">
+                  {latestApp.status === 'APPLIED' 
+                    ? `Your application for ${latestApp.job?.title} is now being processed.`
+                    : `Great news! You've moved to the ${STATUS_CONFIG[latestApp.status as Status]?.label} stage for ${latestApp.job?.title}.`
+                  }
+                </h2>
+                <div className="flex items-center gap-4 text-indigo-100/80 font-medium">
+                  <div className="flex items-center gap-2">
+                    <Building2 size={16} />
+                    <span className="text-sm">{latestApp.job?.company?.name}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-4 shrink-0">
+                <div className="bg-white/10 backdrop-blur-xl rounded-2xl p-4 border border-white/20 min-w-[160px] shadow-inner">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-2 leading-none">Status</p>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse shadow-[0_0_10px_rgba(52,211,153,0.5)]" />
+                    <span className="font-black text-lg tracking-tight uppercase">{STATUS_CONFIG[latestApp.status as Status]?.label || latestApp.status}</span>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => setExpandedId(latestApp.id)}
+                  className="bg-white text-indigo-600 hover:bg-indigo-50 rounded-2xl font-black shadow-2xl px-8 h-16 transition-all hover:scale-105 active:scale-95"
+                >
+                  View Details
+                </Button>
+              </div>
             </div>
-            <h3 className="text-lg font-bold text-[#e2e2eb]">No applications found</h3>
-            <p className="text-[#908fa0] text-sm max-w-xs mt-1">We couldn't find any applications matching your current filters or search term.</p>
-            <Button
-              variant="link"
-              className="text-indigo-400 font-bold mt-4"
-              onClick={() => { setSearchQuery(""); setActiveFilter("All"); }}
-            >
-              Reset all filters
-            </Button>
           </div>
         )}
-      </div>
 
-      {/* ─── Footer completion tip ─── */}
-      <div className="bg-amber-500/10 border border-amber-500/20 p-4 rounded-2xl flex items-start sm:items-center gap-4">
-        <div className="w-10 h-10 rounded-xl bg-amber-500/15 flex items-center justify-center text-amber-400 shrink-0">
-          <Sparkles size={20} />
+        {/* ─── Filters & Controls ─── */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-4 border-b border-slate-100 dark:border-white/[0.05]">
+          <div className="flex items-center gap-3 overflow-x-auto pb-4 lg:pb-0 no-scrollbar">
+            <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 p-1.5 rounded-2xl border border-slate-200 dark:border-white/[0.05]">
+              {["All", "Active", "Shortlisted", "Selected", "Rejected"].map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setActiveFilter(filter)}
+                  className={cn(
+                    "px-6 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all",
+                    activeFilter === filter
+                      ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-md border border-slate-200 dark:border-white/10"
+                      : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                  )}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-4 w-full lg:w-auto">
+            <div className="relative flex-1 lg:w-80">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <Input
+                placeholder="Search company or role..."
+                className="pl-12 h-14 bg-white dark:bg-[#1e1f26] border-slate-200 dark:border-white/[0.05] rounded-[1.25rem] text-sm font-medium focus-visible:ring-indigo-500/50 shadow-sm transition-all"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Button variant="outline" size="icon" className="h-14 w-14 rounded-2xl border-slate-200 dark:border-white/[0.05] bg-white dark:bg-[#1e1f26]">
+              <Filter size={20} className="text-slate-500" />
+            </Button>
+          </div>
         </div>
-        <div className="flex-1">
-          <h4 className="text-sm font-bold text-amber-300">Career Pro-Tip</h4>
-          <p className="text-xs text-amber-400/80">Candidates with completed project portfolios and verified skills are 4.5x more likely to clear technical rounds.</p>
+
+        {/* ─── Applications List ─── */}
+        <div className="space-y-5">
+          {filteredApplications.length > 0 ? (
+            <div className="grid grid-cols-1 gap-5">
+              {filteredApplications.map((app: any) => (
+                <ApplicationRow
+                  key={app.id}
+                  app={app}
+                  isExpanded={expandedId === app.id}
+                  onToggle={() => setExpandedId(expandedId === app.id ? null : app.id)}
+                  onAction={handleApplicationAction}
+                  updatingId={updatingId}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="py-24 flex flex-col items-center text-center bg-white dark:bg-[#1e1f26]/30 rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10">
+              <div className="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-[2rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6">
+                <Search size={48} strokeWidth={1.5} />
+              </div>
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white">No applications match your search</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs mt-2 font-medium">Try adjusting your filters or search terms to find what you're looking for.</p>
+              <Button
+                variant="link"
+                className="text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-widest text-[11px] mt-6"
+                onClick={() => { setSearchQuery(""); setActiveFilter("All"); }}
+              >
+                Clear all filters
+              </Button>
+            </div>
+          )}
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          className="bg-[#1e1f26] border-amber-200 text-amber-700 hover:bg-amber-50 rounded-xl font-bold hidden sm:flex"
-          onClick={() => navigate('/student/profile')}
-        >
-          Update Portfolio
-        </Button>
+
+        {/* ─── Footer completion tip ─── */}
+        <div className="group relative overflow-hidden rounded-[2.5rem] bg-indigo-50 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/10 p-8 flex flex-col sm:flex-row items-center gap-8">
+          <div className="w-16 h-16 rounded-3xl bg-indigo-100 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 shadow-inner">
+            <Sparkles size={32} />
+          </div>
+          <div className="flex-1 text-center sm:text-left">
+            <h4 className="text-lg font-black text-indigo-900 dark:text-indigo-300 uppercase tracking-wider mb-2">Career Accelerator</h4>
+            <p className="text-base text-indigo-800/60 dark:text-indigo-100/60 leading-relaxed font-medium">
+              Did you know? Candidates with verified certifications and a complete portfolio are <span className="text-indigo-600 dark:text-indigo-400 font-bold italic">4.5x more likely</span> to clear technical screening rounds.
+            </p>
+          </div>
+          <Button
+            onClick={() => navigate('/student/profile')}
+            className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl px-8 h-14 font-black shadow-xl shadow-indigo-500/20 transition-all hover:scale-105 active:scale-95 shrink-0"
+          >
+            Enhance Profile <ArrowUpRight size={20} className="ml-2" />
+          </Button>
+        </div>
       </div>
     </div>
   );

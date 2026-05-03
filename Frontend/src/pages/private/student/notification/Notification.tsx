@@ -1,4 +1,4 @@
-﻿import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   ArrowUpRight,
   Bell,
@@ -9,6 +9,7 @@ import {
   Sparkles,
   Trash2,
   X,
+  CheckCircle2,
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch } from '@/redux/store/store';
@@ -24,6 +25,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import Loader from '@/components/Loader';
 
 type NotificationFilter = 'all' | 'unread' | 'read';
 type NotificationItem = {
@@ -37,6 +39,7 @@ type NotificationItem = {
 
 const Notification = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.auth);
   const [activeFilter, setActiveFilter] = useState<NotificationFilter>('all');
   const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
 
@@ -110,18 +113,8 @@ const Notification = () => {
       case 'APPLICATION_REJECTED':
       case 'OFFER_REJECTED':
         return { label: 'Update', icon: Info, color: 'text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20' };
-      default: return { label: 'System', icon: Bell, color: 'text-[#c7c4d7]', bg: 'bg-[#191b22]', border: 'border-[rgba(255,255,255,0.06)]' };
+      default: return { label: 'System', icon: Bell, color: 'text-slate-400', bg: 'bg-slate-500/10', border: 'border-slate-500/20' };
     }
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1, transition: { duration: 0.28 } },
   };
 
   const unreadCount = useMemo(() => notifications.filter(n => !n.read).length, [notifications]);
@@ -139,98 +132,90 @@ const Notification = () => {
     { key: 'read', label: 'Read', count: readCount },
   ];
 
-  const renderSkeleton = () => (
-    <div className="space-y-4">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <div
-          key={index}
-          className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#1e1f26] p-5 animate-pulse"
-        >
-          <div className="flex gap-4"><div className="h-11 w-11 rounded-xl bg-[rgba(255,255,255,0.06)]" />
-            <div className="flex-1 space-y-3"><div className="h-4 w-1/3 rounded bg-[rgba(255,255,255,0.06)]" />
-              <div className="h-3 w-3/4 rounded bg-[rgba(255,255,255,0.06)]" />
-              <div className="h-3 w-1/2 rounded bg-[rgba(255,255,255,0.06)]" />
+  if (loading && notifications.length === 0) {
+    return <Loader text="Syncing your updates..." fullScreen />;
+  }
+
+  return (
+    <div className="flex-1 flex flex-col bg-background dark:bg-[#111319] min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
+      <div className="max-w-5xl mx-auto w-full p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        
+        {/* ─── Hero Header ─── */}
+        <div className="group relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-8 md:p-12 text-white shadow-2xl border border-white/5">
+          <div className="absolute inset-0">
+            <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/20 rounded-full blur-[80px]"></div>
+            <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/15 rounded-full blur-[80px]"></div>
+          </div>
+          <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest shadow-lg">
+                <Bell className="h-3 w-3 text-indigo-400" /> 
+                <span className="opacity-90">Notification Hub</span>
+              </div>
+              <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-md">
+                {user?.firstname ? `Hey ${user.firstname}, stay updated` : "Your Updates"}
+              </h1>
+              <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-medium">
+                {unreadCount > 0 
+                  ? `You have ${unreadCount} new alerts that require your attention. Stay on top of your journey!`
+                  : "Track all your recruitment milestones, interview calls, and placement activities in real-time."}
+              </p>
+            </div>
+            
+            <div className="hidden lg:block">
+              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-xl border border-white/10 shadow-inner">
+                <div className="relative">
+                  <Bell className={cn("h-16 w-16 text-white/30", unreadCount > 0 && "animate-[bell-swing_2s_infinite]")} />
+                  {unreadCount > 0 && (
+                    <div className="absolute top-0 right-0 w-6 h-6 bg-indigo-500 rounded-full flex items-center justify-center text-[10px] font-black text-white shadow-lg border-2 border-white/10">
+                      {unreadCount}
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      ))}
-    </div>
-  );
 
-  return (
-    <div className="min-h-screen bg-[#111319] p-4 sm:p-6 lg:p-10">
-      <motion.main
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-        className="mx-auto max-w-5xl space-y-6"
-      >
-        <div className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#1e1f26] p-5 sm:p-6">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <div className="flex items-center gap-3">
-                <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight">Notifications</h1>
-                <Badge className="rounded-full bg-indigo-500/15 px-3 py-1 text-xs font-semibold text-indigo-300 hover:bg-blue-100">
-                  {unreadCount} unread
-                </Badge>
-              </div>
-              <p className="mt-2 text-sm text-[#908fa0]">
-                Stay updated with placements, interviews, and application status.
-              </p>
-            </div>
-
-            <Button
-              variant="outline"
-              onClick={handleMarkAllRead}
-              disabled={unreadCount === 0 || loading}
-              className="h-10 rounded-xl border-[rgba(255,255,255,0.1)] bg-[#191b22] text-[#c7c4d7] px-4 text-sm font-medium hover:bg-[rgba(255,255,255,0.05)]"
-            >
-              Mark all as read
-            </Button>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
+        {/* ─── Controls & Filters ─── */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 pb-2 border-b border-slate-100 dark:border-white/[0.05]">
+          <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/[0.05]">
             {filterTabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveFilter(tab.key)}
                 className={cn(
-                  'inline-flex items-center gap-2 rounded-xl border px-3 py-1.5 text-sm transition-all',
+                  "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2",
                   activeFilter === tab.key
-                    ? 'border-indigo-500/30 bg-indigo-500/10 text-indigo-300 shadow-sm'
-                    : 'border-[rgba(255,255,255,0.07)] bg-[#191b22] text-[#908fa0] hover:bg-[rgba(255,255,255,0.05)] hover:text-[#e2e2eb]'
+                    ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-md border border-slate-200 dark:border-white/10"
+                    : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
                 )}
               >
                 {tab.label}
-                <span className="rounded-full bg-[rgba(255,255,255,0.06)] px-2 py-0.5 text-xs text-[#908fa0]">
-                  {tab.count}
-                </span>
+                <span className={cn(
+                  "px-2 py-0.5 rounded-lg text-[9px] font-black transition-colors",
+                  activeFilter === tab.key ? "bg-indigo-500/10" : "bg-slate-200 dark:bg-white/5"
+                )}>{tab.count}</span>
               </button>
             ))}
           </div>
+
+          <Button
+            variant="outline"
+            onClick={handleMarkAllRead}
+            disabled={unreadCount === 0 || loading}
+            className="rounded-2xl border-2 border-slate-200 dark:border-white/10 bg-white dark:bg-[#1e1f26] font-black text-[10px] uppercase tracking-widest px-6 h-12 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-500/20 transition-all"
+          >
+            Mark all as read <CheckCircle2 className="ml-2 w-4 h-4" />
+          </Button>
         </div>
 
-        {loading && notifications.length === 0 ? (
-          renderSkeleton()
-        ) : filteredNotifications.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#1e1f26] p-12 text-center"
-          >
-            <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-500/10">
-              <Bell className="h-8 w-8 text-blue-500" />
-            </div>
-            <h3 className="text-xl font-semibold text-[#e2e2eb]">No notifications found</h3>
-            <p className="mx-auto mt-2 max-w-md text-sm text-[#908fa0]">
-              {activeFilter === 'all'
-                ? "You're all caught up. New notifications will appear here."
-                : `No ${activeFilter} notifications right now.`}
-            </p>
-          </motion.div>
-        ) : (
-          <AnimatePresence mode="popLayout">
-            <div className="space-y-4">
+        {/* ─── Notifications List ─── */}
+        <AnimatePresence mode="popLayout">
+          {filteredNotifications.length > 0 ? (
+            <motion.div layout className="space-y-4">
               {filteredNotifications.map((notification) => {
                 const config = getTagConfig(String(notification.type));
                 const TagIcon = config.icon;
@@ -239,99 +224,96 @@ const Notification = () => {
                   <motion.div
                     layout
                     key={notification.id}
-                    variants={itemVariants}
-                    initial="hidden"
-                    animate="visible"
-                    exit={{ opacity: 0, y: 8 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
                     onClick={() => !notification.read && handleMarkAsRead(notification.id)}
                     className={cn(
-                      'group cursor-pointer rounded-2xl border p-4 sm:p-5 transition-all duration-200',
+                      "group relative cursor-pointer rounded-[2rem] border p-6 transition-all duration-300 overflow-hidden",
                       !notification.read
-                        ? 'border-indigo-500/30 bg-indigo-500/[0.07]'
-                        : 'border-[rgba(255,255,255,0.06)] bg-[#1e1f26] hover:border-[rgba(255,255,255,0.10)]'
+                        ? "bg-indigo-500/5 border-indigo-500/30 shadow-lg shadow-indigo-500/5"
+                        : "bg-white dark:bg-[#1e1f26] border-slate-200 dark:border-white/[0.05] hover:border-indigo-500/20 hover:shadow-xl"
                     )}
                   >
-                    <div className="flex items-start gap-4">
+                    <div className="flex items-start gap-6">
                       <div className={cn(
-                        'mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border',
+                        "mt-1 flex h-14 w-14 shrink-0 items-center justify-center rounded-[1.25rem] border shadow-sm transition-transform group-hover:scale-110",
                         !notification.read
                           ? cn(config.bg, config.color, config.border)
-                          : 'bg-[rgba(255,255,255,0.06)] text-[#908fa0] border-[rgba(255,255,255,0.08)]'
+                          : "bg-slate-100 dark:bg-white/5 text-slate-400 border-slate-200 dark:border-white/10"
                       )}>
-                        <TagIcon size={18} />
+                        <TagIcon size={24} strokeWidth={2.5} />
                       </div>
 
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                          <div className="min-w-0 space-y-2">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <Badge variant="outline" className={cn('rounded-full text-[10px]', config.bg, config.color, config.border)}>
+                      <div className="min-w-0 flex-1 space-y-3">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-3">
+                              <span className={cn(
+                                "px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border",
+                                config.bg, config.color, config.border
+                              )}>
                                 {config.label}
-                              </Badge>
+                              </span>
                               {!notification.read && (
-                                <>
-                                  <span className="h-2 w-2 rounded-full bg-indigo-500/100" />
-                                  <Badge className="rounded-full bg-indigo-600 px-2 py-0.5 text-[10px] text-white hover:bg-blue-600">
-                                    NEW
-                                  </Badge>
-                                </>
+                                <div className="flex items-center gap-1.5">
+                                  <div className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
+                                  <span className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">New</span>
+                                </div>
                               )}
                             </div>
-
-                            <h3 className={cn('truncate text-base', notification.read ? 'font-semibold text-[#c7c4d7]' : 'font-semibold text-[#e2e2eb]')}>
-                              {String(notification.title)}
+                            <h3 className={cn(
+                              "text-lg font-black tracking-tight transition-colors",
+                              notification.read ? "text-slate-600 dark:text-slate-400" : "text-slate-900 dark:text-white"
+                            )}>
+                              {notification.title}
                             </h3>
-                            <p className={cn('text-sm leading-relaxed', notification.read ? 'text-[#908fa0]' : 'text-[#c7c4d7]')}>
-                              {String(notification.message)}
-                            </p>
                           </div>
-
-                          <div className="flex items-center gap-1 rounded-full bg-[rgba(255,255,255,0.06)] px-2.5 py-1 text-xs text-[#908fa0]">
-                            <Clock size={12} />
-                            {formatTime(String(notification.createdAt))}
+                          
+                          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-white/5 text-[10px] font-black text-slate-500 uppercase tracking-widest shrink-0 h-fit">
+                            <Clock size={12} className="text-indigo-500" />
+                            {formatTime(notification.createdAt)}
                           </div>
                         </div>
 
-                        <div className="mt-4 flex flex-wrap items-center gap-4">
-                          {!notification.read ? (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleMarkAsRead(notification.id);
-                              }}
-                              className="text-sm font-medium text-indigo-400 hover:text-blue-700"
-                            >
-                              Mark as read
-                            </button>
-                          ) : (
-                            <Badge className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 text-[11px] font-medium text-emerald-400 hover:bg-emerald-500/10">
-                              Read
-                            </Badge>
-                          )}
+                        <p className={cn(
+                          "text-sm leading-relaxed font-medium",
+                          notification.read ? "text-slate-500 dark:text-slate-500" : "text-slate-700 dark:text-slate-300"
+                        )}>
+                          {notification.message}
+                        </p>
 
+                        <div className="pt-2 flex flex-wrap items-center gap-6">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleViewDetails(notification);
                             }}
-                            className={cn(
-                              'inline-flex items-center gap-1 text-sm font-medium transition-colors',
-                              notification.read ? 'text-[#c7c4d7] hover:text-[#e2e2eb]' : 'text-[#c7c4d7] hover:text-[#e2e2eb]'
-                            )}
+                            className="flex items-center gap-1.5 text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:translate-x-1 transition-transform"
                           >
-                            View details
-                            <ArrowUpRight size={14} />
+                            Details <ArrowUpRight size={14} />
                           </button>
+                          
+                          {!notification.read && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleMarkAsRead(notification.id);
+                              }}
+                              className="text-[11px] font-black text-slate-500 hover:text-indigo-600 uppercase tracking-widest transition-colors"
+                            >
+                              Mark as read
+                            </button>
+                          )}
 
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleDelete(notification.id);
                             }}
-                            className="inline-flex items-center gap-1 text-sm font-medium text-rose-500 hover:text-rose-600"
+                            className="flex items-center gap-1.5 text-[11px] font-black text-rose-500 hover:text-rose-700 uppercase tracking-widest transition-colors opacity-0 group-hover:opacity-100"
                           >
-                            <Trash2 size={14} />
-                            Remove
+                            <Trash2 size={14} /> Remove
                           </button>
                         </div>
                       </div>
@@ -339,66 +321,91 @@ const Notification = () => {
                   </motion.div>
                 );
               })}
-            </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="py-32 flex flex-col items-center text-center bg-white dark:bg-[#1e1f26]/30 rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10"
+            >
+              <div className="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-[2.5rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 border-2 border-slate-200 dark:border-white/5">
+                <Bell size={48} strokeWidth={1.5} />
+              </div>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">All caught up!</h3>
+              <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs mt-2 font-medium">
+                {activeFilter === 'all'
+                  ? "You don't have any notifications at the moment. Check back later for updates."
+                  : `No ${activeFilter} notifications found in your history.`}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-            {pagination.totalPages > pagination.page && (
-              <motion.div variants={itemVariants} className="pt-2">
-                <Button
-                  onClick={() => dispatch(fetchNotifications({ page: pagination.page + 1, limit: pagination.limit }))}
-                  className="h-11 w-full rounded-xl border border-[rgba(255,255,255,0.08)] bg-[#191b22] text-sm font-medium text-[#c7c4d7] hover:bg-[rgba(255,255,255,0.05)]"
-                  disabled={loading}
-                >
-                  {loading ? 'Loading...' : 'Load older notifications'}
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+        {pagination.totalPages > pagination.page && (
+          <div className="pt-4 flex justify-center">
+            <Button
+              onClick={() => dispatch(fetchNotifications({ page: pagination.page + 1, limit: pagination.limit }))}
+              disabled={loading}
+              className="rounded-2xl border-2 border-slate-200 dark:border-white/10 bg-white dark:bg-[#1e1f26] text-slate-900 dark:text-white font-black text-xs uppercase tracking-widest px-10 h-14 hover:bg-indigo-600 hover:text-white transition-all shadow-lg active:scale-95"
+            >
+              {loading ? <Loader size="sm" /> : 'Load older notifications'}
+            </Button>
+          </div>
         )}
-      </motion.main>
+      </div>
 
+      {/* Details Modal */}
       <AnimatePresence>
         {selectedNotification && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4"
-            onClick={() => setSelectedNotification(null)}
-          >
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
             <motion.div
-              initial={{ y: 16, opacity: 0, scale: 0.98 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedNotification(null)}
+              className="absolute inset-0 bg-slate-950/60 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ y: 20, opacity: 0, scale: 0.95 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
-              exit={{ y: 16, opacity: 0, scale: 0.98 }}
-              className="w-full max-w-lg rounded-2xl border border-[rgba(255,255,255,0.08)] bg-[#1e1f26] p-6 shadow-2xl"
-              onClick={(e) => e.stopPropagation()}
+              exit={{ y: 20, opacity: 0, scale: 0.95 }}
+              className="relative w-full max-w-lg rounded-[2.5rem] bg-white dark:bg-[#1e1f26] p-10 shadow-2xl border border-slate-200 dark:border-white/10"
             >
-              <div className="mb-4 flex items-start justify-between gap-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-[#e2e2eb]">{selectedNotification.title}</h3>
-                  <p className="mt-1 text-xs text-[#908fa0]">{formatTime(selectedNotification.createdAt)}</p>
+              <div className="mb-8 flex items-start justify-between gap-6">
+                <div className="space-y-2">
+                  <div className={cn(
+                    "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border w-fit",
+                    getTagConfig(selectedNotification.type).bg,
+                    getTagConfig(selectedNotification.type).color,
+                    getTagConfig(selectedNotification.type).border
+                  )}>
+                    {getTagConfig(selectedNotification.type).label}
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{selectedNotification.title}</h3>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{formatTime(selectedNotification.createdAt)}</p>
                 </div>
                 <button
                   onClick={() => setSelectedNotification(null)}
-                  className="rounded-lg p-1.5 text-[#908fa0] hover:bg-[rgba(255,255,255,0.06)] hover:text-[#e2e2eb]"
+                  className="rounded-2xl p-3 bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-rose-500 transition-colors shadow-inner"
                 >
-                  <X size={16} />
+                  <X size={20} />
                 </button>
               </div>
 
-              <div className="rounded-xl bg-[#191b22] p-4 text-sm leading-relaxed text-[#c7c4d7]">
+              <div className="rounded-[1.5rem] bg-slate-50 dark:bg-white/[0.03] p-8 text-base leading-relaxed text-slate-700 dark:text-slate-200 font-medium border border-slate-100 dark:border-white/5 shadow-inner">
                 {selectedNotification.message}
               </div>
 
-              <div className="mt-5 flex justify-end">
+              <div className="mt-8">
                 <Button
                   onClick={() => setSelectedNotification(null)}
-                  className="h-9 rounded-lg bg-indigo-600 px-4 text-sm text-white hover:bg-blue-700"
+                  className="w-full h-14 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white font-black text-sm uppercase tracking-widest shadow-xl shadow-indigo-500/20"
                 >
-                  Close
+                  Got it
                 </Button>
               </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
     </div>

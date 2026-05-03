@@ -1,4 +1,4 @@
-﻿import { 
+import { 
   CheckCircle2, 
   XCircle,
   Info,
@@ -6,7 +6,10 @@
   Search,
   User,
   ArrowUpRight,
-  Globe
+  Sparkles,
+  Building2,
+  Trophy,
+  Filter,
 } from 'lucide-react';
 import Loader from '@/components/Loader';
 import { useEffect, useMemo, useState } from 'react';
@@ -15,11 +18,17 @@ import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import { fetchJobApplications, fetchJobs, fetchStudentProfile } from '@/redux/thunks/studentThunk';
 import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
 
 const Eligibility = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const { user } = useSelector((state: RootState) => state.auth);
   const { jobs = [], applications = [], profile, loading } = useSelector((state: RootState) => state.student);
+  
   const [activeFilter, setActiveFilter] = useState<'all' | 'eligible' | 'applied'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -31,20 +40,11 @@ const Eligibility = () => {
     }
   }, [dispatch, profile]);
 
-  // Brand color map for company initials
-  const companyColors: Record<string, { bg: string; text: string }> = {
-    'Google': { bg: 'bg-indigo-600', text: 'text-white' },
-    'Microsoft': { bg: 'bg-emerald-600', text: 'text-white' },
-    'Amazon': { bg: 'bg-orange-500', text: 'text-white' },
-    'Goldman Sachs': { bg: 'bg-blue-900', text: 'text-white' },
-    'Apple': { bg: 'bg-slate-800', text: 'text-white' },
-  };
-
   const studentCgpa = Number(profile?.cgpa || 0);
   const studentBranch = String(profile?.department?.name || profile?.branch || 'N/A');
   const studentBacklogs = Number(profile?.activeBacklogs || 0);
 
-  const normalizedApplications = useMemo(
+  const appliedJobIds = useMemo(
     () => new Set(applications.map((app: any) => Number(app?.jobId || app?.job?.id)).filter(Boolean)),
     [applications]
   );
@@ -58,21 +58,23 @@ const Eligibility = () => {
           [];
         const minCGPA = Number(job?.minCgpa || 0);
         const maxActiveBacklogs = Number(job?.maxActiveBacklogs ?? Number.MAX_SAFE_INTEGER);
+        
         const branchEligible =
           jobBranches.length === 0 ||
           jobBranches.some((b: string) => b.toLowerCase() === studentBranch.toLowerCase());
         const cgpaEligible = !minCGPA || studentCgpa >= minCGPA;
         const backlogEligible = studentBacklogs <= maxActiveBacklogs;
+        
         const active = branchEligible && cgpaEligible && backlogEligible;
 
         let reason = "";
         if (!active) {
           if (!cgpaEligible) {
-            reason = `CGPA required: ${minCGPA}`;
+            reason = `Min ${minCGPA} CGPA required`;
           } else if (!branchEligible) {
-            reason = "Branch criteria not matched";
+            reason = "Branch not eligible";
           } else if (!backlogEligible) {
-            reason = `Backlogs allowed: ${maxActiveBacklogs}`;
+            reason = `Max ${maxActiveBacklogs} backlogs allowed`;
           }
         }
 
@@ -83,12 +85,11 @@ const Eligibility = () => {
           minCGPA,
           branches: jobBranches,
           active,
-          status: active ? "Eligible" : "Ineligible",
           reason,
-          applied: normalizedApplications.has(Number(job.id)),
+          applied: appliedJobIds.has(Number(job.id)),
         };
       }),
-    [jobs, normalizedApplications, studentBacklogs, studentBranch, studentCgpa]
+    [jobs, appliedJobIds, studentBacklogs, studentBranch, studentCgpa]
   );
 
   const filteredCompanies = companies.filter((company) => {
@@ -99,215 +100,264 @@ const Eligibility = () => {
     return matchesSearch;
   });
 
-  const filterTabs = [
-    { key: 'all' as const, label: 'All', count: companies.length },
-    { key: 'eligible' as const, label: 'Eligible', count: companies.filter((c) => c.active).length },
-    { key: 'applied' as const, label: 'Applied', count: companies.filter((c) => c.applied).length },
-  ];
+  const stats = {
+    total: companies.length,
+    eligible: companies.filter((c) => c.active).length,
+    applied: companies.filter((c) => c.applied).length,
+    ineligible: companies.filter((c) => !c.active).length
+  };
 
-  const eligibilitySummary = [
-    {
-      label: 'Eligible Opportunities',
-      value: String(filterTabs[1].count).padStart(2, "0"),
-      icon: CheckCircle2,
-      color: 'text-emerald-600',
-      bg: 'bg-emerald-50'
-    },
-    {
-      label: 'Ineligible Roles',
-      value: String(Math.max(0, companies.length - filterTabs[1].count)).padStart(2, "0"),
-      icon: XCircle,
-      color: 'text-[#908fa0]',
-      bg: 'bg-[#191b22]'
-    },
-  ];
+  if (loading && jobs.length === 0) {
+    return <Loader text="Analyzing eligibility landscape..." fullScreen />;
+  }
 
   return (
-    <div className="min-h-screen bg-[#111319] p-6 lg:p-10 font-sans text-[#e2e2eb]">
-      <div className="max-w-6xl mx-auto">
+    <div className="flex-1 flex flex-col bg-background dark:bg-[#111319] min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
+      <div className="max-w-7xl mx-auto w-full p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+        
+        {/* ─── Hero Header ─── */}
+        <div className="group relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-8 md:p-12 text-white shadow-2xl border border-white/5">
+          <div className="absolute inset-0">
+            <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/20 rounded-full blur-[80px]"></div>
+            <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/15 rounded-full blur-[80px]"></div>
+          </div>
+          <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest shadow-lg">
+                <Trophy className="h-3 w-3 text-yellow-400" /> 
+                <span className="opacity-90">Eligibility Analyzer</span>
+              </div>
+              <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-md">
+                {user?.firstname ? `${user.firstname}'s Potential` : "Placement Eligibility"}
+              </h1>
+              <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-medium">
+                {stats.eligible > 0 
+                  ? `You are eligible for ${stats.eligible} out of ${stats.total} live opportunities. Let's make them count!`
+                  : "Track your academic standing and see which career paths are currently open for your profile."}
+              </p>
+            </div>
+            
+            <div className="hidden lg:block">
+              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-xl border border-white/10 shadow-inner">
+                <CheckCircle2 className="h-16 w-16 text-white/30" />
+              </div>
+            </div>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           
-          {/* Sidebar / Profile Info */}
-          <div className="lg:col-span-4 space-y-4">
-            <div className="bg-[#1e1f26] rounded-2xl p-6 border border-[rgba(255,255,255,0.07)]">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-2 bg-indigo-500/10 rounded-xl">
-                  <User className="w-5 h-5 text-blue-600" />
-                </div>
-                <h2 className="font-bold text-[#e2e2eb]">Academic Profile</h2>
-              </div>
+          {/* ─── Profile & Stats Sidebar ─── */}
+          <div className="lg:col-span-4 space-y-6">
+            {/* Academic Card */}
+            <div className="bg-white dark:bg-[#1e1f26] rounded-[2rem] p-8 border border-slate-200 dark:border-white/[0.05] shadow-sm overflow-hidden relative group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 transition-all group-hover:bg-indigo-500/10" />
               
-              <div className="space-y-4">
-                <div className="p-4 bg-[#191b22] rounded-2xl border border-[rgba(255,255,255,0.07)]">
-                  <p className="text-[11px] font-bold text-[#908fa0] uppercase mb-2">Current Standing</p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-black text-[#e2e2eb]">{studentCgpa || 0}</span>
-                    <span className="text-[#908fa0] font-medium text-sm">/ 10.0 CGPA</span>
+              <div className="relative z-10 space-y-6">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-indigo-500/10 rounded-xl">
+                    <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                   </div>
+                  <h3 className="font-black text-slate-900 dark:text-white uppercase tracking-widest text-xs">Profile Snapshot</h3>
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-[#191b22] rounded-2xl border border-[rgba(255,255,255,0.07)]">
-                    <p className="text-[11px] font-bold text-[#908fa0] uppercase mb-1">Branch</p>
-                    <p className="font-bold text-[#e2e2eb]">{studentBranch}</p>
+                <div className="space-y-4">
+                  <div className="p-5 bg-slate-50 dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/5">
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Current Academic CGPA</p>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-3xl font-black text-slate-900 dark:text-white">{studentCgpa || 0}</span>
+                      <span className="text-slate-500 font-bold text-sm">/ 10.0</span>
+                    </div>
                   </div>
-                  <div className="p-4 bg-[#191b22] rounded-2xl border border-[rgba(255,255,255,0.07)]">
-                    <p className="text-[11px] font-bold text-[#908fa0] uppercase mb-1">Backlogs</p>
-                    <p className={`font-bold ${studentBacklogs > 0 ? "text-amber-600" : "text-emerald-600"}`}>
-                      {studentBacklogs}
-                    </p>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-5 bg-slate-50 dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/5">
+                      <p className="text-[10px] font-black text-slate-500 uppercase mb-1">Branch</p>
+                      <p className="font-black text-slate-900 dark:text-slate-200 truncate">{studentBranch}</p>
+                    </div>
+                    <div className="p-5 bg-slate-50 dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/5">
+                      <p className="text-[10px] font-black text-slate-500 uppercase mb-1">Backlogs</p>
+                      <p className={cn("font-black", studentBacklogs > 0 ? "text-rose-600" : "text-emerald-600")}>
+                        {studentBacklogs} Active
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="mt-6 pt-6 border-t border-[rgba(255,255,255,0.07)]">
-                <div className="flex items-start gap-3 p-3 bg-indigo-500/10/50 rounded-2xl border border-blue-100">
-                  <Info className="w-4 h-4 text-indigo-400 mt-0.5" />
-                  <p className="text-xs text-indigo-300 leading-relaxed">
-                    Eligibility is calculated automatically based on your latest verified university records.
+                <div className="pt-4 flex items-start gap-3">
+                  <Info className="w-4 h-4 text-indigo-500 mt-1 shrink-0" />
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium italic">
+                    Criteria is matched against verified academic records.
                   </p>
                 </div>
               </div>
             </div>
 
-            {loading && companies.length === 0 && (
-              <Loader text="Analyzing eligibility..." />
-            )}
-
-            {/* Quick Stats */}
-            <div className="space-y-3">
-              {eligibilitySummary.map((stat) => (
-                <div key={stat.label} className="bg-[#1e1f26] p-4 rounded-2xl border border-[rgba(255,255,255,0.08)] shadow-sm flex items-center gap-4">
-                  <div className={`${stat.bg} ${stat.color} p-3 rounded-xl`}>
-                    <stat.icon className="w-5 h-5" />
+            {/* Quick Summary Stats */}
+            <div className="grid grid-cols-1 gap-4">
+              {[
+                { label: 'Eligible', value: stats.eligible, color: 'text-emerald-500', bg: 'bg-emerald-500/10', icon: CheckCircle2 },
+                { label: 'Applied', value: stats.applied, color: 'text-indigo-500', bg: 'bg-indigo-500/10', icon: TrendingUp },
+                { label: 'Not Eligible', value: stats.ineligible, color: 'text-slate-400', bg: 'bg-slate-500/10', icon: XCircle },
+              ].map((stat) => (
+                <div key={stat.label} className="bg-white dark:bg-[#1e1f26] p-5 rounded-2xl border border-slate-200 dark:border-white/[0.05] flex items-center gap-4 transition-all hover:shadow-md">
+                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0", stat.bg, stat.color)}>
+                    <stat.icon className="w-6 h-6" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold text-[#e2e2eb]">{stat.value}</p>
-                    <p className="text-xs font-medium text-[#908fa0]">{stat.label}</p>
+                    <p className="text-2xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">{stat.value.toString().padStart(2, '0')}</p>
+                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{stat.label}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Main Content / Company List */}
-          <div className="lg:col-span-8">
-            <div className="bg-[#1e1f26] rounded-2xl border border-[rgba(255,255,255,0.07)] overflow-hidden">
-              <div className="p-6 border-b border-[rgba(255,255,255,0.07)]">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                  <h3 className="font-bold text-[#e2e2eb] text-lg">Company Opportunities</h3>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
-                    <input 
-                      type="text" 
-                      placeholder="Search company..." 
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-9 pr-4 py-2 bg-[#0c0e14] border border-[rgba(255,255,255,0.08)] rounded-xl text-sm outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-blue-500 w-full sm:w-64 transition-all"
-                    />
-                  </div>
-                </div>
-
-                {/* Filter Tabs */}
-                <div className="flex items-center gap-2">
-                  {filterTabs.map((tab) => (
-                    <button
-                      key={tab.key}
-                      onClick={() => setActiveFilter(tab.key)}
-                      className={`px-4 py-1.5 text-xs font-bold rounded-full border transition-all ${
-                        activeFilter === tab.key
-                          ? 'bg-indigo-500/10 border-indigo-500/30 text-indigo-300 shadow-sm'
-                          : 'bg-[#1e1f26] border-[rgba(255,255,255,0.08)] text-[#908fa0] hover:border-[rgba(255,255,255,0.10)] hover:text-[#c7c4d7]'
-                      }`}
-                    >
-                      {tab.label}
-                      <span className={`ml-1.5 text-[10px] ${activeFilter === tab.key ? 'text-indigo-400' : 'text-[#908fa0]'}`}>
-                        {tab.count}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="divide-y divide-[rgba(255,255,255,0.05)]">
-                {filteredCompanies.map((company, index) => {
-                  const colors = companyColors[company.name] || { bg: 'bg-slate-600', text: 'text-white' };
-                  return (
-                    <div 
-                      key={index} 
-                      className={`p-6 transition-all group ${
-                        !company.active 
-                          ? 'opacity-50 bg-[rgba(255,255,255,0.02)]' 
-                          : 'hover:bg-[rgba(255,255,255,0.02)]'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-bold text-lg shadow-sm ${colors.bg} ${colors.text}`}>
-                            {company.name[0]}
-                          </div>
-                          <div>
-                            <div className="flex items-center gap-2 mb-1">
-                              <h4 className={`font-bold ${company.active ? 'text-[#e2e2eb]' : 'text-[#908fa0]'}`}>{company.name}</h4>
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-[rgba(255,255,255,0.06)] text-[#908fa0] tracking-tight">
-                                {company.role}
-                              </span>
-                              {company.applied && (
-                                <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/10 text-indigo-400 tracking-tight">
-                                  Applied
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-3 text-xs font-medium text-[#908fa0]">
-                              <span className="flex items-center gap-1">
-                                <TrendingUp className="w-3 h-3" /> Min {company.minCGPA}
-                              </span>
-                              <span className="w-1 h-1 bg-slate-300 rounded-full"></span>
-                              <span className="flex items-center gap-1">
-                                <Globe className="w-3 h-3" /> {company.branches.join(', ')}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex flex-col items-end gap-3">
-                          {company.active ? (
-                            <div className="flex items-center gap-2 bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-[11px] font-bold border border-emerald-100">
-                              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                              Eligible
-                            </div>
-                          ) : (
-                            <div className="bg-[rgba(255,255,255,0.06)] text-[#908fa0] px-3 py-1 rounded-full text-[11px] font-bold border border-[rgba(255,255,255,0.08)]">
-                              Not Eligible
-                            </div>
-                          )}
-                          
-                          {company.active ? (
-                            <button
-                              onClick={() => navigate('/student/jobs')}
-                              className="flex items-center gap-1 text-xs font-bold text-indigo-400 group-hover:translate-x-1 transition-transform"
-                            >
-                              Apply Now <ArrowUpRight className="w-3 h-3" />
-                            </button>
-                          ) : (
-                            <span className="text-[10px] text-[#908fa0] italic">{company.reason}</span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                {filteredCompanies.length === 0 && (
-                  <div className="p-12 text-center text-[#908fa0]">
-                    <Search className="w-8 h-8 mx-auto mb-3 opacity-30" />
-                    <p className="text-sm font-medium">No companies match your filter</p>
-                  </div>
-                )}
+          {/* ─── Main Content Area ─── */}
+          <div className="lg:col-span-8 space-y-6">
+            {/* Filter & Search Bar */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
+              <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/[0.05]">
+                {["all", "eligible", "applied"].map((filter) => (
+                  <button
+                    key={filter}
+                    onClick={() => setActiveFilter(filter as any)}
+                    className={cn(
+                      "px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                      activeFilter === filter
+                        ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-md border border-slate-200 dark:border-white/10"
+                        : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+                    )}
+                  >
+                    {filter}
+                  </button>
+                ))}
               </div>
               
+              <div className="relative flex-1 max-w-sm">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                <Input
+                  placeholder="Filter by company or role..."
+                  className="pl-12 h-12 bg-white dark:bg-[#1e1f26] border-slate-200 dark:border-white/[0.05] rounded-xl text-sm font-medium"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
             </div>
+
+            {/* Opportunities List */}
+            <div className="space-y-4">
+              <AnimatePresence mode='popLayout'>
+                {filteredCompanies.map((company, idx) => (
+                  <motion.div 
+                    layout
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.05 }}
+                    key={company.id} 
+                    className={cn(
+                      "group relative bg-white dark:bg-[#1e1f26] rounded-[2rem] p-6 border border-slate-200 dark:border-white/[0.05] transition-all hover:shadow-xl hover:translate-y-[-2px] overflow-hidden",
+                      !company.active && "opacity-75"
+                    )}
+                  >
+                    <div className="flex flex-col sm:flex-row items-center gap-6">
+                      <div className={cn(
+                        "w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl text-white shadow-lg shrink-0 transition-transform group-hover:scale-110 duration-500",
+                        company.active ? "bg-gradient-to-br from-indigo-500 to-blue-600" : "bg-slate-500/50 grayscale"
+                      )}>
+                        {company.name[0]}
+                      </div>
+
+                      <div className="flex-1 min-w-0 w-full text-center sm:text-left">
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
+                          <h4 className="text-lg font-black text-slate-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                            {company.name}
+                          </h4>
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-slate-100 dark:bg-white/5 text-slate-500 border border-slate-200 dark:border-white/5 mx-auto sm:mx-0">
+                            {company.role}
+                          </span>
+                          {company.applied && (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest bg-indigo-500/10 text-indigo-500 border border-indigo-500/20 mx-auto sm:mx-0">
+                              Applied
+                            </span>
+                          )}
+                        </div>
+                        
+                        <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-6 gap-y-2 text-[10px] font-black text-slate-500 uppercase tracking-tighter">
+                          <div className="flex items-center gap-1.5">
+                            <TrendingUp size={14} className="text-indigo-500" />
+                            <span>Min {company.minCGPA} CGPA</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Building2 size={14} className="text-purple-500" />
+                            <span className="truncate max-w-[200px]">{company.branches.join(', ') || 'All Branches'}</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-center sm:items-end gap-3 shrink-0">
+                        {company.active ? (
+                          <div className="flex items-center gap-2 bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-emerald-500/20 shadow-sm">
+                            <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+                            Eligible
+                          </div>
+                        ) : (
+                          <div className="bg-slate-100 dark:bg-white/5 text-slate-400 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-slate-200 dark:border-white/10">
+                            Ineligible
+                          </div>
+                        )}
+                        
+                        {company.active ? (
+                          <Button
+                            variant="ghost"
+                            onClick={() => navigate('/student/jobs')}
+                            className="flex items-center gap-2 text-xs font-black text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 hover:bg-transparent p-0 transition-transform hover:translate-x-1"
+                          >
+                            Apply Portal <ArrowUpRight className="w-4 h-4" />
+                          </Button>
+                        ) : (
+                          <span className="text-[10px] text-rose-500 dark:text-rose-400/80 font-bold italic tracking-tight">{company.reason}</span>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+
+              {filteredCompanies.length === 0 && (
+                <div className="py-24 text-center bg-white dark:bg-[#1e1f26]/30 rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10">
+                  <div className="w-20 h-20 bg-slate-100 dark:bg-white/5 rounded-[2rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mx-auto mb-6">
+                    <Search size={40} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">No criteria matches found</h3>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mt-2 max-w-xs mx-auto">Try adjusting your filters or check your academic profile for any updates.</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Pro Tip Banner */}
+        <div className="group relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-indigo-600 to-blue-700 p-8 text-white shadow-2xl">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
+          <div className="relative z-10 flex flex-col sm:flex-row items-center gap-8">
+            <div className="w-16 h-16 rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shrink-0 shadow-xl border border-white/10">
+              <Sparkles size={32} />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <h4 className="text-xl font-black uppercase tracking-widest mb-2">Maximize your Eligibility</h4>
+              <p className="text-indigo-100/80 leading-relaxed font-medium">
+                Keep your CGPA above 8.0 and clear any active backlogs to unlock premium tier-1 opportunities from companies like Google, Microsoft, and Amazon.
+              </p>
+            </div>
+            <Button
+              onClick={() => navigate('/student/profile')}
+              className="bg-white text-indigo-600 hover:bg-indigo-50 rounded-2xl px-10 h-14 font-black shadow-xl transition-all hover:scale-105 active:scale-95 shrink-0"
+            >
+              Check Profile
+            </Button>
           </div>
         </div>
       </div>

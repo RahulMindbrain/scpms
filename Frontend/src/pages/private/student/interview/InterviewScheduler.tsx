@@ -1,193 +1,243 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Calendar,
   Clock, MapPin,
   ExternalLink,
+  Sparkles,
+  ChevronRight,
+  Building2,
+  Video,
+  UserCheck,
 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useDispatch, useSelector } from 'react-redux';
 import CountdownTimer from '@/components/CountdownTimer';
-
-interface Interview {
-  id: number;
-  company: string;
-  role: string;
-  round: string;
-  date: string;
-  time: string;
-  duration: string;
-  location: string;
-  type: 'online' | 'offline';
-  logoText: string;
-  accentColor: string;
-}
-
-const UpcomingInterviews: Interview[] = [
-  {
-    id: 1,
-    company: 'Google',
-    role: 'SDE Intern',
-    round: 'Technical Round 1',
-    date: 'Apr 12, 2026',
-    time: '10:00 AM',
-    duration: '1h',
-    location: 'meet.google.com/abc-def',
-    type: 'online',
-    logoText: 'G',
-    accentColor: 'bg-indigo-600',
-  },
-  {
-    id: 2,
-    company: 'Microsoft',
-    role: 'Full Stack Dev',
-    round: 'HR Round',
-    date: 'Apr 15, 2026',
-    time: '2:00 PM',
-    duration: '45m',
-    location: 'Campus Block A, Room 301',
-    type: 'offline',
-    logoText: 'M',
-    accentColor: 'bg-emerald-600',
-  },
-  {
-    id: 3,
-    company: 'Amazon',
-    role: 'Data Analyst',
-    round: 'Technical Round 2',
-    date: 'Apr 18, 2026',
-    time: '11:00 AM',
-    duration: '1h',
-    location: 'chime.aws/xyz',
-    type: 'online',
-    logoText: 'A',
-    accentColor: 'bg-orange-500',
-  },
-];
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { fetchUpcomingEvents } from '@/redux/thunks/notificationThunks';
+import type { AppDispatch } from '@/redux/store/store';
+import type { RootState } from '@/redux/reducers/rootReducer';
+import Loader from '@/components/Loader';
 
 const InterviewSchedule: React.FC = () => {
+  const dispatch = useDispatch<AppDispatch>();
+  const { user } = useSelector((state: RootState) => state.auth);
+  const { upcomingEvents = [], loading } = useSelector((state: RootState) => state.notification || {});
+
+  useEffect(() => {
+    dispatch(fetchUpcomingEvents());
+  }, [dispatch]);
+
+  // Helper to get accent color based on index or company name
+  const getAccentColor = (name: string, index: number) => {
+    const colors = [
+      'from-blue-500 to-indigo-600',
+      'from-emerald-500 to-teal-600',
+      'from-purple-500 to-indigo-600',
+      'from-orange-500 to-red-600',
+      'from-cyan-500 to-blue-600'
+    ];
+    return colors[index % colors.length];
+  };
+
+  if (loading && upcomingEvents.length === 0) {
+    return <Loader text="Syncing your interview schedule..." fullScreen />;
+  }
+
   return (
-    <div className="min-h-screen bg-[#111319] p-4 md:p-8 font-sans text-[#e2e2eb]">
-      <main className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <div className="flex-1 flex flex-col bg-background dark:bg-[#111319] min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
+      <div className="max-w-7xl mx-auto w-full p-4 md:p-8 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
         
-        {/* Main Content Area */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-[#e2e2eb]">Upcoming Interviews</h2>
-              <p className="text-[#908fa0] text-sm mt-1">You have {UpcomingInterviews.length} interviews scheduled for this week.</p>
-            </div>
-            {/* <button className="text-sm font-semibold text-indigo-400 hover:text-indigo-300 bg-indigo-500/10 px-4 py-2 rounded-lg transition-colors">
-              View Calendar
-            </button> */}
+        {/* ─── Hero Header ─── */}
+        <div className="group relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-8 md:p-12 text-white shadow-2xl border border-white/5">
+          {/* Mesh Background Elements */}
+          <div className="absolute inset-0">
+            <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/20 rounded-full blur-[80px]"></div>
+            <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/15 rounded-full blur-[80px]"></div>
           </div>
-
-          <div className="space-y-4">
-            {UpcomingInterviews.map((item) => (
-              <div 
-                key={item.id} 
-                className={`group relative bg-[#1e1f26] border rounded-2xl p-5 hover:shadow-xl hover:shadow-blue-500/5 transition-all duration-300 ${
-                  item.type === 'online' 
-                    ? 'border-emerald-200/60 hover:border-emerald-300' 
-                    : 'border-amber-200/60 hover:border-amber-300'
-                }`}
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="flex gap-4">
-                    <div className={`${item.accentColor} w-14 h-14 rounded-2xl flex items-center justify-center text-white font-bold text-xl shadow-inner`}>
-                      {item.logoText}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-lg font-bold text-[#e2e2eb]">{item.company}</h3>
-                        <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-md uppercase tracking-wider ${
-                          item.type === 'online' 
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' 
-                            : 'bg-amber-50 text-amber-700 border border-amber-200'
-                        }`}>
-                          {item.type}
-                        </span>
-                      </div>
-                      <p className="text-[#c7c4d7] font-medium">{item.role}</p>
-                      <p className="text-[#908fa0] text-xs mt-0.5">{item.round}</p>
-                    </div>
-                  </div>
-
-                    <div className="flex flex-row sm:flex-col items-end justify-between sm:justify-center gap-3 border-t sm:border-t-0 pt-4 sm:pt-0">
-                      <div className="flex flex-col items-end gap-2">
-                        <div className="flex items-center gap-4 text-slate-600">
-                          <div className="flex items-center gap-1.5 text-sm font-semibold">
-                            <Calendar size={14} className="text-blue-500" />
-                            {item.date}
-                          </div>
-                          <div className="flex items-center gap-1.5 text-sm font-semibold">
-                            <Clock size={14} className="text-blue-500" />
-                            {item.time}
-                          </div>
-                        </div>
-                        <CountdownTimer targetDate={`${item.date} ${item.time}`} />
-                      </div>
-                      
-                      {item.type === 'online' ? (
-                        <a href={`https://${item.location}`} target="_blank" rel="noreferrer" className="flex items-center gap-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-all shadow-sm">
-                          Join Meeting <ExternalLink size={12} />
-                        </a>
-                      ) : (
-                        <button className="flex items-center gap-2 text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-4 py-2 rounded-lg transition-all">
-                          View Map <MapPin size={12} />
-                        </button>
-                      )}
-                    </div>
-                </div>
+          {/* Subtle Texture */}
+          <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest shadow-lg">
+                <Sparkles className="h-3 w-3 text-yellow-400" /> 
+                <span className="opacity-90">Interview Center</span>
               </div>
-            ))}
+              <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-md">
+                {user?.firstname ? `${user.firstname}'s Schedule` : "Interview Hub"}
+              </h1>
+              <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-medium">
+                {upcomingEvents.length > 0 
+                  ? `You have ${upcomingEvents.length} critical sessions scheduled. Be prepared and stay confident!`
+                  : "Track your upcoming interviews, technical rounds, and placement activities in one place."}
+              </p>
+            </div>
+            
+            <div className="hidden lg:block">
+              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-xl border border-white/10 shadow-inner">
+                <Video className="h-16 w-16 text-white/30" />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Sidebar Area */}
-        <div className="space-y-6">
-          {/* <div className="bg-slate-900 rounded-2xl p-6 text-white overflow-hidden relative">
-            <div className="relative z-10">
-              <h3 className="text-lg font-bold mb-2">Interview Prep</h3>
-              <p className="text-[#908fa0] text-sm mb-4">Complete your mock assessment to increase your chances by 40%.</p>
-              <button className="w-full py-3 bg-indigo-600 hover:bg-indigo-500/100 rounded-xl font-bold text-sm transition-colors">
-                Start Mock Test
-              </button>
-            </div>
-            <div className="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-500/100/20 rounded-full blur-2xl"></div>
-          </div> */}
-
-          {/* <div className="bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <History size={18} className="text-[#908fa0]" />
-                <h2 className="font-bold text-[#e2e2eb]">Recent Activity</h2>
+        <main className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+          {/* Main Content Area */}
+          <div className="lg:col-span-8 space-y-8">
+            <div className="flex items-center justify-between px-2">
+              <div>
+                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Active Invitations</h2>
+                <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium">
+                  {upcomingEvents.length > 0 
+                    ? `You have ${upcomingEvents.length} interviews scheduled.` 
+                    : "No interviews scheduled at the moment."}
+                </p>
               </div>
-              <MoreVertical size={16} className="text-[#908fa0] cursor-pointer" />
+              <Button variant="ghost" className="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
+                History <ChevronRight size={16} className="ml-1" />
+              </Button>
             </div>
 
             <div className="space-y-6">
-              <div className="flex gap-4">
-                <div className="w-1 bg-emerald-400 rounded-full"></div>
-                <div>
-                  <p className="text-sm font-bold text-[#e2e2eb]">Apple Inc.</p>
-                  <p className="text-xs text-[#908fa0]">Technical Round 1 Completed</p>
-                  <p className="text-[10px] text-[#908fa0] mt-1 uppercase font-bold">Apr 8 • 2:00 PM</p>
+              {upcomingEvents.length > 0 ? (
+                upcomingEvents.map((item, idx) => (
+                  <motion.div 
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                    key={item.id} 
+                    className={cn(
+                      "group relative bg-white dark:bg-[#1e1f26] border border-slate-200 dark:border-white/[0.05] rounded-[2rem] p-6 md:p-8 transition-all duration-300 hover:shadow-2xl dark:hover:shadow-indigo-500/5 hover:border-indigo-500/20 hover:translate-y-[-4px]",
+                    )}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                      <div className="flex gap-6">
+                        <div className={cn(
+                          "w-16 h-16 md:w-20 md:h-20 rounded-[1.5rem] bg-gradient-to-br flex items-center justify-center text-white font-black text-2xl md:text-3xl shadow-xl transition-transform group-hover:scale-110 duration-500",
+                          getAccentColor(item.company || 'C', idx)
+                        )}>
+                          {(item.company || item.title || 'C').charAt(0).toUpperCase()}
+                        </div>
+                        <div className="space-y-1">
+                          <div className="flex flex-wrap items-center gap-3 mb-1">
+                            <h3 className="text-xl font-black text-slate-900 dark:text-slate-200">{item.title}</h3>
+                            <span className={cn(
+                              "text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-[0.1em] border shadow-sm",
+                              item.venue?.toLowerCase().includes('http') || item.venue?.toLowerCase().includes('meet') || item.venue?.toLowerCase().includes('zoom')
+                                ? 'bg-blue-500/10 text-blue-600 border-blue-500/20 shadow-blue-500/5' 
+                                : 'bg-amber-500/10 text-amber-600 border-amber-500/20 shadow-amber-500/5'
+                            )}>
+                              {item.venue?.toLowerCase().includes('http') || item.venue?.toLowerCase().includes('meet') || item.venue?.toLowerCase().includes('zoom') ? 'Online' : 'Offline'}
+                            </span>
+                          </div>
+                          <p className="text-indigo-600 dark:text-indigo-400 font-black text-sm uppercase tracking-wider">{item.company}</p>
+                          <p className="text-slate-500 dark:text-slate-400 text-xs font-bold flex items-center gap-1.5 uppercase tracking-tighter">
+                            <UserCheck size={14} className="text-indigo-500" />
+                            Interview Round
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-col items-end gap-6 pt-6 sm:pt-0 border-t sm:border-t-0 border-slate-100 dark:border-white/5">
+                        <div className="flex flex-col items-end gap-3 w-full">
+                          <div className="flex items-center gap-6 text-slate-500">
+                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider">
+                              <Calendar size={16} className="text-indigo-500" />
+                              {new Date(item.startTime).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                            </div>
+                            <div className="flex items-center gap-2 text-xs font-black uppercase tracking-wider">
+                              <Clock size={16} className="text-indigo-500" />
+                              {new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </div>
+                          </div>
+                          <CountdownTimer targetDate={item.startTime} />
+                        </div>
+                        
+                        {item.venue?.toLowerCase().includes('http') || item.venue?.toLowerCase().includes('meet') || item.venue?.toLowerCase().includes('zoom') ? (
+                          <a 
+                            href={item.venue.startsWith('http') ? item.venue : `https://${item.venue}`} 
+                            target="_blank" 
+                            rel="noreferrer" 
+                            className="w-full sm:w-auto flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 px-8 py-4 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 active:scale-95"
+                          >
+                            Launch Meeting <ExternalLink size={16} />
+                          </a>
+                        ) : (
+                          <button className="w-full sm:w-auto flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 px-8 py-4 rounded-2xl transition-all border border-slate-200 dark:border-white/10 active:scale-95">
+                            {item.venue || "View Location"} <MapPin size={16} />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))
+              ) : (
+                <div className="py-24 flex flex-col items-center text-center bg-white dark:bg-[#1e1f26]/30 rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10">
+                  <div className="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-[2rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6">
+                    <Calendar size={48} strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white">No upcoming interviews</h3>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs mt-2 font-medium">We'll notify you as soon as a recruiter schedules a round with you.</p>
                 </div>
-              </div>
-              <div className="flex gap-4">
-                <div className="w-1 bg-slate-200 rounded-full"></div>
-                <div>
-                  <p className="text-sm font-bold text-[#e2e2eb]">Netflix</p>
-                  <p className="text-xs text-[#908fa0]">Application Viewed</p>
-                  <p className="text-[10px] text-[#908fa0] mt-1 uppercase font-bold">Apr 7 • 10:45 AM</p>
+              )}
+            </div>
+          </div>
+
+          {/* Sidebar Area */}
+          <div className="lg:col-span-4 space-y-8">
+            <div className="bg-gradient-to-br from-indigo-600 to-blue-700 rounded-[2.5rem] p-8 text-white overflow-hidden relative shadow-2xl shadow-indigo-500/20">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+              <div className="relative z-10">
+                <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center mb-6">
+                  <Rocket className="h-6 w-6 text-white" />
                 </div>
+                <h3 className="text-xl font-black mb-3">Interview Readiness</h3>
+                <p className="text-indigo-100/70 text-sm leading-relaxed mb-8 font-medium">
+                  Candidates who complete mock interviews are <span className="text-white font-bold">2.4x</span> more likely to receive an offer.
+                </p>
+                <Button className="w-full py-7 bg-white text-indigo-600 hover:bg-indigo-50 rounded-[1.25rem] font-black text-sm transition-all shadow-xl hover:scale-[1.02] active:scale-[0.98]">
+                  Start Preparation
+                </Button>
               </div>
             </div>
 
-            <button className="w-full mt-8 flex items-center justify-center gap-2 text-sm font-bold text-[#908fa0] hover:text-indigo-400 transition-colors">
-              View All History <ChevronRight size={16} />
-            </button>
-          </div> */}
-        </div>
-      </main>
+            <div className="bg-white dark:bg-[#1e1f26] border border-slate-200 dark:border-white/[0.05] rounded-[2.5rem] p-8 shadow-sm">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-white/5">
+                    <TrendingUp size={20} className="text-indigo-500" />
+                  </div>
+                  <h2 className="font-black text-slate-900 dark:text-white tracking-tight">Recent Activity</h2>
+                </div>
+              </div>
+
+              <div className="space-y-8">
+                {upcomingEvents.length > 0 ? (
+                  upcomingEvents.slice(0, 3).map((act, i) => (
+                    <div key={i} className="flex gap-5 relative group/item">
+                      <div className={cn("w-1.5 rounded-full shrink-0 h-14", i === 0 ? "bg-emerald-500" : i === 1 ? "bg-blue-500" : "bg-indigo-500")} />
+                      <div className="min-w-0">
+                        <p className="text-sm font-black text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{act.company}</p>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1">{act.title}</p>
+                        <p className="text-[10px] text-slate-400 dark:text-slate-600 mt-2 uppercase font-black tracking-widest">
+                          {new Date(act.startTime).toLocaleDateString()} • {new Date(act.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </p>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-xs text-slate-500 font-medium italic">No recent activity to show.</p>
+                )}
+              </div>
+
+              <button className="w-full mt-10 flex items-center justify-center gap-2 text-[11px] font-black text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all uppercase tracking-widest border-t border-slate-100 dark:border-white/5 pt-6">
+                Full Activity History <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
     </div>
   );
 };
