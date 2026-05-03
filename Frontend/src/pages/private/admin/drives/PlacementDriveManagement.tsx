@@ -10,7 +10,11 @@ import {
   ChevronRight,
   Target,
   Clock,
-  Info
+  Info,
+  Calendar,
+  Briefcase,
+  Trophy,
+  Users
 } from 'lucide-react';
 import Loader from '@/components/Loader';
 import { Badge } from '@/components/ui/badge';
@@ -21,11 +25,16 @@ import { fetchJobs } from '@/redux/thunks/driveThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import { cn } from '@/lib/utils';
+import { AdminPageLayout } from '@/components/layout/AdminPageLayout';
+import { PageHeader } from '@/components/PageHeader';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 interface DriveStatus {
   label: string;
   color: string;
   bg: string;
+  dot: string;
 }
 
 interface Department {
@@ -37,6 +46,7 @@ interface Company {
   id: number;
   name: string;
   description?: string;
+  location?: string;
 }
 
 interface Job {
@@ -54,15 +64,12 @@ interface Job {
   createdAt?: string;
   company?: Company;
   eligibleDepartments?: Department[];
-  _count?: {
-    applications?: number;
-  };
 }
 
 const statusConfig: Record<string, DriveStatus> = {
-  active: { label: 'Active', color: 'text-emerald-700', bg: 'bg-emerald-50 border-emerald-100' },
-  upcoming: { label: 'Upcoming', color: 'text-blue-700', bg: 'bg-blue-50 border-blue-100' },
-  completed: { label: 'Completed', color: 'text-[#c7c4d7]', bg: 'bg-[#111319] border-[rgba(255,255,255,0.06)]' },
+  active: { label: 'Active', color: 'text-emerald-600', bg: 'bg-emerald-500/10 border-emerald-500/20', dot: 'bg-emerald-500' },
+  upcoming: { label: 'Upcoming', color: 'text-blue-600', bg: 'bg-blue-500/10 border-blue-500/20', dot: 'bg-blue-500' },
+  completed: { label: 'Closed', color: 'text-muted-foreground', bg: 'bg-muted/30 border-border', dot: 'bg-muted-foreground' },
 };
 
 const PlacementDriveManagement: React.FC = () => {
@@ -81,7 +88,6 @@ const PlacementDriveManagement: React.FC = () => {
     dispatch(fetchJobs({ status: 'APPROVED' }));
   }, [dispatch]);
 
-  // Click outside to close filter dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
@@ -102,7 +108,6 @@ const PlacementDriveManagement: React.FC = () => {
   const processedDrives = useMemo(() => {
     const now = new Date();
 
-    // 1. Map and Enrich Jobs
     const enrichedJobs = reduxJobs.map((job: Job) => {
       const scheduleDate = job.createdAt ? new Date(job.createdAt) : null;
 
@@ -113,10 +118,9 @@ const PlacementDriveManagement: React.FC = () => {
         status = 'upcoming';
       }
 
-      // Handle both salary and salaryRange fields
       const salaryValue = job.salary || job.salaryRange;
       const formattedSalary = salaryValue
-        ? `₹${Number(salaryValue).toLocaleString('en-IN')}`
+        ? `${Number(salaryValue).toLocaleString('en-IN')}`
         : 'N/A';
 
       return {
@@ -132,7 +136,6 @@ const PlacementDriveManagement: React.FC = () => {
       };
     });
 
-    // 2. Filter Jobs
     const filteredJobs = enrichedJobs.filter(job => {
       const matchesFilter = activeFilter === 'All Drives' || job.status.toLowerCase() === activeFilter.toLowerCase();
       const matchesSearch =
@@ -142,15 +145,14 @@ const PlacementDriveManagement: React.FC = () => {
       return matchesFilter && matchesSearch;
     });
 
-    // 3. Group by Company
-    const groups: Record<number, { company: any, jobs: any[] }> = {};
+    const groups: Record<number, { company: Company, jobs: any[] }> = {};
     filteredJobs.forEach(job => {
       const companyId = job.company?.id;
       if (!companyId) return;
 
       if (!groups[companyId]) {
         groups[companyId] = {
-          company: job.company,
+          company: job.company as Company,
           jobs: []
         };
       }
@@ -160,393 +162,340 @@ const PlacementDriveManagement: React.FC = () => {
     return Object.values(groups);
   }, [reduxJobs, activeFilter, searchQuery]);
 
-  const handleViewDetails = (job: any) => {
-    setSelectedJob(job);
-    setIsDetailsOpen(true);
-  };
-
-
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      <div className=" px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-        
-        {/* Header Section */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
-          <div className="space-y-2">
-            <h1 className="text-4xl font-extrabold text-[#e2e2eb] tracking-tight">Placement Drives</h1>
-            <p className="text-lg text-[#908fa0] font-medium">Manage and monitor recruitment cycles with ease.</p>
+    <AdminPageLayout>
+      <PageHeader
+        title="Placement Drives"
+        description="Oversee and facilitate the complete lifecycle of corporate recruitment drives."
+        badge="Campaign Engine"
+        icon={Trophy}
+        variant="amber"
+      >
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <div className="relative w-full sm:w-[240px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search companies..."
+              className="pl-9 bg-background/50 border-border rounded-xl h-10 text-sm focus-visible:ring-primary/20"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-            {/* Search Bar */}
-            <div className="relative group w-full sm:w-auto sm:min-w-[300px]">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0] group-focus-within:text-blue-500 transition-colors" />
-              <input
-                type="text"
-                placeholder="Search company or role..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-4 py-3.5 bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] rounded-2xl text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all shadow-sm"
-              />
-            </div>
-
-            {/* Filter Dropdown */}
-            <div className="relative" ref={filterRef}>
-              <button
-                onClick={() => setIsFilterOpen(!isFilterOpen)}
-                className="flex items-center justify-between gap-3 px-5 py-3.5 bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] rounded-2xl text-sm font-semibold text-[#c7c4d7] hover:border-slate-300 transition-all shadow-sm active:scale-95"
-              >
-                <div className="flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-blue-600" />
-                  {activeFilter}
-                </div>
-                <ChevronDown className={cn("w-4 h-4 text-[#908fa0] transition-transform", isFilterOpen && "rotate-180")} />
-              </button>
-
-              <AnimatePresence>
-                {isFilterOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 mt-3 w-56 bg-[#1e1f26] border border-[rgba(255,255,255,0.08)] rounded-2xl shadow-2xl z-50 overflow-hidden p-1.5"
-                  >
-                    {['All Drives', 'Active', 'Upcoming', 'Completed'].map((opt) => (
-                      <button
-                        key={opt}
-                        onClick={() => {
-                          setActiveFilter(opt);
-                          setIsFilterOpen(false);
-                        }}
-                        className={cn(
-                          "w-full text-left px-4 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-between",
-                          activeFilter === opt ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20" : "text-[#c7c4d7] hover:bg-[#111319]"
-                        )}
-                      >
-                        {opt}
-                        {activeFilter === opt && <div className="w-2 h-2 bg-[#1e1f26] rounded-full" />}
-                      </button>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-          </div>
-        </div>
-
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-[#1e1f26] rounded-3xl p-5 border border-[rgba(255,255,255,0.06)] shadow-sm">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#908fa0]">Total Drives</p>
-            <p className="text-3xl font-black text-[#e2e2eb] mt-2">{reduxJobs.length}</p>
-          </div>
-          <div className="bg-[#1e1f26] rounded-3xl p-5 border border-[rgba(255,255,255,0.06)] shadow-sm">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#908fa0]">Companies</p>
-            <p className="text-3xl font-black text-[#e2e2eb] mt-2">{processedDrives.length}</p>
-          </div>
-          <div className="bg-[#1e1f26] rounded-3xl p-5 border border-[rgba(255,255,255,0.06)] shadow-sm">
-            <p className="text-xs font-bold uppercase tracking-widest text-[#908fa0]">Scheduled Interviews</p>
-            <p className="text-3xl font-black text-[#e2e2eb] mt-2">
-              {reduxJobs.filter((job: Job) => !!job.interviewScheduleId).length}
-            </p>
-          </div>
-        </div>
-
-        {/* Status Content */}
-        {/* {error && (
-          <div className="flex flex-col items-center justify-center p-12 bg-rose-50 border border-rose-100 rounded-[2rem] text-center space-y-4">
-            <div className="w-12 h-12 bg-[#1e1f26] rounded-2xl flex items-center justify-center shadow-sm mx-auto">
-              <AlertCircle className="w-6 h-6 text-rose-500" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-rose-900 font-bold uppercase tracking-tight">Data Fetching Failed</h3>
-              <p className="text-rose-600 text-sm font-medium">{error}</p>
-            </div>
-            <button
-              onClick={() => dispatch(fetchJobs({ status: 'APPROVED' }))}
-              className="px-8 py-3 bg-rose-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-rose-700 transition-all shadow-lg active:scale-95"
+          <div className="relative w-full sm:w-auto" ref={filterRef}>
+            <Button
+              variant="outline"
+              onClick={() => setIsFilterOpen(!isFilterOpen)}
+              className="w-full sm:w-auto flex items-center justify-between gap-3 h-10 rounded-xl border-border bg-background/50 text-xs font-black uppercase tracking-widest px-4"
             >
-              Retry Connection
-            </button>
-          </div>
-        )} */}
+              <div className="flex items-center gap-2">
+                <Filter className="size-3.5 text-primary" />
+                {activeFilter}
+              </div>
+              <ChevronDown className={cn("size-3.5 text-muted-foreground transition-transform", isFilterOpen && "rotate-180")} />
+            </Button>
 
-        {loading && reduxJobs.length === 0 ? (
-          <div className="py-20">
-            <Loader text="Gathering placement drive details..." />
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {processedDrives.length > 0 ? (
-              processedDrives.map((group) => {
-                const isExpanded = expandedCompanies[group.company.id] ?? true;
-
-                return (
-                  <div key={group.company.id} className="group/company space-y-4">
-                    {/* Company Card */}
+            <AnimatePresence>
+              {isFilterOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                  className="absolute right-0 mt-2 w-52 bg-popover border border-border rounded-2xl shadow-2xl z-50 overflow-hidden p-1.5"
+                >
+                  {['All Drives', 'Active', 'Upcoming', 'Completed'].map((opt) => (
                     <button
-                      onClick={() => toggleCompany(group.company.id)}
+                      key={opt}
+                      onClick={() => {
+                        setActiveFilter(opt);
+                        setIsFilterOpen(false);
+                      }}
                       className={cn(
-                        "w-full flex flex-col md:flex-row md:items-center gap-6 p-6 rounded-[2.5rem] text-left transition-all duration-300",
-                        "bg-[#1e1f26] border-2 border-transparent hover:border-blue-100/50 shadow-sm hover:shadow-xl hover:-translate-y-1",
-                        !isExpanded && "opacity-80 grayscale-[0.2]"
+                        "w-full text-left px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-between",
+                        activeFilter === opt ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20" : "text-muted-foreground hover:bg-muted hover:text-foreground"
                       )}
                     >
-                      <div className="w-20 h-20 bg-[#111319] rounded-3xl flex items-center justify-center text-blue-600 border border-[rgba(255,255,255,0.06)] shrink-0 group-hover/company:scale-110 transition-transform">
-                        <Building2 className="w-10 h-10" />
-                      </div>
-
-                      <div className="flex-1 space-y-1">
-                        <div className="flex flex-wrap items-center gap-3">
-                          <h2 className="text-3xl font-black text-[#e2e2eb] tracking-tight">{group.company.name}</h2>
-                          <Badge variant="secondary" className="bg-blue-50 text-blue-700 border-blue-100 px-3 py-1 rounded-full text-xs font-bold">
-                            {group.jobs.length} {group.jobs.length === 1 ? 'Job Opening' : 'Job Openings'}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-4 text-[#908fa0]">
-                          <div className="flex items-center gap-1.5 text-sm font-medium">
-                            <MapPin className="w-4 h-4 text-[#908fa0]" />
-                            {group.company.location || 'PAN India'}
-                          </div>
-                          <div className="w-1 h-1 bg-slate-300 rounded-full" />
-                          <p className="text-sm font-medium line-clamp-1 italic max-w-xl">
-                            {group.company.description || "Leading industry partner specializing in innovation."}
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-4 ml-auto">
-                        <div className={cn(
-                          "w-12 h-12 rounded-2xl flex items-center justify-center border transition-all",
-                          isExpanded ? "bg-blue-50 border-blue-100 text-blue-600" : "bg-[#111319] border-[rgba(255,255,255,0.06)] text-[#908fa0]"
-                        )}>
-                          <ChevronDown className={cn("w-6 h-6 transition-transform duration-500", !isExpanded && "-rotate-90")} />
-                        </div>
-                      </div>
+                      {opt}
+                      {activeFilter === opt && <div className="size-1.5 bg-current rounded-full" />}
                     </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
+      </PageHeader>
 
-                    {/* Jobs Container */}
-                    <AnimatePresence initial={false}>
-                      {isExpanded && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          className="overflow-hidden"
-                        >
-                          <div className="grid grid-cols-1 gap-5 pl-0  pr-2">
-                            {group.jobs.map((job) => (
+      {/* Quick Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+        {[
+          { label: 'Total Drives', value: reduxJobs.length, icon: Trophy, color: 'primary' },
+          { label: 'Active Companies', value: processedDrives.length, icon: Building2, color: 'emerald' },
+          { label: 'Scheduled Interviews', value: reduxJobs.filter((job: Job) => !!job.interviewScheduleId).length, icon: Calendar, color: 'indigo' }
+        ].map((stat, i) => (
+          <div key={i} className="saas-card flex items-center gap-5">
+            <div className={`size-12 rounded-2xl bg-${stat.color}-500/10 flex items-center justify-center border border-${stat.color}-500/20`}>
+              <stat.icon className={`size-6 text-${stat.color}-600`} />
+            </div>
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">{stat.label}</p>
+              <p className="text-2xl font-black text-foreground">{stat.value}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {loading && reduxJobs.length === 0 ? (
+        <div className="py-32 flex justify-center">
+          <Loader text="Gathering placement drive details..." />
+        </div>
+      ) : (
+        <div className="space-y-8">
+          {processedDrives.length > 0 ? (
+            processedDrives.map((group) => {
+              const isExpanded = expandedCompanies[group.company.id] ?? true;
+
+              return (
+                <div key={group.company.id} className="space-y-4">
+                  {/* Company Row */}
+                  <button
+                    onClick={() => toggleCompany(group.company.id)}
+                    className={cn(
+                      "w-full flex flex-col md:flex-row md:items-center gap-6 p-6 rounded-[2rem] text-left transition-all duration-300",
+                      "bg-card border border-border hover:border-primary/20 shadow-sm group",
+                      !isExpanded && "opacity-80 grayscale-[0.2]"
+                    )}
+                  >
+                    <div className="size-16 bg-muted/50 rounded-2xl flex items-center justify-center border border-border group-hover:border-primary/30 transition-all shadow-sm shrink-0">
+                      <Building2 className="size-8 text-muted-foreground group-hover:text-primary transition-colors" />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-3 mb-1">
+                        <h2 className="text-xl font-bold text-foreground tracking-tight group-hover:text-primary transition-colors">
+                          {group.company.name}
+                        </h2>
+                        <Badge variant="outline" className="bg-primary/5 border-primary/20 text-primary font-black text-[9px] uppercase tracking-widest px-2.5 py-0.5">
+                          {group.jobs.length} {group.jobs.length === 1 ? 'Opening' : 'Openings'}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center gap-3 text-muted-foreground">
+                        <div className="flex items-center gap-1.5 text-xs font-medium">
+                          <MapPin className="size-3.5" />
+                          {group.company.location || 'PAN India'}
+                        </div>
+                        <div className="size-1 bg-border rounded-full" />
+                        <p className="text-xs font-medium truncate max-w-md text-muted-foreground/70">
+                          {group.company.description || "Corporate recruitment partner."}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 ml-auto">
+                      <div className={cn(
+                        "size-10 rounded-xl flex items-center justify-center border transition-all",
+                        isExpanded ? "bg-primary/10 border-primary/20 text-primary" : "bg-muted/50 border-border text-muted-foreground"
+                      )}>
+                        <ChevronDown className={cn("size-5 transition-transform duration-500", !isExpanded && "-rotate-90")} />
+                      </div>
+                    </div>
+                  </button>
+
+                  {/* Jobs Grid */}
+                  <AnimatePresence initial={false}>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-border ml-8 py-2">
+                          {group.jobs.map((job) => {
+                            const config = statusConfig[job.status];
+                            return (
                               <motion.div
                                 key={job.id}
                                 layout
-                                initial={{ opacity: 0, x: -20 }}
+                                initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="relative bg-[#1e1f26] rounded-[2rem] p-6 md:p-8 border border-[rgba(255,255,255,0.06)] shadow-sm hover:shadow-lg transition-all group/job overflow-hidden"
+                                className="saas-card relative group/job p-6"
                               >
-                                {/* Decorative Gradient */}
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-linear-to-br from-blue-50/50 to-transparent rounded-full -mr-16 -mt-16 group-hover/job:scale-150 transition-transform duration-700" />
-
-                                <div className="relative flex flex-col xl:flex-row gap-8">
-                                  {/* Job Core Info */}
-                                  <div className="flex-1 space-y-6">
-                                    <div className="flex flex-wrap items-start justify-between gap-4">
+                                <div className="flex flex-col xl:flex-row gap-8">
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                                       <div className="space-y-1.5">
-                                        <h3 className="text-2xl font-bold text-[#e2e2eb] group-hover/job:text-blue-600 transition-colors uppercase tracking-tight">
+                                        <h3 className="text-lg font-bold text-foreground group-hover/job:text-primary transition-colors tracking-tight">
                                           {job.title}
                                         </h3>
-                                        <Badge className={cn("px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border", statusConfig[job.status].bg, statusConfig[job.status].color)}>
-                                          {statusConfig[job.status].label}
-                                        </Badge>
+                                        <div className={cn("inline-flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm", config.bg, config.color)}>
+                                          <div className={cn("size-1.5 rounded-full animate-pulse", config.dot)} />
+                                          {config.label}
+                                        </div>
                                       </div>
 
-                                      <div className="flex flex-wrap gap-2 pt-1">
-                                        {job.departments.length > 0 ? job.departments.map((dept: string) => (
-                                          <span key={dept} className="px-3 py-1.5 bg-[#111319] text-[#908fa0] border border-[rgba(255,255,255,0.08)] rounded-xl text-[10px] font-bold uppercase tracking-wider">
+                                      <div className="flex flex-wrap gap-2">
+                                        {(job.departments?.length ? job.departments : ['All Depts']).slice(0, 2).map((dept: string) => (
+                                          <Badge key={dept} variant="outline" className="bg-muted/30 border-border text-[9px] font-black uppercase tracking-widest px-2.5">
                                             {dept}
-                                          </span>
-                                        )) : (
-                                          <span className="px-3 py-1.5 bg-[#111319] text-[#908fa0] border border-[rgba(255,255,255,0.08)] rounded-xl text-[10px] font-bold uppercase tracking-wider">
-                                            All Departments
-                                          </span>
-                                        )}
+                                          </Badge>
+                                        ))}
                                       </div>
                                     </div>
 
-                                    <p className="text-[#908fa0] text-base leading-relaxed line-clamp-2 font-medium max-w-3xl">
-                                      {job.description}
+                                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-6 font-medium">
+                                      {job.description || "No description provided."}
                                     </p>
 
-                                    {/* Attributes Grid */}
-                                    <div className="grid grid-cols-2 lg:grid-cols-5 gap-6 pt-2">
-                                      <div className="flex flex-col gap-1.5">
-                                        <span className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest flex items-center gap-1.5">
-                                          <IndianRupee className="w-3.5 h-3.5 text-emerald-500" /> Salary
-                                        </span>
-                                        <span className="text-lg font-bold text-[#e2e2eb]">{job.formattedSalary}</span>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                      <div className="space-y-1">
+                                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                                          <IndianRupee className="size-3 text-emerald-500" /> Package
+                                        </p>
+                                        <p className="text-sm font-bold text-foreground">{job.formattedSalary} LPA</p>
                                       </div>
-                                      <div className="flex flex-col gap-1.5">
-                                        <span className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest flex items-center gap-1.5">
-                                          <MapPin className="w-3.5 h-3.5 text-rose-500" /> Location
-                                        </span>
-                                        <span className="text-lg font-bold text-[#e2e2eb] truncate">{job.location || 'Remote'}</span>
+                                      <div className="space-y-1">
+                                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                                          <Target className="size-3 text-indigo-500" /> Eligibility
+                                        </p>
+                                        <p className="text-sm font-bold text-foreground">{job.minCgpa ?? 'No'} CGPA</p>
                                       </div>
-                                      <div className="flex flex-col gap-1.5">
-                                        <span className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest flex items-center gap-1.5">
-                                          <Target className="w-3.5 h-3.5 text-indigo-500" /> Min CGPA
-                                        </span>
-                                        <span className="text-lg font-bold text-[#e2e2eb]">{job.minCgpa ?? 'N/A'}</span>
+                                      <div className="space-y-1">
+                                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                                          <Users className="size-3 text-violet-500" /> Applicants
+                                        </p>
+                                        <p className="text-sm font-bold text-foreground">{job._count?.applications || 0} Applied</p>
                                       </div>
-                                      <div className="flex flex-col gap-1.5">
-                                        <span className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest flex items-center gap-1.5">
-                                          <GraduationCap className="w-3.5 h-3.5 text-violet-500" /> Max Backlogs
-                                        </span>
-                                        <span className="text-lg font-bold text-[#e2e2eb]">{job.maxBacklogs ?? 'No limit'}</span>
-                                      </div>
-                                      <div className="flex flex-col gap-1.5">
-                                        <span className="text-[10px] font-black text-[#908fa0] uppercase tracking-widest flex items-center gap-1.5">
-                                          <Clock className="w-3.5 h-3.5 text-amber-500" /> Posted On
-                                        </span>
-                                        <span className="text-lg font-bold text-[#e2e2eb]">{job.formattedDate}</span>
+                                      <div className="space-y-1">
+                                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                                          <Calendar className="size-3 text-amber-500" /> Posted
+                                        </p>
+                                        <p className="text-sm font-bold text-foreground">{job.formattedDate}</p>
                                       </div>
                                     </div>
                                   </div>
 
-                                  {/* Stats & Actions */}
-                                  <div className="flex flex-col sm:flex-row xl:flex-col items-stretch xl:items-end justify-center gap-8 w-full xl:w-auto xl:min-w-[260px] border-t xl:border-t-0 xl:border-l border-[rgba(255,255,255,0.06)] pt-8 xl:pt-0 xl:pl-10">
-                                    <div className="flex items-center gap-3 w-full sm:w-auto xl:w-full">
-                                      <button
-                                        onClick={() => handleViewDetails(job)}
-                                        className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-lg active:scale-95"
-                                      >
-                                        <span>View Details</span>
-                                        <ChevronRight className="w-4 h-4" />
-                                      </button>
-                                    </div>
+                                  <div className="flex xl:flex-col items-stretch xl:justify-center gap-4 xl:pl-8 xl:border-l border-border min-w-[160px]">
+                                    <Button
+                                      onClick={() => { setSelectedJob(job); setIsDetailsOpen(true); }}
+                                      className="flex-1 bg-slate-900 hover:bg-primary text-white rounded-xl h-10 font-black uppercase tracking-widest text-[10px] shadow-lg active:scale-95 transition-all"
+                                    >
+                                      Review Drive
+                                      <ChevronRight className="size-3.5 ml-1.5" />
+                                    </Button>
                                   </div>
                                 </div>
                               </motion.div>
-                            ))}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                );
-              })
-            ) : (
-              <div className="py-24 text-center bg-[#1e1f26] rounded-[3rem] border-2 border-[rgba(255,255,255,0.06)] border-dashed animate-in fade-in zoom-in duration-500">
-                <div className="w-24 h-24 bg-[#111319] rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Search className="w-10 h-10 text-slate-300" />
+                            );
+                          })}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
-                <h3 className="text-xl font-bold text-[#e2e2eb] mb-2 uppercase tracking-tight">No drives matches your search</h3>
-                <p className="text-[#908fa0] font-medium max-w-xs mx-auto">Try adjusting your filters or search keywords to find what you're looking for.</p>
-                <button
-                  onClick={() => { setSearchQuery(''); setActiveFilter('All Drives'); }}
-                  className="mt-8 text-blue-600 font-bold text-xs uppercase tracking-widest hover:underline"
-                >
-                  Clear all filters
-                </button>
+              );
+            })
+          ) : (
+            <div className="py-32 text-center saas-card border-dashed bg-muted/10">
+              <div className="size-20 bg-muted/30 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6">
+                <Search className="size-10 text-muted-foreground/30" />
               </div>
-            )}
-          </div>
-        )}
-      </div>
+              <h3 className="text-xl font-bold text-foreground mb-2">No results found</h3>
+              <p className="text-muted-foreground text-sm max-w-xs mx-auto mb-8">
+                Try adjusting your filters or search keywords to find the drive.
+              </p>
+              <Button
+                variant="outline"
+                onClick={() => { setSearchQuery(''); setActiveFilter('All Drives'); }}
+                className="rounded-xl px-8 border-border font-bold text-xs uppercase tracking-widest h-11"
+              >
+                Reset Filters
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Details Modal */}
       <Modal
         isOpen={isDetailsOpen}
         onClose={() => setIsDetailsOpen(false)}
-        title="Job Listing Details"
+        title="Drive Specification"
         maxWidth="sm:max-w-3xl"
       >
         {selectedJob && (
-          <div className="space-y-8 py-6">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-slate-100">
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600">
-                    <Building2 className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <h2 className="text-2xl font-black text-[#e2e2eb] uppercase tracking-tight leading-none">
-                      {selectedJob.company?.name}
-                    </h2>
-                    <p className="text-sm font-bold text-blue-600 pt-1 tracking-widest uppercase">
-                      {selectedJob.title}
-                    </p>
-                  </div>
+          <div className="space-y-8 py-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border">
+              <div className="flex items-center gap-4">
+                <div className="size-14 bg-muted/50 rounded-2xl flex items-center justify-center border border-border">
+                  <Building2 className="size-7 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-foreground tracking-tight uppercase leading-none">
+                    {selectedJob.company?.name}
+                  </h2>
+                  <p className="text-[10px] font-black text-primary pt-2 tracking-[0.2em] uppercase">
+                    {selectedJob.title}
+                  </p>
                 </div>
               </div>
-              <Badge className={cn("px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest border", statusConfig[selectedJob.status].bg, statusConfig[selectedJob.status].color)}>
+              <div className={cn("px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-sm", statusConfig[selectedJob.status].bg, statusConfig[selectedJob.status].color)}>
                 {statusConfig[selectedJob.status].label}
-              </Badge>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="p-6 bg-[#111319] rounded-3xl border border-[rgba(255,255,255,0.06)] space-y-1">
-                <div className="flex items-center gap-2 text-[10px] font-black text-[#908fa0] uppercase tracking-widest">
-                  <IndianRupee className="w-3.5 h-3.5 text-emerald-500" /> Package
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { label: 'Package', value: `${selectedJob.formattedSalary} LPA`, icon: IndianRupee, color: 'emerald' },
+                { label: 'Location', value: selectedJob.location || 'Remote', icon: MapPin, color: 'rose' },
+                { label: 'CGPA Limit', value: `${selectedJob.minCgpa ?? 'N/A'}`, icon: GraduationCap, color: 'indigo' },
+                { label: 'Backlogs', value: selectedJob.maxBacklogs ?? 'None', icon: Clock, color: 'amber' }
+              ].map((item, idx) => (
+                <div key={idx} className="p-5 bg-muted/30 rounded-2xl border border-border group hover:border-primary/20 transition-all">
+                  <div className="flex items-center gap-2 text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2">
+                    <item.icon className={`size-3.5 text-${item.color}-500`} /> {item.label}
+                  </div>
+                  <p className="text-lg font-black text-foreground">{item.value}</p>
                 </div>
-                <p className="text-xl font-black text-[#e2e2eb]">{selectedJob.formattedSalary}</p>
-              </div>
-              <div className="p-6 bg-[#111319] rounded-3xl border border-[rgba(255,255,255,0.06)] space-y-1">
-                <div className="flex items-center gap-2 text-[10px] font-black text-[#908fa0] uppercase tracking-widest">
-                  <MapPin className="w-3.5 h-3.5 text-rose-500" /> Location
-                </div>
-                <p className="text-xl font-black text-[#e2e2eb]">{selectedJob.location || 'Remote'}</p>
-              </div>
-              <div className="p-6 bg-[#111319] rounded-3xl border border-[rgba(255,255,255,0.06)] space-y-1">
-                <div className="flex items-center gap-2 text-[10px] font-black text-[#908fa0] uppercase tracking-widest">
-                  <GraduationCap className="w-3.5 h-3.5 text-indigo-500" /> CGPA Req.
-                </div>
-                <p className="text-xl font-black text-[#e2e2eb]">
-                  {selectedJob.minCgpa ?? 'N/A'} - {selectedJob.maxCgpa ?? 'N/A'}
-                </p>
-              </div>
-              <div className="p-6 bg-[#111319] rounded-3xl border border-[rgba(255,255,255,0.06)] space-y-1">
-                <div className="flex items-center gap-2 text-[10px] font-black text-[#908fa0] uppercase tracking-widest">
-                  <Clock className="w-3.5 h-3.5 text-amber-500" /> Backlogs
-                </div>
-                <p className="text-xl font-black text-[#e2e2eb]">{selectedJob.maxBacklogs ?? 'No limit'}</p>
-              </div>
+              ))}
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center gap-2 text-xs font-black text-[#e2e2eb] uppercase tracking-[0.2em]">
-                <Info className="w-4 h-4 text-blue-500" /> Job Description
+              <div className="flex items-center gap-2 text-[10px] font-black text-foreground uppercase tracking-[0.2em]">
+                <Info className="size-4 text-primary" /> Comprehensive Description
               </div>
-              <div className="p-8 bg-[#1e1f26] border border-[rgba(255,255,255,0.06)] rounded-[2.5rem] shadow-sm">
-                <p className="text-[#c7c4d7] leading-relaxed font-medium whitespace-pre-line text-lg">
-                  {selectedJob.description}
+              <div className="p-8 bg-muted/20 border border-border rounded-[2rem]">
+                <p className="text-muted-foreground leading-relaxed text-base whitespace-pre-line">
+                  {selectedJob.description || "No detailed description provided for this placement drive."}
                 </p>
               </div>
             </div>
 
             <div className="space-y-4">
-              <div className="flex items-center gap-2 text-xs font-black text-[#e2e2eb] uppercase tracking-[0.2em]">
-                <Target className="w-4 h-4 text-indigo-500" /> Eligible Departments
+              <div className="flex items-center gap-2 text-[10px] font-black text-foreground uppercase tracking-[0.2em]">
+                <Target className="size-4 text-indigo-500" /> Target Departments
               </div>
               <div className="flex flex-wrap gap-2">
-                {(selectedJob.departments?.length ? selectedJob.departments : ['All Departments']).map((dept: string) => (
-                  <span key={dept} className="px-5 py-2.5 bg-[#111319] text-[#c7c4d7] border border-[rgba(255,255,255,0.08)] rounded-2xl text-[10px] font-black uppercase tracking-widest">
+                {(selectedJob.departments?.length ? selectedJob.departments : ['All Specializations']).map((dept: string) => (
+                  <Badge key={dept} variant="outline" className="px-5 py-2.5 rounded-xl border-border bg-background text-[10px] font-black uppercase tracking-widest">
                     {dept}
-                  </span>
+                  </Badge>
                 ))}
               </div>
             </div>
 
-            <div className="flex justify-end pt-4">
-              <button
+            <div className="flex justify-end pt-6">
+              <Button
                 onClick={() => setIsDetailsOpen(false)}
-                className="px-10 py-4 bg-slate-900 text-white rounded-2xl text-xs font-black uppercase tracking-widest hover:bg-blue-600 transition-all shadow-xl active:scale-95"
+                className="px-12 h-12 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary transition-all shadow-xl active:scale-95"
               >
-                Close Details
-              </button>
+                Close Specification
+              </Button>
             </div>
           </div>
         )}
       </Modal>
-    </div>
+    </AdminPageLayout>
   );
 };
 

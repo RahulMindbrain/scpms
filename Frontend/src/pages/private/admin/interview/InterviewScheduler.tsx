@@ -2,7 +2,9 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { 
   Plus, Edit3, Building2, Clock, 
   MapPin, Briefcase, ChevronDown, ChevronUp, 
-  Search, MessageSquare, Send, Trash2
+  Search, MessageSquare, Send, Trash2,
+  Calendar,
+  Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -21,6 +23,8 @@ import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import Loader from '@/components/Loader';
+import { AdminPageLayout } from '@/components/layout/AdminPageLayout';
+import { PageHeader } from '@/components/PageHeader';
 
 const InterviewSchedulerPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -139,192 +143,211 @@ const InterviewSchedulerPage: React.FC = () => {
     : [];
 
   return (
-    <div className="min-h-screen bg-[#111319] p-4 sm:p-6 md:p-8">
-      <div className="space-y-6 md:space-y-8">
+    <AdminPageLayout>
+      <PageHeader
+        title="Interview Scheduler"
+        description="Coordinate and manage interview timelines for diverse recruitment drives."
+        badge="Ops Center"
+        icon={Calendar}
+        variant="indigo"
+      >
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
+            <SelectTrigger className="w-full sm:w-[180px] h-10 rounded-xl bg-background/50 border-border text-xs font-black uppercase tracking-widest px-4">
+              <SelectValue placeholder="Company" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              {companies.map((company) => (
+                <SelectItem key={company.id} value={company.id.toString()}>
+                  {company.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        {/* Header Section */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-1">
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-[#e2e2eb] tracking-tight">Interview Scheduler</h1>
-            <p className="text-[#908fa0] text-sm sm:text-base font-medium">Manage recruitment drives efficiently</p>
+          <div className="relative w-full sm:w-[220px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Search drives..."
+              className="pl-9 bg-background/50 border-border rounded-xl h-10 text-sm focus-visible:ring-primary/20"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
           </div>
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <div className="flex flex-col sm:flex-row items-center gap-2">
-              <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
-                <SelectTrigger className="w-full sm:w-[180px] border-none bg-white shadow-sm ring-1 ring-slate-200 rounded-xl h-11">
-                  <SelectValue placeholder="Select Company" />
-                </SelectTrigger>
-                <SelectContent>
-                  {companies.map((company) => (
-                    <SelectItem key={company.id} value={company.id.toString()}>
-                      {company.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
-              <Input
-                placeholder="Search drives..."
-                className="pl-10 w-full sm:w-[200px] md:w-[250px] border-none bg-[#1e1f26] shadow-sm ring-1 ring-slate-200 focus:ring-primary/40 rounded-xl h-11"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-            <Button onClick={handleOpenCreate} className="bg-primary hover:bg-primary/90 text-white rounded-xl px-6 h-11 shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
-              <Plus className="w-4 h-4 mr-2" /> <span className="whitespace-nowrap">New Drive</span>
-            </Button>
-          </div>
+
+          <Button 
+            onClick={handleOpenCreate} 
+            className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white rounded-xl h-10 font-black uppercase tracking-widest text-[10px] px-6 shadow-lg shadow-primary/10 active:scale-95 transition-all"
+          >
+            <Plus className="size-3.5 mr-1.5" /> New Schedule
+          </Button>
         </div>
+      </PageHeader>
 
-        {/* Drives List */}
-        <div className="space-y-4">
-          {loading ? (
-            <div className="py-20">
-              <Loader text="Syncing data..." />
-            </div>
-          ) : filteredSchedules.map((drive) => {
+      <div className="space-y-6">
+        {loading ? (
+          <div className="py-32 flex justify-center">
+            <Loader text="Syncing schedule data..." />
+          </div>
+        ) : filteredSchedules.length > 0 ? (
+          filteredSchedules.map((drive) => {
             const dateInfo = formatDate(drive.startTime);
             const isExpanded = expandedId === drive.id;
 
             return (
-              <Card
+              <div
                 key={drive.id}
                 className={cn(
-                  "border-none shadow-sm transition-all duration-300 overflow-hidden group",
-                  isExpanded ? "ring-2 ring-primary/20 shadow-xl" : "hover:shadow-md"
+                  "saas-card p-0 overflow-hidden transition-all duration-300",
+                  isExpanded ? "ring-2 ring-primary/20 shadow-xl" : "hover:border-primary/20"
                 )}
               >
-                <CardContent className="p-0">
-                  <div
-                    className="flex flex-col lg:flex-row cursor-pointer select-none"
-                    onClick={() => toggleExpand(drive.id)}
-                  >
-                    {/* Date Box - Responsive Alignment */}
-                    <div className="bg-[#111319] lg:w-32 p-4 sm:p-6 flex flex-row lg:flex-col items-center justify-center border-b lg:border-b-0 lg:border-r border-[rgba(255,255,255,0.06)]/80 relative gap-3 sm:gap-1">
-                      <div className="hidden lg:block absolute left-0 top-1/2 -translate-y-1/2 w-1 h-12 bg-primary rounded-r-full" />
-                      <span className="text-[10px] sm:text-xs font-black text-[#908fa0] uppercase tracking-tighter">{dateInfo.month}</span>
-                      <span className="text-2xl sm:text-4xl font-black text-[#e2e2eb] group-hover:text-primary transition-colors leading-none">{dateInfo.day}</span>
-                      <span className="text-[10px] sm:text-[11px] font-bold text-[#908fa0] uppercase tracking-widest">{dateInfo.weekday}</span>
+                <div
+                  className="flex flex-col lg:flex-row cursor-pointer group"
+                  onClick={() => toggleExpand(drive.id)}
+                >
+                  {/* Date Sidebar */}
+                  <div className="lg:w-32 bg-muted/30 p-6 flex flex-row lg:flex-col items-center justify-center border-b lg:border-b-0 lg:border-r border-border gap-4 lg:gap-1 shrink-0">
+                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{dateInfo.month}</span>
+                    <span className="text-4xl font-black text-foreground group-hover:text-primary transition-colors leading-none tracking-tight">
+                      {dateInfo.day}
+                    </span>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{dateInfo.weekday}</span>
+                  </div>
+
+                  {/* Main Info */}
+                  <div className="flex-1 p-6 sm:p-8 flex flex-col justify-center gap-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-bold text-foreground tracking-tight leading-tight group-hover:text-primary transition-colors">{drive.title}</h3>
+                        <div className="inline-flex items-center gap-2 text-primary font-black text-[10px] bg-primary/5 border border-primary/10 px-3 py-1.5 rounded-xl uppercase tracking-widest">
+                          <Building2 size={13} />
+                          {drive.company?.name || "Corporate Partner"}
+                        </div>
+                      </div>
+                      <Badge className={cn(
+                        "px-4 py-1 rounded-xl text-[9px] font-black uppercase tracking-widest border shadow-sm self-start",
+                        drive.status === 'COMPLETED' ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" :
+                          drive.status === 'ONGOING' ? "bg-sky-500/10 text-sky-600 border-sky-500/20" :
+                            "bg-amber-500/10 text-amber-600 border-amber-500/20"
+                      )}>
+                        {drive.status}
+                      </Badge>
                     </div>
 
-                    {/* Content Body */}
-                    <div className="flex-1 p-5 sm:p-6 md:p-8 flex flex-col justify-center space-y-4 sm:space-y-6">
-                      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                        <div className="space-y-2">
-                          <h3 className="text-lg sm:text-2xl font-black text-[#e2e2eb] tracking-tight leading-tight">{drive.title}</h3>
-                          <div className="flex items-center gap-2 text-primary font-bold text-xs sm:text-sm bg-primary/5 px-3 py-1.5 rounded-full w-fit">
-                            <Building2 size={14} className="sm:w-4 sm:h-4" />
-                            {drive.company?.name || "Corporate Partner"}
-                          </div>
-                        </div>
-                        <Badge className={cn(
-                          "px-4 py-1 rounded-full text-[9px] sm:text-[10px] font-black uppercase tracking-[0.1em] border-none shadow-sm h-fit self-start",
-                          drive.status === 'COMPLETED' ? "bg-emerald-500/10 text-emerald-600" :
-                            drive.status === 'ONGOING' ? "bg-sky-500/10 text-sky-600" :
-                              "bg-amber-500/10 text-amber-600"
-                        )}>
-                          {drive.status}
-                        </Badge>
-                      </div>
-
-                      {/* Quick Info Grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-slate-100 rounded-lg text-primary"><Clock size={16} /></div>
-                          <div className="flex flex-col">
-                            <span className="text-[9px] font-black text-[#908fa0] uppercase">Timing</span>
-                            <span className="text-xs sm:text-sm font-bold text-[#c7c4d7]">{formatTime(drive.startTime)} - {formatTime(drive.endTime)}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-slate-100 rounded-lg text-rose-500"><MapPin size={16} /></div>
-                          <div className="flex flex-col">
-                            <span className="text-[9px] font-black text-[#908fa0] uppercase">Venue</span>
-                            <span className="text-xs sm:text-sm font-bold text-[#c7c4d7] truncate max-w-[150px]">{drive.venue}</span>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-3">
-                          <div className="p-2 bg-slate-100 rounded-lg text-amber-500"><Briefcase size={16} /></div>
-                          <div className="flex flex-col">
-                            <span className="text-[9px] font-black text-[#908fa0] uppercase">Openings</span>
-                            <span className="text-xs sm:text-sm font-bold text-[#c7c4d7]">{drive.jobs?.length || 0} Roles</span>
-                          </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                      <div className="flex items-center gap-3">
+                        <div className="size-10 rounded-xl bg-muted flex items-center justify-center text-primary border border-border"><Clock size={16} /></div>
+                        <div className="space-y-0.5">
+                          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Timing</p>
+                          <p className="text-sm font-bold text-foreground">{formatTime(drive.startTime)} - {formatTime(drive.endTime)}</p>
                         </div>
                       </div>
-                    </div>
-
-                    {/* Action Bar / Stack */}
-                    <div className="bg-[#111319] p-4 sm:p-6 lg:w-44 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-slate-100">
-                      <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-primary hover:bg-primary/5 rounded-xl transition-all" onClick={(e) => handleOpenEdit(e, drive)}>
-                          <Edit3 size={18} />
-                        </Button>
-                        <Button variant="ghost" size="icon" className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all" onClick={(e) => handleOpenMessages(e, drive)}>
-                          <MessageSquare size={18} />
-                        </Button>
-                         <Button 
-    variant="ghost" 
-    size="icon" 
-    className="h-9 w-9 sm:h-10 sm:w-10 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all" 
-    onClick={(e) => {
-      e.stopPropagation();
-      // TODO: call delete API here
-      dispatch(deleteSchedule(drive.id))
-        .unwrap()
-        .then(() => toast.success("Schedule deleted"))
-        .catch((err) => toast.error(err || "Delete failed"));
-    }}
-  >
-    <Trash2 size={18} />
-  </Button>
+                      <div className="flex items-center gap-3">
+                        <div className="size-10 rounded-xl bg-muted flex items-center justify-center text-rose-500 border border-border"><MapPin size={16} /></div>
+                        <div className="space-y-0.5">
+                          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Venue</p>
+                          <p className="text-sm font-bold text-foreground truncate max-w-[150px]">{drive.venue}</p>
+                        </div>
                       </div>
-                      <div className="w-10 h-10 rounded-xl bg-slate-200/50 flex items-center justify-center text-[#908fa0]">
-                        {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                      <div className="flex items-center gap-3">
+                        <div className="size-10 rounded-xl bg-muted flex items-center justify-center text-amber-500 border border-border"><Briefcase size={16} /></div>
+                        <div className="space-y-0.5">
+                          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Linked Roles</p>
+                          <p className="text-sm font-bold text-foreground">{drive.jobs?.length || 0} Openings</p>
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Expandable Content */}
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        className="border-t border-[rgba(255,255,255,0.06)] bg-white"
+                  {/* Actions Column */}
+                  <div className="bg-muted/10 p-6 lg:w-48 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-border shrink-0">
+                    <div className="flex items-center gap-2">
+                      <Button variant="outline" size="icon" className="size-10 rounded-xl border-border text-muted-foreground hover:text-primary hover:bg-primary/5 hover:border-primary/20 transition-all" onClick={(e) => handleOpenEdit(e, drive)}>
+                        <Edit3 size={16} />
+                      </Button>
+                      <Button variant="outline" size="icon" className="size-10 rounded-xl border-border text-muted-foreground hover:text-amber-600 hover:bg-amber-500/10 hover:border-amber-500/20 transition-all" onClick={(e) => handleOpenMessages(e, drive)}>
+                        <MessageSquare size={16} />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="icon" 
+                        className="size-10 rounded-xl border-border text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 hover:border-rose-500/20 transition-all" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const toastId = toast.loading("Removing schedule...");
+                          dispatch(deleteSchedule(drive.id))
+                            .unwrap()
+                            .then(() => toast.success("Schedule deleted", { id: toastId }))
+                            .catch((err) => toast.error(err || "Delete failed", { id: toastId }));
+                        }}
                       >
-                        <div className="p-5 sm:p-8 md:p-10 space-y-6 bg-gradient-to-b from-white to-slate-50/30">
-                          <div className="flex items-center gap-3">
-                            <div className="p-2.5 bg-indigo-50 text-indigo-600 rounded-2xl">
-                              <Briefcase size={20} />
-                            </div>
-                            <h4 className="text-base sm:text-lg font-black text-[#e2e2eb] tracking-tight uppercase">Job Openings</h4>
-                          </div>
+                        <Trash2 size={16} />
+                      </Button>
+                    </div>
+                    <div className="size-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground">
+                      {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                    </div>
+                  </div>
+                </div>
 
-                          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-                            {drive.jobs?.map((job: any) => (
-                              <div key={job.id} className="p-5 sm:p-6 rounded-2xl border border-[rgba(255,255,255,0.06)] bg-[#1e1f26] shadow-sm hover:ring-2 hover:ring-primary/20 transition-all space-y-4">
-                                <div className="space-y-1">
-                                  <p className="font-black text-[#e2e2eb] text-sm sm:text-base">{job.title}</p>
-                                  <p className="text-[10px] font-bold text-[#908fa0] uppercase tracking-widest">{job.jobType} • {job.location}</p>
-                                </div>
-                                <div className="flex items-center justify-between pt-4 border-t border-slate-50">
-                                  <Badge variant="outline" className="rounded-lg text-[8px] sm:text-[9px] font-black tracking-widest border-slate-200">{job.status}</Badge>
-                                </div>
-                              </div>
-                            )) || <div className="col-span-full py-8 text-[#908fa0] font-bold text-center italic text-sm">No jobs linked.</div>}
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="border-t border-border bg-muted/5"
+                    >
+                      <div className="p-8 sm:p-10 space-y-8">
+                        <div className="flex items-center gap-3">
+                          <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
+                            <Sparkles size={18} />
                           </div>
+                          <h4 className="text-base font-black text-foreground uppercase tracking-widest">Opening Specifications</h4>
                         </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </CardContent>
-              </Card>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                          {drive.jobs?.map((job: any) => (
+                            <div key={job.id} className="saas-card bg-background p-6 space-y-4 hover:border-primary/30 transition-all">
+                              <div className="space-y-1">
+                                <p className="font-bold text-foreground tracking-tight">{job.title}</p>
+                                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                                  <MapPin size={10} /> {job.location || 'Remote'}
+                                </p>
+                              </div>
+                              <div className="pt-4 border-t border-border flex items-center justify-between">
+                                <Badge variant="secondary" className="bg-muted text-muted-foreground text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg border-none">{job.status}</Badge>
+                                <div className="text-[10px] font-black text-primary uppercase tracking-widest">View Specs</div>
+                              </div>
+                            </div>
+                          )) || <div className="col-span-full py-12 text-muted-foreground font-bold text-center italic text-sm saas-card bg-muted/10 border-dashed">No openings linked to this schedule.</div>}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             );
-          })}
-        </div>
+          })
+        ) : (
+          <div className="py-32 text-center saas-card border-dashed bg-muted/10">
+            <div className="size-20 bg-muted/30 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6">
+              <Calendar className="size-10 text-muted-foreground/30" />
+            </div>
+            <h3 className="text-xl font-bold text-foreground mb-2">No schedules found</h3>
+            <p className="text-muted-foreground text-sm max-w-xs mx-auto mb-8">
+              Adjust your filters or company selection to see interview schedules.
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => { setSearchTerm(''); setSelectedCompanyId('all'); }}
+              className="rounded-xl px-8 border-border font-bold text-xs uppercase tracking-widest h-11"
+            >
+              Reset Filters
+            </Button>
+          </div>
+        )}
       </div>
 
       <EditScheduleModal
@@ -337,60 +360,60 @@ const InterviewSchedulerPage: React.FC = () => {
       <Modal
         isOpen={isMessagesOpen}
         onClose={() => setIsMessagesOpen(false)}
-        title="Formal Notes"
+        title="Internal Communication"
         subtitle={`Notes for ${activeSchedule?.title || "selected schedule"}`}
       >
-        <div className="flex flex-col gap-6 pt-2">
-          <div className="space-y-3 max-h-[320px] overflow-y-auto pr-1">
+        <div className="flex flex-col gap-8 py-4">
+          <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 scrollbar-hide">
             {msgLoading === activeSchedule?.id ? (
-              <div className="py-12">
-                <Loader size="sm" text="Loading notes..." />
+              <div className="py-16">
+                <Loader size="sm" text="Syncing communications..." />
               </div>
             ) : activeSchedule?.messages && activeSchedule.messages.length > 0 ? (
               [...activeSchedule.messages].reverse().map((msg: any) => (
-                <div key={msg.id} className="bg-[#111319] border border-[rgba(255,255,255,0.06)] rounded-2xl p-5 space-y-2">
-                  <p className="text-xs font-black text-[#c7c4d7]">
-                    {msg.senderName || (msg.isAdmin ? 'Placement Admin' : 'Company')}
-                  </p>
-                  <p className="text-sm text-[#c7c4d7] font-medium leading-relaxed">{msg.message}</p>
+                <div key={msg.id} className="bg-muted/30 border border-border rounded-2xl p-5 space-y-2 group hover:border-primary/20 transition-all">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[10px] font-black text-primary uppercase tracking-widest">
+                      {msg.senderName || (msg.isAdmin ? 'Placement Admin' : 'Corporate Partner')}
+                    </p>
+                  </div>
+                  <p className="text-sm text-foreground font-medium leading-relaxed">{msg.message}</p>
                 </div>
               ))
             ) : (
-              <div className="flex flex-col items-center justify-center py-12 text-center space-y-3">
-                <MessageSquare className="w-6 h-6 text-slate-300" />
-                <p className="text-[#908fa0] text-sm font-bold">No formal notes yet.</p>
+              <div className="flex flex-col items-center justify-center py-16 text-center space-y-4 bg-muted/10 rounded-3xl border border-dashed border-border">
+                <MessageSquare className="size-10 text-muted-foreground/30" />
+                <p className="text-muted-foreground text-xs font-black uppercase tracking-widest">Zero historical notes recorded.</p>
               </div>
             )}
           </div>
 
-          <div className="border-t border-slate-100" />
-
-          <div className="space-y-3">
-            <label className="text-[10px] font-black uppercase tracking-widest text-[#908fa0]">
-              Post a Formal Note
-            </label>
+          <div className="space-y-4 pt-6 border-t border-border">
+            <div className="flex items-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+              <Sparkles className="size-3.5 text-primary" /> Post Communication Note
+            </div>
             <textarea
               rows={4}
-              placeholder="Write a clear formal note for the company regarding this schedule."
+              placeholder="Record a formal note or internal update for this drive..."
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
-              className="w-full px-5 py-4 bg-[#111319] border border-[rgba(255,255,255,0.08)] rounded-2xl text-sm font-medium text-[#c7c4d7] placeholder:text-slate-300 outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-200 resize-none transition-all"
+              className="w-full px-5 py-4 bg-muted/30 border border-border rounded-2xl text-sm font-medium text-foreground placeholder:text-muted-foreground/50 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/30 resize-none transition-all"
             />
             <Button
               onClick={handleSendMessage}
               disabled={!messageText.trim() || sendingMsg}
-              className="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xs uppercase tracking-widest"
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/10 active:scale-95 transition-all"
             >
               {sendingMsg ? (
-                <span className="flex items-center gap-2"><Loader size="sm" /> Submitting...</span>
+                <span className="flex items-center gap-2"><Loader size="sm" /> Sending...</span>
               ) : (
-                <span className="flex items-center gap-2"><Send className="w-4 h-4" /> Submit Note</span>
+                <span className="flex items-center gap-2"><Send className="size-3.5" /> Dispatch Note</span>
               )}
             </Button>
           </div>
         </div>
       </Modal>
-    </div>
+    </AdminPageLayout>
   );
 };
 

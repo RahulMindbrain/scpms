@@ -1,17 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import {
-  Search,
-  CheckCircle2,
-  UserCheck,
-  XCircle,
-  Check,
-  X
-} from 'lucide-react';
+import { Users, Search, UserCheck, CheckCircle2, XCircle, Check, X, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { toast } from 'sonner';
-import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -30,10 +22,6 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import {
-  Card,
-  CardContent,
-} from "@/components/ui/card"
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -44,9 +32,9 @@ import { fetchStudents, fetchInactiveStudents, activateStudents } from '@/redux/
 import { fetchDepartments } from '@/redux/thunks/departmentThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
-// import { getAPI } from '@/apis/api';
-
 import Loader from '@/components/Loader';
+import { AdminPageLayout } from '@/components/layout/AdminPageLayout';
+import { PageHeader } from '@/components/PageHeader';
 
 const StudentManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -58,12 +46,6 @@ const StudentManagement: React.FC = () => {
   const [selectedDept, _setSelectedDept] = useState('All Depts');
   const [selectedStatus, _setSelectedStatus] = useState('All Status');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-
-  // Viewing Student Profile State
-  // const [isViewProfileModalOpen, setIsViewProfileModalOpen] = useState(false);
-  // const [viewingStudent, setViewingStudent] = useState<any>(null);
-  // const [viewingStudentDept, setViewingStudentDept] = useState<any>(null);
-  // const [isProfileDeptLoading, setIsProfileDeptLoading] = useState(false);
 
   useEffect(() => {
     dispatch(fetchStudents({}));
@@ -107,21 +89,6 @@ const StudentManagement: React.FC = () => {
     setIsAddModalOpen(false);
   };
 
-  // const handleViewProfile = async (student: any) => {
-  //   setViewingStudent(student);
-  //   setViewingStudentDept(null);
-  //   setIsViewProfileModalOpen(true);
-  //   setIsProfileDeptLoading(true);
-  //   try {
-  //     const data = await getAPI<any>(`/dept/${student.deptId}`);
-  //     setViewingStudentDept(data?.data || null);
-  //   } catch {
-  //     // dept data unavailable, just show student info
-  //   } finally {
-  //     setIsProfileDeptLoading(false);
-  //   }
-  // };
-
   const handleApprove = async (id: number) => {
     const toastId = toast.loading("Approving student account...");
     try {
@@ -161,316 +128,226 @@ const StudentManagement: React.FC = () => {
 
   if (error) {
     return (
-      <div className="flex h-[60vh] flex-col items-center justify-center space-y-4">
-        <p className="text-destructive font-bold uppercase tracking-widest">{error}</p>
-        <Button onClick={() => dispatch(fetchStudents({}))}>Retry</Button>
-      </div>
+      <AdminPageLayout>
+        <div className="flex h-[400px] flex-col items-center justify-center space-y-4">
+          <p className="text-destructive font-bold uppercase tracking-widest">{error}</p>
+          <Button onClick={() => dispatch(fetchStudents({}))}>Retry</Button>
+        </div>
+      </AdminPageLayout>
     );
   }
 
   return (
-    <div className="p-4 md:p-8 space-y-6 bg-[#111319] min-h-screen">
-      {/* Top Bar */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full xl:w-auto">
-          <div className="relative w-full sm:w-[280px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
-            <Input
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search students..."
-              className="pl-9 bg-[#0c0e14] border-[rgba(255,255,255,0.08)] text-[#e2e2eb] placeholder:text-[#908fa0] h-10 w-full focus:border-indigo-500"
-            />
+    <AdminPageLayout>
+      <PageHeader
+        title="Student Directory"
+        description="Manage and verify student accounts across all departments."
+        badge="Account Verification"
+        icon={GraduationCap}
+        variant="sky"
+      >
+        <div className="relative w-full sm:w-[280px]">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search students..."
+            className="pl-9 bg-background border-border h-10 w-full focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+        <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+          <DialogTrigger asChild>
+            <Button className="h-10 shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 text-white font-bold">
+              Add Student
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[500px] rounded-3xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl font-black tracking-tight">Register New Student</DialogTitle>
+              <DialogDescription className="font-medium">
+                Add a student record to the placement database.
+              </DialogDescription>
+            </DialogHeader>
+            <form onSubmit={handleAddStudent} className="space-y-6 pt-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="saas-label">Full Name</label>
+                  <Input required placeholder="Ex: John Doe" className="saas-input" />
+                </div>
+                <div className="space-y-2">
+                  <label className="saas-label">Department</label>
+                  <Select>
+                    <SelectTrigger className="saas-input">
+                      <SelectValue placeholder="Select Dept" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {departments.map((dept: any) => (
+                        <SelectItem key={dept.id} value={dept.name || dept.deptName}>
+                          {dept.name || dept.deptName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="saas-label">CGPA</label>
+                  <Input type="number" step="0.01" required placeholder="0.00" className="saas-input" />
+                </div>
+                <div className="space-y-2">
+                  <label className="saas-label">Roll Number</label>
+                  <Input required placeholder="24CS001" className="saas-input" />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="submit" disabled={loading} className="w-full h-12 rounded-xl bg-primary font-bold text-white">
+                  {loading ? (
+                    <span className="flex items-center gap-2"><Loader size="sm" /> Creating...</span>
+                  ) : "Create Record"}
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </PageHeader>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[
+          { label: "Total Students", value: students.length, icon: Users, color: "indigo" },
+          { label: "Verified Students", value: reduxStudents.length, icon: CheckCircle2, color: "emerald" },
+          { label: "Pending Verification", value: reduxInactiveStudents.length, icon: UserCheck, color: "amber" },
+          { label: "Rejected Applications", value: students.filter((s: any) => s.status === 'rejected').length, icon: XCircle, color: "rose" },
+        ].map((stat, idx) => (
+          <div key={idx} className={`premium-stat-card stat-glow-${stat.color} group`}>
+            <div className="flex items-center justify-between mb-4">
+              <div className={`p-3 rounded-2xl bg-${stat.color === 'indigo' ? 'primary' : stat.color}-500/10 text-${stat.color === 'indigo' ? 'primary' : stat.color}-500`}>
+                <stat.icon className="size-5" />
+              </div>
+              <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/5 border border-primary/10">
+                 <div className="size-1.5 rounded-full bg-primary animate-pulse" />
+                 <span className="text-[9px] font-bold text-primary uppercase">Live</span>
+              </div>
+            </div>
+            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{stat.label}</p>
+            <h2 className="text-3xl font-black text-foreground mt-1 tracking-tight">{stat.value}</h2>
           </div>
-          {activeTab !== 'active' && (
-            <>
-              {/* <Select value={selectedDept} onValueChange={setSelectedDept}>
-                <SelectTrigger className="w-full sm:w-[140px] bg-white border-slate-200 shadow-sm h-10">
-                  <SelectValue placeholder="All Depts" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All Depts">All Depts</SelectItem>
-                  {departments.map((dept: any) => (
-                    <SelectItem key={dept.id} value={dept.name || dept.deptName}>
-                      {dept.name || dept.deptName}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select> */}
-              {/* <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-                <SelectTrigger className="w-full sm:w-[140px] bg-white border-slate-200 shadow-sm h-10">
-                  <SelectValue placeholder="All Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="All Status">All Status</SelectItem>
-                  <SelectItem value="approved">Approved</SelectItem>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="rejected">Rejected</SelectItem>
-                </SelectContent>
-              </Select> */}
-            </>
-          )}
-        </div>
-        
-        <div className="flex flex-row items-center gap-3 w-full xl:w-auto">
-          {/* <Button
-            variant="outline"
-            onClick={handleExport}
-            disabled={isExporting}
-            className="flex-1 xl:flex-none h-10 bg-white border border-slate-200 text-slate-700 shadow-sm hover:bg-slate-50"
-          >
-            <Download className="w-4 h-4 mr-2" /> Export
-          </Button> */}
-          <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
-            <DialogTrigger asChild>
-              {/* <Button className="flex-1 xl:flex-none h-10 shadow-sm bg-blue-600 hover:bg-blue-700 text-white">
-                <UserPlus className="w-4 h-4 mr-2" /> Add Student
-              </Button> */}
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[500px]">
-              <DialogHeader>
-                <DialogTitle>Register New Student</DialogTitle>
-                <DialogDescription>
-                  Add a student record to the placement database.
-                </DialogDescription>
-              </DialogHeader>
-              <form onSubmit={handleAddStudent} className="space-y-6 pt-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Full Name</label>
-                    <Input required placeholder="Ex: John Doe" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Department</label>
-                    <Select>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select Dept" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {departments.map((dept: any) => (
-                          <SelectItem key={dept.id} value={dept.name || dept.deptName}>
-                            {dept.name || dept.deptName}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">CGPA</label>
-                    <Input type="number" step="0.01" required placeholder="0.00" />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Roll Number</label>
-                    <Input required placeholder="24CS001" />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit" disabled={loading} className="w-full">
-                    {loading ? (
-                      <span className="flex items-center gap-2"><Loader size="sm" /> Creating...</span>
-                    ) : "Create Record"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </DialogContent>
-          </Dialog>
-        </div>
+        ))}
       </div>
 
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="shadow-none border border-[rgba(255,255,255,0.07)] rounded-xl bg-[#1e1f26] border-t-2 border-t-indigo-500/80">
-          <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-[28px] font-bold text-[#e2e2eb]">{students.length}</span>
-            <span className="text-[13px] text-[#908fa0] mt-1">Total Students</span>
-          </CardContent>
-        </Card>
-        <Card className="shadow-none border border-[rgba(255,255,255,0.07)] rounded-xl bg-[#1e1f26] border-t-2 border-t-emerald-500/80">
-          <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-[28px] font-bold text-emerald-400">{reduxStudents.length}</span>
-            <span className="text-[13px] text-[#908fa0] mt-1">Verified</span>
-          </CardContent>
-        </Card>
-        <Card className="shadow-none border border-[rgba(255,255,255,0.07)] rounded-xl bg-[#1e1f26] border-t-2 border-t-amber-500/80">
-          <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-[28px] font-bold text-amber-400">{reduxInactiveStudents.length}</span>
-            <span className="text-[13px] text-[#908fa0] mt-1">Pending Verification</span>
-          </CardContent>
-        </Card>
-        <Card className="shadow-none border border-[rgba(255,255,255,0.07)] rounded-xl bg-[#1e1f26] border-t-2 border-t-rose-500/80">
-          <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-[28px] font-bold text-rose-400">{students.filter((s: any) => s.status === 'rejected').length}</span>
-            <span className="text-[13px] text-[#908fa0] mt-1">Rejected</span>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Students Table */}
-      {/* Tabs + Activate All */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div className="flex items-center gap-1 bg-[#0c0e14] border border-[rgba(255,255,255,0.07)] rounded-xl p-1 w-fit">
+      {/* Tabs and Actions */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 border-b border-border pb-6">
+        <div className="flex items-center gap-1 bg-muted/30 border border-border rounded-2xl p-1.5 w-fit">
           <button
             onClick={() => setActiveTab('active')}
-            className={`px-5 py-2 rounded-lg text-[13px] font-semibold transition-all ${
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
               activeTab === 'active'
-                ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/30'
-                : 'text-[#908fa0] hover:text-[#e2e2eb] hover:bg-[rgba(255,255,255,0.05)]'
+                ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
           >
-            Active Students
-            <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-              activeTab === 'active' ? 'bg-white/20 text-white' : 'bg-[rgba(255,255,255,0.08)] text-[#908fa0]'
+            Active Directory
+            <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] font-black ${
+              activeTab === 'active' ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
             }`}>
               {reduxStudents.length}
             </span>
           </button>
           <button
             onClick={() => setActiveTab('inactive')}
-            className={`px-5 py-2 rounded-lg text-[13px] font-semibold transition-all ${
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
               activeTab === 'inactive'
-                ? 'bg-amber-500 text-white shadow-sm shadow-amber-500/30'
-                : 'text-[#908fa0] hover:text-[#e2e2eb] hover:bg-[rgba(255,255,255,0.05)]'
+                ? 'bg-amber-500 text-white shadow-lg shadow-amber-500/20'
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
           >
-            Inactive Students
-            <span className={`ml-2 px-1.5 py-0.5 rounded-full text-[10px] font-bold ${
-              activeTab === 'inactive' ? 'bg-white/20 text-white' : 'bg-[rgba(255,255,255,0.08)] text-[#908fa0]'
+            Pending List
+            <span className={`ml-2 px-2 py-0.5 rounded-full text-[10px] font-black ${
+              activeTab === 'inactive' ? 'bg-white/20 text-white' : 'bg-muted text-muted-foreground'
             }`}>
               {reduxInactiveStudents.length}
             </span>
           </button>
         </div>
 
-        {/* Activate All — visible only on Inactive tab */}
         {activeTab === 'inactive' && reduxInactiveStudents.length > 0 && (
           <Button
             onClick={handleActivateAll}
             disabled={loading}
-            className="h-10 bg-orange-500 hover:bg-orange-600 text-white shadow-sm font-semibold text-[13px] px-5 rounded-xl transition-all"
+            className="h-12 bg-orange-500 hover:bg-orange-600 text-white shadow-xl shadow-orange-500/20 font-black text-sm px-8 rounded-2xl transition-all active:scale-95"
           >
-            <UserCheck className="w-4 h-4 mr-2" />
-            {loading ? (
-              <span className="flex items-center gap-2"><Loader size="sm" /> Activating...</span>
-            ) : `Activate All (${reduxInactiveStudents.length})`}
+            <UserCheck className="w-5 h-5 mr-2" />
+            {loading ? "Activating..." : `Approve All (${reduxInactiveStudents.length})`}
           </Button>
         )}
       </div>
 
-      <Card className="overflow-hidden shadow-none border border-[rgba(255,255,255,0.07)] bg-[#1e1f26] rounded-xl">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader className="bg-[#191b22] border-b border-[rgba(255,255,255,0.06)]">
-              <TableRow className="hover:bg-transparent border-0">
-                <TableHead className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#908fa0] h-11 pl-6">Name</TableHead>
-                <TableHead className="text-[10px] font-semibold uppercase tracking-[0.08em] text-[#908fa0] h-11 text-center">Status</TableHead>
+      {/* Data Table */}
+      <div className="saas-table-container">
+        <Table className="saas-table">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="pl-8">Student Identity</TableHead>
+              <TableHead className="text-center">Verification Status</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredStudents.map((student) => (
+              <TableRow key={student.id}>
+                <TableCell className="py-6 pl-8">
+                  <div className="flex flex-col">
+                    <span className="font-bold text-base text-foreground tracking-tight">{student.name}</span>
+                    <span className="text-xs text-muted-foreground font-medium">{student.dept || "Department Not Assigned"}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="text-center">
+                  <div className="flex items-center justify-center gap-3">
+                    {student.status === 'pending' ? (
+                      <>
+                        <Button
+                          size="sm"
+                          onClick={() => handleApprove(student.id)}
+                          className="h-9 px-4 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl shadow-md shadow-emerald-500/10 flex items-center gap-2 font-bold text-xs"
+                        >
+                          <Check className="w-4 h-4" /> Approve
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleReject(student.id)}
+                          className="h-9 px-4 bg-rose-500 hover:bg-rose-600 text-white rounded-xl shadow-md shadow-rose-500/10 flex items-center gap-2 font-bold text-xs"
+                        >
+                          <X className="w-4 h-4" /> Reject
+                        </Button>
+                      </>
+                    ) : student.status === 'approved' ? (
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
+                        <CheckCircle2 className="w-3.5 h-3.5" /> Verified
+                      </div>
+                    ) : (
+                      <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-600 text-[10px] font-black uppercase tracking-widest">
+                        <XCircle className="w-3.5 h-3.5" /> Declined
+                      </div>
+                    )}
+                  </div>
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredStudents.map((student) => (
-                <TableRow key={student.id} className="border-b border-[rgba(255,255,255,0.04)] hover:bg-[rgba(255,255,255,0.025)] transition-colors">
-                  <TableCell className="font-semibold text-[#e2e2eb] py-4 pl-6">{student.name}</TableCell>
-                  <TableCell className="text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      {student.status === 'pending' ? (
-                        <>
-                          <Button
-                            size="sm"
-                            onClick={() => handleApprove(student.id)}
-                            className="h-8 px-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg shadow-sm flex items-center gap-1.5 transition-all duration-200 font-semibold"
-                          >
-                            <Check className="w-3.5 h-3.5" /> Approve
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => handleReject(student.id)}
-                            className="h-8 px-3 bg-rose-500 hover:bg-rose-600 text-white rounded-lg shadow-sm flex items-center gap-1.5 transition-all duration-200 font-semibold"
-                          >
-                            <X className="w-3.5 h-3.5" /> Reject
-                          </Button>
-                        </>
-                      ) : student.status === 'approved' ? (
-                        <Badge variant="success" className="px-3 py-1 rounded-full gap-1.5 font-bold uppercase tracking-wider">
-                          <CheckCircle2 className="w-3.5 h-3.5" /> Approved
-                        </Badge>
-                      ) : (
-                        <Badge variant="danger" className="px-3 py-1 rounded-full gap-1.5 font-bold uppercase tracking-wider">
-                          <XCircle className="w-3.5 h-3.5" /> Rejected
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  {/* <TableCell className="text-right pr-6">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="h-9 w-9 text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors rounded-lg"
-                      onClick={() => handleViewProfile(student)}
-                    >
-                      <Eye className="w-5 h-5" />
-                    </Button>
-                  </TableCell> */}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+            ))}
+          </TableBody>
+        </Table>
+        
         {filteredStudents.length === 0 && (
-          <div className="py-20 text-center text-[#908fa0]">
-            <Search className="w-12 h-12 mx-auto mb-4 opacity-20" />
-            <p className="font-medium">No results matched your search</p>
+          <div className="py-32 text-center">
+            <div className="bg-muted/50 size-20 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6">
+              <Search className="w-10 h-10 text-muted-foreground/30" />
+            </div>
+            <p className="font-bold text-lg text-foreground tracking-tight">No students found</p>
+            <p className="text-sm text-muted-foreground mt-1">Try adjusting your search terms or filters.</p>
           </div>
         )}
-      </Card>
-      
-      {/* Student Profile Modal */}
-      {/* <Dialog open={isViewProfileModalOpen} onOpenChange={setIsViewProfileModalOpen}>
-        <DialogContent className="sm:max-w-[425px] bg-[#f8fafc] border-none shadow-xl rounded-xl">
-          <DialogHeader className="text-left mb-2">
-            <DialogTitle className="text-xl font-semibold text-slate-900">Student Profile</DialogTitle>
-            <DialogDescription className="text-slate-500 font-medium text-[13px]">
-              Review and verify student details
-            </DialogDescription>
-          </DialogHeader>
-          {viewingStudent && (
-            <div className="grid grid-cols-2 gap-y-6 gap-x-4 py-2">
-              <div>
-                <p className="text-[13px] text-slate-500 mb-1">Name</p>
-                <p className="font-semibold text-slate-900 text-sm">{viewingStudent.name}</p>
-              </div>
-              <div>
-                <p className="text-[13px] text-slate-500 mb-1">Department</p>
-                <p className="font-semibold text-slate-900 text-sm">{viewingStudent.dept}</p>
-                <div className="mt-1.5">
-                  {isProfileDeptLoading ? (
-                    <div className="flex items-center gap-1.5">
-                      <div className="w-3 h-3 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />
-                      <span className="text-[11px] text-slate-400">Loading...</span>
-                    </div>
-                  ) : viewingStudentDept ? (
-                    viewingStudentDept.isActive ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-[10px] font-semibold">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" /> Active
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-50 border border-red-200 text-red-600 text-[10px] font-semibold">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 inline-block" /> Inactive
-                      </span>
-                    )
-                  ) : null}
-                </div>
-              </div>
-              <div>
-                <p className="text-[13px] text-slate-500 mb-1">Verified</p>
-                <p className="font-semibold text-slate-900 text-sm mt-1">{viewingStudent.verified ? 'Yes' : 'No'}</p>
-              </div>
-            </div>
-          )}
-        </DialogContent>
-      </Dialog> */}
-    </div>
+      </div>
+    </AdminPageLayout>
   );
 };
 
