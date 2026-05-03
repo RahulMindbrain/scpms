@@ -10,7 +10,9 @@ import {
   Sparkles,
   Trophy,
   Building2,
-  ChevronLeft
+  ChevronLeft,
+  CheckCircle2,
+  ArrowRight
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -180,7 +182,7 @@ const JobListing = () => {
           </div>
         </motion.div>
 
-        {/* Jobs Grid - Maximum Card Visibility */}
+        {/* Jobs Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 md:gap-10">
           <AnimatePresence mode='popLayout'>
             {paginatedJobs.map((job: Job) => {
@@ -199,12 +201,10 @@ const JobListing = () => {
                     <CardContent className="p-0">
                       <div className="p-8">
                         <div className="flex gap-5">
-                          {/* Company Branding */}
                           <div className={`w-14 h-14 md:w-16 md:h-16 ${job.logoBg || 'bg-indigo-600/15'} rounded-2xl flex items-center justify-center text-indigo-700 dark:text-indigo-400 font-black text-xl shadow-sm group-hover:scale-110 transition-transform duration-500 shrink-0 border-2 border-indigo-500/10`}>
                             {job.logo || job.company.name.substring(0, 2)}
                           </div>
 
-                          {/* Content */}
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-col gap-2 mb-3">
                               <h3 className="text-lg font-bold text-slate-900 dark:text-white leading-tight group-hover:text-indigo-600 transition-colors">
@@ -228,7 +228,6 @@ const JobListing = () => {
                           </div>
                         </div>
 
-                        {/* Visual Stats Grid - Maximum Contrast */}
                         <div className="grid grid-cols-2 gap-3 mt-8">
                           <div className="flex items-center gap-3 p-4 bg-slate-50 dark:bg-white/[0.03] rounded-2xl border-2 border-slate-200 dark:border-white/5 group-hover:bg-white dark:group-hover:bg-white/10 transition-colors">
                             <div className="p-2 rounded-xl bg-blue-600/15 text-blue-800 dark:text-blue-400">
@@ -252,7 +251,6 @@ const JobListing = () => {
                         )}
                       </div>
 
-                      {/* Card Footer Actions - Refined Button */}
                       <div className="px-8 py-5 bg-slate-100/50 dark:bg-white/[0.04] border-t-2 border-slate-200 dark:border-white/5 flex items-center justify-between group-hover:bg-white dark:group-hover:bg-white/10 transition-colors">
                         <div className="flex items-center gap-2 text-slate-600 dark:text-slate-500">
                           <Clock className="w-4 h-4 text-indigo-600" />
@@ -282,7 +280,7 @@ const JobListing = () => {
           </AnimatePresence>
         </div>
 
-        {/* Pagination UI - Refined Styled */}
+        {/* Pagination UI */}
         {totalPages > 1 && (
           <motion.div variants={itemVariants} className="flex items-center justify-center gap-3 pt-10 pb-10">
             <Button
@@ -338,56 +336,70 @@ const JobListing = () => {
           </motion.div>
         )}
 
-        {/* Premium Details Modal - Refined Visibility */}
+        {/* Premium Refined Modal */}
         <Modal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
-          title={selectedJob?.title || "Job Details"}
-          subtitle={`${selectedJob?.company?.name} • ${selectedJob?.location}`}
+          title={selectedJob?.title}
+          subtitle={`${selectedJob?.company.name} • ${selectedJob?.location}`}
+          maxWidth="sm:max-w-lg"
         >
-          <div className="space-y-6 pt-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="p-5 rounded-2xl bg-slate-100 dark:bg-white/5 border-2 border-slate-200 dark:border-white/5 flex gap-4 items-center">
-                <div className="p-2.5 bg-indigo-600/15 rounded-xl">
-                  <Calendar className="w-5 h-5 text-indigo-700 dark:text-indigo-400" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-black text-slate-600 dark:text-slate-500 uppercase tracking-widest">Deadline</p>
-                  <p className="text-sm font-bold text-slate-950 dark:text-slate-50">{selectedJob?.deadline || 'To be announced'}</p>
-                </div>
+          <div className="space-y-6">
+            {/* Header / Logo Section */}
+            <div className="flex items-center gap-4">
+              <div className={`w-16 h-16 ${selectedJob?.logoBg || 'bg-indigo-600/10'} rounded-2xl flex items-center justify-center text-indigo-700 dark:text-indigo-400 font-black text-2xl border-2 border-slate-100 dark:border-white/5 shadow-sm`}>
+                {selectedJob?.logo || selectedJob?.company.name.substring(0, 2)}
               </div>
-              <div className="p-5 rounded-2xl bg-slate-100 dark:bg-white/5 border-2 border-slate-200 dark:border-white/10 flex gap-4 items-center">
-                <div className="p-2.5 bg-emerald-600/15 rounded-xl">
-                  <IndianRupee className="w-5 h-5 text-emerald-700 dark:text-emerald-400" />
-                </div>
-                <div>
-                  <p className="text-[10px] font-black text-slate-600 dark:text-slate-500 uppercase tracking-widest">Expected LPA</p>
-                  <p className="text-sm font-bold text-slate-950 dark:text-slate-50">{selectedJob?.salary ? formatSalary(selectedJob.salary) : 'Competitive'}</p>
+              <div className="space-y-1">
+                <p className="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Job Opportunity</p>
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-slate-400" />
+                  <span className="text-slate-900 dark:text-white font-bold">{selectedJob?.company.name}</span>
                 </div>
               </div>
             </div>
 
+            {/* Info Grid */}
+            <div className="grid grid-cols-2 gap-3">
+              <div className="p-4 bg-slate-50 dark:bg-white/[0.03] rounded-2xl border-2 border-slate-100 dark:border-white/5">
+                <div className="flex items-center gap-2 mb-1">
+                  <Calendar className="w-3.5 h-3.5 text-indigo-600" />
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Deadline</span>
+                </div>
+                <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{selectedJob?.deadline || 'Not Specified'}</p>
+              </div>
+              <div className="p-4 bg-slate-50 dark:bg-white/[0.03] rounded-2xl border-2 border-slate-100 dark:border-white/5">
+                <div className="flex items-center gap-2 mb-1">
+                  <IndianRupee className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Expected LPA</span>
+                </div>
+                <p className="text-sm font-bold text-slate-900 dark:text-slate-100">{selectedJob?.salary ? formatSalary(selectedJob.salary) : 'Competitive'}</p>
+              </div>
+            </div>
+
+            {/* Description */}
             <div className="space-y-3">
-              <h4 className="text-[10px] font-black text-slate-950 dark:text-white uppercase tracking-[0.2em] flex items-center gap-2">
-                <div className="w-1.5 h-4 bg-indigo-700 rounded-full"></div>
-                About the Opportunity
-              </h4>
-              <div className="bg-slate-100 dark:bg-white/5 p-6 rounded-2xl border-2 border-slate-200 dark:border-white/5">
-                <p className="text-slate-900 dark:text-slate-100 leading-relaxed font-semibold text-[14px]">
+              <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Role Description</h4>
+              <div className="bg-slate-50 dark:bg-white/[0.02] p-6 rounded-2xl border-2 border-slate-100 dark:border-white/5">
+                <p className="text-slate-800 dark:text-slate-200 leading-relaxed font-medium text-sm">
                   {selectedJob?.description}
                 </p>
               </div>
             </div>
 
-            <div className="pt-4 pb-2">
+            {/* Action */}
+            <div className="pt-2">
               <Button
-                className="w-full !bg-indigo-600 !text-white py-6 rounded-xl font-bold text-base tracking-tight shadow-xl shadow-indigo-500/30 hover:!bg-indigo-700 hover:scale-[1.01] active:scale-[0.99] transition-all border-none"
+                className="w-full !bg-indigo-600 !text-white py-6 rounded-xl font-bold text-base tracking-tight shadow-lg shadow-indigo-500/30 hover:!bg-indigo-700 transition-all border-none"
                 onClick={handleApply}
                 disabled={isApplying}
               >
-                {isApplying ? <Loader size="sm" /> : 'Confirm Application'}
+                {isApplying ? <Loader size="sm" /> : 'Apply for this Position'}
               </Button>
-              <p className="text-center text-[10px] font-black text-slate-600 uppercase tracking-widest mt-4">Verified application process</p>
+              <div className="flex items-center justify-center gap-2 mt-4 text-slate-400">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span className="text-[10px] font-bold uppercase tracking-wider">Application Tracking Enabled</span>
+              </div>
             </div>
           </div>
         </Modal>
@@ -397,4 +409,5 @@ const JobListing = () => {
 };
 
 export default JobListing;
+;
 
