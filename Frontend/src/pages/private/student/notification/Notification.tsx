@@ -152,11 +152,10 @@ const Notification = () => {
           <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div className="max-w-2xl">
               <div className="student-hero-badge">
-                <Sparkles /> 
                 <span>Notification Center</span>
               </div>
               <h1 className="student-hero-title">
-                Stay <span>Updated</span> 🔔
+                Stay <span>Updated</span>
               </h1>
               <p className="student-hero-description">
                 {unreadCount > 0 
@@ -165,18 +164,6 @@ const Notification = () => {
               </p>
             </div>
             
-            <div className="hidden lg:block">
-              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 dark:bg-white/5 backdrop-blur-2xl border border-blue-100 dark:border-white/10 shadow-2xl">
-                <div className="relative">
-                  <Bell className={cn("h-16 w-16 text-indigo-600/40 dark:text-white/40", unreadCount > 0 && "animate-[bell-swing_2s_infinite]")} />
-                  {unreadCount > 0 && (
-                    <div className="absolute -top-1 -right-1 w-8 h-8 bg-indigo-500 rounded-full flex items-center justify-center text-xs font-black text-white shadow-2xl border-4 border-white dark:border-[#0f172a]">
-                      {unreadCount}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 

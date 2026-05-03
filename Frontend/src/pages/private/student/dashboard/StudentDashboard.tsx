@@ -81,11 +81,10 @@ export default function StudentDashboard() {
           
           <div className="relative z-10">
             <div className="student-hero-badge mb-6">
-              <Sparkles className="h-3.5 w-3.5" /> 
               <span>Student Overview</span>
             </div>
             <h1 className="student-hero-title text-3xl md:text-5xl">
-              Welcome back, <span className="text-primary">{user?.firstname || "Student"}</span> 👋
+              Welcome back, <span className="text-primary">{user?.firstname || "Student"}</span>
             </h1>
             <p className="student-hero-description mt-4 text-base md:text-lg">
               Your personalized workspace for tracking interviews, applications, and upcoming placement milestones.
