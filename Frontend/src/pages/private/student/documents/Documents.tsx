@@ -186,7 +186,7 @@ const Documents = () => {
                 <input
                   type="text"
                   placeholder="Search files..."
-                  className="pl-12 pr-6 h-14 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-white/20 transition-all placeholder:text-white/30 text-white w-full sm:w-64"
+                  className="pl-12 pr-6 h-14 bg-slate-100 dark:bg-white/10 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-400 dark:placeholder:text-white/30 text-slate-900 dark:text-white w-full sm:w-64"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />

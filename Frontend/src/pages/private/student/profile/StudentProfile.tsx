@@ -310,7 +310,7 @@ const StudentProfile = () => {
               <div className="text-center md:text-left pb-4 space-y-3 flex-1">
                 <div className="space-y-2">
                   <div className="flex flex-col md:flex-row items-center gap-3">
-                    <h1 className="text-2xl md:text-4xl font-bold text-white tracking-tight drop-shadow-md">
+                    <h1 className="text-2xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight drop-shadow-md">
                       {profile.name}
                     </h1>
                     <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/20">
