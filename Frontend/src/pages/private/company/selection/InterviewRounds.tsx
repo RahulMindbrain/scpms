@@ -223,7 +223,7 @@ const CompanyInterviewManager: React.FC = () => {
             placeholder="Search interviews..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="saas-input pl-11 h-10"
+            className="saas-input saas-input-with-icon h-10"
           />
         </div>
       </div>

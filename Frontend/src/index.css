@@ -297,7 +297,7 @@
   box-shadow: 
     0 4px 6px -1px rgba(0, 0, 0, 0.02), 
     0 10px 15px -3px rgba(0, 0, 0, 0.03);
-  overflow: hidden;
+  overflow: visible;
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 1.5rem;
   position: relative;
@@ -352,12 +352,37 @@
 }
 
 .saas-input-with-icon {
-  @apply pl-12;
+  @apply pl-14;
 }
 
 .saas-label {
   @apply text-[10px] font-bold uppercase tracking-wider text-muted-foreground ml-1 mb-1 block;
 }
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  display: block !important;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 82, 255, 0.2);
+  border-radius: 10px;
+  border: 1px solid transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 82, 255, 0.4);
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 82, 255, 0.2) transparent;
+}
+
 .light .bg-\[\#111319\],
 .light .bg-\[\#111827\],
 .light .bg-\[\#0c0e14\],
