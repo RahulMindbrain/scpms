@@ -1,9 +1,8 @@
-﻿import { useEffect, useMemo, useState } from "react";
-import { Pencil, Plus, Search, Trash2, Wrench } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Pencil, Plus, Search, Trash2, Wrench, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { deleteAPI, getAPI, postAPI, putAPI } from "@/apis/api";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -22,6 +21,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { AdminPageLayout } from "@/components/layout/AdminPageLayout";
+import { PageHeader } from "@/components/PageHeader";
 
 import Loader from "@/components/Loader";
 
@@ -166,49 +167,45 @@ const SkillManagement = () => {
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6 bg-[#111319] min-h-screen">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-[#e2e2eb] flex items-center gap-2">
-            <Wrench className="w-6 h-6 text-blue-600" /> Skill Management
-          </h1>
-          <p className="text-[13px] text-[#908fa0] mt-1">
-            Create and manage skills available to students
-          </p>
-        </div>
+    <AdminPageLayout>
+      <PageHeader
+        title="Skill Repository"
+        description="Curate and maintain the talent taxonomy and technological competencies."
+        badge="Taxonomy"
+        icon={Wrench}
+        variant="indigo"
+      >
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button className="h-10 bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
+            <Button className="h-11 px-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
               <Plus className="w-4 h-4 mr-2" /> Create Skill
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[420px] bg-[#111319] border-none shadow-xl rounded-xl">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-[#e2e2eb]">
-                New Skill
-              </DialogTitle>
-              <DialogDescription className="text-[#908fa0] text-[13px]">
-                Add a new skill to the platform.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleCreate} className="space-y-5 pt-2">
+          <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border-none rounded-3xl">
+            <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-8 text-white">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-black">New Skill</DialogTitle>
+                <DialogDescription className="text-indigo-100/70 font-medium">
+                  Add a new technical or soft skill to the enterprise taxonomy.
+                </DialogDescription>
+              </DialogHeader>
+            </div>
+            <form onSubmit={handleCreate} className="p-8 space-y-6 bg-card">
               <div className="space-y-2">
-                <label className="text-[13px] font-semibold text-[#c7c4d7]">
-                  Skill Name
-                </label>
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Skill Nomenclature</label>
                 <Input
                   required
-                  placeholder="e.g. Django Python Framework"
+                  placeholder="e.g. Distributed Systems Engineering"
                   value={newSkillName}
                   onChange={(e) => setNewSkillName(e.target.value)}
-                  className="h-10 bg-[#1e1f26] border-[rgba(255,255,255,0.08)]"
+                  className="h-12 bg-muted/30 border-border/50 rounded-xl focus:ring-primary/20 transition-all font-bold"
                 />
               </div>
-              <DialogFooter>
+              <DialogFooter className="gap-3">
                 <Button
                   type="button"
-                  variant="outline"
-                  className="flex-1"
+                  variant="ghost"
+                  className="flex-1 h-12 rounded-xl font-bold"
                   onClick={() => setIsCreateOpen(false)}
                   disabled={isSubmitting}
                 >
@@ -216,149 +213,165 @@ const SkillManagement = () => {
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  className="flex-1 h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
-                    <>
-                      <Loader size="sm" /> Creating...
-                    </>
+                    <><Loader size="sm" /> Syncing...</>
                   ) : (
-                    <>
-                      <Plus className="w-4 h-4 mr-2" /> Create
-                    </>
+                    <><Plus className="w-4 h-4 mr-2" /> Initialize</>
                   )}
                 </Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
-      </div>
+      </PageHeader>
 
-      <Card className="shadow-sm border border-slate-200/60 rounded-xl max-w-sm">
-        <CardContent className="p-6 flex flex-col items-center justify-center">
-          <span className="text-[28px] font-bold text-[#e2e2eb]">{skills.length}</span>
-          <span className="text-[13px] text-[#908fa0] mt-1">Total Skills</span>
-        </CardContent>
-      </Card>
+      <div className="space-y-8 pb-10">
+        <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+          <div className="relative w-full md:w-96 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <Input
+              placeholder="Search skills..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-11 h-12 bg-card border-border/50 rounded-2xl shadow-sm focus:ring-primary/10 transition-all"
+            />
+          </div>
+          
+          <div className="flex items-center gap-4 p-2 rounded-2xl bg-card border border-border/50 shadow-sm">
+             <div className="flex -space-x-2">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="size-8 rounded-full border-2 border-card bg-muted flex items-center justify-center overflow-hidden">
+                    <div className="size-full bg-gradient-to-br from-emerald-500/20 to-teal-500/20" />
+                  </div>
+                ))}
+             </div>
+             <div className="pr-4">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-none">Global Taxonomy</p>
+                <p className="text-sm font-black text-foreground">{skills.length} Competencies</p>
+             </div>
+          </div>
+        </div>
 
-      <div className="relative w-full sm:w-[300px]">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
-        <Input
-          placeholder="Search skills..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="pl-9 bg-[#1e1f26] border-[rgba(255,255,255,0.08)] shadow-sm h-10"
-        />
-      </div>
-
-      <Card className="overflow-hidden shadow-sm border border-slate-200/60 bg-[#1e1f26] rounded-xl">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader className="bg-[#1e1f26] border-b border-[rgba(255,255,255,0.06)]">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold text-[#908fa0] py-4 pl-6">#</TableHead>
-                <TableHead className="font-semibold text-[#908fa0]">Skill Name</TableHead>
-                <TableHead className="font-semibold text-[#908fa0] text-center">ID</TableHead>
-                <TableHead className="font-semibold text-[#908fa0] text-right pr-6">
-                  Action
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="py-20 text-center">
-                    <Loader text="Loading skills..." />
-                  </TableCell>
+        <div className="saas-card overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border/50 hover:bg-transparent">
+                  <TableHead className="w-20 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground py-5 pl-8">#</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground py-5">Skill Name</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground py-5 text-center">Skill ID</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground py-5 text-right pr-8">Management</TableHead>
                 </TableRow>
-              ) : filteredSkills.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="py-20 text-center">
-                    <div className="flex flex-col items-center gap-2 text-[#908fa0]">
-                      <Wrench className="w-10 h-10 opacity-20" />
-                      <span className="text-sm font-medium">No skills found</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filteredSkills.map((skill, index) => (
-                  <TableRow
-                    key={skill.id}
-                    className="bg-[#1e1f26] hover:bg-[#111319] border-b border-slate-100/60 transition-colors"
-                  >
-                    <TableCell className="font-medium text-[#908fa0] py-4 pl-6">
-                      {index + 1}
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-24 text-center">
+                      <Loader text="Retrieving technical skill taxonomy..." />
                     </TableCell>
-                    <TableCell className="font-semibold text-[#e2e2eb]">
-                      {skill.name}
-                    </TableCell>
-                    <TableCell className="text-center text-[#908fa0] text-sm font-mono">
-                      {skill.id}
-                    </TableCell>
-                    <TableCell className="text-right pr-6">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                          onClick={() => void openEditDialog(skill.id)}
-                          disabled={isSubmitting}
-                          title="Edit Skill"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => {
-                            setDeletingSkillId(skill.id);
-                            setIsDeleteDialogOpen(true);
-                          }}
-                          disabled={isSubmitting}
-                          title="Delete Skill"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                  </TableRow>
+                ) : filteredSkills.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-24 text-center">
+                      <div className="flex flex-col items-center gap-4 opacity-40">
+                        <Wrench className="w-12 h-12" />
+                        <span className="text-xs font-black uppercase tracking-widest">No skills synchronized</span>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  filteredSkills.map((skill, index) => (
+                    <TableRow
+                      key={skill.id}
+                      className="border-border/50 hover:bg-muted/30 transition-all group"
+                    >
+                      <TableCell className="font-bold text-muted-foreground py-5 pl-8 tabular-nums">{String(index + 1).padStart(2, '0')}</TableCell>
+                      <TableCell className="py-5">
+                        <div className="flex items-center gap-3">
+                          <div className="size-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
+                             <Wrench className="size-4" />
+                          </div>
+                          <span className="font-black text-foreground group-hover:text-emerald-600 transition-colors">
+                            {skill.name}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center py-5">
+                        <span className="px-2 py-1 rounded-md bg-muted font-bold text-[10px] text-muted-foreground border border-border/50">
+                          {skill.id}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right py-5 pr-8">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-9 rounded-xl text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
+                            onClick={() => void openEditDialog(skill.id)}
+                            disabled={isSubmitting}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-9 rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                            onClick={() => {
+                              setDeletingSkillId(skill.id);
+                              setIsDeleteDialogOpen(true);
+                            }}
+                            disabled={isSubmitting}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-9 rounded-xl text-muted-foreground"
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
-      </Card>
+      </div>
 
+      {/* Edit Dialog */}
       <Dialog open={isUpdateOpen} onOpenChange={setIsUpdateOpen}>
-        <DialogContent className="sm:max-w-[420px] bg-[#111319] border-none shadow-xl rounded-xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-[#e2e2eb]">
-              Update Skill
-            </DialogTitle>
-            <DialogDescription className="text-[#908fa0] text-[13px]">
-              Edit skill information for student profiles.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleUpdate} className="space-y-5 pt-2">
+        <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border-none rounded-3xl">
+          <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-8 text-white">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-black">Refine Skill</DialogTitle>
+              <DialogDescription className="text-indigo-100/70 font-medium">
+                Adjust the parameters for the selected competency.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+          <form onSubmit={handleUpdate} className="p-8 space-y-6 bg-card">
             <div className="space-y-2">
-              <label className="text-[13px] font-semibold text-[#c7c4d7]">
-                Skill Name
-              </label>
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Skill Nomenclature</label>
               <Input
                 required
-                placeholder="e.g. Django Python Framework"
+                placeholder="e.g. Distributed Systems Engineering"
                 value={updateSkillName}
                 onChange={(e) => setUpdateSkillName(e.target.value)}
-                className="h-10 bg-[#1e1f26] border-[rgba(255,255,255,0.08)]"
+                className="h-12 bg-muted/30 border-border/50 rounded-xl focus:ring-primary/20 transition-all font-bold"
               />
             </div>
-            <DialogFooter>
+            <DialogFooter className="gap-3">
               <Button
                 type="button"
-                variant="outline"
-                className="flex-1"
+                variant="ghost"
+                className="flex-1 h-12 rounded-xl font-bold"
                 onClick={() => setIsUpdateOpen(false)}
                 disabled={isSubmitting}
               >
@@ -366,15 +379,13 @@ const SkillManagement = () => {
               </Button>
               <Button
                 type="submit"
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                className="flex-1 h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
-                  <>
-                    <Loader size="sm" /> Updating...
-                  </>
+                  <><Loader size="sm" /> Syncing...</>
                 ) : (
-                  "Update"
+                  'Apply Changes'
                 )}
               </Button>
             </DialogFooter>
@@ -382,46 +393,44 @@ const SkillManagement = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[420px] bg-[#1e1f26] border-none shadow-xl rounded-xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-[#e2e2eb]">
-              Delete Skill
-            </DialogTitle>
-            <DialogDescription className="text-[#908fa0] text-[13px]">
-              Are you sure you want to delete this skill? This action cannot be
-              undone.
+        <DialogContent className="sm:max-w-[400px] p-8 border-none rounded-3xl bg-card">
+          <div className="size-16 rounded-full bg-rose-500/10 flex items-center justify-center mb-6 mx-auto">
+            <Trash2 className="size-8 text-rose-600" />
+          </div>
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-2xl font-black">Terminate Skill?</DialogTitle>
+            <DialogDescription className="text-muted-foreground font-medium pt-2">
+              You are about to decommission this skill from the global taxonomy. This action is irreversible.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="mt-4 gap-2 sm:gap-0">
+          <div className="mt-8 flex gap-3">
             <Button
               type="button"
-              variant="outline"
-              className="flex-1"
+              variant="ghost"
+              className="flex-1 h-12 rounded-xl font-bold"
               onClick={() => setIsDeleteDialogOpen(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              Abort
             </Button>
             <Button
               type="button"
-              variant="destructive"
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+              className="flex-1 h-12 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black shadow-lg shadow-rose-500/20"
               onClick={() => void handleDelete()}
               disabled={isSubmitting}
             >
               {isSubmitting ? (
-                <>
-                  <Loader size="sm" /> Deleting...
-                </>
+                <><Loader size="sm" /> Deleting...</>
               ) : (
-                "Delete"
+                'Terminate'
               )}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminPageLayout>
   );
 };
 

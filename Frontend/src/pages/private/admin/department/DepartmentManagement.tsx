@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Building2,
@@ -6,6 +6,7 @@ import {
   Plus,
   Search,
   Trash2,
+  ChevronRight,
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
@@ -27,7 +28,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Card, CardContent } from '@/components/ui/card';
+import { AdminPageLayout } from '@/components/layout/AdminPageLayout';
+import { PageHeader } from '@/components/PageHeader';
 
 import {
   fetchDepartments,
@@ -132,44 +134,45 @@ const DepartmentManagement: React.FC = () => {
   };
 
   return (
-    <div className="p-4 md:p-8 space-y-6 bg-[#111319] min-h-screen">
-      {/* Top Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-[#e2e2eb] flex items-center gap-2">
-            <Building2 className="w-6 h-6 text-blue-600" /> Department Management
-          </h1>
-          <p className="text-[13px] text-[#908fa0] mt-1">Manage all academic departments</p>
-        </div>
+    <AdminPageLayout>
+      <PageHeader
+        title="Department Control"
+        description="Strategize and manage the organizational hierarchy and academic divisions."
+        badge="Governance"
+        icon={Building2}
+        variant="indigo"
+      >
         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
           <DialogTrigger asChild>
-            <Button className="h-10 bg-blue-600 hover:bg-blue-700 text-white shadow-sm">
+            <Button className="h-11 px-6 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
               <Plus className="w-4 h-4 mr-2" /> Create Department
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[400px] bg-[#111319] border-none shadow-xl rounded-xl">
-            <DialogHeader>
-              <DialogTitle className="text-xl font-semibold text-[#e2e2eb]">New Department</DialogTitle>
-              <DialogDescription className="text-[#908fa0] text-[13px]">
-                Add a new academic department to the system.
-              </DialogDescription>
-            </DialogHeader>
-            <form onSubmit={handleCreate} className="space-y-5 pt-2">
+          <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border-none rounded-3xl">
+            <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-8 text-white">
+              <DialogHeader>
+                <DialogTitle className="text-2xl font-black">New Department</DialogTitle>
+                <DialogDescription className="text-indigo-100/70 font-medium">
+                  Establish a new academic or operational unit within the institution.
+                </DialogDescription>
+              </DialogHeader>
+            </div>
+            <form onSubmit={handleCreate} className="p-8 space-y-6 bg-card">
               <div className="space-y-2">
-                <label className="text-[13px] font-semibold text-[#c7c4d7]">Department Name</label>
+                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Department Nomenclature</label>
                 <Input
                   required
-                  placeholder="e.g. Computer Science Engineering"
+                  placeholder="e.g. Artificial Intelligence & Data Science"
                   value={deptName}
                   onChange={(e) => setDeptName(e.target.value)}
-                  className="h-10 bg-[#1e1f26] border-[rgba(255,255,255,0.08)]"
+                  className="h-12 bg-muted/30 border-border/50 rounded-xl focus:ring-primary/20 transition-all font-bold"
                 />
               </div>
-              <DialogFooter>
+              <DialogFooter className="gap-3">
                 <Button
                   type="button"
-                  variant="outline"
-                  className="flex-1"
+                  variant="ghost"
+                  className="flex-1 h-12 rounded-xl font-bold"
                   onClick={() => setIsCreateOpen(false)}
                   disabled={isSubmitting}
                 >
@@ -177,142 +180,165 @@ const DepartmentManagement: React.FC = () => {
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                  className="flex-1 h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black"
                   disabled={isSubmitting}
                 >
                   {isSubmitting ? (
-                    <><Loader size="sm" /> Creating...</>
+                    <><Loader size="sm" /> Syncing...</>
                   ) : (
-                    <><Plus className="w-4 h-4 mr-2" /> Create</>
+                    <><Plus className="w-4 h-4 mr-2" /> Initialize</>
                   )}
                 </Button>
               </DialogFooter>
             </form>
           </DialogContent>
         </Dialog>
-      </div>
+      </PageHeader>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-1 gap-4">
-        <Card className="shadow-sm border border-slate-200/60 rounded-xl max-w-sm mx-auto sm:mx-0">
-          <CardContent className="p-6 flex flex-col items-center justify-center">
-            <span className="text-[28px] font-bold text-[#e2e2eb]">{departments.length}</span>
-            <span className="text-[13px] text-[#908fa0] mt-1">Total Departments</span>
-          </CardContent>
-        </Card>
-      </div>
+      <div className="space-y-8 pb-10">
+        <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
+          <div className="relative w-full md:w-96 group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+            <Input
+              placeholder="Search departments..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-11 h-12 bg-card border-border/50 rounded-2xl shadow-sm focus:ring-primary/10 transition-all"
+            />
+          </div>
+          
+          <div className="flex items-center gap-4 p-2 rounded-2xl bg-card border border-border/50 shadow-sm">
+             <div className="flex -space-x-2">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="size-8 rounded-full border-2 border-card bg-muted flex items-center justify-center overflow-hidden">
+                    <div className="size-full bg-gradient-to-br from-indigo-500/20 to-violet-500/20" />
+                  </div>
+                ))}
+             </div>
+             <div className="pr-4">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest leading-none">Operational Units</p>
+                <p className="text-sm font-black text-foreground">{departments.length} Active</p>
+             </div>
+          </div>
+        </div>
 
-      {/* Search */}
-      <div className="relative w-full sm:w-[300px]">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#908fa0]" />
-        <Input
-          placeholder="Search departments..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-9 bg-[#1e1f26] border-[rgba(255,255,255,0.08)] shadow-sm h-10"
-        />
-      </div>
-
-      {/* Table */}
-      <Card className="overflow-hidden shadow-sm border border-slate-200/60 bg-[#1e1f26] rounded-xl">
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader className="bg-[#1e1f26] border-b border-[rgba(255,255,255,0.06)]">
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="font-semibold text-[#908fa0] py-4 pl-6">#</TableHead>
-                <TableHead className="font-semibold text-[#908fa0]">Department Name</TableHead>
-                <TableHead className="font-semibold text-[#908fa0] text-center">ID</TableHead>
-                <TableHead className="font-semibold text-[#908fa0] text-right pr-6">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="py-20 text-center">
-                    <Loader text="Loading departments..." />
-                  </TableCell>
+        <div className="saas-card overflow-hidden">
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-border/50 hover:bg-transparent">
+                  <TableHead className="w-20 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground py-5 pl-8">#</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground py-5">Department Name</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground py-5 text-center">Unit ID</TableHead>
+                  <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground py-5 text-right pr-8">Management</TableHead>
                 </TableRow>
-              ) : filtered.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={4} className="py-20 text-center">
-                    <div className="flex flex-col items-center gap-2 text-[#908fa0]">
-                      <Building2 className="w-10 h-10 opacity-20" />
-                      <span className="text-sm font-medium">No departments found</span>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ) : (
-                filtered.map((dept: any, index: number) => (
-                  <TableRow
-                    key={dept.id}
-                    className="bg-[#1e1f26] hover:bg-[#111319] border-b border-slate-100/60 transition-colors"
-                  >
-                    <TableCell className="font-medium text-[#908fa0] py-4 pl-6">{index + 1}</TableCell>
-                    <TableCell className="font-semibold text-[#e2e2eb]">
-                      {dept.name || dept.deptName || '—'}
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-24 text-center">
+                      <Loader text="Retrieving tactical department data..." />
                     </TableCell>
-                    <TableCell className="text-center text-[#908fa0] text-sm font-mono">
-                      {dept.id}
-                    </TableCell>
-                    <TableCell className="text-right pr-6">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                          onClick={() => openEditDialog(dept)}
-                          disabled={isSubmitting}
-                          title="Edit Department"
-                        >
-                          <Pencil className="w-4 h-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => {
-                            setDeletingDeptId(dept.id);
-                            setIsDeleteDialogOpen(true);
-                          }}
-                          disabled={isSubmitting}
-                          title="Delete Department"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
+                  </TableRow>
+                ) : filtered.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={4} className="py-24 text-center">
+                      <div className="flex flex-col items-center gap-4 opacity-40">
+                        <Building2 className="w-12 h-12" />
+                        <span className="text-xs font-black uppercase tracking-widest">No departments synchronized</span>
                       </div>
                     </TableCell>
                   </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+                ) : (
+                  filtered.map((dept: any, index: number) => (
+                    <TableRow
+                      key={dept.id}
+                      className="border-border/50 hover:bg-muted/30 transition-all group"
+                    >
+                      <TableCell className="font-bold text-muted-foreground py-5 pl-8 tabular-nums">{String(index + 1).padStart(2, '0')}</TableCell>
+                      <TableCell className="py-5">
+                        <div className="flex items-center gap-3">
+                          <div className="size-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600 group-hover:scale-110 transition-transform">
+                             <Building2 className="size-4" />
+                          </div>
+                          <span className="font-black text-foreground group-hover:text-indigo-600 transition-colors">
+                            {dept.name || dept.deptName || '—'}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-center py-5">
+                        <span className="px-2 py-1 rounded-md bg-muted font-bold text-[10px] text-muted-foreground border border-border/50">
+                          {dept.id}
+                        </span>
+                      </TableCell>
+                      <TableCell className="text-right py-5 pr-8">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-9 rounded-xl text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-500/10"
+                            onClick={() => openEditDialog(dept)}
+                            disabled={isSubmitting}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-9 rounded-xl text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-500/10"
+                            onClick={() => {
+                              setDeletingDeptId(dept.id);
+                              setIsDeleteDialogOpen(true);
+                            }}
+                            disabled={isSubmitting}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="size-9 rounded-xl text-muted-foreground"
+                          >
+                            <ChevronRight className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </div>
         </div>
-      </Card>
+      </div>
 
+      {/* Edit Dialog */}
       <Dialog open={isUpdateOpen} onOpenChange={setIsUpdateOpen}>
-        <DialogContent className="sm:max-w-[400px] bg-[#111319] border-none shadow-xl rounded-xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-[#e2e2eb]">Update Department</DialogTitle>
-            <DialogDescription className="text-[#908fa0] text-[13px]">
-              Edit department information.
-            </DialogDescription>
-          </DialogHeader>
-          <form onSubmit={handleUpdate} className="space-y-5 pt-2">
+        <DialogContent className="sm:max-w-[450px] p-0 overflow-hidden border-none rounded-3xl">
+          <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-8 text-white">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-black">Refine Unit</DialogTitle>
+              <DialogDescription className="text-indigo-100/70 font-medium">
+                Adjust the parameters for the selected department.
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+          <form onSubmit={handleUpdate} className="p-8 space-y-6 bg-card">
             <div className="space-y-2">
-              <label className="text-[13px] font-semibold text-[#c7c4d7]">Department Name</label>
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Department Nomenclature</label>
               <Input
                 required
                 placeholder="e.g. Computer Science Engineering"
                 value={updateDeptName}
                 onChange={(e) => setUpdateDeptName(e.target.value)}
-                className="h-10 bg-[#1e1f26] border-[rgba(255,255,255,0.08)]"
+                className="h-12 bg-muted/30 border-border/50 rounded-xl focus:ring-primary/20 transition-all font-bold"
               />
             </div>
-            <DialogFooter>
+            <DialogFooter className="gap-3">
               <Button
                 type="button"
-                variant="outline"
-                className="flex-1"
+                variant="ghost"
+                className="flex-1 h-12 rounded-xl font-bold"
                 onClick={() => setIsUpdateOpen(false)}
                 disabled={isSubmitting}
               >
@@ -320,13 +346,13 @@ const DepartmentManagement: React.FC = () => {
               </Button>
               <Button
                 type="submit"
-                className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                className="flex-1 h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black"
                 disabled={isSubmitting}
               >
                 {isSubmitting ? (
-                  <><Loader size="sm" /> Updating...</>
+                  <><Loader size="sm" /> Syncing...</>
                 ) : (
-                  'Update'
+                  'Apply Changes'
                 )}
               </Button>
             </DialogFooter>
@@ -334,41 +360,44 @@ const DepartmentManagement: React.FC = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Delete Dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-        <DialogContent className="sm:max-w-[400px] bg-[#1e1f26] border-none shadow-xl rounded-xl">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-semibold text-[#e2e2eb]">Delete Department</DialogTitle>
-            <DialogDescription className="text-[#908fa0] text-[13px]">
-              Are you sure you want to delete this department? This action cannot be undone.
+        <DialogContent className="sm:max-w-[400px] p-8 border-none rounded-3xl bg-card">
+          <div className="size-16 rounded-full bg-rose-500/10 flex items-center justify-center mb-6 mx-auto">
+            <Trash2 className="size-8 text-rose-600" />
+          </div>
+          <DialogHeader className="text-center">
+            <DialogTitle className="text-2xl font-black">Terminate Unit?</DialogTitle>
+            <DialogDescription className="text-muted-foreground font-medium pt-2">
+              You are about to decommission this department. This action is irreversible and may impact linked personnel.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter className="mt-4 gap-2 sm:gap-0">
+          <div className="mt-8 flex gap-3">
             <Button
               type="button"
-              variant="outline"
-              className="flex-1"
+              variant="ghost"
+              className="flex-1 h-12 rounded-xl font-bold"
               onClick={() => setIsDeleteDialogOpen(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              Abort
             </Button>
             <Button
               type="button"
-              variant="destructive"
-              className="flex-1 bg-red-600 hover:bg-red-700 text-white"
+              className="flex-1 h-12 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-black shadow-lg shadow-rose-500/20"
               onClick={() => void handleDelete()}
               disabled={isSubmitting}
             >
               {isSubmitting ? (
                 <><Loader size="sm" /> Deleting...</>
               ) : (
-                'Delete'
+                'Terminate'
               )}
             </Button>
-          </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
-    </div>
+    </AdminPageLayout>
   );
 };
 
