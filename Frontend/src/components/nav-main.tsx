@@ -22,7 +22,7 @@ export function NavMain({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-[0.2em] text-slate-500 px-4 mb-1 group-data-[collapsible=icon]:hidden">
+      <SidebarGroupLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-sidebar-foreground/80 px-4 mb-1 group-data-[collapsible=icon]:hidden">
         Core Modules
       </SidebarGroupLabel>
       <SidebarMenu className="gap-1 px-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center">
@@ -38,13 +38,13 @@ export function NavMain({
                   h-9 transition-colors duration-200 rounded-md border-none relative group/btn
                   ${isActive
                     ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
-                    : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
                   }
                   group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
                 `}
               >
                 <NavLink to={item.url} className="flex items-center w-full gap-3 px-3 relative cursor-pointer group/link group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0">
-                  <span className={`size-4 flex items-center justify-center shrink-0 transition-colors duration-200 ${isActive ? "text-primary" : "text-sidebar-foreground/40 group-hover/link:text-sidebar-foreground"}`}>
+                  <span className={`size-4 flex items-center justify-center shrink-0 transition-colors duration-200 ${isActive ? "text-primary" : "text-sidebar-foreground/70 group-hover/link:text-sidebar-foreground"}`}>
                     {item.icon}
                   </span>
                   <span className="text-[13px] group-data-[collapsible=icon]:hidden whitespace-nowrap tracking-tight">{item.title}</span>

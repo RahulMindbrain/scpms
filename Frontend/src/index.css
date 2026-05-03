@@ -115,15 +115,15 @@
   --chart-5:                   #ef4444;
 
   /* ── Sidebar ── */
-  --sidebar:                   #fcfcfd;
-  --sidebar-foreground:        #475467;
-  --sidebar-primary:           #6366f1;
+  --sidebar:                   #f8faff;
+  --sidebar-foreground:        #000000;
+  --sidebar-primary:           #2563eb;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent:            #f2f4f7;
-  --sidebar-accent-foreground: #101828;
-  --sidebar-border:            #eaecf0;
-  --sidebar-ring:              #6366f1;
-  --sidebar-gradient:          linear-gradient(180deg, rgba(37, 99, 235, 0.05) 0%, rgba(37, 99, 235, 0) 100%);
+  --sidebar-accent:            #eef2ff;
+  --sidebar-accent-foreground: #000000;
+  --sidebar-border:            #cbd5e1;
+  --sidebar-ring:              #2563eb;
+  --sidebar-gradient:          linear-gradient(180deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.02) 100%);
 }
 
 /* ── Global Transitions ── */

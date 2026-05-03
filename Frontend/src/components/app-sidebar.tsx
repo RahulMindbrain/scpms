@@ -114,7 +114,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
             <span className="text-[16px] font-bold tracking-tight text-sidebar-accent-foreground">CPMS</span>
-            <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">{role} Portal</span>
+            <span className="text-[10px] text-sidebar-foreground/60 font-bold uppercase tracking-wider">{role} Portal</span>
           </div>
         </div>
       </SidebarHeader>
