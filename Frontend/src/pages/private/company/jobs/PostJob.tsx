@@ -164,22 +164,38 @@ const PostJob: React.FC = () => {
       setFormErrors({});
       setCurrentStep(1);
     } catch (error: any) {
-      // Handle structured backend validation errors
-      if (error?.data?.errors) {
+      console.error("Job Posting Error:", error);
+      
+      // Handle structured backend validation errors (e.g. Zod errors from API)
+      if (error?.data?.errors && Array.isArray(error.data.errors)) {
         const backendErrors: Record<string, string> = {};
         error.data.errors.forEach((err: any) => {
-          backendErrors[err.path] = err.message;
+          // Map backend path to frontend field name
+          const path = err.path === 'eligibleDepartmentIds' ? 'branches' : err.path;
+          backendErrors[path] = err.message;
         });
         setFormErrors(backendErrors);
         
-        // Jump to the first step that has an error
-        if (backendErrors.title || backendErrors.salary || backendErrors.location) setCurrentStep(1);
-        else if (backendErrors.description) setCurrentStep(2);
-        else if (backendErrors.minCgpa || backendErrors.maxCgpa || backendErrors.branches) setCurrentStep(3);
+        // Logical step jumping based on where the error is
+        if (backendErrors.title || backendErrors.salary || backendErrors.location) {
+          setCurrentStep(1);
+        } else if (backendErrors.description) {
+          setCurrentStep(2);
+        } else if (backendErrors.minCgpa || backendErrors.maxCgpa || backendErrors.branches) {
+          setCurrentStep(3);
+        }
         
-        toast.error("Validation failed", { description: "Please check the highlighted fields." });
+        toast.error("Form Validation Failed", { 
+          description: "We found some issues in Step 0" + currentStep + ". Please review the red highlighted fields.",
+          icon: <AlertCircle className="text-destructive" size={20} />
+        });
       } else {
-        toast.error(error?.message || "Failed to post job.");
+        // Fallback for general error messages
+        const errorMsg = error?.data?.message || error?.message || "An unexpected error occurred while publishing the job drive.";
+        toast.error("Submission Failed", { 
+          description: errorMsg,
+          icon: <X className="text-destructive" size={20} />
+        });
       }
     }
   };
@@ -187,8 +203,8 @@ const PostJob: React.FC = () => {
   const renderError = (field: string) => {
     if (!formErrors[field]) return null;
     return (
-      <p className="text-[10px] font-bold text-destructive mt-1.5 flex items-center gap-1 animate-in fade-in slide-in-from-top-1 duration-300">
-        <AlertCircle size={10} /> {formErrors[field]}
+      <p className="text-[10px] font-black text-destructive mt-2 flex items-center gap-1.5 animate-in fade-in slide-in-from-top-1 duration-300 uppercase tracking-wider">
+        <AlertCircle size={10} strokeWidth={3} /> {formErrors[field]}
       </p>
     );
   };
@@ -278,7 +294,7 @@ const PostJob: React.FC = () => {
                 <div className="space-y-2">
                   <label className="saas-label">Job Title</label>
                   <div className="relative group">
-                    <Zap className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
+                    <Zap className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${formErrors.title ? 'text-destructive' : 'text-muted-foreground group-focus-within:text-primary'}`} size={16} />
                     <input 
                       type="text" 
                       name="title" 
@@ -295,7 +311,7 @@ const PostJob: React.FC = () => {
                 <div className="space-y-2">
                   <label className="saas-label">Annual Salary (INR)</label>
                   <div className="relative group">
-                    <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
+                    <IndianRupee className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${formErrors.salary ? 'text-destructive' : 'text-muted-foreground group-focus-within:text-primary'}`} size={16} />
                     <input
                       type="number"
                       name="salary"
@@ -312,7 +328,7 @@ const PostJob: React.FC = () => {
                 <div className="space-y-2 md:col-span-2">
                   <label className="saas-label">Work Location</label>
                   <div className="relative group">
-                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
+                    <MapPin className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${formErrors.location ? 'text-destructive' : 'text-muted-foreground group-focus-within:text-primary'}`} size={16} />
                     <input 
                       type="text" 
                       name="location" 
@@ -337,7 +353,7 @@ const PostJob: React.FC = () => {
               </div>
 
               <div className="relative group">
-                <AlignLeft className="absolute left-4 top-4 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
+                <AlignLeft className={`absolute left-4 top-4 transition-colors ${formErrors.description ? 'text-destructive' : 'text-muted-foreground group-focus-within:text-primary'}`} size={16} />
                 <textarea 
                   name="description" 
                   value={formData.description} 
@@ -363,7 +379,7 @@ const PostJob: React.FC = () => {
                 <div className="space-y-2">
                   <label className="saas-label">Min CGPA</label>
                   <div className="relative group">
-                    <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
+                    <BookOpen className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${formErrors.minCgpa ? 'text-destructive' : 'text-muted-foreground group-focus-within:text-primary'}`} size={16} />
                     <input 
                       type="number" 
                       step="0.01" 
@@ -380,7 +396,7 @@ const PostJob: React.FC = () => {
                 <div className="space-y-2">
                   <label className="saas-label">Max CGPA</label>
                   <div className="relative group">
-                    <CheckCircle2 className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={16} />
+                    <CheckCircle2 className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${formErrors.maxCgpa ? 'text-destructive' : 'text-muted-foreground group-focus-within:text-primary'}`} size={16} />
                     <input 
                       type="number" 
                       step="0.01" 
