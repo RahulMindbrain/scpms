@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Building2, Briefcase, Info, Users, UserCheck } from 'lucide-react';
+import { Search, Building2, Briefcase, Users, UserCheck } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchScheduleApplications, fetchSchedules } from '@/redux/thunks/interviewThunk';
 import { fetchCompanies } from '@/redux/thunks/companyThunk';

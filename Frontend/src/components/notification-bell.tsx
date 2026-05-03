@@ -21,14 +21,14 @@ import { useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 
 export function NotificationBell() {
-  const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useSocket();
+  const { notifications, unreadCount, markAsRead, markAllAsRead } = useSocket();
   const dispatch = useDispatch<AppDispatch>();
   const { userType } = useAuth();
   const navigate = useNavigate();
   const apiUnreadCount = useSelector((state: RootState) => state.notification.unreadCount);
   const apiNotifications = useSelector((state: RootState) => state.notification.items);
   const isLoggedIn = !!userType;
-  const isStudent = userType === "STUDENT";
+
 
   useEffect(() => {
     if (isLoggedIn) {

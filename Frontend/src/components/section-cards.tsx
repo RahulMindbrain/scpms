@@ -1,12 +1,6 @@
 "use client"
 
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+
 import { Users, TrendingUp, GraduationCap, Building2 } from "lucide-react"
 
 interface SectionCardsProps {
