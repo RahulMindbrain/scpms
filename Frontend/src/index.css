@@ -101,22 +101,34 @@
 }
 
 .dark {
-  --background:                #0B0E14;
-  --foreground:                #F8FAFC;
-  --card:                      #11141B;
-  --card-foreground:           #F8FAFC;
-  --popover:                   #11141B;
-  --popover-foreground:        #F8FAFC;
-  --primary:                   #818cf8;
+  --background:                #080a0f;
+  --foreground:                #f8fafc;
+  --card:                      #0f172a;
+  --card-foreground:           #f8fafc;
+  --popover:                   #0f172a;
+  --popover-foreground:        #f8fafc;
+  --primary:                   #3b82f6;
   --primary-foreground:        #ffffff;
-  --border:                    #1E293B;
-  --input:                     #0B0E14;
-  --ring:                      #818cf8;
-  --sidebar:                   #0B0E14;
-  --sidebar-foreground:        #94A3B8;
-  --sidebar-accent:            #1E293B;
-  --sidebar-accent-foreground: #F8FAFC;
-  --sidebar-border:            #1E293B;
+  --secondary:                 #1e293b;
+  --secondary-foreground:      #f8fafc;
+  --muted:                     #1e293b;
+  --muted-foreground:          #94a3b8;
+  --accent:                    #334155;
+  --accent-foreground:         #f8fafc;
+  --destructive:               #ef4444;
+  --destructive-foreground:    #ffffff;
+  --border:                    #1e293b;
+  --input:                     #020617;
+  --ring:                      #3b82f6;
+  --sidebar:                   #020617;
+  --sidebar-foreground:        #94a3b8;
+  --sidebar-primary:           #3b82f6;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent:            #1e293b;
+  --sidebar-accent-foreground: #f8fafc;
+  --sidebar-border:            #1e293b;
+  --sidebar-ring:              #3b82f6;
+  --sidebar-gradient:          linear-gradient(180deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0) 100%);
 }
 
 /* ============================================================
@@ -131,8 +143,8 @@
 }
 
 .dark .student-hero-banner {
-  background: linear-gradient(135deg, #111827 0%, #0f172a 100%);
-  border-color: rgba(255, 255, 255, 0.05);
+  @apply bg-gradient-to-br from-[#0f172a] to-[#0f172a];
+  @apply border border-white/5;
 }
 
 .student-hero-mesh {
@@ -200,9 +212,6 @@
 
 .saas-shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
 .saas-shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-
-
-/* ── Global Theme Overrides for Hardcoded Styles ── */
 .light .bg-\[\#111319\],
 .light .bg-\[\#111827\],
 .light .bg-\[\#0c0e14\],
@@ -437,6 +446,10 @@ select {
   border-color: var(--border);
 }
 select option {
+  background-color: var(--card);
+  color: var(--foreground);
+}
+option {
   background-color: var(--card);
   color: var(--foreground);
 }

@@ -37,16 +37,16 @@ export function NavMain({
                 className={`
                   h-10 transition-all duration-200 rounded-xl border-none relative group/btn
                   ${isActive
-                    ? "bg-indigo-50 text-indigo-600 font-bold dark:bg-white/5 dark:text-indigo-400"
+                    ? "bg-indigo-50 text-indigo-600 font-bold dark:bg-indigo-600 dark:text-white"
                     : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
                   }
                   group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
                 `}
               >
-                <NavLink to={item.url} className="flex items-center w-full gap-3 px-2 relative cursor-pointer group/link group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0">
-                  <span className={`size-4.5 flex items-center justify-center shrink-0 transition-colors duration-200 ${isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 group-hover/link:text-slate-600 dark:group-hover/link:text-slate-300"}`}>
-                    {item.icon}
-                  </span>
+                  <NavLink to={item.url} className="flex items-center w-full gap-3 px-2 relative cursor-pointer group/link group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0">
+                    <span className={`size-4.5 flex items-center justify-center shrink-0 transition-colors duration-200 ${isActive ? "text-indigo-600 dark:text-white" : "text-slate-400 group-hover/link:text-slate-600 dark:group-hover/link:text-slate-300"}`}>
+                      {item.icon}
+                    </span>
                   <span className="text-[14px] group-data-[collapsible=icon]:hidden whitespace-nowrap tracking-tight">{item.title}</span>
                   
                   {isActive && (
