@@ -154,34 +154,35 @@ const Documents = () => {
 
   return (
     <div className="flex-1 flex flex-col bg-background min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
-      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
 
-        {/* Header aligned with Premium Style */}
-        <div className="group relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-8 md:p-12 text-white shadow-2xl border border-white/5">
-          <div className="absolute inset-0">
-            <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/25 rounded-full blur-[100px] animate-pulse"></div>
-            <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
+        {/* Adaptive Hero Banner */}
+        <div className="student-hero-banner group">
+          <div className="student-hero-mesh">
+            <div className="bubble-indigo"></div>
+            <div className="bubble-sky"></div>
           </div>
-          <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
+
+          <div className="student-hero-texture"></div>
+          <div className="student-hero-overlay"></div>
           
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-xl backdrop-blur-md">
-                <FileCheck className="h-4 w-4 text-yellow-400" /> 
-                <span className="opacity-90">Secure Repository</span>
+              <div className="student-hero-badge">
+                <Sparkles /> 
+                <span>Document Vault</span>
               </div>
-              <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
-                Academic Records
+              <h1 className="student-hero-title">
+                Secure Your <span>Credentials</span> 📂
               </h1>
-              <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-medium opacity-90">
-                Manage and share your verified documents. Your secure mission control for placement credentials.
+              <p className="student-hero-description">
+                Manage your resumes, certificates, and academic transcripts in one encrypted location.
               </p>
             </div>
             
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <div className="relative group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-white transition-colors" size={18} />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 dark:text-white/40 dark:group-focus-within:text-white transition-colors" size={18} />
                 <input
                   type="text"
                   placeholder="Search files..."

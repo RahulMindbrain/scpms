@@ -127,7 +127,8 @@
 }
 
 /* ── Global Transitions ── */
-* {
+/* ── Global Transitions (Applied selectively for performance) ── */
+.theme-transition {
   transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
 }
 
@@ -135,6 +136,65 @@
 html, body, #root {
   background-color: var(--background);
   color: var(--foreground);
+}
+
+/* ============================================================
+   STUDENT PORTAL — "PASTEL SILK" HERO SYSTEM
+   ============================================================ */
+
+.student-hero-banner {
+  @apply relative overflow-hidden rounded-[2.5rem] p-8 md:p-12 text-slate-900 dark:text-white shadow-2xl transition-all duration-500;
+  @apply bg-gradient-to-br from-[#EEF2FF] to-[#E0F2FE] dark:from-[#0f172a] dark:to-[#0f172a];
+  @apply border border-blue-100/50 dark:border-white/5;
+}
+
+.student-hero-mesh {
+  @apply absolute inset-0 pointer-events-none;
+}
+
+.student-hero-mesh .bubble-indigo {
+  @apply absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full blur-[100px] animate-pulse;
+  @apply bg-[#F0F9FF] dark:bg-indigo-600/25;
+}
+
+.student-hero-mesh .bubble-sky {
+  @apply absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] rounded-full blur-[100px] animate-pulse delay-1000;
+  @apply bg-[#EDE9FE] dark:bg-blue-500/20;
+}
+
+.student-hero-texture {
+  @apply absolute inset-0 pointer-events-none opacity-40;
+  @apply bg-[radial-gradient(#6366f108_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff08_1px,transparent_1px)];
+  background-size: 24px 24px;
+}
+
+.student-hero-overlay {
+  @apply absolute inset-0 pointer-events-none;
+  @apply bg-gradient-to-t from-white/40 via-transparent to-transparent dark:from-[#0f172a] dark:via-transparent dark:to-transparent;
+}
+
+.student-hero-badge {
+  @apply inline-flex items-center gap-2 rounded-full border border-blue-200 dark:border-white/10 bg-white/40 dark:bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-sm backdrop-blur-md transition-all duration-300;
+}
+
+.student-hero-badge span {
+  @apply text-indigo-700 dark:text-white/90;
+}
+
+.student-hero-badge svg {
+  @apply h-3.5 w-3.5 text-indigo-600 dark:text-yellow-400;
+}
+
+.student-hero-title {
+  @apply mt-6 text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight;
+}
+
+.student-hero-title span {
+  @apply text-indigo-600 dark:text-blue-400;
+}
+
+.student-hero-description {
+  @apply mt-4 max-w-lg text-base md:text-lg text-slate-600 dark:text-slate-300 leading-relaxed font-medium opacity-90;
 }
 
 
@@ -312,9 +372,6 @@ html, body, #root {
 /* ============================================================
    INPUT FIELDS
    ============================================================ */
-/* ============================================================
-   INPUT FIELDS
-   ============================================================ */
 .input-field {
   background-color: var(--input);
   border: 1px solid var(--border);
@@ -334,7 +391,7 @@ html, body, #root {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-.animate-in { animation: slideUp 0.4s ease-out forwards; }
+.student-hero-animate { animation: slideUp 0.4s ease-out forwards; }
 
 @keyframes glow-pulse {
   0%, 100% { box-shadow: 0 0 12px rgba(99, 102, 241, 0.3); }

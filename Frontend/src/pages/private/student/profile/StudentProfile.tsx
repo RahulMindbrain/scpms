@@ -275,17 +275,15 @@ const StudentProfile = () => {
       >
         {/* Hero Section */}
         <motion.div variants={itemVariants} className="relative group/hero">
-          {/* Elegant Slim Banner */}
-          <div className="h-56 md:h-72 w-full rounded-[2.5rem] bg-[#0f172a] shadow-2xl relative overflow-hidden border border-white/5">
-            {/* Sophisticated Mesh Gradients */}
-            <div className="absolute inset-0">
-              <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/25 rounded-full blur-[100px] animate-pulse"></div>
-              <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
+          {/* Adaptive Banner */}
+          <div className="student-hero-banner group !p-0 !rounded-[2.5rem] h-56 md:h-72">
+            <div className="student-hero-mesh">
+              <div className="bubble-indigo"></div>
+              <div className="bubble-sky"></div>
             </div>
-
-            {/* Subtle Texture */}
-            <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
+            
+            <div className="student-hero-texture"></div>
+            <div className="student-hero-overlay"></div>
           </div>
 
           {/* Profile Content Area */}

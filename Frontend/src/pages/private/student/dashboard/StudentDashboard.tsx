@@ -69,40 +69,45 @@ export default function StudentDashboard() {
 
   return (
     <div className="flex-1 flex flex-col bg-background min-h-screen">
-      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
 
-          {/* Hero Banner aligned with Premium Style */}
-          <div className="group relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-8 text-white shadow-2xl md:p-12 border border-white/5">
-            {/* Mesh Background Elements */}
-            <div className="absolute inset-0">
-              <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/25 rounded-full blur-[100px] animate-pulse"></div>
-              <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
-            </div>
-            {/* Subtle Texture */}
-            <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
-            
-            <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-              <div className="max-w-2xl">
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-xl backdrop-blur-md">
-                  <Sparkles className="h-3.5 w-3.5 text-yellow-400" /> 
-                  <span className="opacity-90">Student Control Center</span>
-                </div>
-                <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
-                  {user?.firstname ? `Welcome back, ${user.firstname} 👋` : "Track your placement journey"}
-                </h1>
-                <p className="mt-4 max-w-lg text-base md:text-lg text-slate-300 leading-relaxed font-medium opacity-90">
-                  Your personalized mission control for interviews, career opportunities, and campus placements.
-                </p>
+        {/* Adaptive Hero Banner */}
+        <div className="student-hero-banner group">
+          <div className="student-hero-mesh">
+            <div className="bubble-indigo"></div>
+            <div className="bubble-sky"></div>
+          </div>
+
+          <div className="student-hero-texture"></div>
+          <div className="student-hero-overlay"></div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className="student-hero-badge">
+                <Sparkles /> 
+                <span>Student Control Center</span>
               </div>
-              
-              <div className="hidden lg:block">
-                <div className="flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl">
-                  <LayoutDashboard className="h-10 w-10 text-white/40" />
-                </div>
+              <h1 className="student-hero-title">
+                {user?.firstname ? (
+                  <>
+                    Welcome back, <span>{user.firstname}</span>! 👋
+                  </>
+                ) : (
+                  "Track your placement journey"
+                )}
+              </h1>
+              <p className="student-hero-description">
+                Your personalized mission control for interviews, career opportunities, and campus placements.
+              </p>
+            </div>
+            
+            <div className="hidden lg:block">
+              <div className="flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-white/40 dark:bg-white/5 backdrop-blur-2xl border border-blue-200 dark:border-white/10 shadow-2xl">
+                <LayoutDashboard className="h-10 w-10 text-indigo-600/40 dark:text-white/40" />
               </div>
             </div>
           </div>
+        </div>
 
           {/* Stat Cards Section */}
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

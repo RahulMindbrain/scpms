@@ -405,32 +405,31 @@ const ApplicationStatus = () => {
 
   return (
     <div className="flex-1 flex flex-col bg-background min-h-screen">
-      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
+      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
         
-        {/* ─── Premium Command Center Hero ─── */}
-        <div className="group relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-8 md:p-12 text-white shadow-2xl border border-white/5">
-          <div className="absolute inset-0">
-            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/25 rounded-full blur-[120px] animate-pulse"></div>
-            <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-blue-500/20 rounded-full blur-[120px] animate-pulse delay-700"></div>
+        {/* Adaptive Hero Banner */}
+        <div className="student-hero-banner group">
+          <div className="student-hero-mesh">
+            <div className="bubble-indigo"></div>
+            <div className="bubble-sky"></div>
           </div>
-          <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+
+          <div className="student-hero-texture"></div>
+          <div className="student-hero-overlay"></div>
           
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
-            <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-md shadow-lg">
-                <ShieldCheck className="h-4 w-4 text-emerald-400" /> 
-                <span className="opacity-90">Secure Application Pipeline</span>
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className="student-hero-badge">
+                <Sparkles /> 
+                <span>Application Command</span>
               </div>
-              <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-tight">
-                {user?.firstname ? `${user.firstname}'s Hub` : "Application Hub"}
+              <h1 className="student-hero-title">
+                Track Your <span>Mission Progress</span> 🚀
               </h1>
-              <p className="text-base md:text-lg text-slate-300 font-medium max-w-xl leading-relaxed opacity-90">
-                {activeApps.length > 0 
-                  ? `You are currently navigating ${activeApps.length} active processes. Stay focused on your next milestones.`
-                  : "Optimize your recruitment flow, track real-time status, and manage corporate offers from one central dashboard."}
+              <p className="student-hero-description">
+                Monitor your job applications, interview stages, and feedback in real-time. Your career journey, organized.
               </p>
             </div>
-            
             <Button
               onClick={() => navigate('/student/jobs')}
               className="bg-white text-slate-900 hover:bg-slate-100 font-black rounded-2xl shadow-2xl px-10 h-16 text-sm transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-3 group whitespace-nowrap"
