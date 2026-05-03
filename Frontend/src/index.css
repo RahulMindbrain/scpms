@@ -55,7 +55,7 @@
 
 :root {
   /* ── Premium Blue Light Theme ── */
-  --background:                #ffffff; 
+  --background:                #f4f8ff; 
   --surface:                   #ffffff;
   --foreground:                #020617; 
   --muted-foreground:          #64748b;
@@ -69,12 +69,12 @@
   /* ── Primary — Premium Blue ── */
   --primary:                   #0052FF; 
   --primary-foreground:        #ffffff;
-  --primary-container:         #f0f5ff;
+  --primary-container:         #e0f0ff;
 
   /* ── Secondary & Muted ── */
-  --secondary:                 #f1f5f9;
-  --secondary-foreground:      #0f172a;
-  --muted:                     #f8fafc;
+  --secondary:                 #e0f0ff;
+  --secondary-foreground:      #0052FF;
+  --muted:                     #f0f7ff;
 
   /* ── Borders & Inputs ── */
   --border:                    #e2e8f0;
@@ -85,11 +85,11 @@
   --radius:                    0.75rem;
 
   /* ── Sidebar — Professional ── */
-  --sidebar:                   #f1f5f9;
-  --sidebar-foreground:        #475569;
+  --sidebar:                   #eff6ff;
+  --sidebar-foreground:        #1e40af;
   --sidebar-primary:           #0052FF;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent:            #e2e8f0;
+  --sidebar-accent:            #dbeafe;
   --sidebar-accent-foreground: #0052FF;
   --sidebar-border:            #e2e8f0;
   --sidebar-ring:              #0052FF;
@@ -142,11 +142,11 @@
 
 .student-hero-banner {
   @apply relative overflow-hidden rounded-[3rem] p-8 md:p-14 transition-all duration-700;
-  background: linear-gradient(135deg, #f0f7ff 0%, #e0edff 100%);
-  border: 1px solid rgba(0, 82, 255, 0.08);
+  background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 50%, #f4f8ff 100%);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   box-shadow: 
-    0 10px 15px -3px rgba(0, 82, 255, 0.05),
-    0 25px 50px -12px rgba(0, 82, 255, 0.1);
+    0 20px 25px -5px rgba(0, 82, 255, 0.08),
+    0 40px 60px -20px rgba(0, 82, 255, 0.15);
 }
 
 .dark .student-hero-banner {
@@ -159,12 +159,12 @@
 }
 
 .student-hero-mesh .bubble-indigo {
-  @apply absolute top-[-40%] left-[-20%] w-[100%] h-[100%] rounded-full blur-[150px] opacity-25;
+  @apply absolute top-[-40%] left-[-20%] w-[100%] h-[100%] rounded-full blur-[150px] opacity-40;
   background: radial-gradient(circle, #0052FF 0%, transparent 70%);
 }
 
 .student-hero-mesh .bubble-sky {
-  @apply absolute bottom-[-40%] right-[-20%] w-[100%] h-[100%] rounded-full blur-[150px] opacity-25;
+  @apply absolute bottom-[-40%] right-[-20%] w-[100%] h-[100%] rounded-full blur-[150px] opacity-40;
   background: radial-gradient(circle, #3B82F6 0%, transparent 70%);
 }
 
@@ -260,12 +260,12 @@
 
 .light .glass-card,
 .light .glass-modal {
-  background: rgba(255, 255, 255, 0.7) !important;
-  border-color: rgba(0, 82, 255, 0.03) !important;
+  background: rgba(239, 246, 255, 0.8) !important;
+  border-color: rgba(0, 82, 255, 0.08) !important;
   backdrop-filter: blur(40px) saturate(200%);
   box-shadow: 
-    0 4px 6px -1px rgba(0, 82, 255, 0.02),
-    0 10px 15px -3px rgba(0, 82, 255, 0.03);
+    0 10px 15px -3px rgba(0, 82, 255, 0.05),
+    0 20px 25px -5px rgba(0, 82, 255, 0.08);
 }
 
 

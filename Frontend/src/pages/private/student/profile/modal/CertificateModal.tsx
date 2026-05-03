@@ -48,7 +48,7 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[550px] rounded-2xl p-0 overflow-hidden bg-white dark:bg-slate-900 border-none shadow-2xl flex flex-col">
-        <DialogHeader className="p-8 pb-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+        <DialogHeader className="p-8 pb-4 bg-[#fbfdff] dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-amber-100 dark:bg-amber-500/10 rounded-lg">
               <GraduationCap className="h-5 w-5 text-amber-600" />
@@ -116,7 +116,7 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
           </div>
         </div>
 
-        <DialogFooter className="p-8 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex gap-3">
+        <DialogFooter className="p-8 bg-[#fbfdff] dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex gap-3">
           <Button variant="ghost" onClick={onClose} className="flex-1 rounded-xl h-12 font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50">
             Cancel
           </Button>

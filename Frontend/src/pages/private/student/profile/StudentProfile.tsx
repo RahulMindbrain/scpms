@@ -399,7 +399,7 @@ const StudentProfile = () => {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group border border-slate-200/60 dark:border-white/[0.08]">
+              <Card className="rounded-[2rem] border-none shadow-sm bg-card dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group border border-border dark:border-white/[0.08]">
             <CardContent className="p-8">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
@@ -414,7 +414,7 @@ const StudentProfile = () => {
             </CardContent>
           </Card>
 
-          <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group border border-slate-200/60 dark:border-white/[0.08]">
+              <Card className="rounded-[2rem] border-none shadow-sm bg-card dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group border border-border dark:border-white/[0.08]">
             <CardContent className="p-8">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
@@ -440,7 +440,7 @@ const StudentProfile = () => {
           <div className="lg:col-span-7 space-y-8">
             {/* Academic Details */}
             <motion.div variants={itemVariants}>
-              <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl overflow-hidden group border border-slate-200/60 dark:border-white/[0.08]">
+              <Card className="rounded-[2rem] border-none shadow-sm bg-card dark:bg-[#161b22]/40 backdrop-blur-xl overflow-hidden group border border-border dark:border-white/[0.08]">
                 <div className="h-2 w-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-800"></div>
                 <CardContent className="p-10">
                   <div className="flex items-center gap-4 mb-8">
@@ -477,7 +477,7 @@ const StudentProfile = () => {
 
             {/* Experience Timeline */}
             <motion.div variants={itemVariants}>
-              <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl overflow-hidden group border border-slate-200/60 dark:border-white/[0.08]">
+              <Card className="rounded-[2rem] border-none shadow-sm bg-card dark:bg-[#161b22]/40 backdrop-blur-xl overflow-hidden group border border-border dark:border-white/[0.08]">
                 <div className="h-2 w-full bg-gradient-to-r from-blue-500 to-blue-800"></div>
                 <CardContent className="p-10">
                   <div className="flex items-center justify-between mb-10">
@@ -538,7 +538,7 @@ const StudentProfile = () => {
           <div className="lg:col-span-5 space-y-8">
             {/* Skills Card */}
             <motion.div variants={itemVariants}>
-              <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl overflow-hidden group border border-slate-200/60 dark:border-white/[0.08]">
+              <Card className="rounded-[2rem] border-none shadow-sm bg-card dark:bg-[#161b22]/40 backdrop-blur-xl overflow-hidden group border border-border dark:border-white/[0.08]">
                 <div className="h-2 w-full bg-gradient-to-r from-emerald-500 to-teal-500"></div>
                 <CardContent className="p-10">
                   <div className="flex items-center gap-4 mb-8">

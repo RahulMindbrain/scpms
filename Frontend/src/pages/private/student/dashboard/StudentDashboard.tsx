@@ -68,7 +68,7 @@ export default function StudentDashboard() {
   }, [dispatch, socket]);
 
   return (
-    <div className="flex-1 flex flex-col bg-[#F8FAFC] dark:bg-[#0B0E14] min-h-screen">
+    <div className="flex-1 flex flex-col bg-background min-h-screen">
       <div className="max-w-[1400px] mx-auto w-full p-4 md:p-8 space-y-8 student-hero-animate">
 
         {/* Hero Section */}
@@ -123,7 +123,7 @@ export default function StudentDashboard() {
           ].map((stat, idx) => (
             <div
               key={idx}
-              className="bg-white dark:bg-[#11141B] rounded-[1.5rem] p-7 shadow-sm border border-gray-100 dark:border-white/5 transition-all hover:shadow-md group"
+              className="bg-card dark:bg-[#11141B] rounded-[1.5rem] p-7 shadow-sm border border-border dark:border-white/5 transition-all hover:shadow-md group"
             >
               <div className="flex items-center justify-between">
                 <div className={`p-3 rounded-xl ${stat.bg} dark:bg-white/5 transition-transform group-hover:scale-110`}>
@@ -186,7 +186,7 @@ export default function StudentDashboard() {
                 upcomingEvents.map((event) => (
                   <div
                     key={event.id}
-                    className="bg-white dark:bg-[#11141B] border border-gray-100 dark:border-white/5 rounded-2xl p-5 flex items-center gap-5 transition-all hover:border-blue-100 dark:hover:border-blue-500/20 group"
+                    className="bg-card dark:bg-[#11141B] border border-border dark:border-white/5 rounded-2xl p-5 flex items-center gap-5 transition-all hover:border-blue-100 dark:hover:border-blue-500/20 group shadow-sm"
                   >
                     <div className="h-14 w-14 rounded-xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400">
                       <Briefcase className="h-6 w-6" />
@@ -223,7 +223,7 @@ export default function StudentDashboard() {
                 <Link
                   key={nav.to}
                   to={nav.to}
-                  className="bg-white dark:bg-[#11141B] border border-gray-100 dark:border-white/5 rounded-2xl p-4 flex items-center gap-4 transition-all hover:shadow-md hover:translate-y-[-2px] group"
+                  className="bg-card dark:bg-[#11141B] border border-border dark:border-white/5 rounded-2xl p-4 flex items-center gap-4 transition-all hover:shadow-md hover:translate-y-[-2px] group"
                 >
                   <div className={`h-11 w-11 rounded-xl ${nav.bg} dark:bg-white/5 flex items-center justify-center transition-transform group-hover:scale-110`}>
                     <nav.icon className={`h-5 w-5 text-${nav.color}-500`} />
