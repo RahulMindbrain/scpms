@@ -61,7 +61,9 @@ export const getJobs = async (params: {
       include: {
         company: true,
         eligibleDepartments: true,
+        skills: true,
       },
+
     }),
     prisma.job.count({ where }),
   ]);

@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getAPI, putAPI, postAPI } from "../../apis/api";
+import { getAPI, putAPI, postAPI, deleteAPI } from "../../apis/api";
 
 // ✅ Fetch Active Companies
 export const fetchCompanies = createAsyncThunk(
@@ -108,6 +108,30 @@ export const fetchCompanyJobs = createAsyncThunk(
         jobs: res.data.data,
         meta: res.data.meta,
       };
+    } catch (error: any) {
+      return rejectWithValue(error?.message);
+    }
+  }
+);
+
+export const updateCompanyJob = createAsyncThunk(
+  "company/updateCompanyJob",
+  async ({ id, data }: { id: number; data: any }, { rejectWithValue }) => {
+    try {
+      const res = await putAPI<any>(`/company/post-job/${id}`, data);
+      return res.data;
+    } catch (error: any) {
+      return rejectWithValue(error?.message);
+    }
+  }
+);
+
+export const deleteCompanyJob = createAsyncThunk(
+  "company/deleteCompanyJob",
+  async (id: number, { rejectWithValue }) => {
+    try {
+      await deleteAPI(`/company/post-job/${id}`);
+      return id;
     } catch (error: any) {
       return rejectWithValue(error?.message);
     }

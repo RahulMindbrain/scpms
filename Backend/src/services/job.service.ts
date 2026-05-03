@@ -3,9 +3,11 @@ import { getDepartmentsByIds } from "../repository/department.repository";
 import {
   createJob,
   deleteJob,
+  getJobById,
   getJobs,
   updateJob,
 } from "../repository/job.repository";
+
 import { getSkillsByIds } from "../repository/skill.repostiory";
 import { normalizeText } from "../utils/normalize.utils";
 
@@ -95,9 +97,19 @@ export const getJobsService = async (params: {
   return getJobs(query);
 };
 
-export const updateJobService = async (id: number, data: any) => {
+export const updateJobService = async (id: number, data: any, userId: number) => {
   if (!id || isNaN(id)) {
     throw new Error("Invalid job id");
+  }
+
+  const job = await getJobById(id);
+  if (!job) {
+    throw new Error("Job not found");
+  }
+
+  const company = await getCompanyByUserId(userId);
+  if (!company || job.companyId !== company.id) {
+    throw new Error("Unauthorized to update this job");
   }
 
   if (data.title !== undefined) {
@@ -112,17 +124,37 @@ export const updateJobService = async (id: number, data: any) => {
     data.location = normalizeText(data.location);
   }
 
-  if (data.eligibleDepartmentIds?.length) {
-    const departments = await getDepartmentsByIds(data.eligibleDepartmentIds);
+  // Validate eligible departments
+  const departmentIds = [
+    ...(data.eligibleDepartmentIds || []),
+    ...(data.addEligibleDepartmentIds || []),
+    ...(data.removeEligibleDepartmentIds || []),
+  ];
 
+  if (departmentIds.length) {
+    const departments = await getDepartmentsByIds(departmentIds);
     const foundIds = departments.map((d) => d.id);
-
-    const missingIds = data.eligibleDepartmentIds.filter(
-      (deptId: number) => !foundIds.includes(deptId),
-    );
+    const missingIds = departmentIds.filter((id: number) => !foundIds.includes(id));
 
     if (missingIds.length) {
       throw new Error(`Invalid department IDs: ${missingIds.join(", ")}`);
+    }
+  }
+
+  // Validate skills
+  const skillIds = [
+    ...(data.skillIds || []),
+    ...(data.addSkillIds || []),
+    ...(data.removeSkillIds || []),
+  ];
+
+  if (skillIds.length) {
+    const skills = await getSkillsByIds(skillIds);
+    const foundIds = skills.map((s) => s.id);
+    const missingIds = skillIds.filter((id: number) => !foundIds.includes(id));
+
+    if (missingIds.length) {
+      throw new Error(`Invalid skill IDs: ${missingIds.join(", ")}`);
     }
   }
 

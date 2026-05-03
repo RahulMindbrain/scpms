@@ -10,6 +10,8 @@ import {
   fetchJobApplications,
   updateJobApplicationStatus,
   fetchJobsByCompanyId,
+  updateCompanyJob,
+  deleteCompanyJob,
   sendBulkMail,
 } from "../thunks/companyThunk";
 
@@ -92,6 +94,23 @@ const companySlice = createSlice({
       .addCase(fetchJobsByCompanyId.fulfilled, (state, action) => {
         state.jobs = action.payload.jobs;
         state.meta = action.payload.meta;
+      })
+      .addCase(updateCompanyJob.fulfilled, (state, action) => {
+        const updatedJob = action.payload;
+        if (updatedJob) {
+          state.jobs = state.jobs.map((job) =>
+            job.id === updatedJob.id ? updatedJob : job
+          );
+        }
+      })
+      .addCase(updateCompanyJob.rejected, (state, action) => {
+        state.error = action.payload as string;
+      })
+      .addCase(deleteCompanyJob.fulfilled, (state, action) => {
+        state.jobs = state.jobs.filter((job) => job.id !== action.payload);
+      })
+      .addCase(deleteCompanyJob.rejected, (state, action) => {
+        state.error = action.payload as string;
       })
 
       // ✅ Applications

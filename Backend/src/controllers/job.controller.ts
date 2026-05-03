@@ -115,9 +115,21 @@ export const getJobsController = async (req: Request, res: Response) => {
   }
 };
 export const updateJobController = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const data = await updateJobService(Number(id), req.body);
-  return sendSuccess(res, 200, "Job updated", data);
+  try {
+    const { id } = req.params;
+    const user = res.locals.user;
+    const data = await updateJobService(Number(id), req.body, user.id);
+    return sendSuccess(res, 200, "Job updated", data);
+  } catch (error: any) {
+    if (error.name === "ZodError") {
+      return sendError(
+        res,
+        400,
+        error.errors.map((e: any) => e.message).join(", "),
+      );
+    }
+    return sendError(res, 400, error.message);
+  }
 };
 
 export const deleteJobController = async (req: Request, res: Response) => {
