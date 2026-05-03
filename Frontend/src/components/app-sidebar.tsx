@@ -94,21 +94,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }
 
   const roleColors: Record<string, string> = {
-    admin: "from-blue-700 via-blue-600 to-indigo-800",
-    student: "from-blue-500 via-blue-600 to-blue-700",
-    company: "from-cyan-600 via-blue-600 to-blue-800",
+    admin: "from-blue-700 via-blue-600 to-blue-800",
+    student: "from-blue-600 via-blue-500 to-blue-700",
+    company: "from-blue-800 via-blue-600 to-cyan-600",
   }
-  const gradientClass = roleColors[role ?? ""] ?? "from-blue-700 via-blue-600 to-indigo-800"
+  const gradientClass = roleColors[role ?? ""] ?? "from-blue-700 via-blue-600 to-blue-800"
 
   return (
     <Sidebar
       collapsible="icon"
-      className="border-r border-sidebar-border bg-[#F8FAFC] dark:bg-[#0B0E14] transition-all duration-300"
+      className="border-r border-sidebar-border bg-sidebar dark:bg-[#0B0E14] transition-all duration-300"
       {...props}
     >
       <SidebarHeader className="h-16 flex items-center px-3 shrink-0 overflow-hidden border-b border-sidebar-border/30">
         <div className="flex items-center gap-3 w-full justify-start group-data-[collapsible=icon]:justify-center">
-          <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-indigo-600 shadow-sm shrink-0">
+          <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-blue-600 shadow-sm shrink-0">
             <GraduationCap className="size-5 text-white" />
           </div>
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">

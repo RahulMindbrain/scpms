@@ -46,10 +46,10 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[550px] rounded-2xl p-0 overflow-hidden bg-white dark:bg-slate-900 border-none shadow-2xl flex flex-col">
-        <DialogHeader className="p-8 pb-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+        <DialogHeader className="p-8 pb-4 bg-[#fbfdff] dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-indigo-100 dark:bg-indigo-500/10 rounded-lg">
-              <Code2 className="h-5 w-5 text-indigo-600" />
+            <div className="p-2 bg-blue-50 dark:bg-blue-500/10 rounded-lg">
+              <Code2 className="h-5 w-5 text-blue-600" />
             </div>
             <div>
               <DialogTitle className="text-xl font-bold text-slate-800 dark:text-white">Add Project</DialogTitle>
@@ -128,7 +128,7 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
           </Button>
           <Button
             onClick={handleSubmit}
-            className="flex-1 rounded-xl h-12 font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-600/20 active:scale-95 transition-all"
+            className="flex-1 rounded-xl h-12 font-bold bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20 active:scale-95 transition-all"
           >
             Ship Project
           </Button>

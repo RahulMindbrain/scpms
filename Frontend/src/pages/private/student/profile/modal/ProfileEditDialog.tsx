@@ -188,7 +188,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden p-0 bg-white dark:bg-slate-900 border-none shadow-2xl rounded-2xl flex flex-col">
-        <DialogHeader className="p-8 pb-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 shrink-0">
+        <DialogHeader className="p-8 pb-4 bg-[#fbfdff] dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 shrink-0">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-100 dark:bg-blue-500/10 rounded-lg">
               <User className="h-5 w-5 text-blue-600" />
@@ -203,7 +203,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
           <div className="p-8 pt-6 space-y-8">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-4 mb-8 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+              <TabsList className="grid grid-cols-4 mb-8 bg-[#f1f5f9]/50 dark:bg-slate-800 p-1.5 rounded-xl">
                 <TabsTrigger value="personal" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-sm font-semibold">Personal</TabsTrigger>
                 <TabsTrigger value="academic" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-sm font-semibold">Academic</TabsTrigger>
                 <TabsTrigger value="social" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-sm font-semibold">Social</TabsTrigger>
@@ -383,7 +383,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                   </div>
 
 
-                  <div className="flex flex-wrap gap-2 p-4 border rounded-xl border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 min-h-[100px]">
+                  <div className="flex flex-wrap gap-2 p-4 border rounded-xl border-slate-100 dark:border-slate-800 bg-[#f8fafc] dark:bg-slate-900/50 min-h-[100px]">
                     {formData.skills?.length > 0 ? (
                       formData.skills.map((skill: any, i: number) => (
                         <Badge key={i} className="pl-3 pr-1 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex items-center gap-1 shadow-sm">
@@ -453,7 +453,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
           </div>
         </form>
 
-        <DialogFooter className="p-8 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 shrink-0">
+        <DialogFooter className="p-8 bg-[#fbfdff] dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 shrink-0">
           <DialogClose asChild>
             <Button type="button" variant="ghost" className="rounded-xl h-12 px-6 font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50">Cancel</Button>
           </DialogClose>

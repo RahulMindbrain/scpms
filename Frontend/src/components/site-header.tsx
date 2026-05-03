@@ -87,15 +87,15 @@ export function SiteHeader() {
   return (
     <header className="
       flex h-16 shrink-0 items-center gap-2
-      border-b border-white/5
-      bg-background/60 backdrop-blur-xl sticky top-0 z-50
-      transition-all duration-300
+      border-b border-border
+      bg-background/80 backdrop-blur-2xl sticky top-0 z-50
+      transition-all duration-300 shadow-sm
     ">
       <div className="flex w-full items-center gap-4 px-4 sm:px-8">
         {/* Sidebar toggle */}
         <div className="flex items-center gap-2">
-          <SidebarTrigger className="text-muted-foreground hover:text-indigo-400 hover:bg-indigo-500/10 transition-all duration-300 h-10 w-10 rounded-xl" />
-          <div className="h-6 w-[1px] bg-white/5 mx-1 hidden sm:block" />
+          <SidebarTrigger className="text-muted-foreground hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-all duration-300 h-10 w-10 rounded-xl" />
+          <div className="h-6 w-[1px] bg-border mx-1 hidden sm:block" />
         </div>
 
         {/* Page title area */}
@@ -105,10 +105,10 @@ export function SiteHeader() {
 
         {/* Right side actions */}
         <div className="ml-auto flex items-center gap-3">
-          <div className="flex items-center bg-white/5 p-1 rounded-full border border-white/5 hover:bg-white/10 transition-colors">
+          <div className="flex items-center bg-muted/50 dark:bg-white/5 p-1 rounded-full border border-border dark:border-white/5 hover:bg-muted dark:hover:bg-white/10 transition-colors">
             <ModeToggle />
           </div>
-          <div className="h-8 w-[1px] bg-white/5 mx-1 hidden sm:block" />
+          <div className="h-8 w-[1px] bg-border mx-1 hidden sm:block" />
           <NotificationBell />
         </div>
       </div>

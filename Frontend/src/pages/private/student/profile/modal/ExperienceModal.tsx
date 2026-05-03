@@ -38,7 +38,7 @@ const ExperienceModal = ({ isOpen, onClose, onAddExperience }: ExperienceModalPr
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[550px] rounded-2xl p-0 overflow-hidden bg-white dark:bg-slate-900 border-none shadow-2xl flex flex-col">
-        <DialogHeader className="p-8 pb-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
+        <DialogHeader className="p-8 pb-4 bg-[#fbfdff] dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-blue-100 dark:bg-blue-500/10 rounded-lg">
               <Briefcase className="h-5 w-5 text-blue-600" />

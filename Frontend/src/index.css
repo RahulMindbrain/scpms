@@ -55,10 +55,10 @@
 
 :root {
   /* ── Premium Blue Light Theme ── */
-  --background:                #ffffff; /* Pure white */
-  --surface:                   #f8fafc;
-  --foreground:                #020617; /* Deep Navy */
-  --muted-foreground:          #475569;
+  --background:                #ffffff; 
+  --surface:                   #ffffff;
+  --foreground:                #020617; 
+  --muted-foreground:          #64748b;
 
   /* ── Card & UI Components ── */
   --card:                      #ffffff;
@@ -67,37 +67,42 @@
   --popover-foreground:        #020617;
 
   /* ── Primary — Premium Blue ── */
-  --primary:                   #0052FF; /* Vibrant, professional blue */
+  --primary:                   #0052FF; 
   --primary-foreground:        #ffffff;
   --primary-container:         #f0f5ff;
+
+  /* ── Secondary & Muted ── */
+  --secondary:                 #f1f5f9;
+  --secondary-foreground:      #0f172a;
+  --muted:                     #f8fafc;
 
   /* ── Borders & Inputs ── */
   --border:                    #e2e8f0;
   --input:                     #ffffff;
-  --ring:                      #0052FF;
+  --ring:                      rgba(0, 82, 255, 0.1);
 
   /* ── Radius ── */
   --radius:                    0.75rem;
 
   /* ── Sidebar — Professional ── */
-  --sidebar:                   #fbfcfd;
-  --sidebar-foreground:        #334155;
+  --sidebar:                   #f1f5f9;
+  --sidebar-foreground:        #475569;
   --sidebar-primary:           #0052FF;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent:            #f1f5f9;
+  --sidebar-accent:            #e2e8f0;
   --sidebar-accent-foreground: #0052FF;
   --sidebar-border:            #e2e8f0;
   --sidebar-ring:              #0052FF;
 
-  /* ── Status Colors ── */
-  --success-bg:                #f0fdf4;
-  --success-text:              #166534;
+  /* ── Status Colors (Beautiful & Soft) ── */
+  --success-bg:                #ecfdf5;
+  --success-text:              #065f46;
   --warning-bg:                #fffbeb;
   --warning-text:              #92400e;
   --error-bg:                  #fef2f2;
   --error-text:                #991b1b;
-  --info-bg:                   #f0f9ff;
-  --info-text:                 #075985;
+  --info-bg:                   #eff6ff;
+  --info-text:                 #1e40af;
 }
 
 .dark {
@@ -136,10 +141,12 @@
    ============================================================ */
 
 .student-hero-banner {
-  @apply relative overflow-hidden rounded-[2.5rem] p-8 md:p-14 transition-all duration-500;
+  @apply relative overflow-hidden rounded-[3rem] p-8 md:p-14 transition-all duration-700;
   background: linear-gradient(135deg, #f0f7ff 0%, #e0edff 100%);
-  border: 1px solid rgba(0, 82, 255, 0.1);
-  box-shadow: 0 20px 50px -12px rgba(0, 82, 255, 0.15);
+  border: 1px solid rgba(0, 82, 255, 0.08);
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 82, 255, 0.05),
+    0 25px 50px -12px rgba(0, 82, 255, 0.1);
 }
 
 .dark .student-hero-banner {
@@ -152,12 +159,12 @@
 }
 
 .student-hero-mesh .bubble-indigo {
-  @apply absolute top-[-30%] left-[-10%] w-[80%] h-[80%] rounded-full blur-[120px] opacity-30;
+  @apply absolute top-[-40%] left-[-20%] w-[100%] h-[100%] rounded-full blur-[150px] opacity-25;
   background: radial-gradient(circle, #0052FF 0%, transparent 70%);
 }
 
 .student-hero-mesh .bubble-sky {
-  @apply absolute bottom-[-30%] right-[-10%] w-[80%] h-[80%] rounded-full blur-[120px] opacity-30;
+  @apply absolute bottom-[-40%] right-[-20%] w-[100%] h-[100%] rounded-full blur-[150px] opacity-25;
   background: radial-gradient(circle, #3B82F6 0%, transparent 70%);
 }
 
@@ -253,10 +260,12 @@
 
 .light .glass-card,
 .light .glass-modal {
-  background: rgba(255, 255, 255, 0.85) !important;
-  border-color: rgba(0, 82, 255, 0.05) !important;
-  backdrop-filter: blur(24px) saturate(180%);
-  box-shadow: 0 10px 40px 0 rgba(0, 82, 255, 0.03);
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-color: rgba(0, 82, 255, 0.03) !important;
+  backdrop-filter: blur(40px) saturate(200%);
+  box-shadow: 
+    0 4px 6px -1px rgba(0, 82, 255, 0.02),
+    0 10px 15px -3px rgba(0, 82, 255, 0.03);
 }
 
 
@@ -427,11 +436,11 @@
 /* ============================================================
    STATUS BADGES
    ============================================================ */
-.badge-success { background: #F0FDF4; color: #15803D; border: 1px solid rgba(21, 128, 61, 0.1); }
-.badge-warning { background: #FFFBEB; color: #B45309; border: 1px solid rgba(180, 83, 9, 0.1); }
-.badge-error   { background: #FEF2F2; color: #B91C1C; border: 1px solid rgba(185, 28, 28, 0.1); }
-.badge-indigo  { background: #EFF6FF; color: var(--primary); border: 1px solid rgba(37, 99, 235, 0.1); }
-.badge-cyan    { background: #F0F9FF; color: #0369A1; border: 1px solid rgba(3, 105, 161, 0.1); }
+.badge-success { background: #ecfdf5; color: #065f46; border: 1px solid rgba(5, 150, 105, 0.08); }
+.badge-warning { background: #fffbeb; color: #92400e; border: 1px solid rgba(217, 119, 6, 0.08); }
+.badge-error   { background: #fef2f2; color: #991b1b; border: 1px solid rgba(220, 38, 38, 0.08); }
+.badge-indigo  { background: #f0f7ff; color: var(--primary); border: 1px solid rgba(0, 82, 255, 0.08); }
+.badge-cyan    { background: #f0f9ff; color: #1e40af; border: 1px solid rgba(30, 64, 175, 0.08); }
 
 /* ============================================================
    PRIMARY BUTTON GLOW

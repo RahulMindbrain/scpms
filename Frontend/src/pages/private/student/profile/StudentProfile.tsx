@@ -266,7 +266,7 @@ const StudentProfile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background pb-20 selection:bg-blue-500/30 selection:text-blue-200">
+    <div className="min-h-screen bg-background pb-20 selection:bg-blue-100 selection:text-blue-900">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -460,7 +460,7 @@ const StudentProfile = () => {
                       { label: 'Academic Year', value: profile.stats?.year ? `${profile.stats.year}${profile.stats.year === 1 ? 'st' : profile.stats.year === 2 ? 'nd' : profile.stats.year === 3 ? 'rd' : 'th'} Year` : 'N/A', icon: Layers },
                       { label: 'Passing Batch', value: profile.stats?.passingYear || 'N/A', icon: Rocket },
                     ].map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50/50 dark:bg-white/5 border border-slate-100 dark:border-white/10 transition-all hover:bg-white dark:hover:bg-white/10 hover:shadow-md hover:border-transparent group/item">
+                      <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-[#f8fafc] dark:bg-white/5 border border-slate-100 dark:border-white/10 transition-all hover:bg-white dark:hover:bg-white/10 hover:shadow-md hover:border-transparent group/item">
                         <div className="h-10 w-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover/item:text-blue-500 transition-colors shadow-sm">
                           <item.icon className="h-5 w-5" />
                         </div>
@@ -502,7 +502,7 @@ const StudentProfile = () => {
                           <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-slate-800 bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
                             <Building2 className="h-5 w-5" />
                           </div>
-                          <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm transition-all hover:shadow-md hover:bg-white dark:hover:bg-white/10 group-hover/timeline:border-blue-100 dark:group-hover/timeline:border-blue-500/30">
+                          <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-5 rounded-2xl bg-[#f8fafc] dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm transition-all hover:shadow-md hover:bg-white dark:hover:bg-white/10 group-hover/timeline:border-blue-100 dark:group-hover/timeline:border-blue-500/30">
                             <div className="flex justify-between items-start mb-1">
                               <h4 className="font-bold text-slate-900 dark:text-white">{exp.role}</h4>
                               <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-rose-500 opacity-0 group-hover/timeline:opacity-100 transition-opacity"
@@ -523,7 +523,7 @@ const StudentProfile = () => {
                         </div>
                       ))
                     ) : (
-                      <div className="text-center py-10 bg-slate-50/50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+                      <div className="text-center py-10 bg-[#f8fafc]/50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
                         <Briefcase className="h-10 w-10 text-slate-200 mx-auto mb-3" />
                         <p className="text-sm text-slate-400 italic">No professional experience listed.</p>
                       </div>
