@@ -2,10 +2,10 @@ import {
   Mail, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
   Briefcase, FileText, Building2,
-  CheckCircle, Globe, MapPin, Phone,
+  CheckCircle, Globe, MapPin,
   Award, Layers, Cpu, Rocket
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,6 @@ import type { RootState } from '@/redux/reducers/rootReducer';
 import ExperienceModal from './modal/ExperienceModal';
 import CertificateModal from './modal/CertificateModal';
 import ProfileEditDialog from './modal/ProfileEditDialog';
-import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
 import Loader from '@/components/Loader';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -39,7 +38,6 @@ const StudentProfile = () => {
   const [showExperienceModal, setShowExperienceModal] = useState(false)
   const [showCertificateModal, setShowCertificateModal] = useState(false)
   const [showProfileEditDialog, setShowProfileEditDialog] = useState(false)
-  const { upload: uploadToCloudinary } = useCloudinaryUpload();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewName, setPreviewName] = useState<string>('');
 

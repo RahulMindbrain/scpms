@@ -21,7 +21,6 @@ import {
 } from '@/redux/thunks/notificationThunks';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -111,10 +110,7 @@ const CompanyNotificationPage = () => {
     }
   };
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.05 } },
-  };
+
 
   const itemVariants = {
     hidden: { y: 15, opacity: 0 },

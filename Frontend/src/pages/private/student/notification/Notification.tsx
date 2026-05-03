@@ -38,7 +38,6 @@ type NotificationItem = {
 
 const Notification = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.auth);
   const [activeFilter, setActiveFilter] = useState<NotificationFilter>('all');
   const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
 

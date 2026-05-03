@@ -2,8 +2,8 @@ import { useEffect, useState, useMemo } from 'react';
 import {
   CheckCircle2, Clock, XCircle, Briefcase,
   Search, ArrowRight, Sparkles, UserCircle,
-  Rocket, TrendingUp, Calendar, Building2, 
-  ChevronDown, ArrowUpRight, Filter, 
+  Rocket, Calendar, Building2, 
+  ChevronDown, 
   Activity, Zap, ShieldCheck, Target,
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -120,7 +120,6 @@ const ApplicationCard = ({
   const isSelected = status === 'SELECTED';
   const isRejected = status === 'REJECTED';
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.APPLIED;
-  const Icon = config.icon;
 
   return (
     <motion.div
@@ -304,7 +303,7 @@ const ApplicationCard = ({
 const StatCard = ({ title, value, icon: Icon, color, subValue }: { title: string, value: number | string, icon: any, color: 'indigo' | 'blue' | 'purple' | 'emerald', subValue?: string }) => {
   const colorMap = {
     blue: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-blue-500/10',
-    blue: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-blue-500/10',
+    indigo: 'bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-indigo-500/10',
     purple: 'bg-purple-500/10 text-purple-600 dark:text-purple-400 shadow-purple-500/10',
     emerald: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-emerald-500/10',
   };
@@ -335,7 +334,6 @@ const ApplicationStatus = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { id: routeApplicationId } = useParams<{ id?: string }>();
-  const { user } = useSelector((state: RootState) => state.auth);
   const { applications = [], loading } = useSelector((state: RootState) => state.student);
 
   const [searchQuery, setSearchQuery] = useState("");
@@ -380,7 +378,7 @@ const ApplicationStatus = () => {
     return { total, active, shortlisted, selected };
   }, [applications]);
 
-  const activeApps = applications.filter((a: any) => !['SELECTED', 'REJECTED'].includes(a.status));
+
 
   const handleApplicationAction = async (id: number, action: "ACCEPT" | "REJECT") => {
     const loadingText = action === "ACCEPT" ? "Accepting offer..." : "Rejecting offer...";

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Search, Filter, User, GraduationCap, Briefcase, CheckCircle2, XCircle, Clock, Sparkles, Target, ChevronRight } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
+import { Search, User, GraduationCap, Briefcase, CheckCircle2, XCircle, Clock, Sparkles, Target } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobApplications, updateJobApplicationStatus } from '@/redux/thunks/companyThunk';
 import { toast } from 'sonner';

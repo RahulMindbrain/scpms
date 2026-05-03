@@ -5,7 +5,6 @@ import {
   ExternalLink,
   Sparkles,
   ChevronRight,
-  Building2,
   Video,
   UserCheck,
   Rocket,
@@ -23,7 +22,6 @@ import Loader from '@/components/Loader';
 
 const InterviewSchedule: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.auth);
   const { upcomingEvents = [], loading } = useSelector((state: RootState) => state.notification || {});
 
   useEffect(() => {
@@ -31,7 +29,7 @@ const InterviewSchedule: React.FC = () => {
   }, [dispatch]);
 
   // Helper to get accent color based on index or company name
-  const getAccentColor = (name: string, index: number) => {
+  const getAccentColor = (_name: string, index: number) => {
     const colors = [
       'from-blue-500 to-indigo-600',
       'from-emerald-500 to-teal-600',

@@ -1,16 +1,12 @@
 import {
-  Briefcase,
   Search,
   MapPin,
   Clock,
   ChevronRight,
   IndianRupee,
   Calendar,
-  Sparkles,
-  Trophy,
   Building2,
   ChevronLeft,
-  Filter,
 } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -48,7 +44,6 @@ interface Job {
 
 const JobListing = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { user } = useSelector((state: RootState) => state.auth);
   const { jobs, profile, applications = [], loading } = useSelector((state: RootState) => state.student);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -401,7 +396,7 @@ const JobListing = () => {
               <Button
                 className="w-full !bg-blue-600 !text-white py-8 rounded-2xl font-black text-base uppercase tracking-widest shadow-xl shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all border-none"
                 onClick={handleApply}
-                disabled={isApplying || (selectedJob && appliedJobIds.has(Number(selectedJob.id)))}
+                disabled={isApplying || (!!selectedJob && appliedJobIds.has(Number(selectedJob.id)))}
               >
                 {isApplying ? <Loader size="sm" /> : appliedJobIds.has(Number(selectedJob?.id)) ? 'Already Applied' : 'Confirm Application'}
               </Button>

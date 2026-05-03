@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Search, Filter, GraduationCap, ArrowUpRight } from 'lucide-react';
+import { Search, GraduationCap, ArrowUpRight } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchApplications } from '@/redux/thunks/applicationThunk';
 import type { RootState, AppDispatch } from '@/redux/store/store';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Loader from '@/components/Loader';

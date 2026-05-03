@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
-  Calendar, Clock, MapPin, Info, User, Search, ChevronRight, Loader2,
-  MessageSquare, Briefcase, CheckCircle, XCircle, Users, Bell, Trash2,
-  ArrowUpRight, Check, X, GraduationCap, Filter, MoreHorizontal
+  Calendar, Clock, MapPin, Info, Search, Loader2,
+  MessageSquare, CheckCircle, XCircle, Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';

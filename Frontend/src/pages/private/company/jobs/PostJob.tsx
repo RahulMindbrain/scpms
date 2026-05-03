@@ -4,7 +4,6 @@ import { toast } from 'sonner';
 import {
   Briefcase, 
   MapPin, 
-  GraduationCap, 
   AlignLeft, 
   CheckCircle2, 
   Zap, 

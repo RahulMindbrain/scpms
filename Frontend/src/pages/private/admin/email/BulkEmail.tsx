@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Building2, 
   Briefcase, 
   Mail, 
   Send, 
   Eye, 
   ChevronDown, 
   CheckSquare,
-  Square,
   ShieldCheck,
   Zap
 } from 'lucide-react';

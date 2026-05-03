@@ -8,8 +8,6 @@ import {
   ArrowUpRight,
   Sparkles,
   Building2,
-  Trophy,
-  Filter,
 } from 'lucide-react';
 import Loader from '@/components/Loader';
 import { useEffect, useMemo, useState } from 'react';
@@ -26,7 +24,6 @@ import { cn } from '@/lib/utils';
 const Eligibility = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { user } = useSelector((state: RootState) => state.auth);
   const { jobs = [], applications = [], profile, loading } = useSelector((state: RootState) => state.student);
   
   const [activeFilter, setActiveFilter] = useState<'all' | 'eligible' | 'applied'>('all');

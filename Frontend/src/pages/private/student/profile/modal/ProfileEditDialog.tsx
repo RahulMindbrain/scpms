@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Plus, Upload, Globe, User, FileText, X, Mail, Link as LinkIcon, GraduationCap, Code2 } from "lucide-react";
+import { Upload, Globe, User, FileText, X, Mail, Link as LinkIcon, GraduationCap, Code2 } from "lucide-react";
 import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
 import Loader from "@/components/Loader";
 import { toast } from "sonner";
@@ -52,8 +52,6 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
   const [formData, setFormData] = useState<any>(profile);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isUploading, setIsUploading] = useState(false);
-  const [resumeName, setResumeName] = useState("");
-  const [skillInput, setSkillInput] = useState("");
   const [allSkillsList, setAllSkillsList] = useState<SkillOption[]>([]);
   const [allDepartmentsList, setAllDepartmentsList] = useState<any[]>([]);
 
@@ -81,7 +79,6 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
         projects: profile.projects || [],
       };
       setFormData(newFormData);
-      setResumeName(profile.resumeUrl ? "Current Resume" : "");
     }
   }, [isOpen, profile]);
 
@@ -154,7 +151,6 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
       ...prev,
       skills: [...(prev.skills || []), { id: skillId, name: skillName }]
     }));
-    setSkillInput("");
   };
 
   const removeSkill = (index: number) => {
@@ -423,7 +419,6 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       const url = await upload(file, "resumes");
                       if (url) {
                         updateField("resumeUrl", url);
-                        setResumeName(file.name);
                         toast.success("Resume uploaded");
                       }
                     } catch (error) {

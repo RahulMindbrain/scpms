@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import {
   FileText, Upload, Download, Trash2,
-  Search, FileCheck, FileClock
+  Search, FileCheck, FileClock, Sparkles
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
 import Loader from '@/components/Loader';
 

@@ -29,7 +29,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { AdminPageLayout } from '@/components/layout/AdminPageLayout';
 import { PageHeader } from '@/components/PageHeader';
-import Loader from '@/components/Loader';
+
 
 type NotificationFilter = 'all' | 'unread' | 'read';
 type NotificationItem = {

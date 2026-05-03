@@ -9,25 +9,22 @@ import {
   Briefcase,
   ChevronRight,
   Sparkles,
-  MapPin,
-  Clock3,
   Calendar,
-  LayoutDashboard,
   ArrowUpRight,
 } from "lucide-react"
-import CountdownTimer from "@/components/CountdownTimer"
+
 import type { AppDispatch } from "@/redux/store/store"
 import type { RootState } from "@/redux/reducers/rootReducer"
 import { fetchUpcomingEvents, fetchUnreadCount } from "@/redux/thunks/notificationThunks"
 import { useSocket } from "@/socket/SocketProvider"
 import { SOCKET_EVENTS } from "@/socket/socket.events"
-import Loader from "@/components/Loader"
+
 
 export default function StudentDashboard() {
   const dispatch = useDispatch<AppDispatch>()
   const { socket } = useSocket()
 
-  const { upcomingEvents = [], unreadCount = 0, loading = false } = useSelector(
+  const { upcomingEvents = [], unreadCount = 0 } = useSelector(
     (state: RootState) => state.notification || {}
   )
 

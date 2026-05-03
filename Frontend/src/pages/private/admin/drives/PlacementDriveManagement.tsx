@@ -12,7 +12,6 @@ import {
   Clock,
   Info,
   Calendar,
-  Briefcase,
   Trophy,
   Users
 } from 'lucide-react';

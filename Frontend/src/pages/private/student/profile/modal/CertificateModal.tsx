@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useCloudinaryUpload } from "@/hooks/useCloudinaryUpload";
-import { Upload, GraduationCap, Calendar, FileText } from "lucide-react";
+import { Upload, GraduationCap, Calendar } from "lucide-react";
 import Loader from "@/components/Loader";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";

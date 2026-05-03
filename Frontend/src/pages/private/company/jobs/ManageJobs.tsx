@@ -9,13 +9,7 @@ import {
   MapPin, 
   IndianRupee, 
   Calendar, 
-  Sparkles, 
-  X, 
-  Check, 
-  AlertTriangle, 
-  Zap, 
-  Info, 
-  Target 
+  Sparkles
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useDispatch, useSelector } from 'react-redux';
@@ -33,19 +27,7 @@ import {
 } from "@/components/ui/pagination";
 import { Link } from 'react-router-dom';
 import Loader from '@/components/Loader';
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogHeader, 
-  DialogTitle, 
-  DialogDescription,
-  DialogFooter
-} from "@/components/ui/dialog";
-import { toast } from 'sonner';
-import { fetchDepartments } from '@/redux/thunks/departmentThunk';
-import { fetchSkills } from '@/redux/thunks/skillThunk';
-import { deleteCompanyJob } from '@/redux/thunks/companyThunk';
-import { Button } from '@/components/ui/button';
+
 
 const ManageJobs: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -54,38 +36,16 @@ const ManageJobs: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   // Modal States
-  const [selectedJob, setSelectedJob] = useState<any>(null);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { departments } = useSelector((state: RootState) => state.department);
-  const { skills } = useSelector((state: RootState) => state.skill);
+
 
   useEffect(() => {
     dispatch(fetchCompanyJobs({ page }));
-    dispatch(fetchDepartments());
-    dispatch(fetchSkills());
   }, [dispatch, page]);
 
-  const handleDeleteClick = (job: any) => {
-    setSelectedJob(job);
-    setIsDeleteOpen(true);
-  };
 
-  const confirmDelete = async () => {
-    if (!selectedJob) return;
-    setIsSubmitting(true);
-    try {
-      await dispatch(deleteCompanyJob(selectedJob.id)).unwrap();
-      toast.success("Job drive deleted successfully");
-      setIsDeleteOpen(false);
-    } catch (error: any) {
-      const errorMessage = typeof error === 'string' ? error : error?.message || "Failed to delete job drive";
-      toast.error(errorMessage);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
+
+
 
   const formatSalary = (salary: number) => {
     if (salary >= 100000) {
@@ -260,7 +220,6 @@ const ManageJobs: React.FC = () => {
                             <Edit3 size={14} /> Modify
                           </Link>
                           <button 
-                            onClick={() => handleDeleteClick(job)}
                             className="p-2.5 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all" 
                             title="Delete Drive"
                           >
