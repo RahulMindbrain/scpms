@@ -8,6 +8,8 @@ import {
   Building2,
   Video,
   UserCheck,
+  Rocket,
+  TrendingUp,
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
@@ -45,29 +47,31 @@ const InterviewSchedule: React.FC = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background dark:bg-[#111319] min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
-      <div className="max-w-7xl mx-auto w-full p-4 md:p-8 space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="flex-1 flex flex-col bg-background min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
+      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500">
         
         {/* ─── Hero Header ─── */}
         <div className="group relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-8 md:p-12 text-white shadow-2xl border border-white/5">
           {/* Mesh Background Elements */}
           <div className="absolute inset-0">
-            <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/20 rounded-full blur-[80px]"></div>
-            <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/15 rounded-full blur-[80px]"></div>
+            <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/25 rounded-full blur-[100px] animate-pulse"></div>
+            <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
           </div>
+          
           {/* Subtle Texture */}
           <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
           
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest shadow-lg">
-                <Sparkles className="h-3 w-3 text-yellow-400" /> 
-                <span className="opacity-90">Interview Center</span>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-xl backdrop-blur-md">
+                <Sparkles className="h-4 w-4 text-yellow-400" /> 
+                <span className="opacity-90">Interview Control Center</span>
               </div>
-              <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-md">
+              <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
                 {user?.firstname ? `${user.firstname}'s Schedule` : "Interview Hub"}
               </h1>
-              <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-medium">
+              <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-medium opacity-90">
                 {upcomingEvents.length > 0 
                   ? `You have ${upcomingEvents.length} critical sessions scheduled. Be prepared and stay confident!`
                   : "Track your upcoming interviews, technical rounds, and placement activities in one place."}
@@ -75,8 +79,8 @@ const InterviewSchedule: React.FC = () => {
             </div>
             
             <div className="hidden lg:block">
-              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-xl border border-white/10 shadow-inner">
-                <Video className="h-16 w-16 text-white/30" />
+              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl">
+                <Video className="h-16 w-16 text-white/40" />
               </div>
             </div>
           </div>
@@ -108,7 +112,7 @@ const InterviewSchedule: React.FC = () => {
                     transition={{ delay: idx * 0.1 }}
                     key={item.id} 
                     className={cn(
-                      "group relative bg-white dark:bg-[#1e1f26] border border-slate-200 dark:border-white/[0.05] rounded-[2rem] p-6 md:p-8 transition-all duration-300 hover:shadow-2xl dark:hover:shadow-indigo-500/5 hover:border-indigo-500/20 hover:translate-y-[-4px]",
+                      "group relative bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl border border-slate-200/60 dark:border-white/[0.08] rounded-[2.5rem] p-8 md:p-10 transition-all duration-500 hover:shadow-2xl hover:border-indigo-500/30 hover:translate-y-[-4px]",
                     )}
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
@@ -202,13 +206,13 @@ const InterviewSchedule: React.FC = () => {
               </div>
             </div>
 
-            <div className="bg-white dark:bg-[#1e1f26] border border-slate-200 dark:border-white/[0.05] rounded-[2.5rem] p-8 shadow-sm">
+            <div className="bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl border border-slate-200/60 dark:border-white/[0.08] rounded-[2.5rem] p-8 shadow-sm">
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-xl bg-slate-100 dark:bg-white/5">
-                    <TrendingUp size={20} className="text-indigo-500" />
+                  <div className="p-2.5 rounded-xl bg-indigo-500/10 shadow-inner">
+                    <TrendingUp size={20} className="text-indigo-600 dark:text-indigo-400" />
                   </div>
-                  <h2 className="font-black text-slate-900 dark:text-white tracking-tight">Recent Activity</h2>
+                  <h2 className="font-black text-slate-900 dark:text-white tracking-[0.1em] uppercase text-xs">Recent Activity</h2>
                 </div>
               </div>
 

@@ -1,4 +1,4 @@
-﻿import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import {
   FileText, Upload, Download, Trash2,
   Search, FileCheck, FileClock
@@ -153,125 +153,146 @@ const Documents = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9FAFB]">
-      <main className="max-w-6xl mx-auto px-8 py-10">
+    <div className="flex-1 flex flex-col bg-background min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
+      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
 
-        {/* Header */}
-        <div className="flex justify-between mb-10">
-          <div>
-            <h2 className="text-2xl font-bold text-[#e2e2eb]">Academic Records</h2>
-            <p className="text-[#908fa0] text-sm">
-              Manage and share your verified documents
-            </p>
+        {/* Header aligned with Premium Style */}
+        <div className="group relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-8 md:p-12 text-white shadow-2xl border border-white/5">
+          <div className="absolute inset-0">
+            <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/25 rounded-full blur-[100px] animate-pulse"></div>
+            <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
           </div>
-
-          <div className="flex gap-3">
-            <div className="hidden md:flex items-center relative">
-              <Search className="absolute left-3 text-[#908fa0]" size={16} />
-              <input
-                type="text"
-                placeholder="Search files..."
-                className="pl-10 pr-4 py-2 border rounded-xl text-sm"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+          <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
+          
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-xl backdrop-blur-md">
+                <FileCheck className="h-4 w-4 text-yellow-400" /> 
+                <span className="opacity-90">Secure Repository</span>
+              </div>
+              <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
+                Academic Records
+              </h1>
+              <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-medium opacity-90">
+                Manage and share your verified documents. Your secure mission control for placement credentials.
+              </p>
             </div>
-
-            <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
-
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading}
-              className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 text-white rounded-xl"
-            >
-              {isUploading ? <Loader size="sm" /> : <Upload size={16} />}
-              {isUploading ? "Uploading..." : "Upload"}
-            </button>
+            
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <div className="relative group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 group-focus-within:text-white transition-colors" size={18} />
+                <input
+                  type="text"
+                  placeholder="Search files..."
+                  className="pl-12 pr-6 h-14 bg-white/10 backdrop-blur-xl border border-white/10 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-white/20 transition-all placeholder:text-white/30 text-white w-full sm:w-64"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="flex items-center justify-center gap-3 px-8 h-14 bg-white text-[#0f172a] rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all w-full sm:w-auto active:scale-95"
+              >
+                {isUploading ? <Loader size="sm" /> : <Upload size={18} />}
+                {isUploading ? "Syncing..." : "Upload File"}
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex gap-2 mb-8">
+        {/* Filters aligned with Premium Style */}
+        <div className="flex items-center gap-2 bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl p-1.5 rounded-2xl border border-slate-200/60 dark:border-white/[0.08] w-fit shadow-sm">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveTab(cat)}
-              className={`px-4 py-2 rounded-full text-sm ${
-                activeTab === cat ? 'bg-indigo-500/15 text-indigo-300' : 'bg-white'
-              }`}
+              className={cn(
+                "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300",
+                activeTab === cat
+                  ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-xl border border-slate-200/50 dark:border-white/10 scale-105"
+                  : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
+              )}
             >
               {cat}
             </button>
           ))}
         </div>
 
-        {/* Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Grid aligned with Premium Style */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredDocs.length > 0 ? (
             filteredDocs.map((doc) => (
-              <div key={doc.id} className="bg-[#1e1f26] p-5 rounded-xl border">
-
-                <div className="relative group/card h-40 mb-3 rounded-lg overflow-hidden bg-[#191b22] border border-[rgba(255,255,255,0.06)] flex items-center justify-center">
+              <div key={doc.id} className="group relative bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl p-6 rounded-[2.5rem] border border-slate-200/60 dark:border-white/[0.08] transition-all duration-500 hover:shadow-2xl hover:translate-y-[-4px] hover:border-indigo-500/30">
+                <div className="relative h-48 mb-6 rounded-[1.5rem] overflow-hidden bg-slate-100 dark:bg-black/20 border border-slate-200/50 dark:border-white/5 flex items-center justify-center shadow-inner">
                   {getThumbnail(doc) ? (
                     <img
                       src={getThumbnail(doc)}
                       alt={doc.name}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover/card:scale-105"
+                      className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110 group-hover:rotate-1"
                       onError={(e) => {
-                        (e.target as HTMLImageElement).src = ''; // Clear src on error
+                        (e.target as HTMLImageElement).src = '';
                         (e.target as HTMLImageElement).className = 'hidden';
                       }}
                     />
                   ) : (
-                    <div className="p-4 bg-[#191b22] text-[#c7c4d7]">
-                      <FileText size={48} />
+                    <div className="p-8 text-indigo-500/40 group-hover:scale-110 transition-transform duration-500">
+                      <FileText size={64} strokeWidth={1} />
                     </div>
                   )}
-                </div>
-
-                <div className="flex justify-between mb-1 items-start">
-                  <h3 className="font-semibold truncate flex-1 pr-2" title={doc.name}>{doc.name}</h3>
-                  {getIcon(doc.category)}
-                </div>
-                <p className="text-[10px] text-[#908fa0] font-medium uppercase tracking-wider">{doc.size} • {doc.date}</p>
-
-                <div className="flex justify-between mt-4">
-                  <span className="text-emerald-600 text-sm">{doc.status}</span>
-
-                  <div className="flex items-center gap-2">
-
-                    {/* ⬇️ DOWNLOAD */}
+                  {/* Hover Overlay */}
+                  <div className="absolute inset-0 bg-indigo-900/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center gap-4">
                     <button
                       onClick={() => downloadFile(doc.url, doc.name)}
-                      className="p-2 hover:bg-indigo-500/10 rounded-lg text-[#908fa0] hover:text-indigo-400 transition-colors"
-                      title="Download"
+                      className="p-4 bg-white text-indigo-600 rounded-2xl shadow-2xl hover:scale-110 active:scale-95 transition-all"
                     >
-                      <Download size={16} />
+                      <Download size={20} />
                     </button>
-
-                    {/* 🗑️ DELETE */}
-                    <button
-                      onClick={() => deleteDocument(doc.id)}
-                      className="p-2 hover:bg-rose-50 rounded-lg"
-                    >
-                      <Trash2 size={16} />
-                    </button>
-
                   </div>
                 </div>
-
+ 
+                <div className="px-2 space-y-4">
+                  <div className="flex justify-between items-start gap-4">
+                    <h3 className="font-black text-lg text-slate-900 dark:text-white truncate tracking-tight" title={doc.name}>
+                      {doc.name}
+                    </h3>
+                    <div className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 shadow-inner">
+                      {getIcon(doc.category)}
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center justify-between">
+                    <div className="space-y-1">
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-black uppercase tracking-[0.2em]">{doc.size} • {doc.date}</p>
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                        <span className="text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">{doc.status}</span>
+                      </div>
+                    </div>
+                    
+                    <button
+                      onClick={() => deleteDocument(doc.id)}
+                      className="p-3 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
               </div>
             ))
           ) : (
-            <div className="col-span-full text-center py-20 text-[#908fa0]">
-              <FileClock size={40} />
-              <p>No documents found</p>
+            <div className="col-span-full py-32 text-center bg-white/40 dark:bg-white/[0.02] border-2 border-dashed border-slate-200/60 dark:border-white/10 rounded-[3rem] shadow-sm">
+              <div className="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-[2.5rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mx-auto mb-6">
+                <FileClock size={48} />
+              </div>
+              <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Vault is Empty</h3>
+              <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm font-medium">Start by uploading your academic credentials.</p>
             </div>
           )}
         </div>
-
-      </main>
-
+      </div>
     </div>
   );
 };

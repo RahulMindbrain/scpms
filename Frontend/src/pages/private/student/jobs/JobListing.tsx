@@ -131,27 +131,31 @@ const JobListing = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background dark:bg-[#111319] min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
-      <div className="max-w-7xl mx-auto w-full p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="flex-1 flex flex-col bg-background min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
+      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
         
         {/* ─── Refined Hero Section ─── */}
         <div className="group relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-8 md:p-12 text-white shadow-2xl border border-white/5">
+          {/* Mesh Background Elements */}
           <div className="absolute inset-0">
-            <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/20 rounded-full blur-[80px]"></div>
-            <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/15 rounded-full blur-[80px]"></div>
+            <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/25 rounded-full blur-[100px] animate-pulse"></div>
+            <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
           </div>
+          
+          {/* Subtle Texture */}
           <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
           
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest shadow-lg">
-                <Sparkles className="h-3 w-3 text-yellow-400" /> 
-                <span className="opacity-90">Opportunity Hub</span>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-xl backdrop-blur-md">
+                <Sparkles className="h-4 w-4 text-yellow-400" /> 
+                <span className="opacity-90">Career Control Center</span>
               </div>
-              <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-md">
+              <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
                 {user?.firstname ? `${user.firstname}, find your fit` : "Career Opportunities"}
               </h1>
-              <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-medium">
+              <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-medium opacity-90">
                 {jobs.length > 0 
                   ? `There are ${jobs.length} active roles tailored for your profile. Take the next step today.`
                   : "Explore curated roles from top-tier companies. Your next big break starts here."}
@@ -159,8 +163,8 @@ const JobListing = () => {
             </div>
             
             <div className="hidden lg:block">
-              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-xl border border-white/10 shadow-inner">
-                <Briefcase className="h-16 w-16 text-white/30" />
+              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl">
+                <Briefcase className="h-16 w-16 text-white/40" />
               </div>
             </div>
           </div>
@@ -168,8 +172,8 @@ const JobListing = () => {
 
         {/* ─── Compact Controls Bar ─── */}
         {jobs.length > 0 && (
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-4">
-            <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/[0.05] w-fit">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl p-6 rounded-[2rem] border border-slate-200/60 dark:border-white/[0.08] shadow-sm">
+            <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 p-1.5 rounded-2xl border border-slate-200 dark:border-white/[0.05] w-fit">
               {[
                 { id: 'all', label: 'All Jobs' },
                 { id: 'eligible', label: 'Recommended' },
@@ -179,9 +183,9 @@ const JobListing = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
                   className={cn(
-                    "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                    "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300",
                     activeTab === tab.id
-                      ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-md border border-slate-200 dark:border-white/10"
+                      ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-xl border border-slate-200/50 dark:border-white/10 scale-105"
                       : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
                   )}
                 >
@@ -192,10 +196,10 @@ const JobListing = () => {
             
             <div className="flex items-center gap-4 w-full lg:w-auto">
               <div className="relative flex-1 lg:w-96 group">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
                 <Input
                   placeholder="Search by role, company, or tech stack..."
-                  className="pl-12 h-14 bg-white dark:bg-[#1e1f26] border-slate-200 dark:border-white/[0.05] rounded-[1.25rem] text-sm font-medium focus-visible:ring-indigo-500/50 shadow-sm transition-all"
+                  className="pl-14 h-14 bg-slate-100 dark:bg-white/5 border-none rounded-2xl text-sm font-semibold focus-visible:ring-indigo-500/30 shadow-inner transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -221,61 +225,61 @@ const JobListing = () => {
                   whileHover={{ y: -4 }}
                   className="group"
                 >
-                  <Card className="h-full border-none bg-white dark:bg-[#1e1f26] rounded-[2rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-200 dark:border-white/[0.05] hover:border-indigo-500/30">
+                  <Card className="h-full border-none bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-200/60 dark:border-white/[0.08] hover:border-indigo-500/30">
                     <CardContent className="p-0 flex flex-col h-full">
                       {/* Top Info */}
-                      <div className="p-6 flex-1 space-y-6">
+                      <div className="p-8 flex-1 space-y-8">
                         <div className="flex items-start justify-between gap-4">
                           <div className={cn(
-                            "w-14 h-14 rounded-2xl flex items-center justify-center font-black text-xl text-white shadow-lg shrink-0 transition-transform group-hover:scale-110",
+                            "w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl text-white shadow-2xl shrink-0 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3",
                             isApplied ? "bg-indigo-500" : isEligible ? "bg-gradient-to-br from-indigo-500 to-blue-600" : "bg-slate-400 grayscale"
                           )}>
                             {job.company.name[0]}
                           </div>
-                          <div className="flex flex-col items-end gap-2">
+                          <div className="flex flex-col items-end gap-3">
                             {isApplied ? (
-                              <Badge className="bg-indigo-500/10 text-indigo-500 border-indigo-500/20 text-[9px] font-black uppercase tracking-widest px-3 py-1">
+                              <Badge className="bg-indigo-500/10 text-indigo-500 border-indigo-500/20 text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-sm">
                                 Applied
                               </Badge>
                             ) : isEligible ? (
-                              <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[9px] font-black uppercase tracking-widest px-3 py-1">
-                                Eligible
+                              <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-sm">
+                                Recommended
                               </Badge>
                             ) : (
-                              <Badge className="bg-rose-500/10 text-rose-500 border-rose-500/20 text-[9px] font-black uppercase tracking-widest px-3 py-1">
+                              <Badge className="bg-rose-500/10 text-rose-500 border-rose-500/20 text-[9px] font-black uppercase tracking-[0.2em] px-4 py-1.5 rounded-full shadow-sm">
                                 Ineligible
                               </Badge>
                             )}
                           </div>
                         </div>
 
-                        <div className="space-y-1">
-                          <h3 className="text-lg font-black text-slate-900 dark:text-white leading-tight group-hover:text-indigo-600 transition-colors truncate">
+                        <div className="space-y-2">
+                          <h3 className="text-xl font-black text-slate-900 dark:text-white leading-tight group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors tracking-tight">
                             {job.title}
                           </h3>
-                          <p className="text-sm font-bold text-slate-500 flex items-center gap-1.5 uppercase tracking-tighter">
+                          <p className="text-[10px] font-black text-slate-500 flex items-center gap-2 uppercase tracking-[0.15em]">
                             <Building2 size={14} className="text-indigo-500" />
                             {job.company.name}
                           </p>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3">
-                          <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-white/[0.03] rounded-xl border border-slate-100 dark:border-white/5">
-                            <MapPin size={14} className="text-blue-500" />
-                            <span className="text-[10px] font-black text-slate-900 dark:text-slate-100 truncate">{job.location}</span>
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="flex items-center gap-3 p-4 bg-slate-100 dark:bg-white/5 rounded-2xl border border-slate-200/50 dark:border-white/5 shadow-inner">
+                            <MapPin size={16} className="text-blue-500" />
+                            <span className="text-[10px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest truncate">{job.location}</span>
                           </div>
-                          <div className="flex items-center gap-2 p-3 bg-slate-50 dark:bg-white/[0.03] rounded-xl border border-slate-100 dark:border-white/5">
-                            <IndianRupee size={14} className="text-emerald-500" />
-                            <span className="text-[10px] font-black text-slate-900 dark:text-slate-100 truncate">{formatSalary(job.salary)}</span>
+                          <div className="flex items-center gap-3 p-4 bg-slate-100 dark:bg-white/5 rounded-2xl border border-slate-200/50 dark:border-white/5 shadow-inner">
+                            <IndianRupee size={16} className="text-emerald-500" />
+                            <span className="text-[10px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest truncate">{formatSalary(job.salary)}</span>
                           </div>
                         </div>
                       </div>
 
                       {/* Footer Actions */}
-                      <div className="px-6 py-4 bg-slate-50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/[0.05] flex items-center justify-between">
-                        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                          <Clock size={14} className="text-indigo-500" />
-                          {new Date(job.postedAt || (job as any).createdAt).toLocaleDateString()}
+                      <div className="px-8 py-6 bg-slate-50 dark:bg-black/20 border-t border-slate-200/60 dark:border-white/[0.05] flex items-center justify-between mt-auto">
+                        <div className="flex items-center gap-2 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                          <Clock size={16} className="text-indigo-500" />
+                          {new Date(job.postedAt || (job as any).createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                         </div>
                         <Button
                           onClick={() => {
@@ -283,12 +287,12 @@ const JobListing = () => {
                             setIsModalOpen(true);
                           }}
                           className={cn(
-                            "rounded-xl font-black text-[10px] uppercase tracking-widest px-6 h-10 transition-all border-none",
+                            "rounded-[1.25rem] font-black text-[10px] uppercase tracking-[0.2em] px-8 h-12 transition-all duration-500 border-none shadow-xl",
                             isApplied 
-                              ? "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-none" 
+                              ? "bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-none hover:bg-indigo-500/20" 
                               : isEligible
-                              ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20 hover:scale-105"
-                              : "bg-slate-100 text-slate-400 cursor-not-allowed"
+                              ? "bg-indigo-600 text-white shadow-indigo-500/30 hover:scale-105 hover:shadow-indigo-500/50"
+                              : "bg-slate-200 dark:bg-white/5 text-slate-400 cursor-not-allowed shadow-none"
                           )}
                         >
                           {isApplied ? 'Details' : 'Apply Now'}

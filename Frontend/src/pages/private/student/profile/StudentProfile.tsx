@@ -271,16 +271,16 @@ const StudentProfile = () => {
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        className="space-y-8 px-4 lg:px-10 pt-0 w-full"
+        className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8"
       >
         {/* Hero Section */}
         <motion.div variants={itemVariants} className="relative group/hero">
           {/* Elegant Slim Banner */}
-          <div className="h-48 md:h-64 w-full rounded-[2.5rem] bg-[#0f172a] shadow-xl relative overflow-hidden">
+          <div className="h-56 md:h-72 w-full rounded-[2.5rem] bg-[#0f172a] shadow-2xl relative overflow-hidden border border-white/5">
             {/* Sophisticated Mesh Gradients */}
             <div className="absolute inset-0">
-              <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/20 rounded-full blur-[80px] animate-pulse"></div>
-              <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/15 rounded-full blur-[80px] animate-pulse delay-1000"></div>
+              <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/25 rounded-full blur-[100px] animate-pulse"></div>
+              <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
             </div>
 
             {/* Subtle Texture */}
@@ -368,88 +368,91 @@ const StudentProfile = () => {
         </motion.div>
 
         {/* Stats Row */}
-        <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
-          <Card className="rounded-2xl border-none shadow-sm bg-white/70 dark:bg-white/5 backdrop-blur-md hover:shadow-md transition-all group overflow-hidden">
-            <CardContent className="p-6">
+        <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group overflow-hidden border border-slate-200/60 dark:border-white/[0.08]">
+            <CardContent className="p-8">
               <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">CGPA</p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{profile.stats?.cgpa || '0.0'} <span className="text-sm font-normal text-slate-400">/ 10</span></h3>
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">CGPA Score</p>
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{profile.stats?.cgpa || '0.0'} <span className="text-sm font-normal text-slate-400">/ 10</span></h3>
                 </div>
-                <div className="h-12 w-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
-                  <Award className="h-6 w-6" />
+                <div className="h-14 w-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
+                  <Award className="h-7 w-7" />
                 </div>
               </div>
-              <div className="mt-4">
-                <Progress value={(parseFloat(profile.stats?.cgpa) || 0) * 10} className="h-1.5 bg-blue-100" />
+              <div className="mt-6">
+                <Progress value={(parseFloat(profile.stats?.cgpa) || 0) * 10} className="h-1.5 bg-blue-100 dark:bg-blue-900/20" />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-none shadow-sm bg-white/70 dark:bg-white/5 backdrop-blur-md hover:shadow-md transition-all group">
-            <CardContent className="p-6">
+          <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group border border-slate-200/60 dark:border-white/[0.08]">
+            <CardContent className="p-8">
               <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Projects</p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{profile.projects?.length || 0}</h3>
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Projects</p>
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{profile.projects?.length || 0}</h3>
                 </div>
-                <div className="h-12 w-12 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
-                  <Cpu className="h-6 w-6" />
+                <div className="h-14 w-14 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
+                  <Cpu className="h-7 w-7" />
                 </div>
               </div>
-              <p className="mt-4 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 w-fit px-2 py-0.5 rounded-full">Active Contributions</p>
+              <p className="mt-6 text-[9px] font-black text-indigo-600 dark:text-indigo-400 bg-indigo-500/10 w-fit px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">Technical Portfolio</p>
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-none shadow-sm bg-white/70 dark:bg-white/5 backdrop-blur-md hover:shadow-md transition-all group">
-            <CardContent className="p-6">
+          <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group border border-slate-200/60 dark:border-white/[0.08]">
+            <CardContent className="p-8">
               <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Skills</p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{profile.skills?.length || 0}</h3>
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Verified Skills</p>
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{profile.skills?.length || 0}</h3>
                 </div>
-                <div className="h-12 w-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
-                  <Rocket className="h-6 w-6" />
+                <div className="h-14 w-14 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
+                  <Rocket className="h-7 w-7" />
                 </div>
               </div>
-              <p className="mt-4 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 w-fit px-2 py-0.5 rounded-full">Technical Stack</p>
+              <p className="mt-6 text-[9px] font-black text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 w-fit px-3 py-1 rounded-full uppercase tracking-widest shadow-sm">Industry Ready</p>
             </CardContent>
           </Card>
 
-          <Card className="rounded-2xl border-none shadow-sm bg-white/70 dark:bg-white/5 backdrop-blur-md hover:shadow-md transition-all group">
-            <CardContent className="p-6">
+          <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group border border-slate-200/60 dark:border-white/[0.08]">
+            <CardContent className="p-8">
               <div className="flex items-center justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Backlogs</p>
-                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{profile.stats?.activeBacklogs || '0'}</h3>
+                <div className="space-y-2">
+                  <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Active Backlogs</p>
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{profile.stats?.activeBacklogs || '0'}</h3>
                 </div>
-                <div className="h-12 w-12 rounded-2xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform">
-                  <Layers className="h-6 w-6" />
+                <div className="h-14 w-14 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
+                  <Layers className="h-7 w-7" />
                 </div>
               </div>
               <Badge
                 variant={parseInt(profile.stats?.activeBacklogs) > 0 ? "destructive" : "secondary"}
-                className={`mt-4 rounded-full px-3 ${parseInt(profile.stats?.activeBacklogs) === 0 ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/30" : ""}`}
+                className={`mt-6 rounded-full px-4 py-1 text-[9px] font-black uppercase tracking-widest ${parseInt(profile.stats?.activeBacklogs) === 0 ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 shadow-sm" : "shadow-lg shadow-rose-500/20"}`}
               >
-                {parseInt(profile.stats?.activeBacklogs) === 0 ? "Clear History" : "Action Required"}
+                {parseInt(profile.stats?.activeBacklogs) === 0 ? "Perfect Record" : "Action Required"}
               </Badge>
             </CardContent>
           </Card>
         </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           {/* Left Column */}
           <div className="lg:col-span-7 space-y-8">
             {/* Academic Details */}
             <motion.div variants={itemVariants}>
-              <Card className="rounded-2xl border-none shadow-sm bg-white dark:bg-slate-900/50 overflow-hidden group">
-                <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 to-indigo-500"></div>
-                <CardContent className="p-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                      <GraduationCap className="h-6 w-6" />
+              <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl overflow-hidden group border border-slate-200/60 dark:border-white/[0.08]">
+                <div className="h-2 w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500"></div>
+                <CardContent className="p-10">
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-inner">
+                      <GraduationCap className="h-7 w-7" />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Academic Details</h3>
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Academic Profile</h3>
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Verified Scholastic Records</p>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -476,18 +479,21 @@ const StudentProfile = () => {
 
             {/* Experience Timeline */}
             <motion.div variants={itemVariants}>
-              <Card className="rounded-2xl border-none shadow-sm bg-white dark:bg-slate-900/50 overflow-hidden group">
-                <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 to-purple-500"></div>
-                <CardContent className="p-8">
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-                        <Briefcase className="h-6 w-6" />
+              <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl overflow-hidden group border border-slate-200/60 dark:border-white/[0.08]">
+                <div className="h-2 w-full bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+                <CardContent className="p-10">
+                  <div className="flex items-center justify-between mb-10">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 shadow-inner">
+                        <Briefcase className="h-7 w-7" />
                       </div>
-                      <h3 className="text-xl font-bold text-slate-900 dark:text-white">Experience</h3>
+                      <div>
+                        <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Professional History</h3>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Career Timeline & Roles</p>
+                      </div>
                     </div>
-                    <Button onClick={() => setShowExperienceModal(true)} variant="ghost" size="sm" className="text-indigo-600 hover:bg-indigo-50 rounded-xl">
-                      <Plus className="h-4 w-4 mr-1" /> Add Experience
+                    <Button onClick={() => setShowExperienceModal(true)} variant="ghost" size="sm" className="text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all">
+                      <Plus className="h-4 w-4 mr-2" /> Add Entry
                     </Button>
                   </div>
 
@@ -534,14 +540,17 @@ const StudentProfile = () => {
           <div className="lg:col-span-5 space-y-8">
             {/* Skills Card */}
             <motion.div variants={itemVariants}>
-              <Card className="rounded-2xl border-none shadow-sm bg-white dark:bg-slate-900/50 overflow-hidden">
-                <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 to-teal-500"></div>
-                <CardContent className="p-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                      <Code2 className="h-6 w-6" />
+              <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl overflow-hidden group border border-slate-200/60 dark:border-white/[0.08]">
+                <div className="h-2 w-full bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+                <CardContent className="p-10">
+                  <div className="flex items-center gap-4 mb-8">
+                    <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 shadow-inner">
+                      <Code2 className="h-7 w-7" />
                     </div>
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Technical Skills</h3>
+                    <div>
+                      <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Technical Stack</h3>
+                      <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Core Competencies</p>
+                    </div>
                   </div>
 
                   <div className="flex flex-wrap gap-2.5">
@@ -607,18 +616,21 @@ const StudentProfile = () => {
 
             {/* Certifications Card */}
             <motion.div variants={itemVariants}>
-              <Card className="rounded-2xl border-none shadow-sm bg-white dark:bg-slate-900/50 overflow-hidden">
-                <div className="h-1.5 w-full bg-gradient-to-r from-rose-500 to-orange-500"></div>
-                <CardContent className="p-8">
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400">
-                        <Award className="h-6 w-6" />
+              <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl overflow-hidden group border border-slate-200/60 dark:border-white/[0.08]">
+                <div className="h-2 w-full bg-gradient-to-r from-rose-500 to-orange-500"></div>
+                <CardContent className="p-10">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-4">
+                      <div className="p-3 rounded-2xl bg-rose-500/10 text-rose-600 dark:text-rose-400 shadow-inner">
+                        <Award className="h-7 w-7" />
                       </div>
-                      <h3 className="text-xl font-bold text-slate-900 dark:text-white">Certifications</h3>
+                      <div>
+                        <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Certifications</h3>
+                        <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Professional Recognition</p>
+                      </div>
                     </div>
-                    <Button onClick={() => setShowCertificateModal(true)} variant="ghost" size="sm" className="text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl">
-                      <Plus className="h-4 w-4" />
+                    <Button onClick={() => setShowCertificateModal(true)} variant="ghost" size="sm" className="text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 rounded-xl px-3 py-1.5">
+                      <Plus className="h-5 w-5" />
                     </Button>
                   </div>
 
@@ -705,19 +717,22 @@ const StudentProfile = () => {
         </div>
 
         {/* Projects Section - Full Width */}
-        <motion.div variants={itemVariants} className="space-y-6">
-          <div className="flex items-center justify-between px-2">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600 shadow-sm">
-                <Rocket className="h-6 w-6" />
+        <motion.div variants={itemVariants} className="space-y-8">
+          <div className="flex items-center justify-between px-4">
+            <div className="flex items-center gap-4">
+              <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 shadow-inner">
+                <Rocket className="h-7 w-7" />
               </div>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Featured Projects</h3>
+              <div>
+                <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Featured Projects</h3>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Showcasing Innovation</p>
+              </div>
             </div>
             <Button
               onClick={() => setShowProjectModal(true)}
-              className="bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-purple-500/10 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-200 dark:hover:border-purple-500/30 rounded-2xl px-6 h-11 font-bold shadow-sm transition-all"
+              className="bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl border border-slate-200/60 dark:border-white/[0.1] text-slate-700 dark:text-white hover:bg-purple-500 hover:text-white dark:hover:bg-purple-500 transition-all rounded-[1.5rem] px-8 h-14 text-xs font-black uppercase tracking-widest shadow-sm"
             >
-              <Plus className="h-4 w-4 mr-2" /> Add Project
+              <Plus className="h-5 w-5 mr-3" /> Add Project
             </Button>
           </div>
 
@@ -729,14 +744,14 @@ const StudentProfile = () => {
                   whileHover={{ y: -5 }}
                   className="group"
                 >
-                  <Card className="rounded-3xl border-none shadow-sm bg-white dark:bg-slate-900/50 h-full flex flex-col overflow-hidden transition-all hover:shadow-xl hover:shadow-indigo-500/5">
+                  <Card className="rounded-[2.5rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl h-full flex flex-col overflow-hidden transition-all duration-500 hover:shadow-2xl hover:translate-y-[-8px] hover:border-indigo-500/30 border border-slate-200/60 dark:border-white/[0.08]">
                     <div className="h-2 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-                    <CardContent className="p-6 flex-1 flex flex-col">
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="h-12 w-12 rounded-2xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-indigo-500 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-500/10 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors shadow-sm">
-                          <Globe className="h-6 w-6" />
+                    <CardContent className="p-8 flex-1 flex flex-col">
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="h-14 w-14 rounded-2xl bg-slate-100 dark:bg-black/20 flex items-center justify-center text-indigo-500 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-inner">
+                          <Globe className="h-7 w-7" />
                         </div>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"
                           onClick={() => {
                             const projId = profile.projects[i]?.id;
                             const updated = profile.projects.filter((_: any, idx: number) => idx !== i);
@@ -744,40 +759,40 @@ const StudentProfile = () => {
                             handleSave({ ...profile, projects: updated, deleteProjectIds: projId ? [projId] : [] });
                           }}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-5 w-5" />
                         </Button>
                       </div>
 
-                      <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{project.title}</h4>
-                      <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 mb-6 leading-relaxed flex-1">{project.description || 'No description provided.'}</p>
+                      <h4 className="text-2xl font-black text-slate-900 dark:text-white mb-3 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors tracking-tight">{project.title}</h4>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 mb-8 leading-relaxed flex-1 font-medium">{project.description || 'No description provided.'}</p>
 
-                      <div className="flex flex-wrap gap-2 mb-6">
+                      <div className="flex flex-wrap gap-2.5 mb-8">
                         {project.techStack?.split(',').map((tech: string, j: number) => (
-                          <Badge key={j} variant="secondary" className="bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 border-none px-2.5 py-0.5 text-[10px] font-bold rounded-lg uppercase tracking-wider">
+                          <Badge key={j} variant="secondary" className="bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-indigo-500 hover:text-white border-none px-3 py-1 text-[10px] font-black rounded-lg uppercase tracking-widest transition-all">
                             {tech.trim()}
                           </Badge>
                         ))}
                       </div>
 
-                      <div className="flex items-center gap-3 mt-auto pt-4 border-t border-slate-50 dark:border-slate-800">
+                      <div className="flex items-center gap-4 mt-auto pt-6 border-t border-slate-100 dark:border-white/5">
                         {project.liveUrl && (
                           <Button
                             variant="outline"
                             size="sm"
-                            className="flex-1 rounded-xl h-9 text-xs font-bold border-slate-200 dark:border-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-100 dark:hover:border-indigo-500/30"
+                            className="flex-1 rounded-2xl h-12 text-[10px] font-black uppercase tracking-widest border-slate-200/60 dark:border-white/10 hover:bg-indigo-500 hover:text-white dark:hover:bg-indigo-500 transition-all shadow-sm"
                             onClick={() => window.open(project.liveUrl, '_blank')}
                           >
-                            <ExternalLink className="h-3.5 w-3.5 mr-2" /> Live Demo
+                            <ExternalLink className="h-4 w-4 mr-2" /> Live Demo
                           </Button>
                         )}
                         {project.githubUrl && (
                           <Button
                             variant="outline"
                             size="sm"
-                            className="flex-1 rounded-xl h-9 text-xs font-bold border-slate-200 dark:border-slate-800 hover:bg-slate-900 dark:hover:bg-slate-700 hover:text-white hover:border-slate-900 dark:hover:border-slate-700"
+                            className="flex-1 rounded-2xl h-12 text-[10px] font-black uppercase tracking-widest border-slate-200/60 dark:border-white/10 hover:bg-slate-900 hover:text-white dark:hover:bg-slate-800 transition-all shadow-sm"
                             onClick={() => window.open(project.githubUrl, '_blank')}
                           >
-                            <Code2 className="h-3.5 w-3.5 mr-2" /> GitHub
+                            <Code2 className="h-4 w-4 mr-2" /> GitHub
                           </Button>
                         )}
                       </div>

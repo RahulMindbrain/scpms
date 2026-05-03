@@ -126,8 +126,8 @@ const ApplicationCard = ({
     <motion.div
       layout
       className={cn(
-        "group relative bg-white dark:bg-[#1e1f26] rounded-3xl border border-slate-200 dark:border-white/[0.05] transition-all duration-300",
-        isExpanded ? "ring-2 ring-indigo-500/20 shadow-xl z-10" : "hover:shadow-lg hover:border-indigo-500/20"
+        "group relative bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl rounded-[2rem] border border-slate-200/60 dark:border-white/[0.08] transition-all duration-500",
+        isExpanded ? "ring-2 ring-indigo-500/30 shadow-2xl z-10 scale-[1.01]" : "hover:shadow-xl hover:border-indigo-500/30 hover:translate-y-[-2px]"
       )}
     >
       <div className="p-5 md:p-6">
@@ -310,19 +310,19 @@ const StatCard = ({ title, value, icon: Icon, color, subValue }: { title: string
   };
 
   return (
-    <Card className="rounded-[2rem] border-none shadow-sm bg-white/70 dark:bg-[#1e1f26] backdrop-blur-md hover:shadow-md transition-all group overflow-hidden border border-slate-200/50 dark:border-white/[0.03]">
-      <CardContent className="p-6">
+    <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group overflow-hidden border border-slate-200/50 dark:border-white/[0.05]">
+      <CardContent className="p-8">
         <div className="flex items-start justify-between">
-          <div className="space-y-1">
-            <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{title}</p>
-            <h3 className="text-3xl font-black text-slate-900 dark:text-white tabular-nums">{value}</h3>
-            {subValue && <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase">{subValue}</p>}
+          <div className="space-y-2">
+            <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">{title}</p>
+            <h3 className="text-4xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">{value}</h3>
+            {subValue && <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{subValue}</p>}
           </div>
           <div className={cn(
-            "h-14 w-14 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg",
+            "h-16 w-16 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 shadow-2xl",
             colorMap[color]
           )}>
-            <Icon size={28} strokeWidth={2.5} />
+            <Icon size={32} strokeWidth={2.5} />
           </div>
         </div>
       </CardContent>
@@ -404,52 +404,52 @@ const ApplicationStatus = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background dark:bg-[#111319] min-h-screen">
-      <div className="max-w-7xl mx-auto w-full p-4 md:p-6 space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="flex-1 flex flex-col bg-background min-h-screen">
+      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
         
-        {/* ─── Compact Command Center Hero ─── */}
-        <div className="group relative overflow-hidden rounded-[2rem] bg-[#0f172a] p-8 md:p-10 text-white shadow-xl border border-white/5">
+        {/* ─── Premium Command Center Hero ─── */}
+        <div className="group relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-8 md:p-12 text-white shadow-2xl border border-white/5">
           <div className="absolute inset-0">
-            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/20 rounded-full blur-[100px]"></div>
-            <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-blue-500/15 rounded-full blur-[100px]"></div>
+            <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-indigo-600/25 rounded-full blur-[120px] animate-pulse"></div>
+            <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-blue-500/20 rounded-full blur-[120px] animate-pulse delay-700"></div>
           </div>
           <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
           
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] backdrop-blur-md">
-                <ShieldCheck className="h-3.5 w-3.5 text-emerald-400" /> 
-                <span className="opacity-80">Secure Application Pipeline</span>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-md shadow-lg">
+                <ShieldCheck className="h-4 w-4 text-emerald-400" /> 
+                <span className="opacity-90">Secure Application Pipeline</span>
               </div>
-              <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
-                {user?.firstname ? `${user.firstname}'s Workspace` : "Application Workspace"}
+              <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-tight">
+                {user?.firstname ? `${user.firstname}'s Hub` : "Application Hub"}
               </h1>
-              <p className="text-sm md:text-base text-slate-300 font-medium max-w-xl opacity-90">
+              <p className="text-base md:text-lg text-slate-300 font-medium max-w-xl leading-relaxed opacity-90">
                 {activeApps.length > 0 
-                  ? `Navigating ${activeApps.length} active processes. Focus on upcoming rounds.`
-                  : "Optimize recruitment flow, track real-time status, and manage corporate offers."}
+                  ? `You are currently navigating ${activeApps.length} active processes. Stay focused on your next milestones.`
+                  : "Optimize your recruitment flow, track real-time status, and manage corporate offers from one central dashboard."}
               </p>
             </div>
             
             <Button
               onClick={() => navigate('/student/jobs')}
-              className="bg-white text-slate-900 hover:bg-slate-100 font-black rounded-xl shadow-xl px-8 h-14 transition-all hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-3 group whitespace-nowrap"
+              className="bg-white text-slate-900 hover:bg-slate-100 font-black rounded-2xl shadow-2xl px-10 h-16 text-sm transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-3 group whitespace-nowrap"
             >
-              Job Explorer <ArrowRight size={18} className="text-indigo-600 group-hover:translate-x-1 transition-transform" />
+              Job Explorer <ArrowRight size={20} className="text-indigo-600 group-hover:translate-x-1 transition-transform" />
             </Button>
           </div>
         </div>
 
         {/* ─── Streamlined Stats ─── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard
-            title="Total Apps"
+            title="Total Applications"
             value={stats.total}
             icon={Briefcase}
             color="indigo"
           />
           <StatCard
-            title="Active"
+            title="Active Pipeline"
             value={stats.active}
             icon={Activity}
             color="blue"
@@ -461,7 +461,7 @@ const ApplicationStatus = () => {
             color="purple"
           />
           <StatCard
-            title="Selected"
+            title="Selections"
             value={stats.selected}
             icon={ShieldCheck}
             color="emerald"
@@ -469,16 +469,16 @@ const ApplicationStatus = () => {
         </div>
 
         {/* ─── Refined Controls ─── */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/40 dark:bg-white/[0.01] p-4 rounded-[1.5rem] border border-slate-200/50 dark:border-white/[0.05] backdrop-blur-sm">
-          <div className="flex items-center gap-1.5 p-1 bg-slate-200/50 dark:bg-black/20 rounded-xl border border-slate-200 dark:border-white/[0.05] w-fit overflow-x-auto no-scrollbar">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white/50 dark:bg-[#161b22]/40 p-6 rounded-[2rem] border border-slate-200/60 dark:border-white/[0.08] backdrop-blur-xl shadow-sm">
+          <div className="flex items-center gap-2 p-1.5 bg-slate-200/50 dark:bg-black/40 rounded-2xl border border-slate-200/50 dark:border-white/[0.05] w-full lg:w-auto overflow-x-auto no-scrollbar">
             {["All", "Active", "Shortlisted", "Selected", "Rejected"].map((filter) => (
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
                 className={cn(
-                  "px-4 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
+                  "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
                   activeFilter === filter
-                    ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-white/10"
+                    ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-md border border-slate-200 dark:border-white/10 scale-[1.02]"
                     : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
                 )}
               >
@@ -487,11 +487,11 @@ const ApplicationStatus = () => {
             ))}
           </div>
           
-          <div className="relative flex-1 md:max-w-xs">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+          <div className="relative w-full lg:max-w-md">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <Input
-              placeholder="Search..."
-              className="pl-11 h-12 bg-white dark:bg-[#1e1f26] border-slate-200 dark:border-white/[0.05] rounded-xl text-sm font-bold focus-visible:ring-indigo-500/30"
+              placeholder="Filter by company or role..."
+              className="pl-14 h-14 bg-white dark:bg-black/20 border-slate-200/60 dark:border-white/[0.1] rounded-2xl text-sm font-bold focus-visible:ring-indigo-500/30 transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -499,16 +499,16 @@ const ApplicationStatus = () => {
         </div>
 
         {/* ─── Compact Application Feed ─── */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between px-2">
-            <div className="flex items-center gap-2">
-              <div className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
-              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">Pipeline Status</h2>
+        <div className="space-y-6">
+          <div className="flex items-center justify-between px-4">
+            <div className="flex items-center gap-3">
+              <div className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
+              <h2 className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Live Pipeline Status</h2>
             </div>
-            <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{filteredApplications.length} Entries</span>
+            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-3 py-1 rounded-full">{filteredApplications.length} Entries Identified</span>
           </div>
 
-          <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-1 gap-6">
             <AnimatePresence mode="popLayout">
               {filteredApplications.length > 0 ? (
                 filteredApplications.map((app: any) => (
@@ -523,34 +523,38 @@ const ApplicationStatus = () => {
                 ))
               ) : (
                 <motion.div 
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="py-20 flex flex-col items-center text-center bg-white/40 dark:bg-[#1e1f26]/20 rounded-[2rem] border border-dashed border-slate-200 dark:border-white/10"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="py-32 flex flex-col items-center text-center bg-white/30 dark:bg-white/[0.02] rounded-[3rem] border-2 border-dashed border-slate-200/60 dark:border-white/10"
                 >
-                  <Search size={32} className="text-slate-300 mb-4" />
-                  <h3 className="text-lg font-black text-slate-900 dark:text-white">No Matching Records</h3>
-                  <p className="text-slate-500 dark:text-slate-400 text-xs mt-2 font-medium">Try broadening your search.</p>
+                  <div className="w-20 h-20 rounded-3xl bg-slate-100 dark:bg-white/5 flex items-center justify-center mb-6 text-slate-300 dark:text-slate-700">
+                    <Search size={40} />
+                  </div>
+                  <h3 className="text-2xl font-black text-slate-900 dark:text-white">No Matching Records</h3>
+                  <p className="text-slate-500 dark:text-slate-400 text-sm mt-3 font-medium max-w-xs leading-relaxed">
+                    We couldn't find any applications matching your current criteria. Try adjusting your filters.
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         </div>
 
-        {/* ─── Sleek Footer Banner ─── */}
-        <div className="group relative overflow-hidden rounded-[2rem] bg-slate-50 dark:bg-white/[0.02] border border-slate-200 dark:border-white/[0.05] p-6 flex flex-col md:flex-row items-center gap-6">
-          <div className="w-12 h-12 rounded-xl bg-white dark:bg-white/5 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 shadow-sm">
-            <Rocket size={24} className="group-hover:translate-y-[-2px] transition-transform" />
+        {/* ─── Premium Footer Banner ─── */}
+        <div className="group relative overflow-hidden rounded-[2.5rem] bg-white/40 dark:bg-[#161b22]/40 border border-slate-200/60 dark:border-white/[0.08] p-8 flex flex-col md:flex-row items-center gap-8 backdrop-blur-xl shadow-sm">
+          <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/20 flex items-center justify-center text-indigo-600 dark:text-indigo-400 shrink-0 shadow-inner">
+            <Rocket size={32} className="group-hover:translate-y-[-4px] group-hover:translate-x-[4px] transition-transform duration-500" />
           </div>
           <div className="flex-1 text-center md:text-left">
-            <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">Operational Velocity</h4>
-            <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium">
-              Keep your response time under 24 hours to increase final interview success by <span className="text-indigo-600 font-black">65%</span>.
+            <h4 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-wider">Operational Velocity</h4>
+            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-1">
+              Data shows that candidates who respond within 24 hours increase their final interview success rate by <span className="text-indigo-600 dark:text-indigo-400 font-black">65%</span>. Keep your profile sharp.
             </p>
           </div>
           <Button
             variant="outline"
             onClick={() => navigate('/student/profile')}
-            className="rounded-xl px-6 h-12 font-black text-xs uppercase tracking-widest border-slate-200 dark:border-white/10 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-all"
+            className="rounded-2xl px-8 h-14 font-black text-xs uppercase tracking-widest border-slate-200 dark:border-white/10 hover:bg-indigo-500 hover:text-white dark:hover:bg-indigo-500/20 transition-all shadow-sm"
           >
             Enhance Profile
           </Button>

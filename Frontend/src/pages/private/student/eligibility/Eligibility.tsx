@@ -112,27 +112,29 @@ const Eligibility = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background dark:bg-[#111319] min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
-      <div className="max-w-7xl mx-auto w-full p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+    <div className="flex-1 flex flex-col bg-background min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
+      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
         
         {/* ─── Hero Header ─── */}
         <div className="group relative overflow-hidden rounded-[2.5rem] bg-[#0f172a] p-8 md:p-12 text-white shadow-2xl border border-white/5">
           <div className="absolute inset-0">
-            <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/20 rounded-full blur-[80px]"></div>
-            <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/15 rounded-full blur-[80px]"></div>
+            <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/25 rounded-full blur-[100px] animate-pulse"></div>
+            <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/20 rounded-full blur-[100px] animate-pulse delay-1000"></div>
           </div>
+          
           <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
           
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[10px] font-black uppercase tracking-widest shadow-lg">
-                <Trophy className="h-3 w-3 text-yellow-400" /> 
-                <span className="opacity-90">Eligibility Analyzer</span>
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-xl backdrop-blur-md">
+                <Trophy className="h-4 w-4 text-yellow-400" /> 
+                <span className="opacity-90">Eligibility Control Center</span>
               </div>
-              <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-md">
+              <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
                 {user?.firstname ? `${user.firstname}'s Potential` : "Placement Eligibility"}
               </h1>
-              <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-medium">
+              <p className="mt-4 text-base md:text-lg text-slate-300 leading-relaxed font-medium opacity-90">
                 {stats.eligible > 0 
                   ? `You are eligible for ${stats.eligible} out of ${stats.total} live opportunities. Let's make them count!`
                   : "Track your academic standing and see which career paths are currently open for your profile."}
@@ -140,8 +142,8 @@ const Eligibility = () => {
             </div>
             
             <div className="hidden lg:block">
-              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-xl border border-white/10 shadow-inner">
-                <CheckCircle2 className="h-16 w-16 text-white/30" />
+              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl">
+                <CheckCircle2 className="h-16 w-16 text-white/40" />
               </div>
             </div>
           </div>
@@ -152,34 +154,35 @@ const Eligibility = () => {
           {/* ─── Profile & Stats Sidebar ─── */}
           <div className="lg:col-span-4 space-y-6">
             {/* Academic Card */}
-            <div className="bg-white dark:bg-[#1e1f26] rounded-[2rem] p-8 border border-slate-200 dark:border-white/[0.05] shadow-sm overflow-hidden relative group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 transition-all group-hover:bg-indigo-500/10" />
+            {/* Academic Card */}
+            <div className="bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl rounded-[2rem] p-8 border border-slate-200/60 dark:border-white/[0.08] shadow-sm overflow-hidden relative group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 transition-all group-hover:bg-indigo-500/20" />
               
-              <div className="relative z-10 space-y-6">
+              <div className="relative z-10 space-y-8">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-indigo-500/10 rounded-xl">
+                  <div className="p-2.5 bg-indigo-500/10 rounded-xl shadow-inner">
                     <User className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                   </div>
-                  <h3 className="font-black text-slate-900 dark:text-white uppercase tracking-widest text-xs">Profile Snapshot</h3>
+                  <h3 className="font-black text-slate-900 dark:text-white uppercase tracking-[0.2em] text-[10px]">Profile Status</h3>
                 </div>
                 
-                <div className="space-y-4">
-                  <div className="p-5 bg-slate-50 dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/5">
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">Current Academic CGPA</p>
+                <div className="space-y-6">
+                  <div className="p-6 bg-slate-100 dark:bg-white/5 rounded-2xl border border-slate-200/50 dark:border-white/5 shadow-inner">
+                    <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em] mb-2">Verified Academic Score</p>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-3xl font-black text-slate-900 dark:text-white">{studentCgpa || 0}</span>
+                      <span className="text-4xl font-black text-slate-900 dark:text-white tracking-tight">{studentCgpa || 0}</span>
                       <span className="text-slate-500 font-bold text-sm">/ 10.0</span>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="p-5 bg-slate-50 dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/5">
-                      <p className="text-[10px] font-black text-slate-500 uppercase mb-1">Branch</p>
-                      <p className="font-black text-slate-900 dark:text-slate-200 truncate">{studentBranch}</p>
+                    <div className="p-6 bg-slate-100 dark:bg-white/5 rounded-2xl border border-slate-200/50 dark:border-white/5 shadow-inner">
+                      <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Branch</p>
+                      <p className="font-black text-slate-900 dark:text-slate-200 truncate tracking-tight">{studentBranch}</p>
                     </div>
-                    <div className="p-5 bg-slate-50 dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/5">
-                      <p className="text-[10px] font-black text-slate-500 uppercase mb-1">Backlogs</p>
-                      <p className={cn("font-black", studentBacklogs > 0 ? "text-rose-600" : "text-emerald-600")}>
+                    <div className="p-6 bg-slate-100 dark:bg-white/5 rounded-2xl border border-slate-200/50 dark:border-white/5 shadow-inner">
+                      <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-1">Backlogs</p>
+                      <p className={cn("font-black tracking-tight", studentBacklogs > 0 ? "text-rose-600" : "text-emerald-600")}>
                         {studentBacklogs} Active
                       </p>
                     </div>
@@ -198,17 +201,17 @@ const Eligibility = () => {
             {/* Quick Summary Stats */}
             <div className="grid grid-cols-1 gap-4">
               {[
-                { label: 'Eligible', value: stats.eligible, color: 'text-emerald-500', bg: 'bg-emerald-500/10', icon: CheckCircle2 },
-                { label: 'Applied', value: stats.applied, color: 'text-indigo-500', bg: 'bg-indigo-500/10', icon: TrendingUp },
-                { label: 'Not Eligible', value: stats.ineligible, color: 'text-slate-400', bg: 'bg-slate-500/10', icon: XCircle },
+                { label: 'Eligible Opportunities', value: stats.eligible, color: 'text-emerald-500', bg: 'bg-emerald-500/10', icon: CheckCircle2 },
+                { label: 'Active Applications', value: stats.applied, color: 'text-indigo-500', bg: 'bg-indigo-500/10', icon: TrendingUp },
+                { label: 'Locked Status', value: stats.ineligible, color: 'text-slate-400', bg: 'bg-slate-500/10', icon: XCircle },
               ].map((stat) => (
-                <div key={stat.label} className="bg-white dark:bg-[#1e1f26] p-5 rounded-2xl border border-slate-200 dark:border-white/[0.05] flex items-center gap-4 transition-all hover:shadow-md">
-                  <div className={cn("w-12 h-12 rounded-xl flex items-center justify-center shrink-0", stat.bg, stat.color)}>
-                    <stat.icon className="w-6 h-6" />
+                <div key={stat.label} className="bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl p-6 rounded-2xl border border-slate-200/60 dark:border-white/[0.08] flex items-center gap-6 transition-all duration-500 hover:shadow-2xl hover:translate-y-[-2px] group">
+                  <div className={cn("w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 shadow-inner transition-transform group-hover:scale-110 group-hover:rotate-3", stat.bg, stat.color)}>
+                    <stat.icon className="w-7 h-7" />
                   </div>
                   <div>
-                    <p className="text-2xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">{stat.value.toString().padStart(2, '0')}</p>
-                    <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{stat.label}</p>
+                    <p className="text-3xl font-black text-slate-900 dark:text-white tabular-nums tracking-tight">{stat.value.toString().padStart(2, '0')}</p>
+                    <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{stat.label}</p>
                   </div>
                 </div>
               ))}
@@ -218,16 +221,16 @@ const Eligibility = () => {
           {/* ─── Main Content Area ─── */}
           <div className="lg:col-span-8 space-y-6">
             {/* Filter & Search Bar */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-2">
-              <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 p-1 rounded-2xl border border-slate-200 dark:border-white/[0.05]">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl p-6 rounded-[2rem] border border-slate-200/60 dark:border-white/[0.08] shadow-sm">
+              <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 p-1.5 rounded-2xl border border-slate-200 dark:border-white/[0.05]">
                 {["all", "eligible", "applied"].map((filter) => (
                   <button
                     key={filter}
                     onClick={() => setActiveFilter(filter as any)}
                     className={cn(
-                      "px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                      "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300",
                       activeFilter === filter
-                        ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-md border border-slate-200 dark:border-white/10"
+                        ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-xl border border-slate-200/50 dark:border-white/10 scale-105"
                         : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
                     )}
                   >
@@ -236,11 +239,11 @@ const Eligibility = () => {
                 ))}
               </div>
               
-              <div className="relative flex-1 max-w-sm">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+              <div className="relative flex-1 max-w-sm group">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" size={18} />
                 <Input
                   placeholder="Filter by company or role..."
-                  className="pl-12 h-12 bg-white dark:bg-[#1e1f26] border-slate-200 dark:border-white/[0.05] rounded-xl text-sm font-medium"
+                  className="pl-12 h-12 bg-slate-100 dark:bg-white/5 border-none rounded-xl text-sm font-semibold focus-visible:ring-indigo-500/30 shadow-inner"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -251,17 +254,17 @@ const Eligibility = () => {
             <div className="space-y-4">
               <AnimatePresence mode='popLayout'>
                 {filteredCompanies.map((company, idx) => (
-                  <motion.div 
-                    layout
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    key={company.id} 
-                    className={cn(
-                      "group relative bg-white dark:bg-[#1e1f26] rounded-[2rem] p-6 border border-slate-200 dark:border-white/[0.05] transition-all hover:shadow-xl hover:translate-y-[-2px] overflow-hidden",
-                      !company.active && "opacity-75"
-                    )}
-                  >
+                    <motion.div 
+                      layout
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      key={company.id} 
+                      className={cn(
+                        "group relative bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl rounded-[2rem] p-8 border border-slate-200/60 dark:border-white/[0.08] transition-all duration-500 hover:shadow-2xl hover:translate-y-[-4px] overflow-hidden hover:border-indigo-500/30",
+                        !company.active && "opacity-75 grayscale-[0.5]"
+                      )}
+                    >
                     <div className="flex flex-col sm:flex-row items-center gap-6">
                       <div className={cn(
                         "w-16 h-16 rounded-2xl flex items-center justify-center font-black text-2xl text-white shadow-lg shrink-0 transition-transform group-hover:scale-110 duration-500",
