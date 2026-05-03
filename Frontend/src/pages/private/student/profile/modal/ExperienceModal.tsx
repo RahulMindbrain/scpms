@@ -47,7 +47,7 @@ const ExperienceModal = ({ isOpen, onClose, onAddExperience }: ExperienceModalPr
               <Label htmlFor="company" className="text-xs font-black uppercase tracking-widest text-slate-500">Company</Label>
               <Input
                 id="company"
-                placeholder="Google"
+                placeholder="Enter company name"
                 className="rounded-2xl h-11 border-slate-200"
                 value={experience.companyName}
                 onChange={(e) => setExperience({ ...experience, companyName: e.target.value })}
@@ -57,7 +57,7 @@ const ExperienceModal = ({ isOpen, onClose, onAddExperience }: ExperienceModalPr
               <Label htmlFor="role" className="text-xs font-black uppercase tracking-widest text-slate-500">Role</Label>
               <Input
                 id="role"
-                placeholder="Software Engineer"
+                placeholder="Enter job role"
                 className="rounded-2xl h-11 border-slate-200"
                 value={experience.role}
                 onChange={(e) => setExperience({ ...experience, role: e.target.value })}

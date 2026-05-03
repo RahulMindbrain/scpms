@@ -55,7 +55,7 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
             <Label htmlFor="title" className="text-xs font-black uppercase tracking-widest text-slate-500">Project Title</Label>
             <Input
               id="title"
-              placeholder="e.g. AI Portfolio Platform"
+              placeholder="Enter project title"
               className="rounded-2xl border-slate-200 focus:ring-blue-500/10 h-12 font-bold"
               value={project.title}
               onChange={(e) => setProject({ ...project, title: e.target.value })}
@@ -77,7 +77,7 @@ const ProjectModal = ({ isOpen, onClose, onAddProject }: ProjectModalProps) => {
             <Label htmlFor="techStack" className="text-xs font-black uppercase tracking-widest text-slate-500">Tech Stack (e.g. React, Nodejs)</Label>
             <Input
               id="techStack"
-              placeholder="React, TypeScript, Tailwind"
+              placeholder="e.g. React, Nodejs, Tailwind"
               className="rounded-2xl border-slate-200 focus:ring-blue-500/10 h-12 font-bold"
               value={project.techStack}
               onChange={(e) => setProject({ ...project, techStack: e.target.value })}

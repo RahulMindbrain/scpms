@@ -57,7 +57,7 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
             <Label htmlFor="title" className="text-xs font-black uppercase tracking-widest text-slate-500">Certificate Title</Label>
             <Input
               id="title"
-              placeholder="Full Stack Web Development"
+              placeholder="Enter certificate title"
               className="rounded-2xl h-12 border-slate-200"
               value={certificate.title}
               onChange={(e) => setCertificate({ ...certificate, title: e.target.value })}
@@ -68,7 +68,7 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
             <Label htmlFor="issuer" className="text-xs font-black uppercase tracking-widest text-slate-500">Issuer</Label>
             <Input
               id="issuer"
-              placeholder="Coursera / Udemy / LinkedIn"
+              placeholder="Enter issuer (e.g. Coursera, Udemy)"
               className="rounded-2xl h-12 border-slate-200"
               value={certificate.issuer}
               onChange={(e) => setCertificate({ ...certificate, issuer: e.target.value })}

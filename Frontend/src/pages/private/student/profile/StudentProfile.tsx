@@ -153,6 +153,7 @@ const StudentProfile = () => {
         year: isNaN(yearInt) ? undefined : yearInt,
         passingYear: isNaN(passingYearInt) ? undefined : passingYearInt,
         cgpa: (isNaN(cgpaFloat) || yearInt === 1) ? undefined : cgpaFloat,
+        activeBacklogs: isNaN(parseInt(updatedProfile.stats?.activeBacklogs)) ? 0 : parseInt(updatedProfile.stats?.activeBacklogs),
         linkedinUrl: cleanUrl(updatedProfile.linkedinUrl),
         githubUrl: cleanUrl(updatedProfile.githubUrl),
         portfolioUrl: cleanUrl(updatedProfile.portfolioUrl),

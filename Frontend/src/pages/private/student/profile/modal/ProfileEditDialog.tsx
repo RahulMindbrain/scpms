@@ -28,11 +28,11 @@ const profileSchema = z.object({
   githubUrl: z.string().url("Invalid GitHub URL").or(z.literal("")).nullable(),
   portfolioUrl: z.string().url("Invalid Portfolio URL").or(z.literal("")).nullable(),
   stats: z.object({
-    cgpa: z.coerce.number().min(0, "CGPA cannot be negative").max(10, "CGPA must be 10 or less"),
-    year: z.coerce.number().min(1, "Year must be at least 1").max(5, "Year must be 5 or less"),
-    passingYear: z.coerce.number().min(2000, "Invalid year").max(2100, "Invalid year"),
-    departmentId: z.coerce.number().min(1, "Required"),
-    activeBacklogs: z.coerce.number().min(0, "Cannot be negative"),
+    cgpa: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(0, "CGPA cannot be negative").max(10, "CGPA must be 10 or less").optional()),
+    year: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(1, "Year must be at least 1").max(5, "Year must be 5 or less")),
+    passingYear: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(2000, "Invalid year").max(2100, "Invalid year")),
+    departmentId: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(1, "Required")),
+    activeBacklogs: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(0, "Cannot be negative").default(0)),
   }),
   resumeUrl: z.string().url("Invalid Resume URL").or(z.literal("")).nullable(),
 });
@@ -177,7 +177,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
         const newErrors: Record<string, string> = {};
         const errorPaths: string[] = [];
         
-        err.errors.forEach((e: any) => {
+        const issues = err.issues || (err as any).errors || [];
+        issues.forEach((e: any) => {
           const path = e.path.join(".");
           newErrors[path] = e.message;
           errorPaths.push(path);
@@ -223,7 +224,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       <User className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                       <Input
                         id="name"
-                        placeholder="e.g. John Doe"
+                        placeholder="Enter full name"
                         className={`pl-10 h-11 rounded-xl ${errors.name ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                         value={formData.name || ""}
                         onChange={(e) => updateField("name", e.target.value)}
@@ -237,7 +238,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     <Input
                       id="email"
                       type="email"
-                      placeholder="john@example.com"
+                      placeholder="Enter email address"
                       className={`h-11 rounded-xl ${errors.email ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                       value={formData.email || ""}
                       onChange={(e) => updateField("email", e.target.value)}
@@ -257,7 +258,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       id="cgpa"
                       type="number"
                       step="0.01"
-                      placeholder="0.00"
+                      placeholder="0.0"
                       className={`h-11 rounded-xl ${errors['stats.cgpa'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                       value={formData.stats?.cgpa || ""}
                       onChange={(e) => updateStat("cgpa", e.target.value)}
@@ -270,9 +271,9 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     <Input
                       id="backlogs"
                       type="number"
-                      placeholder="0"
+                      placeholder="Enter active backlogs"
                       className={`h-11 rounded-xl ${errors['stats.activeBacklogs'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
-                      value={formData.stats?.activeBacklogs || 0}
+                      value={formData.stats?.activeBacklogs ?? ""}
                       onChange={(e) => updateStat("activeBacklogs", e.target.value)}
                     />
                     {errors['stats.activeBacklogs'] && <p className="text-xs text-red-500 font-medium ml-1">{errors['stats.activeBacklogs']}</p>}
@@ -283,7 +284,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     <Input
                       id="year"
                       type="number"
-                      placeholder="3"
+                      placeholder="Enter current year"
                       className={`h-11 rounded-xl ${errors['stats.year'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                       value={formData.stats?.year || ""}
                       onChange={(e) => updateStat("year", e.target.value)}
@@ -296,7 +297,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     <Input
                       id="passingYear"
                       type="number"
-                      placeholder="2026"
+                      placeholder="Enter passing year"
                       className={`h-11 rounded-xl ${errors['stats.passingYear'] ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                       value={formData.stats?.passingYear || ""}
                       onChange={(e) => updateStat("passingYear", e.target.value)}
@@ -331,7 +332,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       {/* <Linkedin className="absolute left-3 top-3 h-4 w-4 text-[#0077B5]" /> */}
                       <Input
                         id="linkedinUrl"
-                        placeholder="https://linkedin.com/in/username"
+                        placeholder="LinkedIn Profile URL"
                         className={`pl-10 h-11 rounded-xl ${errors.linkedinUrl ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                         value={formData.linkedinUrl || ""}
                         onChange={(e) => updateField("linkedinUrl", e.target.value)}
@@ -346,7 +347,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       {/* <Github className="absolute left-3 top-3 h-4 w-4 text-[#333]" /> */}
                       <Input
                         id="githubUrl"
-                        placeholder="https://github.com/username"
+                        placeholder="GitHub Profile URL"
                         className={`pl-10 h-11 rounded-xl ${errors.githubUrl ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                         value={formData.githubUrl || ""}
                         onChange={(e) => updateField("githubUrl", e.target.value)}
@@ -361,7 +362,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       <Globe className="absolute left-3 top-3 h-4 w-4 text-slate-400" />
                       <Input
                         id="portfolioUrl"
-                        placeholder="https://yourportfolio.com"
+                        placeholder="Portfolio Website URL"
                         className={`pl-10 h-11 rounded-xl ${errors.portfolioUrl ? 'border-red-500 focus-visible:ring-red-500' : 'border-slate-200'}`}
                         value={formData.portfolioUrl || ""}
                         onChange={(e) => updateField("portfolioUrl", e.target.value)}
