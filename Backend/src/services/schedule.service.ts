@@ -238,7 +238,7 @@ export const deleteScheduleService = async (id: number) => {
 
     const jobIds = schedule.jobs.map((j) => j.id);
 
-   
+
     if (jobIds.length) {
       await tx.job.updateMany({
         where: { id: { in: jobIds } },
@@ -246,12 +246,12 @@ export const deleteScheduleService = async (id: number) => {
       });
     }
 
-   
+
     await tx.scheduleMessage.deleteMany({
       where: { scheduleId: id },
     });
 
-    
+
     await tx.interviewSchedule.delete({
       where: { id },
     });

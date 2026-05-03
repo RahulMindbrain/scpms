@@ -70,7 +70,7 @@ scheduleRoute.delete(
   authenticateUser,
   requireActiveUser,
   authorizeRoles("ADMIN"),
-deleteScheduleController,
+  deleteScheduleController,
 );
 
 scheduleRoute.get(
