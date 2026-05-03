@@ -49,103 +49,90 @@
 }
 
 /* ============================================================
-   STITCH "INDIGO NEXUS" — Smart CPMS Dark Design System
-   Primary: #6366f1 Electric Indigo | Generated via Stitch MCP
+   SaaS MINIMALIST — Professional SaaS Design System
+   Inspired by Stripe & Linear | Off-white, Soft Shadows, Indigo Accents
    ============================================================ */
 
 :root {
-  /* ── Core Light Backgrounds (Tonal Layering) ── */
-  --background:                #ffffff;
+  /* ── Core SaaS Light Backgrounds ── */
+  --background:                #F8FAFC; /* Off-white / Very light gray */
   --surface:                   #ffffff;
-  --surface-dim:               #f1f5f9;
-  --surface-container-lowest:  #ffffff;
-  --surface-container-low:     #f8fafc;
-  --surface-container:         #f1f5f9;
-  --surface-container-high:    #e2e8f0;
-  --surface-container-highest: #cbd5e1;
-  --surface-bright:            #ffffff;
-
-  /* ── Foreground / Text ── */
   --foreground:                #0f172a;
   --muted-foreground:          #64748b;
 
-  /* ── Card ── */
+  /* ── Card & UI Components ── */
   --card:                      #ffffff;
   --card-foreground:           #0f172a;
-
-  /* ── Popover ── */
   --popover:                   #ffffff;
   --popover-foreground:        #0f172a;
 
-  /* ── Primary — Vibrant Blue ── */
-  --primary:                   #2563eb;
+  /* ── Primary — Professional Indigo ── */
+  --primary:                   #6366f1; /* Indigo-500 */
   --primary-foreground:        #ffffff;
-  --primary-container:         #dbeafe;
-  --inverse-primary:           #60a5fa;
-
-  /* ── Secondary ── */
-  --secondary:                 #f1f5f9;
-  --secondary-foreground:      #0f172a;
-
-  /* ── Muted ── */
-  --muted:                     #f1f5f9;
-  --muted-foreground:          #64748b;
-
-  /* ── Accent ── */
-  --accent:                    #f1f5f9;
-  --accent-foreground:         #0f172a;
-
-  /* ── Destructive — Rose ── */
-  --destructive:               #ef4444;
-  --destructive-foreground:    #ffffff;
+  --primary-container:         #EEF2FF;
 
   /* ── Borders & Inputs ── */
-  --border:                    #e2e8f0;
+  --border:                    #E5E7EB; /* Subtle borders */
   --input:                     #ffffff;
   --ring:                      #6366f1;
 
-  /* ── Radius ── */
-  --radius:                    0.5rem;
+  /* ── Radius — Softer Corners ── */
+  --radius:                    0.75rem;
 
-  /* ── Charts ── */
-  --chart-1:                   #6366f1;
-  --chart-2:                   #10b981;
-  --chart-3:                   #f59e0b;
-  --chart-4:                   #06b6d4;
-  --chart-5:                   #ef4444;
-
-  /* ── Sidebar ── */
-  --sidebar:                   #f8faff;
-  --sidebar-foreground:        #000000;
-  --sidebar-primary:           #2563eb;
+  /* ── Sidebar — Minimalist ── */
+  --sidebar:                   #F8FAFC;
+  --sidebar-foreground:        #475569;
+  --sidebar-primary:           #6366f1;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent:            #eef2ff;
-  --sidebar-accent-foreground: #000000;
-  --sidebar-border:            #cbd5e1;
-  --sidebar-ring:              #2563eb;
-  --sidebar-gradient:          linear-gradient(180deg, rgba(37, 99, 235, 0.08) 0%, rgba(37, 99, 235, 0.02) 100%);
+  --sidebar-accent:            #EEF2FF;
+  --sidebar-accent-foreground: #6366f1;
+  --sidebar-border:            #E5E7EB;
+  --sidebar-ring:              #6366f1;
+
+  /* ── Status Colors (Pastel) ── */
+  --success-bg:                #F0FDF4;
+  --success-text:              #16A34A;
+  --warning-bg:                #FFFBEB;
+  --warning-text:              #D97706;
+  --error-bg:                  #FEF2F2;
+  --error-text:                #DC2626;
+  --info-bg:                   #EFF6FF;
+  --info-text:                 #2563EB;
 }
 
-/* ── Global Transitions ── */
-/* ── Global Transitions (Applied selectively for performance) ── */
-.theme-transition {
-  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* ── Force theme variables globally ── */
-html, body, #root {
-  background-color: var(--background);
-  color: var(--foreground);
+.dark {
+  --background:                #0B0E14;
+  --foreground:                #F8FAFC;
+  --card:                      #11141B;
+  --card-foreground:           #F8FAFC;
+  --popover:                   #11141B;
+  --popover-foreground:        #F8FAFC;
+  --primary:                   #818cf8;
+  --primary-foreground:        #ffffff;
+  --border:                    #1E293B;
+  --input:                     #0B0E14;
+  --ring:                      #818cf8;
+  --sidebar:                   #0B0E14;
+  --sidebar-foreground:        #94A3B8;
+  --sidebar-accent:            #1E293B;
+  --sidebar-accent-foreground: #F8FAFC;
+  --sidebar-border:            #1E293B;
 }
 
 /* ============================================================
-   STUDENT PORTAL — "PASTEL SILK" HERO SYSTEM
+   SaaS HERO — "AIRY GRADIENT" SYSTEM
    ============================================================ */
 
 .student-hero-banner {
-  @apply relative overflow-hidden rounded-[2.5rem] p-8 md:p-12 text-slate-900 dark:text-white shadow-2xl transition-all duration-500;
-  @apply bg-gradient-to-br from-[#EEF2FF] to-[#E0F2FE] dark:from-[#0f172a] dark:to-[#0f172a];
-  @apply border border-blue-100/50 dark:border-white/5;
+  @apply relative overflow-hidden rounded-[2rem] p-8 md:p-12 transition-all duration-500;
+  background: linear-gradient(135deg, #EEF2FF 0%, #E0F2FE 100%);
+  border: 1px solid rgba(99, 102, 241, 0.1);
+  box-shadow: 0 4px 20px -2px rgba(99, 102, 241, 0.05);
+}
+
+.dark .student-hero-banner {
+  background: linear-gradient(135deg, #111827 0%, #0f172a 100%);
+  border-color: rgba(255, 255, 255, 0.05);
 }
 
 .student-hero-mesh {
@@ -153,81 +140,67 @@ html, body, #root {
 }
 
 .student-hero-mesh .bubble-indigo {
-  @apply absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full blur-[100px] animate-pulse;
-  @apply bg-[#F0F9FF] dark:bg-indigo-600/25;
+  @apply absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full blur-[80px] opacity-40;
+  background: radial-gradient(circle, #EEF2FF 0%, transparent 70%);
 }
 
 .student-hero-mesh .bubble-sky {
-  @apply absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] rounded-full blur-[100px] animate-pulse delay-1000;
-  @apply bg-[#EDE9FE] dark:bg-blue-500/20;
+  @apply absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] rounded-full blur-[80px] opacity-40;
+  background: radial-gradient(circle, #E0F2FE 0%, transparent 70%);
 }
 
 .student-hero-texture {
-  @apply absolute inset-0 pointer-events-none opacity-40;
-  @apply bg-[radial-gradient(#6366f108_1px,transparent_1px)] dark:bg-[radial-gradient(#ffffff08_1px,transparent_1px)];
+  @apply absolute inset-0 pointer-events-none opacity-[0.03];
+  background-image: radial-gradient(#6366f1 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
-.student-hero-overlay {
-  @apply absolute inset-0 pointer-events-none;
-  @apply bg-gradient-to-t from-white/40 via-transparent to-transparent dark:from-[#0f172a] dark:via-transparent dark:to-transparent;
-}
-
 .student-hero-badge {
-  @apply inline-flex items-center gap-2 rounded-full border border-blue-200 dark:border-white/10 bg-white/40 dark:bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-sm backdrop-blur-md transition-all duration-300;
+  @apply inline-flex items-center gap-2 rounded-full border border-indigo-100 bg-white/60 px-3 py-1.5 text-[11px] font-bold text-indigo-600 shadow-sm backdrop-blur-md;
 }
 
-.student-hero-badge span {
-  @apply text-indigo-700 dark:text-white/90;
-}
-
-.student-hero-badge svg {
-  @apply h-3.5 w-3.5 text-indigo-600 dark:text-yellow-400;
+.dark .student-hero-badge {
+  @apply border-white/10 bg-white/5 text-indigo-300;
 }
 
 .student-hero-title {
-  @apply mt-6 text-3xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight leading-tight;
+  @apply mt-6 text-3xl md:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight;
+}
+
+.dark .student-hero-title {
+  @apply text-white;
 }
 
 .student-hero-title span {
-  @apply text-indigo-600 dark:text-blue-400;
+  @apply text-indigo-500;
 }
 
 .student-hero-description {
-  @apply mt-4 max-w-lg text-base md:text-lg text-slate-600 dark:text-slate-300 leading-relaxed font-medium opacity-90;
+  @apply mt-4 max-w-lg text-base text-slate-500 leading-relaxed font-medium;
 }
 
-
-.dark {
-  --background:                #080a0f;
-  --foreground:                #f8fafc;
-  --card:                      #0f172a;
-  --card-foreground:           #f8fafc;
-  --popover:                   #0f172a;
-  --popover-foreground:        #f8fafc;
-  --primary:                   #3b82f6;
-  --primary-foreground:        #ffffff;
-  --secondary:                 #1e293b;
-  --secondary-foreground:      #f8fafc;
-  --muted:                     #1e293b;
-  --muted-foreground:          #94a3b8;
-  --accent:                    #334155;
-  --accent-foreground:         #f8fafc;
-  --destructive:               #ef4444;
-  --destructive-foreground:    #ffffff;
-  --border:                    #1e293b;
-  --input:                     #020617;
-  --ring:                      #3b82f6;
-  --sidebar:                   #020617;
-  --sidebar-foreground:        #94a3b8;
-  --sidebar-primary:           #3b82f6;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent:            #1e293b;
-  --sidebar-accent-foreground: #f8fafc;
-  --sidebar-border:            #1e293b;
-  --sidebar-ring:              #3b82f6;
-  --sidebar-gradient:          linear-gradient(180deg, rgba(59, 130, 246, 0.08) 0%, rgba(59, 130, 246, 0) 100%);
+.dark .student-hero-description {
+  @apply text-slate-400;
 }
+
+/* ============================================================
+   CARD UTILITIES
+   ============================================================ */
+.saas-card {
+  @apply bg-white border border-gray-200 shadow-sm rounded-2xl p-6 transition-all duration-300;
+}
+
+.dark .saas-card {
+  @apply bg-[#11141B] border-white/5 shadow-none;
+}
+
+.saas-card:hover {
+  @apply shadow-md translate-y-[-2px];
+}
+
+.saas-shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+.saas-shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+
 
 /* ── Global Theme Overrides for Hardcoded Styles ── */
 .light .bg-\[\#111319\],

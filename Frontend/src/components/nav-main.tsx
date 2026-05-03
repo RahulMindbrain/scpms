@@ -22,10 +22,10 @@ export function NavMain({
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-[11px] font-black uppercase tracking-[0.2em] text-sidebar-foreground/80 px-4 mb-1 group-data-[collapsible=icon]:hidden">
-        Core Modules
+      <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-2 mb-2 group-data-[collapsible=icon]:hidden">
+        Navigation
       </SidebarGroupLabel>
-      <SidebarMenu className="gap-1 px-2 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center">
+      <SidebarMenu className="gap-1 px-1 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center">
         {items.map((item) => {
           const isActive = location.pathname === item.url || location.pathname.startsWith(item.url + '/')
           return (
@@ -35,24 +35,24 @@ export function NavMain({
                 tooltip={item.title}
                 isActive={isActive}
                 className={`
-                  h-9 transition-colors duration-200 rounded-md border-none relative group/btn
+                  h-10 transition-all duration-200 rounded-xl border-none relative group/btn
                   ${isActive
-                    ? "bg-sidebar-accent text-sidebar-accent-foreground font-semibold"
-                    : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground"
+                    ? "bg-indigo-50 text-indigo-600 font-bold dark:bg-white/5 dark:text-indigo-400"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
                   }
-                  group-data-[collapsible=icon]:size-9 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
+                  group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
                 `}
               >
-                <NavLink to={item.url} className="flex items-center w-full gap-3 px-3 relative cursor-pointer group/link group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0">
-                  <span className={`size-4 flex items-center justify-center shrink-0 transition-colors duration-200 ${isActive ? "text-primary" : "text-sidebar-foreground/70 group-hover/link:text-sidebar-foreground"}`}>
+                <NavLink to={item.url} className="flex items-center w-full gap-3 px-2 relative cursor-pointer group/link group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0">
+                  <span className={`size-4.5 flex items-center justify-center shrink-0 transition-colors duration-200 ${isActive ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 group-hover/link:text-slate-600 dark:group-hover/link:text-slate-300"}`}>
                     {item.icon}
                   </span>
-                  <span className="text-[13px] group-data-[collapsible=icon]:hidden whitespace-nowrap tracking-tight">{item.title}</span>
+                  <span className="text-[14px] group-data-[collapsible=icon]:hidden whitespace-nowrap tracking-tight">{item.title}</span>
                   
                   {isActive && (
                     <motion.div 
                       layoutId="sidebar-active-indicator"
-                      className="absolute left-0 w-1 h-4 bg-primary rounded-r-full group-data-[collapsible=icon]:hidden"
+                      className="absolute right-0 w-1 h-5 bg-indigo-500 rounded-l-full group-data-[collapsible=icon]:hidden"
                     />
                   )}
                 </NavLink>
@@ -62,6 +62,7 @@ export function NavMain({
         })}
       </SidebarMenu>
     </SidebarGroup>
+
 
   )
 }
