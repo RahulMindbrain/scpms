@@ -101,38 +101,36 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const gradientClass = roleColors[role ?? ""] ?? "from-indigo-500 to-violet-600"
 
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5! hover:bg-sidebar-accent"
-            >
-              <a href="#" className="flex items-center gap-3">
-                {/* Gradient logo icon */}
-                <div className={`flex aspect-square size-9 items-center justify-center rounded-xl bg-gradient-to-br ${gradientClass} shadow-lg shadow-indigo-500/25 shrink-0`}>
-                  <GraduationCap className="size-5 text-white" />
-                </div>
-                <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
-                  <span className="text-[16px] font-semibold">Smart CPMS</span>
-                  <span className="text-xs text-muted-foreground uppercase tracking-wider">{role} Portal</span>
-                </div>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
+    <Sidebar collapsible="icon" className="border-r border-white/5 bg-[#0c0e14]" {...props}>
+      <SidebarHeader className="h-20 flex flex-row items-center px-4 shrink-0 overflow-hidden">
+        <div className="flex items-center gap-3 w-full">
+          {/* Premium Logo Icon */}
+          <div className="flex aspect-square size-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/20 shrink-0 transition-all duration-300 group-data-[collapsible=icon]:mx-auto">
+             <GraduationCap className="size-6 text-white" />
+          </div>
+          <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden animate-in fade-in slide-in-from-left-4 duration-500">
+            <span className="text-[17px] font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">Smart CPMS</span>
+            <div className="flex items-center gap-1.5 mt-0.5">
+              <span className="size-1.5 rounded-full bg-indigo-500 animate-pulse" />
+              <span className="text-[10px] text-indigo-400/80 uppercase font-bold tracking-widest">{role} Portal</span>
+            </div>
+          </div>
+        </div>
       </SidebarHeader>
 
       {/* ── Navigation ── */}
-      <SidebarContent className="py-2">
-        <NavMain items={navigation.main} />
-        <SidebarSeparator className="bg-sidebar-border my-2" />
-        <NavSecondary items={navigation.secondary} className="mt-0" />
+      <SidebarContent className="px-2 py-4 gap-4 bg-[#0c0e14]">
+        <div className="space-y-6">
+          <NavMain items={navigation.main} />
+          <div className="px-4">
+             <div className="h-[1px] bg-gradient-to-r from-transparent via-white/10 to-transparent w-full" />
+          </div>
+          <NavSecondary items={navigation.secondary} className="mt-0" />
+        </div>
       </SidebarContent>
 
       {/* ── Footer / User ── */}
-      <SidebarFooter className="border-t border-sidebar-border pt-2">
+      <SidebarFooter className="border-t border-white/5 p-4 bg-[#0c0e14]">
         <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>

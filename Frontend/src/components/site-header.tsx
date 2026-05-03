@@ -1,4 +1,4 @@
-import { Separator } from "@/components/ui/separator"
+import React from "react"
 import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useLocation } from "react-router-dom"
 import { NotificationBell } from "@/components/notification-bell"
@@ -73,48 +73,42 @@ const routeTitles: Record<string, string> = {
   "/company/notifications":  "Notifications",
 }
 
+// Site Header component for the Indigo Nexus theme
 export function SiteHeader() {
   const location = useLocation()
 
   const getTitle = () => {
-    // Exact match first
     if (routeTitles[location.pathname]) return routeTitles[location.pathname]
-    // Fallback: humanize last segment
     const path = location.pathname.split("/").filter(Boolean).pop()
     if (!path) return "Dashboard"
     return path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ")
   }
 
-  const PageIcon = routeIcons[location.pathname] || LayoutDashboard
-
   return (
     <header className="
-      flex h-(--header-height) shrink-0 items-center gap-2
-      border-b border-border
-      bg-background
-      transition-[width,height,background-color] ease-linear
-      group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)
+      flex h-16 shrink-0 items-center gap-2
+      border-b border-white/5
+      bg-background/60 backdrop-blur-xl sticky top-0 z-50
+      transition-all duration-300
     ">
-      <div className="flex w-full items-center gap-1 px-4 md:px-6 max-w-7xl mx-auto">
+      <div className="flex w-full items-center gap-4 px-4 sm:px-8">
         {/* Sidebar toggle */}
-        <SidebarTrigger className="-ml-1 text-muted-foreground hover:text-foreground hover:bg-accent/10 transition-colors" />
-
-        <Separator
-          orientation="vertical"
-          className="mx-2 data-[orientation=vertical]:h-4 bg-border"
-        />
-
-        {/* Page title + icon */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center justify-center p-1.5 bg-primary/10 rounded-md text-primary">
-            <PageIcon className="size-4" />
-          </div>
-          <h1 className="text-sm font-semibold text-foreground tracking-tight">{getTitle()}</h1>
+          <SidebarTrigger className="text-muted-foreground hover:text-indigo-400 hover:bg-indigo-500/10 transition-all duration-300 h-10 w-10 rounded-xl" />
+          <div className="h-6 w-[1px] bg-white/5 mx-1 hidden sm:block" />
+        </div>
+
+        {/* Page title area */}
+        <div className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-500">
+          <h1 className="text-[18px] font-bold text-foreground tracking-tight leading-tight">{getTitle()}</h1>
         </div>
 
         {/* Right side actions */}
         <div className="ml-auto flex items-center gap-3">
-          <ModeToggle />
+          <div className="flex items-center bg-white/5 p-1 rounded-full border border-white/5 hover:bg-white/10 transition-colors">
+            <ModeToggle />
+          </div>
+          <div className="h-8 w-[1px] bg-white/5 mx-1 hidden sm:block" />
           <NotificationBell />
         </div>
       </div>

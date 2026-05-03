@@ -26,11 +26,11 @@ export function NavSecondary({
 
   return (
     <SidebarGroup {...props}>
-      <SidebarGroupLabel className="text-[10px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/50 px-3 mb-1">
-        General
+      <SidebarGroupLabel className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/20 px-4 mb-3 group-data-[collapsible=icon]:hidden">
+        Tools
       </SidebarGroupLabel>
       <SidebarGroupContent>
-        <SidebarMenu>
+        <SidebarMenu className="gap-1.5 px-2 group-data-[collapsible=icon]:px-0">
           {items.map((item) => {
             const isActive = location.pathname === item.url || location.pathname.startsWith(item.url + '/')
             return (
@@ -38,17 +38,19 @@ export function NavSecondary({
                 <SidebarMenuButton
                   asChild
                   isActive={isActive}
-                  className={
-                    isActive
-                      ? "bg-primary/15 text-primary font-semibold border border-primary/25"
-                      : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                  }
+                  className={`
+                    h-10 transition-all duration-300 rounded-xl border-none
+                    ${isActive
+                      ? "bg-indigo-500/15 text-indigo-400 font-bold shadow-[0_0_20px_rgba(99,102,241,0.1)]"
+                      : "text-white/50 hover:bg-white/5 hover:text-white"
+                    }
+                  `}
                 >
-                  <Link to={item.url} className="flex items-center gap-2.5">
-                    <span className={`size-4 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground"}`}>
-                      {item.icon}
+                  <Link to={item.url} className="flex items-center w-full gap-3 px-3 relative group/link group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:px-0">
+                    <span className={`size-5 flex items-center justify-center shrink-0 transition-all duration-300 ${isActive ? "text-indigo-400 scale-110" : "text-white/30 group-hover/link:text-white"}`}>
+                       {item.icon}
                     </span>
-                    <span className="text-sm group-data-[collapsible=icon]:hidden">{item.title}</span>
+                    <span className="text-[13px] group-data-[collapsible=icon]:hidden whitespace-nowrap">{item.title}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
