@@ -85,7 +85,7 @@ export default function StudentDashboard() {
             <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
               <div className="max-w-2xl">
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] shadow-xl backdrop-blur-md">
-                  <Sparkles className="h-4 w-4 text-yellow-400" /> 
+                  <Sparkles className="h-3.5 w-3.5 text-yellow-400" /> 
                   <span className="opacity-90">Student Control Center</span>
                 </div>
                 <h1 className="mt-6 text-3xl md:text-5xl font-black text-white tracking-tight leading-tight">
@@ -97,8 +97,8 @@ export default function StudentDashboard() {
               </div>
               
               <div className="hidden lg:block">
-                <div className="flex h-28 w-28 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl">
-                  <LayoutDashboard className="h-14 w-14 text-white/40" />
+                <div className="flex h-20 w-20 items-center justify-center rounded-[1.5rem] bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl">
+                  <LayoutDashboard className="h-10 w-10 text-white/40" />
                 </div>
               </div>
             </div>
@@ -278,12 +278,12 @@ export default function StudentDashboard() {
               {/* Bonus Tip Card */}
               <div className="rounded-[2.5rem] bg-indigo-500/5 dark:bg-indigo-500/10 border border-indigo-500/10 dark:border-indigo-500/20 p-8 mt-8 shadow-inner relative overflow-hidden group">
                 <div className="absolute top-0 right-0 p-8 opacity-5 group-hover:opacity-10 transition-opacity">
-                  <Sparkles size={120} className="text-indigo-500" />
+                  <Sparkles size={80} className="text-indigo-500" />
                 </div>
                 <div className="relative z-10">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-3 bg-indigo-500/20 rounded-xl text-indigo-600 dark:text-indigo-400 shadow-xl">
-                      <Sparkles className="h-5 w-5" />
+                      <Sparkles className="h-4 w-4" />
                     </div>
                     <h4 className="text-[11px] font-black text-indigo-600 dark:text-indigo-300 uppercase tracking-[0.2em]">Recruiter Insight</h4>
                   </div>
