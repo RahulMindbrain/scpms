@@ -9,7 +9,6 @@ import {
   MapPin, 
   IndianRupee, 
   Calendar, 
-  ArrowRight, 
   Sparkles, 
   X, 
   Check, 
@@ -267,14 +266,7 @@ const ManageJobs: React.FC = () => {
                           >
                             <Trash2 size={18} />
                           </button>
-                          <div className="w-px h-4 bg-border mx-1" />
-                          <Link 
-                            to={`/company/applicants/${job.id}`}
-                            className="p-2.5 text-primary hover:bg-primary/10 rounded-xl transition-all group/btn flex items-center justify-center" 
-                            title="View Applicants"
-                          >
-                            <ArrowRight size={18} className="group-hover/btn:translate-x-1 transition-transform" />
-                          </Link>
+
                         </div>
                       </td>
                     </tr>
