@@ -67,7 +67,7 @@ const ManageJobs: React.FC = () => {
             </div>
             
             <Link 
-              to="/company/jobs/post" 
+              to="/company/post-job" 
               className="group relative flex items-center gap-3 px-8 py-4 bg-white text-primary rounded-2xl font-black uppercase tracking-widest text-xs transition-all duration-300 hover:shadow-[0_0_40px_rgba(255,255,255,0.3)] hover:-translate-y-1 active:translate-y-0"
             >
               Post New Drive <Plus size={16} className="group-hover:rotate-90 transition-transform duration-300" />
@@ -133,8 +133,9 @@ const ManageJobs: React.FC = () => {
                           <Briefcase size={32} className="text-muted-foreground" />
                         </div>
                         <div>
-                          <h3 className="text-lg font-bold text-foreground">No drives found</h3>
-                          <p className="text-sm text-muted-foreground font-medium">Try adjusting your search or post a new drive.</p>
+                          <p className="text-sm text-muted-foreground font-medium">
+                            Try adjusting your search or <Link to="/company/post-job" className="text-primary hover:underline font-bold">post a new drive</Link>.
+                          </p>
                         </div>
                       </div>
                     </td>
