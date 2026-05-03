@@ -2,7 +2,8 @@ import {
   Mail, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
   Briefcase, FileText, Building2,
-  Lightbulb, Globe, Upload, CheckCircle, Bell, User
+  CheckCircle, Globe, MapPin, Phone,
+  Award, Layers, Cpu, Rocket
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -24,9 +25,10 @@ import CertificateModal from './modal/CertificateModal';
 import ProfileEditDialog from './modal/ProfileEditDialog';
 import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
 import Loader from '@/components/Loader';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Progress } from "@/components/ui/progress";
 
 const StudentProfile = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -52,7 +54,7 @@ const StudentProfile = () => {
       passingYear: '',
       departmentId: ""
     },
-    phone: '', 
+    phone: '',
     location: '',
     linkedinUrl: '',
     githubUrl: '',
@@ -90,7 +92,6 @@ const StudentProfile = () => {
         skills: backendProfile.skills?.map((s: any) => ({
           id: s.id,
           name: typeof s === 'string' ? s : s.name,
-          color: 'bg-[#14b8a6]' 
         })) || [],
         resumeUrl: backendProfile.resumeUrl || ''
       }));
@@ -247,124 +248,494 @@ const StudentProfile = () => {
     return <Loader text="Retrieving your profile details..." fullScreen />;
   }
 
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 4,
+      transition: {
+        duration: 0.5,
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   return (
-    <div className="min-h-screen bg-[#f8fafc] pb-20 selection:bg-primary/30">
-      <div className="max-w-[1200px] mx-auto space-y-6 px-4 sm:px-6 lg:px-8 pt-8">
-        
-        {/* Header Card */}
-        <Card className="border-none shadow-sm rounded-xl overflow-hidden bg-white">
-          <CardContent className="p-8">
-            <div className="flex flex-col md:flex-row items-center md:items-start justify-between gap-6">
-              <div className="flex flex-col md:flex-row items-center gap-6">
-                <Avatar className="h-24 w-24 border-none shadow-sm">
-                  {profile.profileImage ? (
-                    <AvatarImage src={profile.profileImage} alt={profile.name} className="object-cover" />
-                  ) : (
-                    <AvatarFallback className="text-3xl font-bold bg-[#1e40af] text-white">
-                      {profile.name.split(' ').map((n: string) => n[0]).join('')}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
-                <div className="text-center md:text-left space-y-1">
-                  <h1 className="text-3xl font-bold text-[#1e293b]">{profile.name}</h1>
-                  <p className="text-sm font-medium text-slate-500">
-                    {profile.stats?.department || 'Department Not Set'} • {profile.stats?.passingYear} Batch
-                  </p>
-                  <div className="flex flex-wrap justify-center md:justify-start items-center gap-4 pt-2 text-slate-500">
-                    <div className="flex items-center gap-1.5 text-xs">
-                      <Mail className="h-3.5 w-3.5" />
-                      {profile.email}
+    <div className="min-h-screen bg-background pb-20 selection:bg-indigo-500/30 selection:text-indigo-200">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-8 px-4 lg:px-10 pt-0 w-full"
+      >
+        {/* Hero Section */}
+        <motion.div variants={itemVariants} className="relative group/hero">
+          {/* Elegant Slim Banner */}
+          <div className="h-48 md:h-64 w-full rounded-[2.5rem] bg-[#0f172a] shadow-xl relative overflow-hidden">
+            {/* Sophisticated Mesh Gradients */}
+            <div className="absolute inset-0">
+              <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-indigo-600/20 rounded-full blur-[80px] animate-pulse"></div>
+              <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-blue-500/15 rounded-full blur-[80px] animate-pulse delay-1000"></div>
+            </div>
+
+            {/* Subtle Texture */}
+            <div className="absolute inset-0 bg-[radial-gradient(#ffffff08_1px,transparent_1px)] [background-size:24px_24px] opacity-20"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0f172a] via-transparent to-transparent"></div>
+          </div>
+
+          {/* Profile Content Area */}
+          <div className="px-6 md:px-12 -mt-16 md:-mt-24 relative flex flex-col md:flex-row items-center md:items-end justify-between gap-6">
+            <div className="flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-8 w-full md:w-auto">
+              {/* Streamlined Avatar */}
+              <div className="relative shrink-0">
+                <div className="relative p-1 bg-background rounded-full shadow-xl">
+                  <Avatar className="h-32 w-32 md:h-44 md:w-44 border-4 border-white dark:border-slate-800 rounded-full overflow-hidden transition-all duration-500">
+                    {profile.profileImage ? (
+                      <AvatarImage src={profile.profileImage} alt={profile.name} className="object-cover" />
+                    ) : (
+                      <AvatarFallback className="text-5xl font-bold bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-white">
+                        {profile.name.split(' ').map((n: string) => n[0]).join('')}
+                      </AvatarFallback>
+                    )}
+                  </Avatar>
+                </div>
+                {/* Compact Status Indicator */}
+                <div className="absolute bottom-3 right-3 h-5 w-5 rounded-full bg-emerald-500 border-4 border-white dark:border-slate-800 shadow-lg"></div>
+              </div>
+
+              {/* Name and Professional Details */}
+              <div className="text-center md:text-left pb-4 space-y-3 flex-1">
+                <div className="space-y-2">
+                  <div className="flex flex-col md:flex-row items-center gap-3">
+                    <h1 className="text-2xl md:text-4xl font-bold text-white tracking-tight drop-shadow-md">
+                      {profile.name}
+                    </h1>
+                    <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/20">
+                      <CheckCircle className="h-3 w-3" />
+                      Verified
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap justify-center md:justify-start items-center gap-3">
+                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-bold text-xs md:text-sm shadow-sm transition-all hover:bg-slate-200 dark:hover:bg-white/20">
+                      <Building2 className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                      {profile.stats?.department || 'Department Not Set'}
+                    </div>
+                    <div className="hidden md:block w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-white/40"></div>
+                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-bold text-xs md:text-sm shadow-sm transition-all hover:bg-slate-200 dark:hover:bg-white/20">
+                      <GraduationCap className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                      Batch of {profile.stats?.passingYear || '20xx'}
                     </div>
                   </div>
                 </div>
+
+                {/* Theme-Aware Contact Row */}
+                <div className="flex flex-wrap justify-center md:justify-start items-center gap-3 pt-2">
+                  <div className="group flex items-center gap-3 bg-white dark:bg-slate-800 px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 shadow-lg shadow-slate-200/50 dark:shadow-none transition-all hover:translate-y-[-2px] cursor-pointer group/mail">
+                    <div className="p-1.5 rounded-lg bg-indigo-500 text-white shadow-lg shadow-indigo-500/20 group-hover/mail:scale-110 transition-transform">
+                      <Mail className="h-3.5 w-3.5" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{profile.email}</span>
+                  </div>
+                  {profile.location && (
+                    <div className="group flex items-center gap-3 bg-white dark:bg-slate-800 px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 shadow-lg shadow-slate-200/50 dark:shadow-none transition-all hover:translate-y-[-2px] cursor-pointer group/loc">
+                      <div className="p-1.5 rounded-lg bg-rose-500 text-white shadow-lg shadow-rose-500/20 group-hover/loc:scale-110 transition-transform">
+                        <MapPin className="h-3.5 w-3.5" />
+                      </div>
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{profile.location}</span>
+                    </div>
+                  )}
+                </div>
               </div>
+            </div>
+
+            {/* Streamlined Action Area */}
+            <div className="pb-4 shrink-0">
               <Button
                 onClick={() => setShowProfileEditDialog(true)}
-                variant="outline"
-                className="gap-2 rounded-lg border-slate-200 text-slate-600 hover:bg-slate-50 h-10 px-6 font-semibold"
+                className="bg-white text-slate-900 hover:bg-slate-50 rounded-xl px-8 h-12 font-black shadow-2xl shadow-black/20 transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center gap-3 text-sm"
               >
-                <Edit3 className="h-4 w-4" />
+                <Edit3 className="h-4.5 w-4.5 text-indigo-600" />
                 Edit Profile
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Academic Details */}
-          <Card className="border-none shadow-sm rounded-xl bg-white">
-            <CardHeader className="pb-4 flex flex-row items-center gap-2 space-y-0">
-              <GraduationCap className="h-5 w-5 text-blue-600" />
-              <CardTitle className="text-lg font-bold text-[#1e293b]">Academic Details</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center py-1 border-b border-slate-50">
-                <span className="text-sm text-slate-500">Department</span>
-                <span className="text-sm font-bold text-[#1e293b]">{profile.stats?.department || 'N/A'}</span>
+        {/* Stats Row */}
+        <motion.div variants={itemVariants} className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
+          <Card className="rounded-2xl border-none shadow-sm bg-white/70 dark:bg-white/5 backdrop-blur-md hover:shadow-md transition-all group overflow-hidden">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">CGPA</p>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{profile.stats?.cgpa || '0.0'} <span className="text-sm font-normal text-slate-400">/ 10</span></h3>
+                </div>
+                <div className="h-12 w-12 rounded-2xl bg-blue-50 dark:bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 transition-transform">
+                  <Award className="h-6 w-6" />
+                </div>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-50">
-                <span className="text-sm text-slate-500">CGPA</span>
-                <span className="text-sm font-bold text-[#1e293b]">{profile.stats?.cgpa || '0.0'} / 10</span>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-50">
-                <span className="text-sm text-slate-500">Backlogs</span>
-                <span className="text-sm font-bold text-[#1e293b]">{profile.stats?.activeBacklogs || 'None'}</span>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-50">
-                <span className="text-sm text-slate-500">Batch</span>
-                <span className="text-sm font-bold text-[#1e293b]">{profile.stats?.passingYear || 'N/A'}</span>
-              </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-50">
-                <span className="text-sm text-slate-500">Year</span>
-                <span className="text-sm font-bold text-[#1e293b]">{profile.stats?.year || 'N/A'}</span>
+              <div className="mt-4">
+                <Progress value={(parseFloat(profile.stats?.cgpa) || 0) * 10} className="h-1.5 bg-blue-100" />
               </div>
             </CardContent>
           </Card>
 
-          {/* Skills */}
-          <Card className="border-none shadow-sm rounded-xl bg-white">
-            <CardHeader className="pb-4 flex flex-row items-center gap-2 space-y-0">
-              <Code2 className="h-5 w-5 text-blue-600" />
-              <CardTitle className="text-lg font-bold text-[#1e293b]">Skills</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex flex-wrap gap-2">
-                {profile.skills?.length > 0 ? (
-                  profile.skills.map((skill: any, i: number) => (
-                    <Badge 
-                      key={i} 
-                      className="px-4 py-1.5 text-xs font-semibold bg-[#14b8a6] text-white hover:bg-[#0d9488] border-none rounded-full"
+          <Card className="rounded-2xl border-none shadow-sm bg-white/70 dark:bg-white/5 backdrop-blur-md hover:shadow-md transition-all group">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Projects</p>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{profile.projects?.length || 0}</h3>
+                </div>
+                <div className="h-12 w-12 rounded-2xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform">
+                  <Cpu className="h-6 w-6" />
+                </div>
+              </div>
+              <p className="mt-4 text-xs font-semibold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 w-fit px-2 py-0.5 rounded-full">Active Contributions</p>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl border-none shadow-sm bg-white/70 dark:bg-white/5 backdrop-blur-md hover:shadow-md transition-all group">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Skills</p>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{profile.skills?.length || 0}</h3>
+                </div>
+                <div className="h-12 w-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center text-emerald-600 dark:text-emerald-400 group-hover:scale-110 transition-transform">
+                  <Rocket className="h-6 w-6" />
+                </div>
+              </div>
+              <p className="mt-4 text-xs font-semibold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 w-fit px-2 py-0.5 rounded-full">Technical Stack</p>
+            </CardContent>
+          </Card>
+
+          <Card className="rounded-2xl border-none shadow-sm bg-white/70 dark:bg-white/5 backdrop-blur-md hover:shadow-md transition-all group">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Backlogs</p>
+                  <h3 className="text-2xl font-bold text-slate-900 dark:text-white">{profile.stats?.activeBacklogs || '0'}</h3>
+                </div>
+                <div className="h-12 w-12 rounded-2xl bg-rose-50 dark:bg-rose-500/10 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 transition-transform">
+                  <Layers className="h-6 w-6" />
+                </div>
+              </div>
+              <Badge
+                variant={parseInt(profile.stats?.activeBacklogs) > 0 ? "destructive" : "secondary"}
+                className={`mt-4 rounded-full px-3 ${parseInt(profile.stats?.activeBacklogs) === 0 ? "bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 hover:bg-emerald-100 dark:hover:bg-emerald-500/30" : ""}`}
+              >
+                {parseInt(profile.stats?.activeBacklogs) === 0 ? "Clear History" : "Action Required"}
+              </Badge>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12">
+          {/* Left Column */}
+          <div className="lg:col-span-7 space-y-8">
+            {/* Academic Details */}
+            <motion.div variants={itemVariants}>
+              <Card className="rounded-2xl border-none shadow-sm bg-white dark:bg-slate-900/50 overflow-hidden group">
+                <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 to-indigo-500"></div>
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2.5 rounded-xl bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                      <GraduationCap className="h-6 w-6" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Academic Details</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    {[
+                      { label: 'Department', value: profile.stats?.department || 'N/A', icon: Building2 },
+                      { label: 'CGPA', value: `${profile.stats?.cgpa || '0.0'} / 10`, icon: Award },
+                      { label: 'Academic Year', value: profile.stats?.year ? `${profile.stats.year}${profile.stats.year === 1 ? 'st' : profile.stats.year === 2 ? 'nd' : profile.stats.year === 3 ? 'rd' : 'th'} Year` : 'N/A', icon: Layers },
+                      { label: 'Passing Batch', value: profile.stats?.passingYear || 'N/A', icon: Rocket },
+                    ].map((item, idx) => (
+                      <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50/50 dark:bg-white/5 border border-slate-100 dark:border-white/10 transition-all hover:bg-white dark:hover:bg-white/10 hover:shadow-md hover:border-transparent group/item">
+                        <div className="h-10 w-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover/item:text-blue-500 transition-colors shadow-sm">
+                          <item.icon className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{item.label}</p>
+                          <p className="text-base font-bold text-slate-900 dark:text-white">{item.value}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Experience Timeline */}
+            <motion.div variants={itemVariants}>
+              <Card className="rounded-2xl border-none shadow-sm bg-white dark:bg-slate-900/50 overflow-hidden group">
+                <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+                <CardContent className="p-8">
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                        <Briefcase className="h-6 w-6" />
+                      </div>
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white">Experience</h3>
+                    </div>
+                    <Button onClick={() => setShowExperienceModal(true)} variant="ghost" size="sm" className="text-indigo-600 hover:bg-indigo-50 rounded-xl">
+                      <Plus className="h-4 w-4 mr-1" /> Add Experience
+                    </Button>
+                  </div>
+
+                  <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-indigo-100 dark:before:from-indigo-900/50 before:via-slate-100 dark:before:via-slate-800 before:to-transparent">
+                    {profile.experiences?.length > 0 ? (
+                      profile.experiences.map((exp: any, i: number) => (
+                        <div key={i} className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group/timeline">
+                          <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-slate-800 bg-indigo-50 dark:bg-indigo-900 text-indigo-600 dark:text-indigo-400 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                            <Building2 className="h-5 w-5" />
+                          </div>
+                          <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] p-5 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm transition-all hover:shadow-md hover:bg-white dark:hover:bg-white/10 group-hover/timeline:border-indigo-100 dark:group-hover/timeline:border-indigo-500/30">
+                            <div className="flex justify-between items-start mb-1">
+                              <h4 className="font-bold text-slate-900 dark:text-white">{exp.role}</h4>
+                              <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-rose-500 opacity-0 group-hover/timeline:opacity-100 transition-opacity"
+                                onClick={() => {
+                                  const expId = profile.experiences[i]?.id;
+                                  const updated = profile.experiences.filter((_: any, idx: number) => idx !== i);
+                                  setProfile({ ...profile, experiences: updated });
+                                  handleSave({ ...profile, experiences: updated, deleteExperienceIds: expId ? [expId] : [] });
+                                }}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </div>
+                            <p className="text-sm font-semibold text-indigo-600 dark:text-indigo-400">{exp.companyName}</p>
+                            <time className="text-xs font-medium text-slate-400 mb-2 block">{exp.startDate} — {exp.endDate || 'Present'}</time>
+                            {exp.description && <p className="text-sm text-slate-600 dark:text-slate-400 mt-3 leading-relaxed">{exp.description}</p>}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-10 bg-slate-50/50 dark:bg-white/5 rounded-2xl border border-dashed border-slate-200 dark:border-slate-800">
+                        <Briefcase className="h-10 w-10 text-slate-200 mx-auto mb-3" />
+                        <p className="text-sm text-slate-400 italic">No professional experience listed.</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+
+          {/* Right Column */}
+          <div className="lg:col-span-5 space-y-8">
+            {/* Skills Card */}
+            <motion.div variants={itemVariants}>
+              <Card className="rounded-2xl border-none shadow-sm bg-white dark:bg-slate-900/50 overflow-hidden">
+                <div className="h-1.5 w-full bg-gradient-to-r from-emerald-500 to-teal-500"></div>
+                <CardContent className="p-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2.5 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                      <Code2 className="h-6 w-6" />
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">Technical Skills</h3>
+                  </div>
+
+                  <div className="flex flex-wrap gap-2.5">
+                    {profile.skills?.length > 0 ? (
+                      profile.skills.map((skill: any, i: number) => {
+                        const colors = [
+                          'bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-500/20 hover:bg-blue-600 dark:hover:bg-blue-500 hover:text-white',
+                          'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-100 dark:border-indigo-500/20 hover:bg-indigo-600 dark:hover:bg-indigo-500 hover:text-white',
+                          'bg-purple-50 dark:bg-purple-500/10 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-500/20 hover:bg-purple-600 dark:hover:bg-purple-500 hover:text-white',
+                          'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20 hover:bg-emerald-600 dark:hover:bg-emerald-500 hover:text-white',
+                          'bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-100 dark:border-rose-500/20 hover:bg-rose-600 dark:hover:bg-rose-500 hover:text-white',
+                          'bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-100 dark:border-amber-500/20 hover:bg-amber-600 dark:hover:bg-amber-500 hover:text-white'
+                        ];
+                        const colorClass = colors[i % colors.length];
+
+                        return (
+                          <motion.div
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            key={i}
+                          >
+                            <Badge
+                              className={`px-4 py-2 text-xs font-bold transition-all border rounded-xl cursor-default shadow-sm ${colorClass}`}
+                            >
+                              {skill.name}
+                            </Badge>
+                          </motion.div>
+                        );
+                      })
+                    ) : (
+                      <p className="text-sm text-slate-400 italic">No skills added yet.</p>
+                    )}
+                  </div>
+
+                  <div className="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Quick Actions</h4>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        onClick={() => setShowProjectModal(true)}
+                        variant="outline"
+                        className="rounded-xl border-slate-200 dark:border-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all h-auto py-3 flex-col gap-2"
+                      >
+                        <div className="p-2 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                          <Cpu className="h-4 w-4" />
+                        </div>
+                        <span className="text-xs font-bold">Add Project</span>
+                      </Button>
+                      <Button
+                        onClick={() => setShowExperienceModal(true)}
+                        variant="outline"
+                        className="rounded-xl border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-200 dark:hover:border-emerald-500/30 transition-all h-auto py-3 flex-col gap-2"
+                      >
+                        <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                          <Briefcase className="h-4 w-4" />
+                        </div>
+                        <span className="text-xs font-bold">Add Exp.</span>
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Certifications Card */}
+            <motion.div variants={itemVariants}>
+              <Card className="rounded-2xl border-none shadow-sm bg-white dark:bg-slate-900/50 overflow-hidden">
+                <div className="h-1.5 w-full bg-gradient-to-r from-rose-500 to-orange-500"></div>
+                <CardContent className="p-8">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2.5 rounded-xl bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400">
+                        <Award className="h-6 w-6" />
+                      </div>
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white">Certifications</h3>
+                    </div>
+                    <Button onClick={() => setShowCertificateModal(true)} variant="ghost" size="sm" className="text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 rounded-xl">
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  <div className="space-y-4">
+                    {profile.certificates?.length > 0 ? (
+                      profile.certificates.map((cert: any, i: number) => (
+                        <div key={i} className="group/cert p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 transition-all hover:bg-white dark:hover:bg-white/10 hover:shadow-md hover:border-rose-100 dark:hover:border-rose-500/30">
+                          <div className="flex justify-between items-start">
+                            <div className="flex gap-4">
+                              <div className="h-12 w-12 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center shrink-0 shadow-sm group-hover/cert:text-rose-500 transition-colors">
+                                <CheckCircle className="h-6 w-6 text-emerald-500" />
+                              </div>
+                              <div className="min-w-0">
+                                <h4 className="font-bold text-slate-900 dark:text-white truncate">{cert.title}</h4>
+                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{cert.issuer}</p>
+                                <div className="flex items-center gap-3 mt-2">
+                                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{cert.issuedDate}</span>
+                                  {cert.certificateUrl && (
+                                    <button
+                                      className="text-[10px] font-bold text-indigo-600 hover:text-indigo-700 uppercase tracking-tighter flex items-center gap-1"
+                                      onClick={() => openFile(cert.certificateUrl, cert.title)}
+                                    >
+                                      View <ExternalLink className="h-2.5 w-2.5" />
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-rose-500 opacity-0 group-hover/cert:opacity-100 transition-opacity shrink-0"
+                              onClick={() => {
+                                const certId = profile.certificates[i]?.id;
+                                const updated = profile.certificates.filter((_: any, idx: number) => idx !== i);
+                                setProfile({ ...profile, certificates: updated });
+                                handleSave({ ...profile, certificates: updated, deleteCertificateIds: certId ? [certId] : [] });
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      <p className="text-sm text-slate-400 italic text-center py-6">No certifications added yet.</p>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            {/* Resume Card */}
+            <motion.div variants={itemVariants}>
+              <Card className="rounded-2xl border-none shadow-sm bg-gradient-to-br from-slate-900 to-slate-800 text-white overflow-hidden relative group">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+                <CardContent className="p-8 relative z-10">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2.5 rounded-xl bg-white/10 backdrop-blur-md text-white">
+                      <FileText className="h-6 w-6" />
+                    </div>
+                    <h3 className="text-xl font-bold">Resume</h3>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm group-hover:bg-white/10 transition-all">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                        <FileText className="h-5 w-5 text-indigo-400" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold truncate">{profile.name}_Resume.pdf</p>
+                        <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{profile.resumeUrl ? 'PDF Document • Ready' : 'No document uploaded'}</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => profile.resumeUrl && openFile(profile.resumeUrl, `${profile.name}_Resume`)}
+                      disabled={!profile.resumeUrl}
+                      className="bg-white text-slate-900 hover:bg-slate-100 rounded-xl px-4 h-9 text-xs font-bold shadow-lg shadow-white/5 transition-transform active:scale-95 shrink-0"
                     >
-                      {skill.name}
-                    </Badge>
-                  ))
-                ) : (
-                  <p className="text-sm text-slate-400 italic">No skills added yet.</p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
+                      View
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
         </div>
 
-        {/* Projects */}
-        <Card className="border-none shadow-sm rounded-xl bg-white">
-          <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0">
-            <div className="flex items-center gap-2">
-              <FileText className="h-5 w-5 text-blue-600" />
-              <CardTitle className="text-lg font-bold text-[#1e293b]">Projects</CardTitle>
+        {/* Projects Section - Full Width */}
+        <motion.div variants={itemVariants} className="space-y-6">
+          <div className="flex items-center justify-between px-2">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600 shadow-sm">
+                <Rocket className="h-6 w-6" />
+              </div>
+              <h3 className="text-2xl font-bold text-slate-900 dark:text-white">Featured Projects</h3>
             </div>
-            <Button onClick={() => setShowProjectModal(true)} variant="ghost" size="sm" className="text-blue-600 hover:bg-blue-50">
-              <Plus className="h-4 w-4 mr-1" /> Add Project
+            <Button
+              onClick={() => setShowProjectModal(true)}
+              className="bg-white dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-200 hover:bg-purple-50 dark:hover:bg-purple-500/10 hover:text-purple-600 dark:hover:text-purple-400 hover:border-purple-200 dark:hover:border-purple-500/30 rounded-2xl px-6 h-11 font-bold shadow-sm transition-all"
+            >
+              <Plus className="h-4 w-4 mr-2" /> Add Project
             </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {profile.projects?.length > 0 ? (
-                profile.projects.map((project: any, i: number) => (
-                  <div key={i} className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex flex-col justify-between h-full group">
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-[#1e293b]">{project.title}</h4>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {profile.projects?.length > 0 ? (
+              profile.projects.map((project: any, i: number) => (
+                <motion.div
+                  key={i}
+                  whileHover={{ y: -5 }}
+                  className="group"
+                >
+                  <Card className="rounded-3xl border-none shadow-sm bg-white dark:bg-slate-900/50 h-full flex flex-col overflow-hidden transition-all hover:shadow-xl hover:shadow-indigo-500/5">
+                    <div className="h-2 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+                    <CardContent className="p-6 flex-1 flex flex-col">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="h-12 w-12 rounded-2xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-indigo-500 group-hover:bg-indigo-50 dark:group-hover:bg-indigo-500/10 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors shadow-sm">
+                          <Globe className="h-6 w-6" />
+                        </div>
                         <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
                           onClick={() => {
                             const projId = profile.projects[i]?.id;
@@ -376,160 +747,63 @@ const StudentProfile = () => {
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                      <p className="text-xs text-slate-500 line-clamp-2">{project.description}</p>
-                      <div className="flex flex-wrap gap-1.5">
+
+                      <h4 className="text-xl font-bold text-slate-900 dark:text-white mb-2 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{project.title}</h4>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-3 mb-6 leading-relaxed flex-1">{project.description || 'No description provided.'}</p>
+
+                      <div className="flex flex-wrap gap-2 mb-6">
                         {project.techStack?.split(',').map((tech: string, j: number) => (
-                          <span key={j} className="px-2 py-0.5 text-[10px] bg-white border border-slate-200 rounded text-slate-600">
+                          <Badge key={j} variant="secondary" className="bg-slate-50 dark:bg-white/5 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/10 border-none px-2.5 py-0.5 text-[10px] font-bold rounded-lg uppercase tracking-wider">
                             {tech.trim()}
-                          </span>
+                          </Badge>
                         ))}
                       </div>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-slate-400 italic">No projects showcased yet.</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
 
-        {/* Experience */}
-        <Card className="border-none shadow-sm rounded-xl bg-white">
-          <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0">
-            <div className="flex items-center gap-2">
-              <Briefcase className="h-5 w-5 text-blue-600" />
-              <CardTitle className="text-lg font-bold text-[#1e293b]">Experience</CardTitle>
-            </div>
-            <Button onClick={() => setShowExperienceModal(true)} variant="ghost" size="sm" className="text-blue-600 hover:bg-blue-50">
-              <Plus className="h-4 w-4 mr-1" /> Add Experience
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {profile.experiences?.length > 0 ? (
-                profile.experiences.map((exp: any, i: number) => (
-                  <div key={i} className="p-4 rounded-xl bg-slate-50 border border-slate-100 group">
-                    <div className="flex justify-between items-start">
-                      <div className="flex gap-4">
-                        <div className="h-10 w-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0">
-                          <Building2 className="h-5 w-5 text-slate-400" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-[#1e293b]">{exp.role}</h4>
-                          <p className="text-sm text-slate-500">{exp.companyName}</p>
-                          <p className="text-xs text-slate-400 mt-1">
-                            {exp.startDate} — {exp.endDate || 'Present'}
-                          </p>
-                          {exp.description && <p className="text-sm text-slate-600 mt-3 line-clamp-2">{exp.description}</p>}
-                        </div>
+                      <div className="flex items-center gap-3 mt-auto pt-4 border-t border-slate-50 dark:border-slate-800">
+                        {project.liveUrl && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 rounded-xl h-9 text-xs font-bold border-slate-200 dark:border-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-100 dark:hover:border-indigo-500/30"
+                            onClick={() => window.open(project.liveUrl, '_blank')}
+                          >
+                            <ExternalLink className="h-3.5 w-3.5 mr-2" /> Live Demo
+                          </Button>
+                        )}
+                        {project.githubUrl && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1 rounded-xl h-9 text-xs font-bold border-slate-200 dark:border-slate-800 hover:bg-slate-900 dark:hover:bg-slate-700 hover:text-white hover:border-slate-900 dark:hover:border-slate-700"
+                            onClick={() => window.open(project.githubUrl, '_blank')}
+                          >
+                            <Code2 className="h-3.5 w-3.5 mr-2" /> GitHub
+                          </Button>
+                        )}
                       </div>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => {
-                          const expId = profile.experiences[i]?.id;
-                          const updated = profile.experiences.filter((_: any, idx: number) => idx !== i);
-                          setProfile({ ...profile, experiences: updated });
-                          handleSave({ ...profile, experiences: updated, deleteExperienceIds: expId ? [expId] : [] });
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-slate-400 italic">No professional experience listed.</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Certifications */}
-        <Card className="border-none shadow-sm rounded-xl bg-white">
-          <CardHeader className="pb-4 flex flex-row items-center justify-between space-y-0">
-            <div className="flex items-center gap-2">
-              <GraduationCap className="h-5 w-5 text-blue-600" />
-              <CardTitle className="text-lg font-bold text-[#1e293b]">Certifications</CardTitle>
-            </div>
-            <Button onClick={() => setShowCertificateModal(true)} variant="ghost" size="sm" className="text-blue-600 hover:bg-blue-50">
-              <Plus className="h-4 w-4 mr-1" /> Add Certificate
-            </Button>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {profile.certificates?.length > 0 ? (
-                profile.certificates.map((cert: any, i: number) => (
-                  <div key={i} className="p-4 rounded-xl bg-slate-50 border border-slate-100 group">
-                    <div className="flex justify-between items-start">
-                      <div className="flex gap-4">
-                        <div className="h-10 w-10 rounded-lg bg-white border border-slate-200 flex items-center justify-center shrink-0">
-                          <CheckCircle className="h-5 w-5 text-emerald-500" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-[#1e293b]">{cert.title}</h4>
-                          <p className="text-sm text-slate-500">{cert.issuer}</p>
-                          <p className="text-xs text-slate-400">{cert.issuedDate}</p>
-                          {cert.certificateUrl && (
-                            <Button 
-                              variant="link" 
-                              className="p-0 h-auto text-xs text-blue-600 hover:text-blue-700 mt-2"
-                              onClick={() => openFile(cert.certificateUrl, cert.title)}
-                            >
-                              View Credential
-                            </Button>
-                          )}
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                        onClick={() => {
-                          const certId = profile.certificates[i]?.id;
-                          const updated = profile.certificates.filter((_: any, idx: number) => idx !== i);
-                          setProfile({ ...profile, certificates: updated });
-                          handleSave({ ...profile, certificates: updated, deleteCertificateIds: certId ? [certId] : [] });
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-slate-400 italic">No certifications added yet.</p>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Resume */}
-        <Card className="border-none shadow-sm rounded-xl bg-white">
-          <CardHeader className="pb-4 flex flex-row items-center gap-2 space-y-0">
-            <FileText className="h-5 w-5 text-blue-600" />
-            <CardTitle className="text-lg font-bold text-[#1e293b]">Resume</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="p-4 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center text-blue-600">
-                  <FileText className="h-6 w-6" />
+                    </CardContent>
+                  </Card>
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-full py-16 bg-white dark:bg-slate-900/50 rounded-3xl border-none shadow-sm flex flex-col items-center justify-center text-center px-4">
+                <div className="h-20 w-20 rounded-3xl bg-slate-50 dark:bg-white/5 flex items-center justify-center text-slate-200 dark:text-slate-800 mb-6">
+                  <Rocket className="h-10 w-10" />
                 </div>
-                <div>
-                  <h4 className="text-sm font-bold text-[#1e293b]">{profile.name}_Resume.pdf</h4>
-                  <p className="text-xs text-slate-400">PDF Document • {profile.resumeUrl ? 'Ready to view' : 'No resume uploaded'}</p>
-                </div>
+                <h4 className="text-lg font-bold text-slate-900 dark:text-white mb-2">No projects showcased yet</h4>
+                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs mb-8">Start building your portfolio by adding your best projects and technical work.</p>
+                <Button
+                  onClick={() => setShowProjectModal(true)}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl px-8 h-12 font-bold shadow-lg shadow-indigo-100"
+                >
+                  Create First Project
+                </Button>
               </div>
-              <Button 
-                onClick={() => profile.resumeUrl && openFile(profile.resumeUrl, `${profile.name}_Resume`)}
-                disabled={!profile.resumeUrl}
-                variant="outline"
-                className="bg-white border-slate-200 text-slate-600 hover:bg-slate-50"
-              >
-                View Resume
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+            )}
+          </div>
+        </motion.div>
 
-
+        {/* Modals */}
         <ProjectModal isOpen={showProjectModal} onClose={() => setShowProjectModal(false)} onAddProject={handleAddProject} />
         <ExperienceModal isOpen={showExperienceModal} onClose={() => setShowExperienceModal(false)} onAddExperience={handleAddExperience} />
         <CertificateModal isOpen={showCertificateModal} onClose={() => setShowCertificateModal(false)} onAddCertificate={handleAddCertificate} />
@@ -541,16 +815,19 @@ const StudentProfile = () => {
           isLoading={backendLoading}
         />
 
+        {/* Document Preview Dialog */}
         <Dialog open={!!previewUrl} onOpenChange={(open) => !open && setPreviewUrl(null)}>
-          <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden flex flex-col bg-white border shadow-2xl rounded-xl">
-            <DialogHeader className="p-6 border-b bg-slate-50 shrink-0">
+          <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden flex flex-col bg-white dark:bg-slate-950 border-none shadow-2xl rounded-3xl">
+            <DialogHeader className="p-6 border-b dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 shrink-0">
               <div className="flex items-center justify-between">
-                <DialogTitle className="text-xl font-bold truncate flex items-center gap-3 text-slate-800">
-                  <FileText className="h-6 w-6 text-blue-600" />
+                <DialogTitle className="text-xl font-bold truncate flex items-center gap-3 text-slate-800 dark:text-slate-200">
+                  <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                    <FileText className="h-6 w-6" />
+                  </div>
                   {previewName}
                 </DialogTitle>
-                <Button variant="outline" size="sm" onClick={() => window.open(previewUrl!, '_blank')}>
-                  <ExternalLink className="h-4 w-4 mr-2" /> Open External
+                <Button variant="outline" size="sm" className="rounded-xl border-slate-200 dark:border-slate-800" onClick={() => window.open(previewUrl!, '_blank')}>
+                  <ExternalLink className="h-4 w-4 mr-2" /> Open Full View
                 </Button>
               </div>
             </DialogHeader>
@@ -559,7 +836,7 @@ const StudentProfile = () => {
             </div>
           </DialogContent>
         </Dialog>
-      </div>
+      </motion.div>
     </div>
   );
 };

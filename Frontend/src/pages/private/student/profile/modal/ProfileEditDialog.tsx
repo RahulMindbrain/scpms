@@ -187,15 +187,15 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden p-0 bg-white border-none shadow-2xl rounded-2xl flex flex-col">
-        <DialogHeader className="p-8 pb-4 bg-slate-50 border-b border-slate-100 shrink-0">
+      <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-hidden p-0 bg-white dark:bg-slate-900 border-none shadow-2xl rounded-2xl flex flex-col">
+        <DialogHeader className="p-8 pb-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
+            <div className="p-2 bg-blue-100 dark:bg-blue-500/10 rounded-lg">
               <User className="h-5 w-5 text-blue-600" />
             </div>
             <div>
-              <DialogTitle className="text-xl font-bold text-slate-800">Edit Profile</DialogTitle>
-              <DialogDescription className="text-slate-500 text-sm">Update your information and academic details</DialogDescription>
+              <DialogTitle className="text-xl font-bold text-slate-800 dark:text-white">Edit Profile</DialogTitle>
+              <DialogDescription className="text-slate-500 dark:text-slate-400 text-sm">Update your information and academic details</DialogDescription>
             </div>
           </div>
         </DialogHeader>
@@ -203,23 +203,23 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
           <div className="p-8 pt-6 space-y-8">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="grid grid-cols-4 mb-8 bg-slate-100 p-1 rounded-xl">
-                <TabsTrigger value="personal" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm font-semibold">Personal</TabsTrigger>
-                <TabsTrigger value="academic" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm font-semibold">Academic</TabsTrigger>
-                <TabsTrigger value="social" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm font-semibold">Social</TabsTrigger>
-                <TabsTrigger value="skills" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm font-semibold">Skills</TabsTrigger>
+              <TabsList className="grid grid-cols-4 mb-8 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl">
+                <TabsTrigger value="personal" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-sm font-semibold">Personal</TabsTrigger>
+                <TabsTrigger value="academic" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-sm font-semibold">Academic</TabsTrigger>
+                <TabsTrigger value="social" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-sm font-semibold">Social</TabsTrigger>
+                <TabsTrigger value="skills" className="rounded-lg data-[state=active]:bg-white dark:data-[state=active]:bg-slate-700 data-[state=active]:text-blue-600 dark:data-[state=active]:text-blue-400 data-[state=active]:shadow-sm font-semibold">Skills</TabsTrigger>
               </TabsList>
 
               {/* PERSONAL CONTENT */}
               <TabsContent value="personal" className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name" className="text-sm font-bold text-slate-700">Full Name</Label>
+                    <Label htmlFor="name" className="text-sm font-bold text-slate-700 dark:text-slate-300">Full Name</Label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input
                         id="name"
-                        className={`pl-10 h-11 rounded-xl border-slate-200 focus:ring-blue-500 ${errors.name ? 'border-rose-500' : ''}`}
+                        className={`pl-10 h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500 ${errors.name ? 'border-rose-500' : ''}`}
                         value={formData.name || ""}
                         onChange={(e) => updateField("name", e.target.value)}
                       />
@@ -228,13 +228,13 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm font-bold text-slate-700">Email Address</Label>
+                    <Label htmlFor="email" className="text-sm font-bold text-slate-700 dark:text-slate-300">Email Address</Label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input
                         id="email"
                         type="email"
-                        className={`pl-10 h-11 rounded-xl border-slate-200 focus:ring-blue-500 ${errors.email ? 'border-rose-500' : ''}`}
+                        className={`pl-10 h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500 ${errors.email ? 'border-rose-500' : ''}`}
                         value={formData.email || ""}
                         onChange={(e) => updateField("email", e.target.value)}
                       />
@@ -248,12 +248,12 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
               <TabsContent value="academic" className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="departmentId" className="text-sm font-bold text-slate-700">Department</Label>
+                    <Label htmlFor="departmentId" className="text-sm font-bold text-slate-700 dark:text-slate-300">Department</Label>
                     <div className="relative">
                        <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                        <select
                         id="departmentId"
-                        className={`pl-10 flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors['stats.departmentId'] ? 'border-rose-500' : ''}`}
+                        className={`pl-10 flex h-11 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors['stats.departmentId'] ? 'border-rose-500' : ''}`}
                         value={formData.stats?.departmentId || ""}
                         onChange={(e) => updateStat("departmentId", e.target.value)}
                       >
@@ -267,13 +267,13 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="cgpa" className="text-sm font-bold text-slate-700">Current CGPA</Label>
+                    <Label htmlFor="cgpa" className="text-sm font-bold text-slate-700 dark:text-slate-300">Current CGPA</Label>
                     <Input
                       id="cgpa"
                       type="number"
                       step="0.01"
                       placeholder="0.0"
-                      className={`h-11 rounded-xl border-slate-200 focus:ring-blue-500 ${errors['stats.cgpa'] ? 'border-rose-500' : ''}`}
+                      className={`h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500 ${errors['stats.cgpa'] ? 'border-rose-500' : ''}`}
                       value={formData.stats?.cgpa || ""}
                       onChange={(e) => updateStat("cgpa", e.target.value)}
                     />
@@ -281,34 +281,34 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="year" className="text-sm font-bold text-slate-700">Current Year</Label>
+                    <Label htmlFor="year" className="text-sm font-bold text-slate-700 dark:text-slate-300">Current Year</Label>
                     <Input
                       id="year"
                       type="number"
-                      className={`h-11 rounded-xl border-slate-200 focus:ring-blue-500 ${errors['stats.year'] ? 'border-rose-500' : ''}`}
+                      className={`h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500 ${errors['stats.year'] ? 'border-rose-500' : ''}`}
                       value={formData.stats?.year || ""}
                       onChange={(e) => updateStat("year", e.target.value)}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="passingYear" className="text-sm font-bold text-slate-700">Batch (Passing Year)</Label>
+                    <Label htmlFor="passingYear" className="text-sm font-bold text-slate-700 dark:text-slate-300">Batch (Passing Year)</Label>
                     <Input
                       id="passingYear"
                       type="number"
-                      className={`h-11 rounded-xl border-slate-200 focus:ring-blue-500 ${errors['stats.passingYear'] ? 'border-rose-500' : ''}`}
+                      className={`h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500 ${errors['stats.passingYear'] ? 'border-rose-500' : ''}`}
                       value={formData.stats?.passingYear || ""}
                       onChange={(e) => updateStat("passingYear", e.target.value)}
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="activeBacklogs" className="text-sm font-bold text-slate-700">Active Backlogs</Label>
+                    <Label htmlFor="activeBacklogs" className="text-sm font-bold text-slate-700 dark:text-slate-300">Active Backlogs</Label>
                     <Input
                       id="activeBacklogs"
                       type="number"
                       placeholder="0"
-                      className={`h-11 rounded-xl border-slate-200 focus:ring-blue-500 ${errors['stats.activeBacklogs'] ? 'border-rose-500' : ''}`}
+                      className={`h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500 ${errors['stats.activeBacklogs'] ? 'border-rose-500' : ''}`}
                       value={formData.stats?.activeBacklogs ?? ""}
                       onChange={(e) => updateStat("activeBacklogs", e.target.value)}
                     />
@@ -320,39 +320,39 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
               <TabsContent value="social" className="space-y-6">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="linkedinUrl" className="text-sm font-bold text-slate-700">LinkedIn URL</Label>
+                    <Label htmlFor="linkedinUrl" className="text-sm font-bold text-slate-700 dark:text-slate-300">LinkedIn URL</Label>
                     <div className="relative">
                       <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input
                         id="linkedinUrl"
                         placeholder="https://linkedin.com/in/..."
-                        className={`pl-10 h-11 rounded-xl border-slate-200 focus:ring-blue-500 ${errors.linkedinUrl ? 'border-rose-500' : ''}`}
+                        className={`pl-10 h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500 ${errors.linkedinUrl ? 'border-rose-500' : ''}`}
                         value={formData.linkedinUrl || ""}
                         onChange={(e) => updateField("linkedinUrl", e.target.value)}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="githubUrl" className="text-sm font-bold text-slate-700">GitHub URL</Label>
+                    <Label htmlFor="githubUrl" className="text-sm font-bold text-slate-700 dark:text-slate-300">GitHub URL</Label>
                     <div className="relative">
                       <Code2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input
                         id="githubUrl"
                         placeholder="https://github.com/..."
-                        className={`pl-10 h-11 rounded-xl border-slate-200 focus:ring-blue-500 ${errors.githubUrl ? 'border-rose-500' : ''}`}
+                        className={`pl-10 h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500 ${errors.githubUrl ? 'border-rose-500' : ''}`}
                         value={formData.githubUrl || ""}
                         onChange={(e) => updateField("githubUrl", e.target.value)}
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="portfolioUrl" className="text-sm font-bold text-slate-700">Portfolio Website URL</Label>
+                    <Label htmlFor="portfolioUrl" className="text-sm font-bold text-slate-700 dark:text-slate-300">Portfolio Website URL</Label>
                     <div className="relative">
                       <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input
                         id="portfolioUrl"
                         placeholder="https://yourportfolio.com"
-                        className={`pl-10 h-11 rounded-xl border-slate-200 focus:ring-blue-500 ${errors.portfolioUrl ? 'border-rose-500' : ''}`}
+                        className={`pl-10 h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500 ${errors.portfolioUrl ? 'border-rose-500' : ''}`}
                         value={formData.portfolioUrl || ""}
                         onChange={(e) => updateField("portfolioUrl", e.target.value)}
                       />
@@ -365,9 +365,9 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
               <TabsContent value="skills" className="space-y-6">
                 <div className="space-y-4">
                   <div className="flex flex-col gap-2">
-                    <Label className="text-sm font-bold text-slate-700 ml-1">Add Technical Skills</Label>
+                    <Label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Add Technical Skills</Label>
                     <select
-                      className="flex h-11 w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex h-11 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                       value=""
                       onChange={(e) => {
                         const selectedSkill = allSkillsList.find(s => s.id === parseInt(e.target.value));
@@ -383,10 +383,10 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                   </div>
 
 
-                  <div className="flex flex-wrap gap-2 p-4 border rounded-xl border-slate-100 bg-slate-50 min-h-[100px]">
+                  <div className="flex flex-wrap gap-2 p-4 border rounded-xl border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 min-h-[100px]">
                     {formData.skills?.length > 0 ? (
                       formData.skills.map((skill: any, i: number) => (
-                        <Badge key={i} className="pl-3 pr-1 py-1.5 rounded-lg bg-white border border-slate-200 text-slate-700 flex items-center gap-1 shadow-sm">
+                        <Badge key={i} className="pl-3 pr-1 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 flex items-center gap-1 shadow-sm">
                           <span className="text-xs font-bold">{skill.name}</span>
                           <Button type="button" variant="ghost" size="icon" className="h-5 w-5 hover:text-rose-500" onClick={() => removeSkill(i)}>
                             <X className="h-3 w-3" />
@@ -401,11 +401,11 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
               </TabsContent>
             </Tabs>
 
-            <Separator className="bg-slate-100" />
+            <Separator className="bg-slate-100 dark:bg-slate-800" />
 
             {/* RESUME SECTION */}
             <div className="space-y-4">
-              <Label className="text-sm font-bold text-slate-700 flex items-center gap-2">
+              <Label className="text-sm font-bold text-slate-700 dark:text-slate-300 flex items-center gap-2">
                 <FileText className="h-4 w-4 text-blue-600" />
                 Resume (PDF)
               </Label>
@@ -436,7 +436,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                 <Button
                   type="button"
                   variant="outline"
-                  className="h-11 rounded-xl border-slate-200 text-slate-600 hover:bg-slate-50 gap-2"
+                  className="h-11 rounded-xl border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 gap-2"
                   onClick={() => document.getElementById('resume-upload')?.click()}
                   disabled={isUploading}
                 >
@@ -444,7 +444,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                   {formData.resumeUrl ? "Change Document" : "Upload Resume"}
                 </Button>
                 {formData.resumeUrl && !isUploading && (
-                  <Badge variant="outline" className="bg-emerald-50 text-emerald-600 border-emerald-100 py-1.5 font-bold uppercase text-[10px]">
+                  <Badge variant="outline" className="bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20 py-1.5 font-bold uppercase text-[10px]">
                     Linked Successfully
                   </Badge>
                 )}
@@ -453,9 +453,9 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
           </div>
         </form>
 
-        <DialogFooter className="p-8 bg-slate-50 border-t border-slate-100 shrink-0">
+        <DialogFooter className="p-8 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 shrink-0">
           <DialogClose asChild>
-            <Button type="button" variant="ghost" className="rounded-xl h-12 px-6 font-bold text-slate-500 hover:bg-slate-200/50">Cancel</Button>
+            <Button type="button" variant="ghost" className="rounded-xl h-12 px-6 font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50">Cancel</Button>
           </DialogClose>
           <Button
             type="submit"

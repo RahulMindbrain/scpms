@@ -47,50 +47,50 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[550px] rounded-2xl p-0 overflow-hidden bg-white border-none shadow-2xl flex flex-col">
-        <DialogHeader className="p-8 pb-4 bg-slate-50 border-b border-slate-100">
+      <DialogContent className="sm:max-w-[550px] rounded-2xl p-0 overflow-hidden bg-white dark:bg-slate-900 border-none shadow-2xl flex flex-col">
+        <DialogHeader className="p-8 pb-4 bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-amber-100 rounded-lg">
+            <div className="p-2 bg-amber-100 dark:bg-amber-500/10 rounded-lg">
               <GraduationCap className="h-5 w-5 text-amber-600" />
             </div>
             <div>
-              <DialogTitle className="text-xl font-bold text-slate-800">Add Credential</DialogTitle>
-              <DialogDescription className="text-slate-500 text-sm">Add your certifications and professional achievements</DialogDescription>
+              <DialogTitle className="text-xl font-bold text-slate-800 dark:text-white">Add Credential</DialogTitle>
+              <DialogDescription className="text-slate-500 dark:text-slate-400 text-sm">Add your certifications and professional achievements</DialogDescription>
             </div>
           </div>
         </DialogHeader>
 
         <div className="p-8 space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="title" className="text-sm font-bold text-slate-700 ml-1">Certificate Title</Label>
+            <Label htmlFor="title" className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Certificate Title</Label>
             <Input
               id="title"
               placeholder="e.g. AWS Certified Solutions Architect"
-              className="h-11 rounded-xl border-slate-200 focus:ring-blue-500"
+              className="h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500"
               value={certificate.title}
               onChange={(e) => setCertificate({ ...certificate, title: e.target.value })}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="issuer" className="text-sm font-bold text-slate-700 ml-1">Issuing Organization</Label>
+            <Label htmlFor="issuer" className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Issuing Organization</Label>
             <Input
               id="issuer"
               placeholder="e.g. Coursera, Microsoft, Google"
-              className="h-11 rounded-xl border-slate-200 focus:ring-blue-500"
+              className="h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500"
               value={certificate.issuer}
               onChange={(e) => setCertificate({ ...certificate, issuer: e.target.value })}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="date" className="text-sm font-bold text-slate-700 ml-1">Issue Date</Label>
+            <Label htmlFor="date" className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Issue Date</Label>
             <div className="relative">
               <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
               <Input
                 id="date"
                 type="date"
-                className="pl-10 h-11 rounded-xl border-slate-200 focus:ring-blue-500"
+                className="pl-10 h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500"
                 value={certificate.issuedDate}
                 onChange={(e) => setCertificate({ ...certificate, issuedDate: e.target.value })}
               />
@@ -98,11 +98,11 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
           </div>
 
           <div className="space-y-2">
-            <Label className="text-sm font-bold text-slate-700 ml-1">Certificate Document</Label>
+            <Label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Certificate Document</Label>
             <div className="flex items-center gap-4">
-              <label className="flex-1 flex items-center justify-center gap-2 px-4 py-4 border-2 border-dashed border-slate-200 rounded-xl cursor-pointer hover:border-amber-500 hover:bg-amber-50 transition-all group">
+              <label className="flex-1 flex items-center justify-center gap-2 px-4 py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl cursor-pointer hover:border-amber-500 dark:hover:border-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/5 transition-all group">
                 {isUploading ? <Loader size="sm" /> : <Upload size={18} className="text-slate-400 group-hover:text-amber-600" />}
-                <span className="text-sm font-bold text-slate-500 group-hover:text-amber-700">
+                <span className="text-sm font-bold text-slate-500 dark:text-slate-400 group-hover:text-amber-700 dark:group-hover:text-amber-400">
                   {file ? file.name : 'Upload PDF or Image'}
                 </span>
                 <input
@@ -116,8 +116,8 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
           </div>
         </div>
 
-        <DialogFooter className="p-8 bg-slate-50 border-t border-slate-100 flex gap-3">
-          <Button variant="ghost" onClick={onClose} className="flex-1 rounded-xl h-12 font-bold text-slate-500 hover:bg-slate-200/50">
+        <DialogFooter className="p-8 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex gap-3">
+          <Button variant="ghost" onClick={onClose} className="flex-1 rounded-xl h-12 font-bold text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-700/50">
             Cancel
           </Button>
           <Button
