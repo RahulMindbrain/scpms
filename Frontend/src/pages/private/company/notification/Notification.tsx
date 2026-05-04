@@ -169,7 +169,7 @@ const CompanyNotificationPage = () => {
               </p>
             </div>
             
-            <div className="hidden lg:block">
+            {/* <div className="hidden lg:block">
               <div className="flex h-32 w-32 items-center justify-center rounded-[2.5rem] bg-white/10 backdrop-blur-2xl border border-white/20 shadow-2xl relative">
                 <Bell className={cn("h-14 w-14 text-white/50", unreadCount > 0 && "animate-[bell-swing_2s_infinite]")} />
                 {unreadCount > 0 && (
@@ -178,7 +178,7 @@ const CompanyNotificationPage = () => {
                   </div>
                 )}
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 

@@ -394,9 +394,7 @@ export default function AdminDashboard() {
                   Synchronized
                </div>
             </div>
-            <button className="p-3 rounded-2xl bg-white dark:bg-slate-900 border border-border shadow-sm hover:border-primary transition-all group">
-               <ChevronRight className="size-5 text-muted-foreground group-hover:text-primary transition-colors" />
-            </button>
+           
          </div>
       </PageHeader>
 
@@ -447,4 +445,4 @@ export default function AdminDashboard() {
       </div>
     </AdminPageLayout>
   )
-}
+}

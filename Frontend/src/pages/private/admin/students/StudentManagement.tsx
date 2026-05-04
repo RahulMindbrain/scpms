@@ -157,9 +157,7 @@ const StudentManagement: React.FC = () => {
         </div>
         <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
           <DialogTrigger asChild>
-            <Button className="h-10 shadow-lg shadow-primary/20 bg-primary hover:bg-primary/90 text-white font-bold">
-              Add Student
-            </Button>
+          
           </DialogTrigger>
           <DialogContent className="sm:max-w-[500px] rounded-3xl">
             <DialogHeader>

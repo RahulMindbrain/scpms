@@ -182,11 +182,11 @@ const CompanyInterviewManager: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-6">
-            <div className="glass-card p-5 rounded-3xl border-white/10 flex flex-col items-center justify-center min-w-[140px] backdrop-blur-xl bg-white/5">
+            {/* <div className="glass-card p-5 rounded-3xl border-white/10 flex flex-col items-center justify-center min-w-[140px] backdrop-blur-xl bg-white/5">
               <span className="text-[10px] font-black uppercase tracking-widest text-blue-200/60 mb-1">Status</span>
               <span className="text-2xl font-black text-white tracking-tighter">{stats.pending}</span>
               <span className="text-[9px] font-bold text-blue-200/80 mt-1 uppercase">Pending Review</span>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -580,4 +580,4 @@ const CompanyInterviewManager: React.FC = () => {
   );
 };
 
-export default CompanyInterviewManager;
+export default CompanyInterviewManager;

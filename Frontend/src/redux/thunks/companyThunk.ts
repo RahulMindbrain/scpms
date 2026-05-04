@@ -200,3 +200,14 @@ export const sendBulkMail = createAsyncThunk(
     }
   }
 );
+export const rejectCompanies = createAsyncThunk(
+  "company/rejectCompanies",
+  async (userIds: number[], { rejectWithValue }) => {
+    try {
+      await putAPI("/admin/reject-companies", { userIds }); // ✅ consistent with activate
+      return { success: true };
+    } catch (error: any) {
+      return rejectWithValue(error?.message || "Failed to reject companies");
+    }
+  }
+);
