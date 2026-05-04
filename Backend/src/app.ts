@@ -16,15 +16,16 @@ import Skillsroute from "./routes/skills.routes.js";
 import scheduleRoute from "./routes/schedule.routes.js";
 import { attachQueryLogger } from "./middlewares/queryLogger.js";
 import notificationRouter from "./routes/notification.routes.js";
+import saRouter from "./routes/superadmin.routes.js";
 
 const app = express();
 
 app.use(
   cors({
-   origin: [
-      "http://localhost:5173",                 
-      "https://7132f00b.scpms.pages.dev",      
-      "https://scpms.pages.dev",               
+    origin: [
+      "http://localhost:5173",
+      "https://7132f00b.scpms.pages.dev",
+      "https://scpms.pages.dev",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
@@ -57,6 +58,7 @@ app.use("/cloudinary", cloudinaryRoute);
 app.use("/skills", Skillsroute);
 app.use("/interview-schedule", scheduleRoute);
 app.use("/notification", notificationRouter);
+app.use("/superadmin", saRouter);
 
 app.use(attachQueryLogger);
 

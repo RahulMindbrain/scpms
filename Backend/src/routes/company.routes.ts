@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createCompanyController,
   getCompanyProfileController,
+  requestUniversityController,
   updateCompanyController,
 } from "../controllers/company.controller";
 import { authorizeRoles } from "../middlewares/verifyRole";
@@ -23,6 +24,7 @@ import {
   updateApplicationController,
 } from "../controllers/application.controller";
 import requireActiveUser from "../middlewares/requireActiveUser";
+import { getCompanyRequestsController } from "../controllers/companyuniversity.controller";
 
 const CompanyRoutes = Router();
 
@@ -52,29 +54,28 @@ CompanyRoutes.put(
 );
 
 CompanyRoutes.post(
+  "/request-university",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("COMPANY"),
+  requestUniversityController,
+);
+
+CompanyRoutes.get(
+  "/requests",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("COMPANY"),
+  getCompanyRequestsController,
+);
+
+CompanyRoutes.post(
   "/post-job",
   authenticateUser,
   requireActiveUser,
   authorizeRoles("COMPANY"),
   validate(createJobSchema),
   createJobController,
-);
-
-CompanyRoutes.put(
-  "/post-job/:id",
-  authenticateUser,
-  requireActiveUser,
-  authorizeRoles("COMPANY"),
-  validate(updateJobSchema),
-  updateJobController,
-);
-
-CompanyRoutes.delete(
-  "/post-job/:id",
-  authenticateUser,
-  requireActiveUser,
-  authorizeRoles("COMPANY"),
-  deleteJobController,
 );
 
 CompanyRoutes.get(

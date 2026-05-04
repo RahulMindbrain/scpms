@@ -16,6 +16,7 @@ enum Role {
   STUDENT
   COMPANY
   ADMIN
+  SUPER_ADMIN
 }
 
 enum CompanyApprovalStatus {
@@ -53,27 +54,22 @@ enum ScheduleMode {
 }
 
 enum NotificationType {
-  
   APPLICATION_SUBMITTED
   APPLICATION_SELECTED
   APPLICATION_REJECTED
   APPLICATION_WITHDRAWN
 
-  
   JOB_POSTED
   JOB_UPDATED
   JOB_ALERT
 
-  
   SCHEDULE_CREATED
   SCHEDULE_UPDATED
   SCHEDULE_APPROVED
 
-  
   OFFER_ACCEPTED
   OFFER_REJECTED
 
-  
   SYSTEM
 }
 
@@ -93,12 +89,13 @@ model User {
 
   otp            String?
   otpExpiry      DateTime?
-  otpAttempts    Int       @default(0) 
-  otpGenerations Int       @default(0) 
+  otpAttempts    Int       @default(0)
+  otpGenerations Int       @default(0)
 
-  tokens        Token[]
-  notifications Notification[]
-  sentMessages  ScheduleMessage[]
+  tokens            Token[]
+  notifications     Notification[]
+  sentMessages      ScheduleMessage[]
+
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -130,12 +127,15 @@ model Student {
 
   projects     Project[]
   applications Application[]
+  universityId Int
+  university   University    @relation(fields: [universityId], references: [id])
 
   createdAt DateTime @default(now())
 
   @@index([departmentId])
   @@index([passingYear])
   @@index([isPlaced])
+  @@index([universityId])
 }
 
 model Skill {
@@ -193,7 +193,7 @@ model Project {
 
   title       String
   description String?
-  techStack   String? 
+  techStack   String?
 
   githubUrl String?
   liveUrl   String?
@@ -213,8 +213,11 @@ model Company {
 
   jobs               Job[]
   interviewSchedules InterviewSchedule[]
+  universities       CompanyUniversity[]
 
   createdAt DateTime @default(now())
+
+  
 }
 
 model Admin {
@@ -222,8 +225,32 @@ model Admin {
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id])
 
-  approvedJobs Job[]               @relation("AdminApprovedJobs")
-  schedules    InterviewSchedule[]
+  approvedJobs      Job[]               @relation("AdminApprovedJobs")
+  schedules         InterviewSchedule[]
+  universityId      Int
+  university        University          @relation(fields: [universityId], references: [id])
+  approvedCompanies CompanyUniversity[] @relation("AdminApprovedCompanies")
+
+  @@index([universityId])
+}
+
+model University {
+  id      Int     @id @default(autoincrement())
+  name    String  @unique
+  code    String? @unique
+  city    String?
+  state   String?
+  country String?
+  status  Status  @default(INACTIVE)
+
+  students  Student[]
+  admins    Admin[]
+  companies CompanyUniversity[]
+  jobs      JobUniversity[]
+  schedules InterviewSchedule[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Department {
@@ -262,6 +289,7 @@ model Job {
   applications Application[]
 
   eligibleDepartments Department[]
+  universities        JobUniversity[]
 
   createdAt DateTime @default(now())
 
@@ -289,6 +317,45 @@ model Application {
 
   @@unique([studentId, jobId])
   @@index([studentId])
+  @@index([jobId])
+}
+
+model CompanyUniversity {
+  id Int @id @default(autoincrement())
+
+  companyId    Int
+  universityId Int
+
+  company    Company    @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  university University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  status CompanyApprovalStatus @default(PENDING)
+
+  createdAt       DateTime  @default(now())
+  approvedAt      DateTime?
+  rejectedAt      DateTime?
+  approvedBy      Int?
+  reason          String?
+  approvedByAdmin Admin?    @relation("AdminApprovedCompanies", fields: [approvedBy], references: [id], onDelete: SetNull)
+
+  @@unique([companyId, universityId])
+  @@index([companyId])
+  @@index([universityId])
+  @@index([status])
+  @@index([approvedBy])
+}
+
+model JobUniversity {
+  id Int @id @default(autoincrement())
+
+  jobId        Int
+  universityId Int
+
+  job        Job        @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  university University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  @@unique([jobId, universityId])
+  @@index([universityId])
   @@index([jobId])
 }
 
@@ -327,8 +394,10 @@ model InterviewSchedule {
   rejectedAt      DateTime?
   rejectionReason String?
 
-  createdBy Int
-  admin     Admin @relation(fields: [createdBy], references: [id])
+  createdBy    Int
+  admin        Admin       @relation(fields: [createdBy], references: [id])
+  universityId Int?
+  university   University? @relation(fields: [universityId], references: [id])
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -341,6 +410,7 @@ model InterviewSchedule {
   @@index([companyId])
   @@index([status])
   @@index([companyApprovalStatus])
+  @@index([universityId])
 }
 
 model ScheduleMessage {
@@ -369,9 +439,8 @@ model Notification {
   message String
 
   type NotificationType
-  read Boolean @default(false)
+  read Boolean          @default(false)
 
-  
   //entityId   Int?
   //entityType String?
 

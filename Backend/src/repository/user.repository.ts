@@ -9,6 +9,12 @@ export const createUser = async (data: {
   password: string;
   role: Role;
 }) => {
+  let status: Status = Status.INACTIVE;
+
+  if (data.role === Role.SUPER_ADMIN) {
+    status = Status.ACTIVE;
+  }
+
   return prisma.user.create({
     data: {
       firstname: data.firstname,
@@ -16,16 +22,7 @@ export const createUser = async (data: {
       email: data.email,
       password: data.password,
       role: data.role,
-
-      status: data.role === Role.ADMIN ? Status.ACTIVE : Status.INACTIVE,
-    },
-
-    select: {
-      id: true,
-      firstname: true,
-      email: true,
-      role: true,
-      status: true,
+      status,
     },
   });
 };

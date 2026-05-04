@@ -5,6 +5,11 @@ import {
   getCompanyProfileService,
   updateCompanyService,
 } from "../services/company.service";
+import {
+  getCompanyRequestsService,
+  requestUniversityService,
+} from "../services/company.university.service";
+import { getCompanyByUserId } from "../repository/company.repository";
 
 export const createCompanyController = async (req: Request, res: Response) => {
   try {
@@ -44,5 +49,56 @@ export const updateCompanyController = async (req: Request, res: Response) => {
     return sendSuccess(res, 200, "Company profile updated", updated);
   } catch (error: any) {
     return sendError(res, 400, error.message);
+  }
+};
+
+export const requestUniversitiesController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const user = res.locals.user;
+
+    if (!user || !user.id) {
+      return sendError(res, 403, "Unauthorized");
+    }
+
+    const company = await getCompanyByUserId(user.id);
+
+    if (!company) {
+      return sendError(res, 400, "Company profile not found");
+    }
+
+    const { universityIds } = req.body;
+
+    if (!Array.isArray(universityIds) || universityIds.length === 0) {
+      return sendError(res, 400, "universityIds must be non-empty array");
+    }
+
+    const data = await requestUniversityService(company.id, universityIds);
+
+    return sendSuccess(res, 201, "Requests sent", data);
+  } catch (error: any) {
+    return sendError(res, 500, error.message);
+  }
+};
+export const getCompanyRequestsController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const user = res.locals.user;
+
+    const company = await getCompanyByUserId(user.id);
+
+    if (!company) {
+      return sendError(res, 400, "Company profile not found");
+    }
+
+    const data = await getCompanyRequestsService(company.id);
+
+    return sendSuccess(res, 200, "Requests fetched", data);
+  } catch (error: any) {
+    return sendError(res, 500, error.message);
   }
 };

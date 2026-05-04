@@ -1,11 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { sendError, sendSuccess } from "../utils/response";
 import { JobStatus, Role } from "@prisma/client";
-import { createAdmin, getAdminCount } from "../repository/admin.repository";
 import {
   activateCompaniesService,
   activateUsersService,
-  createAdminService,
   getActiveStudentsService,
   getCompaniesService,
   getJobsByCompanyIdServices,
@@ -14,42 +12,59 @@ import {
   getInactiveStudentsService,
   getStudentsService,
   updateJobStatusByAdminService,
+  registerAdminService,
+  updateCompanyRequestsService,
+  getCompanyRequestsService,
 } from "../services/admin.service";
 import { notifyEligibleStudentsForJob } from "../services/notification.service";
 import { runInBackground } from "../utils/Background.task";
-import { send } from "node:process";
+import {
+  getUniversitiesByIds,
+  getUniversityByAdminId,
+} from "../repository/university.repository";
 
-export const createAdminController = async (req: Request, res: Response) => {
+export const registerAdminController = async (req: Request, res: Response) => {
   try {
-    const { firstname, lastname, email, password } = req.body;
+    const { firstname, lastname, email, password, university } = req.body;
 
-    if (!firstname || !lastname || !email || !password) {
-      return sendError(res, 400, "All fields are required");
+    if (!firstname || !email || !password) {
+      return sendError(res, 400, "Required fields missing");
     }
 
-    const admin = await createAdminService(
+    if (!university || !university.name) {
+      return sendError(res, 400, "University details are required");
+    }
+
+    const data = await registerAdminService({
       firstname,
       lastname,
       email,
       password,
-    );
+      university,
+    });
 
-    return sendSuccess(res, 201, "Admin created successfully", admin);
+    return sendSuccess(res, 201, "Admin registered successfully", data);
   } catch (error: any) {
-    console.error(error);
-
-    if (error.message === "Admin already exists") {
-      return sendError(res, 403, error.message);
+    if (error.message === "Email already exists") {
+      return sendError(res, 409, error.message);
     }
 
-    return sendError(res, 500, error.message || "Something went wrong");
+    return sendError(res, 500, error.message);
   }
 };
 
 export const getStudentsController = async (req: Request, res: Response) => {
   try {
-    const { page, limit, passingYear, year, minCgpa, maxCgpa, departmentId } =
-      req.query;
+    const {
+      page,
+      limit,
+      passingYear,
+      year,
+      minCgpa,
+      maxCgpa,
+      departmentId,
+      status,
+    } = req.query;
 
     const parseNumber = (value: any) => {
       if (value === undefined) return undefined;
@@ -365,6 +380,60 @@ export const getJobsByCompanyIdController = async (
   } catch (error: any) {
     console.log(error);
     return sendError(res, 500, "Failed");
+  }
+};
+
+export const getCompanyRequestsController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const user = res.locals.user;
+    const university = await getUniversityByAdminId(user.id);
+
+    const { status } = req.query;
+
+    if (!user) {
+      return sendError(res, 403, "Unauthorized admin");
+    }
+
+    if (!university) {
+      return sendError(res, 400, "university not found ");
+    }
+
+    const data = await getCompanyRequestsService(university?.id, status as any);
+
+    return sendSuccess(res, 200, "Requests fetched", data);
+  } catch (error: any) {
+    return sendError(res, 500, error.message);
+  }
+};
+
+export const updateCompanyRequestsController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const { ids, status } = req.body;
+    const user = res.locals.user;
+
+    if (!user || !user.id) {
+      return sendError(res, 403, "Unauthorized admin");
+    }
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return sendError(res, 400, "IDs must be a non-empty array");
+    }
+
+    if (!["APPROVED", "REJECTED"].includes(status)) {
+      return sendError(res, 400, "Invalid status");
+    }
+
+    const data = await updateCompanyRequestsService(ids, status, user.id);
+
+    return sendSuccess(res, 200, "Requests updated", data);
+  } catch (error: any) {
+    return sendError(res, 500, error.message);
   }
 };
 
