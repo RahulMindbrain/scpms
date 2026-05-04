@@ -83,55 +83,73 @@ const SignUp: React.FC = () => {
     setTimeout(() => setStep(2), 200);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    // Custom Validation
-    if (!form.fullName.trim()) return toast.error("Full name is required", { id: "register-toast" });
-    if (!form.email.trim()) return toast.error("Email address is required", { id: "register-toast" });
-    if (!form.password) return toast.error("Password is required", { id: "register-toast" });
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
 
-    const names = form.fullName.trim().split(/\s+/);
-    if (names.length < 2) {
-      toast.error("Please enter your full name (First and Last name)", { id: "register-toast" });
-      return;
-    }
+  if (!form.fullName.trim()) {
+    return toast.error("Full name is required", { id: "register-toast" });
+  }
 
-    if (form.password !== form.confirmPassword) {
-      toast.error("Passwords do not match", { id: "register-toast" });
-      return;
-    }
+  if (!form.email.trim()) {
+    return toast.error("Email address is required", { id: "register-toast" });
+  }
 
-    if (form.password.length < 6) {
-      toast.error("Password must be at least 6 characters long", { id: "register-toast" });
-      return;
-    }
+  if (!form.password) {
+    return toast.error("Password is required", { id: "register-toast" });
+  }
 
-    const firstname = names[0];
-    const lastname = names.slice(1).join(" ");
+  if (!passwordRegex.test(form.password)) {
+    return toast.error(
+      "Password must contain at least one uppercase and one lowercase letter",
+      { id: "register-toast" }
+    );
+  }
 
-    const payload = {
-      firstname,
-      lastname,
-      email: form.email.toLowerCase(),
-      password: form.password,
-      role: activeRole,
-    };
+  if (form.password !== form.confirmPassword) {
+    return toast.error("Passwords do not match", { id: "register-toast" });
+  }
 
-    setIsSubmitting(true);
-    try {
-      await dispatch(registerUser(payload)).unwrap();
-      toast.success("Registration successful! Please sign in to continue.", { id: "register-toast" });
-      setTimeout(() => {
-        navigate("/login");
-      }, 1500);
-    } catch (err: any) {
-      const message = typeof err === 'string' ? err : (err?.message || "Registration failed. Please try again.");
-      toast.error(message, { id: "register-toast" });
-    } finally {
-      setIsSubmitting(false);
-    }
+  if (form.password.length < 6) {
+    return toast.error("Password must be at least 6 characters long", { id: "register-toast" });
+  }
+
+  const names = form.fullName.trim().split(/\s+/);
+  if (names.length < 2) {
+    return toast.error("Please enter your full name (First and Last name)", { id: "register-toast" });
+  }
+
+  const firstname = names[0];
+  const lastname = names.slice(1).join(" ");
+
+  const payload = {
+    firstname,
+    lastname,
+    email: form.email.toLowerCase(),
+    password: form.password,
+    role: activeRole,
   };
+
+  setIsSubmitting(true);
+  try {
+    await dispatch(registerUser(payload)).unwrap();
+    toast.success("Registration successful! Please sign in to continue.", { id: "register-toast" });
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 1500);
+  } catch (err: any) {
+    const message =
+      typeof err === "string"
+        ? err
+        : err?.message || "Registration failed. Please try again.";
+
+    toast.error(message, { id: "register-toast" });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   const inputClasses = "w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all duration-200 outline-none text-slate-700 placeholder:text-slate-400";
 
