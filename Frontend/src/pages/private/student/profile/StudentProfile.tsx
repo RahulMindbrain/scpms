@@ -1,4 +1,4 @@
-import {
+﻿import {
   Mail, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
   Briefcase, FileText, Building2,
@@ -271,94 +271,82 @@ const StudentProfile = () => {
         animate="visible"
         className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8"
       >
-        {/* Hero Section */}
+     
+       {/* Hero Section */}
         <motion.div variants={itemVariants} className="relative group/hero">
           {/* Adaptive Banner */}
-          <div className="student-hero-banner group !p-0 !rounded-[2.5rem] h-56 md:h-72">
+          <div className="student-hero-banner group !p-0 !rounded-[2.5rem] h-64 md:h-80 overflow-hidden relative">
             <div className="student-hero-mesh">
               <div className="bubble-blue"></div>
               <div className="bubble-sky"></div>
             </div>
-            
             <div className="student-hero-texture"></div>
-            <div className="student-hero-overlay"></div>
-          </div>
-
-          {/* Profile Content Area */}
-          <div className="px-6 md:px-12 -mt-16 md:-mt-24 relative flex flex-col md:flex-row items-center md:items-end justify-between gap-6">
-            <div className="flex flex-col md:flex-row items-center md:items-end gap-6 md:gap-8 w-full md:w-auto">
-              {/* Streamlined Avatar */}
-              <div className="relative shrink-0">
-                <div className="relative p-1 bg-background rounded-full shadow-xl">
-                  <Avatar className="h-32 w-32 md:h-44 md:w-44 border-4 border-white dark:border-slate-800 rounded-full overflow-hidden transition-all duration-500">
-                    {profile.profileImage ? (
-                      <AvatarImage src={profile.profileImage} alt={profile.name} className="object-cover" />
-                    ) : (
-                      <AvatarFallback className="text-5xl font-bold bg-slate-100 dark:bg-slate-900 text-slate-900 dark:text-white">
-                        {profile.name.split(' ').map((n: string) => n[0]).join('')}
-                      </AvatarFallback>
-                    )}
-                  </Avatar>
-                </div>
-                {/* Compact Status Indicator */}
-                <div className="absolute bottom-3 right-3 h-5 w-5 rounded-full bg-emerald-500 border-4 border-white dark:border-slate-800 shadow-lg"></div>
-              </div>
-
-              {/* Name and Professional Details */}
-              <div className="text-center md:text-left pb-4 space-y-3 flex-1">
-                <div className="space-y-2">
-                  <div className="flex flex-col md:flex-row items-center gap-3">
-                    <h1 className="text-2xl md:text-4xl font-bold text-slate-900 dark:text-white tracking-tight drop-shadow-md">
-                      {profile.name}
-                    </h1>
-                    <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/20">
-                      <CheckCircle className="h-3 w-3" />
-                      Verified
-                    </div>
-                  </div>
-
-                  <div className="flex flex-wrap justify-center md:justify-start items-center gap-3">
-                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-bold text-xs md:text-sm shadow-sm transition-all hover:bg-slate-200 dark:hover:bg-white/20">
-                      <Building2 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
-                      {profile.stats?.department || 'Department Not Set'}
-                    </div>
-                    <div className="hidden md:block w-1.5 h-1.5 rounded-full bg-slate-300 dark:bg-white/40"></div>
-                    <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-white/10 text-slate-900 dark:text-white font-bold text-xs md:text-sm shadow-sm transition-all hover:bg-slate-200 dark:hover:bg-white/20">
-                      <GraduationCap className="h-4 w-4 text-purple-600 dark:text-purple-400" />
-                      Batch of {profile.stats?.passingYear || '20xx'}
-                    </div>
-                  </div>
+            
+            {/* New Integrated Profile Content (No standalone Avatar) */}
+            <div className="absolute inset-0 flex flex-col justify-end p-8 md:p-12 bg-gradient-to-t from-black/60 via-black/20 to-transparent">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                
+                {/* Initials Badge - Replaces the empty Avatar */}
+                <div className="h-24 w-24 md:h-32 md:w-32 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-2xl shrink-0 group-hover:scale-105 transition-transform duration-500">
+                  <span className="text-4xl md:text-5xl font-black text-white tracking-tighter">
+                    {profile.name.split(' ').map((n: string) => n[0]).join('')}
+                  </span>
                 </div>
 
-                {/* Theme-Aware Contact Row */}
-                <div className="flex flex-wrap justify-center md:justify-start items-center gap-3 pt-2">
-                  <div className="group flex items-center gap-3 bg-white dark:bg-slate-800 px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 shadow-lg shadow-slate-200/50 dark:shadow-none transition-all hover:translate-y-[-2px] cursor-pointer group/mail">
-                    <div className="p-1.5 rounded-lg bg-blue-500 text-white shadow-lg shadow-blue-500/20 group-hover/mail:scale-110 transition-transform">
-                      <Mail className="h-3.5 w-3.5" />
-                    </div>
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{profile.email}</span>
-                  </div>
-                  {profile.location && (
-                    <div className="group flex items-center gap-3 bg-white dark:bg-slate-800 px-4 py-2 rounded-xl border border-slate-200 dark:border-white/10 shadow-lg shadow-slate-200/50 dark:shadow-none transition-all hover:translate-y-[-2px] cursor-pointer group/loc">
-                      <div className="p-1.5 rounded-lg bg-rose-500 text-white shadow-lg shadow-rose-500/20 group-hover/loc:scale-110 transition-transform">
-                        <MapPin className="h-3.5 w-3.5" />
+                <div className="space-y-4 flex-1">
+                  <div className="space-y-2">
+                    <div className="flex flex-wrap items-center gap-3">
+                      <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-lg">
+                        {profile.name}
+                      </h1>
+                      <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/40">
+                        <CheckCircle className="h-3 w-3" />
+                        Verified Student
                       </div>
-                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200">{profile.location}</span>
                     </div>
-                  )}
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 text-white font-bold text-xs md:text-sm shadow-sm transition-all hover:bg-white/20">
+                        <Building2 className="h-4 w-4 text-blue-300" />
+                        {profile.stats?.department || 'Department Not Set'}
+                      </div>
+                      <div className="hidden md:block w-1.5 h-1.5 rounded-full bg-white/40"></div>
+                      <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 text-white font-bold text-xs md:text-sm shadow-sm transition-all hover:bg-white/20">
+                        <GraduationCap className="h-4 w-4 text-purple-300" />
+                        Batch of {profile.stats?.passingYear || '20xx'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div className="flex items-center gap-2.5 text-white/90">
+                      <div className="p-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/10">
+                        <Mail className="h-4 w-4" />
+                      </div>
+                      <span className="text-sm font-bold tracking-wide">{profile.email}</span>
+                    </div>
+                    {profile.location && (
+                      <div className="flex items-center gap-2.5 text-white/90">
+                        <div className="p-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/10">
+                          <MapPin className="h-4 w-4" />
+                        </div>
+                        <span className="text-sm font-bold tracking-wide">{profile.location}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Edit Button moved inside banner for better composition */}
+                <div className="pt-4 md:pt-0">
+                  <Button
+                    onClick={() => setShowProfileEditDialog(true)}
+                    className="bg-white text-slate-900 hover:bg-blue-50 rounded-2xl px-6 h-12 font-black shadow-xl transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center gap-3 text-sm"
+                  >
+                    <Edit3 className="h-4.5 w-4.5 text-blue-600" />
+                    Edit Profile
+                  </Button>
                 </div>
               </div>
-            </div>
-
-            {/* Streamlined Action Area */}
-            <div className="pb-4 shrink-0">
-              <Button
-                onClick={() => setShowProfileEditDialog(true)}
-                className="bg-white text-slate-900 hover:bg-slate-50 rounded-xl px-8 h-12 font-black shadow-2xl shadow-black/20 transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center gap-3 text-sm"
-              >
-                <Edit3 className="h-4.5 w-4.5 text-blue-600" />
-                Edit Profile
-              </Button>
             </div>
           </div>
         </motion.div>
