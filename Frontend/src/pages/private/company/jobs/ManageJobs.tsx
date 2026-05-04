@@ -118,9 +118,9 @@ const ManageJobs: React.FC = () => {
                 {jobs?.length || 0} Total Postings
               </span>
             </div>
-            <button className="p-3 bg-card border border-border rounded-2xl hover:bg-muted transition-colors shadow-sm">
+            {/* <button className="p-3 bg-card border border-border rounded-2xl hover:bg-muted transition-colors shadow-sm">
               <Filter size={18} className="text-muted-foreground" />
-            </button>
+            </button> */}
           </div>
         </div>
 
