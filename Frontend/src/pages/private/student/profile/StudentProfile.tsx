@@ -40,6 +40,7 @@ const StudentProfile = () => {
   const [showProfileEditDialog, setShowProfileEditDialog] = useState(false)
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewName, setPreviewName] = useState<string>('');
+  const [isPdfPreview, setIsPdfPreview] = useState(false);
 
   const [profile, setProfile] = useState<any>({
     name: user ? `${user.firstname} ${user.lastname}` : 'Student Name',
@@ -218,10 +219,29 @@ const StudentProfile = () => {
     }
   };
 
+  const normalizePreviewUrl = (url: string) => {
+    if (!url) return '';
+
+    // Prefer HTTPS to avoid mixed content in production.
+    const secureUrl = url.replace(/^http:\/\//i, 'https://');
+    const lower = secureUrl.toLowerCase();
+    const hasPdfExt = lower.endsWith('.pdf');
+    const cloudinaryImageUpload = /\/image\/upload\//i.test(secureUrl);
+    const cloudinaryRawUpload = /\/raw\/upload\//i.test(secureUrl);
+
+    if ((cloudinaryImageUpload || cloudinaryRawUpload) && !hasPdfExt && !lower.includes('/f_pdf/')) {
+      return `${secureUrl}.pdf`;
+    }
+
+    return secureUrl;
+  };
+
   const openFile = (url: string, name = '') => {
     if (!url) return;
+    const normalizedUrl = normalizePreviewUrl(url);
     setPreviewName(name);
-    setPreviewUrl(url);
+    setPreviewUrl(normalizedUrl);
+    setIsPdfPreview(normalizedUrl.toLowerCase().includes('.pdf') || normalizedUrl.toLowerCase().includes('/f_pdf/'));
   };
 
   const handleAddProject = (project: any) => {
@@ -815,7 +835,15 @@ const StudentProfile = () => {
         />
 
         {/* Document Preview Dialog */}
-        <Dialog open={!!previewUrl} onOpenChange={(open) => !open && setPreviewUrl(null)}>
+        <Dialog
+          open={!!previewUrl}
+          onOpenChange={(open) => {
+            if (!open) {
+              setPreviewUrl(null);
+              setIsPdfPreview(false);
+            }
+          }}
+        >
           <DialogContent className="max-w-5xl h-[90vh] p-0 overflow-hidden flex flex-col bg-white dark:bg-slate-950 border-none shadow-2xl rounded-3xl">
             <DialogHeader className="p-6 border-b dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 shrink-0">
               <div className="flex items-center justify-between">
@@ -831,7 +859,43 @@ const StudentProfile = () => {
               </div>
             </DialogHeader>
             <div className="flex-1 bg-slate-100 overflow-hidden relative">
-              <iframe src={`${previewUrl}#toolbar=0`} className="w-full h-full border-none" title="Document Preview" />
+              {isPdfPreview ? (
+                <object
+                  data={`${previewUrl}#toolbar=0&navpanes=0`}
+                  type="application/pdf"
+                  className="w-full h-full"
+                >
+                  <div className="h-full flex items-center justify-center p-8">
+                    <div className="max-w-lg text-center space-y-5">
+                      <img
+                        src={previewUrl!.replace('/upload/', '/upload/pg_1,f_jpg,w_1200/').replace(/\.pdf$/i, '.jpg')}
+                        alt="PDF preview"
+                        className="w-full max-h-[60vh] object-contain rounded-xl border border-slate-200 bg-white"
+                      />
+                      <p className="text-sm text-slate-600 dark:text-slate-300">
+                        PDF preview is blocked in this browser. Use open or download to view the document.
+                      </p>
+                      <div className="flex justify-center gap-3">
+                        <Button
+                          variant="outline"
+                          onClick={() => window.open(previewUrl!, '_blank')}
+                          className="rounded-xl"
+                        >
+                          Open PDF
+                        </Button>
+                        <Button
+                          onClick={() => window.open(previewUrl!.replace('/upload/', '/upload/fl_attachment/'), '_blank')}
+                          className="rounded-xl"
+                        >
+                          Download PDF
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </object>
+              ) : (
+                <iframe src={previewUrl!} className="w-full h-full border-none" title="Document Preview" />
+              )}
             </div>
           </DialogContent>
         </Dialog>
