@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 interface SuperAdminState {
   universities: any[];
   admins: any[];
-  professions: any[];
+
   loading: boolean;
   isSubmitting: boolean;
   error: string | null;
@@ -21,12 +21,7 @@ const initialState: SuperAdminState = {
     { id: 2, firstname: "Jane", lastname: "Smith", email: "jane@mit.edu", status: "ACTIVE", university: { name: "MIT" } },
     { id: 3, firstname: "Robert", lastname: "Brown", email: "robert@global.com", status: "INACTIVE", university: null },
   ],
-  professions: [
-    { id: 1, name: "Software Development", description: "Building applications and systems" },
-    { id: 2, name: "Data Science", description: "Analyzing data and building models" },
-    { id: 3, name: "Cybersecurity", description: "Protecting systems and networks" },
-    { id: 4, name: "Product Management", description: "Managing product lifecycle" },
-  ],
+
   loading: false,
   isSubmitting: false,
   error: null,
@@ -46,18 +41,7 @@ const superAdminSlice = createSlice({
     mockAddUniversity: (state, action) => {
       state.universities.push({ ...action.payload, id: Date.now() });
     },
-    mockAddProfession: (state, action) => {
-      state.professions.push({ ...action.payload, id: Date.now() });
-    },
-    mockUpdateProfession: (state, action) => {
-      const index = state.professions.findIndex(p => p.id === action.payload.id);
-      if (index !== -1) {
-        state.professions[index] = { ...state.professions[index], ...action.payload.data };
-      }
-    },
-    mockDeleteProfession: (state, action) => {
-      state.professions = state.professions.filter(p => p.id !== action.payload);
-    },
+
     mockUpdateAdminStatus: (state, action) => {
       const { ids, status } = action.payload;
       state.admins = state.admins.map(admin => 
@@ -71,9 +55,7 @@ export const {
   setLoading, 
   setSubmitting, 
   mockAddUniversity, 
-  mockAddProfession, 
-  mockUpdateProfession, 
-  mockDeleteProfession,
+
   mockUpdateAdminStatus
 } = superAdminSlice.actions;
 

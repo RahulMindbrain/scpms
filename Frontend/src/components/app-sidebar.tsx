@@ -85,7 +85,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       return {
         main: [
           { title: "Dashboard", url: "/superadmin/dashboard", icon: <LayoutDashboard /> },
-          { title: "Professions", url: "/superadmin/professions", icon: <Briefcase /> },
+
           { title: "Universities", url: "/superadmin/universities", icon: <Building2 /> },
           { title: "Admins", url: "/superadmin/admins", icon: <ShieldCheck /> },
         ],

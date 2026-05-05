@@ -12,6 +12,7 @@ import {
   Search,
   CheckCircle2,
   Calendar,
+  User,
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch } from '@/redux/store/store';
@@ -21,6 +22,8 @@ import {
   markAllNotificationsAsRead,
   markNotificationAsRead,
   deleteNotification,
+  fetchUpcomingEvents,
+  fetchUnreadCount,
 } from '@/redux/thunks/notificationThunks';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,7 +33,8 @@ import { cn } from '@/lib/utils';
 import { AdminPageLayout } from '@/components/layout/AdminPageLayout';
 import { PageHeader } from '@/components/PageHeader';
 
-
+import { SOCKET_EVENTS } from "@/socket/socket.events"
+import { socket } from '@/socket/socket.config';
 type NotificationFilter = 'all' | 'unread' | 'read';
 type NotificationItem = {
   id: number;
@@ -47,14 +51,52 @@ const AdminNotificationPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
 
+  const { user, userType } = useSelector(
+    (state: RootState) => state.auth
+  );
   const {
     items: notifications = [],
     loading = false,
   } = useSelector((state: RootState) => state.notification || {});
 
+
+useEffect(() => {
+  if (!socket || !user) return;
+
+  const handleConnect = () => {
+    socket.emit("join", {
+      userId: user.id,
+      role: user.role ?? userType,
+    });
+  };
+
+  if (socket.connected) {
+    handleConnect();
+  }
+
+  socket.on("connect", handleConnect);
+
+  return () => {
+    socket.off("connect", handleConnect);
+  };
+}, [user, userType]);
   useEffect(() => {
-    dispatch(fetchNotifications({ page: 1, limit: 50 }));
-  }, [dispatch]);
+    if (!socket) return;
+    const handleUpdate = () => {
+      dispatch(fetchUpcomingEvents());
+      dispatch(fetchUnreadCount());
+    };
+    socket.on(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED, handleUpdate);
+    socket.on(SOCKET_EVENTS.NEW_JOB, handleUpdate);
+    socket.on(SOCKET_EVENTS.SCHEDULE_APPROVED, handleUpdate);
+    socket.on(SOCKET_EVENTS.SCHEDULE_CREATED, handleUpdate);
+    return () => {
+      socket.off(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED, handleUpdate);
+      socket.off(SOCKET_EVENTS.NEW_JOB, handleUpdate);
+      socket.off(SOCKET_EVENTS.SCHEDULE_APPROVED, handleUpdate);
+      socket.off(SOCKET_EVENTS.SCHEDULE_CREATED, handleUpdate);
+    };
+  }, [dispatch, socket]);
 
   const handleMarkAllRead = async () => {
     try {

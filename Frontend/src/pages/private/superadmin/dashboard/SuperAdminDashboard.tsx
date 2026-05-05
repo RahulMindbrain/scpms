@@ -5,24 +5,24 @@ import { PageHeader } from "@/components/PageHeader";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "@/redux/store/store";
 import type { RootState } from "@/redux/reducers/rootReducer";
-import { fetchUniversities, fetchAdmins, fetchProfessions } from "@/redux/thunks/superAdminThunk";
+import { fetchUniversities, fetchAdmins } from "@/redux/thunks/superAdminThunk";
 
 const SuperAdminDashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
-  const { universities, admins, professions } = useSelector((state: RootState) => state.superAdmin);
+  const { universities, admins } = useSelector((state: RootState) => state.superAdmin);
 
   useEffect(() => {
     dispatch(fetchUniversities());
     dispatch(fetchAdmins());
-    dispatch(fetchProfessions());
+
   }, [dispatch]);
 
   const stats = [
     { label: "Total Universities", value: universities.length.toString(), icon: Building2, color: "text-blue-500", bg: "bg-blue-500/10" },
     { label: "Global Admins", value: admins.length.toString(), icon: ShieldCheck, color: "text-indigo-500", bg: "bg-indigo-500/10" },
     { label: "Total Students", value: "4,250", icon: Users, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-    { label: "Professions", value: professions.length.toString(), icon: Briefcase, color: "text-amber-500", bg: "bg-amber-500/10" },
+
   ];
 
   return (
