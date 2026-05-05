@@ -133,7 +133,7 @@ const PostJob: React.FC = () => {
       if (!formData.description) {
         errors.description = "Description is required";
       } else if (formData.description.length < 10) {
-        errors.description = "Description must be at least 10 characters";
+          errors.description = `Description must be at least 10 characters (currently ${formData.description.length}).`;
       }
     } else if (step === 3) {
       if (!formData.minCgpa) errors.minCgpa = "Minimum CGPA is required";
@@ -230,8 +230,8 @@ const PostJob: React.FC = () => {
           setCurrentStep(3);
         }
         
-        toast.error("Form Validation Failed", { 
-          description: "We found some issues in Step 0" + currentStep + ". Please review the red highlighted fields.",
+        toast.error("Form Validation Failed", {
+          description: `We found some issues in Step ${currentStep}. Please review the highlighted fields.`,
           icon: <AlertCircle className="text-destructive" size={20} />
         });
       } else {

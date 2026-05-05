@@ -71,6 +71,12 @@ const statusConfig: Record<string, DriveStatus> = {
   completed: { label: 'Closed', color: 'text-muted-foreground', bg: 'bg-muted/30 border-border', dot: 'bg-muted-foreground' },
 };
 
+const statColorStyles: Record<string, { container: string; icon: string }> = {
+  primary: { container: "bg-primary/10 border-primary/20", icon: "text-primary" },
+  emerald: { container: "bg-emerald-500/10 border-emerald-500/20", icon: "text-emerald-600" },
+  indigo: { container: "bg-indigo-500/10 border-indigo-500/20", icon: "text-indigo-600" },
+};
+
 const PlacementDriveManagement: React.FC = () => {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<any | null>(null);
@@ -233,8 +239,8 @@ const PlacementDriveManagement: React.FC = () => {
           { label: 'Scheduled Interviews', value: reduxJobs.filter((job: Job) => !!job.interviewScheduleId).length, icon: Calendar, color: 'indigo' }
         ].map((stat, i) => (
           <div key={i} className="saas-card flex items-center gap-5">
-            <div className={`size-12 rounded-2xl bg-${stat.color}-500/10 flex items-center justify-center border border-${stat.color}-500/20`}>
-              <stat.icon className={`size-6 text-${stat.color}-600`} />
+            <div className={`size-12 rounded-2xl flex items-center justify-center border ${statColorStyles[stat.color]?.container || statColorStyles.primary.container}`}>
+              <stat.icon className={`size-6 ${statColorStyles[stat.color]?.icon || statColorStyles.primary.icon}`} />
             </div>
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">{stat.label}</p>
@@ -327,7 +333,7 @@ const PlacementDriveManagement: React.FC = () => {
                                         <h3 className="text-lg font-bold text-foreground group-hover/job:text-primary transition-colors tracking-tight">
                                           {job.title}
                                         </h3>
-                                        <div className={cn("inline-flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm", config.bg, config.color)}>
+                                      <div className={cn("inline-flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm", config.bg, config.color)}>
                                           <div className={cn("size-1.5 rounded-full animate-pulse", config.dot)} />
                                           {config.label}
                                         </div>
@@ -445,14 +451,14 @@ const PlacementDriveManagement: React.FC = () => {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: 'Package', value: `${selectedJob.formattedSalary} LPA`, icon: IndianRupee, color: 'emerald' },
-                { label: 'Location', value: selectedJob.location || 'Remote', icon: MapPin, color: 'rose' },
-                { label: 'CGPA Limit', value: `${selectedJob.minCgpa ?? 'N/A'}`, icon: GraduationCap, color: 'indigo' },
-                { label: 'Backlogs', value: selectedJob.maxBacklogs ?? 'None', icon: Clock, color: 'amber' }
+                { label: 'Package', value: `${selectedJob.formattedSalary} LPA`, icon: IndianRupee, iconClass: 'text-emerald-500' },
+                { label: 'Location', value: selectedJob.location || 'Remote', icon: MapPin, iconClass: 'text-rose-500' },
+                { label: 'CGPA Limit', value: `${selectedJob.minCgpa ?? 'N/A'}`, icon: GraduationCap, iconClass: 'text-indigo-500' },
+                { label: 'Backlogs', value: selectedJob.maxBacklogs ?? 'None', icon: Clock, iconClass: 'text-amber-500' }
               ].map((item, idx) => (
                 <div key={idx} className="p-5 bg-muted/30 rounded-2xl border border-border group hover:border-primary/20 transition-all">
                   <div className="flex items-center gap-2 text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2">
-                    <item.icon className={`size-3.5 text-${item.color}-500`} /> {item.label}
+                    <item.icon className={`size-3.5 ${item.iconClass}`} /> {item.label}
                   </div>
                   <p className="text-lg font-black text-foreground">{item.value}</p>
                 </div>

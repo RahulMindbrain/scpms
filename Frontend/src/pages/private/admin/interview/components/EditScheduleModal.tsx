@@ -259,7 +259,7 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
                 type="datetime-local"
                 value={formData.startTime}
                 min={new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
-                className="bg-slate-50/50"
+                className="bg-background text-foreground scheme-light"
                 onChange={(e) => {
                   const newStart = e.target.value;
                   setFormData(prev => {
@@ -284,7 +284,7 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
                 type="datetime-local"
                 value={formData.endTime}
                 min={formData.startTime || new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16)}
-                className="bg-slate-50/50"
+                className="bg-background text-foreground scheme-light"
                 onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
               />
             </div>

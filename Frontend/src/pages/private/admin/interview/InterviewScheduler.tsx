@@ -4,7 +4,8 @@ import {
   MapPin, Briefcase, ChevronDown, ChevronUp, 
   Search, MessageSquare, Send, Trash2,
   Calendar,
-  Sparkles
+  Sparkles,
+  FileText
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -39,6 +40,8 @@ const InterviewSchedulerPage: React.FC = () => {
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
   const [mode, setMode] = useState<'create' | 'edit'>('edit');
   const [isMessagesOpen, setIsMessagesOpen] = useState(false);
+  const [isJobDetailsOpen, setIsJobDetailsOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<any | null>(null);
   const [messageText, setMessageText] = useState('');
   const [msgLoading, setMsgLoading] = useState<number | null>(null);
   const [sendingMsg, setSendingMsg] = useState(false);
@@ -128,6 +131,12 @@ const InterviewSchedulerPage: React.FC = () => {
     } finally {
       setSendingMsg(false);
     }
+  };
+
+  const handleOpenJobDetails = (e: React.MouseEvent, job: any) => {
+    e.stopPropagation();
+    setSelectedJob(job);
+    setIsJobDetailsOpen(true);
   };
 
   const filteredSchedules = Array.isArray(schedules)
@@ -318,10 +327,16 @@ const InterviewSchedulerPage: React.FC = () => {
                               </div>
                               <div className="pt-4 border-t border-border flex items-center justify-between">
                                 <Badge variant="secondary" className="bg-muted text-muted-foreground text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg border-none">{job.status}</Badge>
-                                <div className="text-[10px] font-black text-primary uppercase tracking-widest">View Specs</div>
+                                <button
+                                  type="button"
+                                  className="text-[10px] font-black text-primary uppercase tracking-widest hover:text-primary/80"
+                                  onClick={(e) => handleOpenJobDetails(e, job)}
+                                >
+                                  View Specs
+                                </button>
                               </div>
                             </div>
-                          )) || <div className="col-span-full py-12 text-muted-foreground font-bold text-center italic text-sm saas-card bg-muted/10 border-dashed">No openings linked to this schedule.</div>}
+                          )) || <div className="col-span-full py-12 text-muted-foreground font-bold text-center italic text-sm saas-card bg-muted/10 border-dashed">No openings linked to this schedule yet. Create or approve jobs first, then attach them while creating a schedule.</div>}
                         </div>
                       </div>
                     </motion.div>
@@ -356,6 +371,36 @@ const InterviewSchedulerPage: React.FC = () => {
         onOpenChange={setIsEditModalOpen}
         mode={mode}
       />
+
+      <Modal
+        isOpen={isJobDetailsOpen}
+        onClose={() => setIsJobDetailsOpen(false)}
+        title="Job Description"
+        subtitle={selectedJob?.title || "Selected role"}
+      >
+        {selectedJob && (
+          <div className="space-y-5 py-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="p-4 rounded-xl bg-muted/30 border border-border">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Location</p>
+                <p className="text-sm font-bold text-foreground">{selectedJob.location || "Remote"}</p>
+              </div>
+              <div className="p-4 rounded-xl bg-muted/30 border border-border">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Status</p>
+                <p className="text-sm font-bold text-foreground">{selectedJob.status || "N/A"}</p>
+              </div>
+            </div>
+            <div className="p-5 rounded-2xl bg-muted/20 border border-border">
+              <div className="flex items-center gap-2 mb-3 text-[10px] font-black text-foreground uppercase tracking-widest">
+                <FileText className="size-3.5 text-primary" /> Description
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">
+                {selectedJob.description || "No job description provided for this role."}
+              </p>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       <Modal
         isOpen={isMessagesOpen}
