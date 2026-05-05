@@ -15,6 +15,7 @@ import {
   PlusCircle,
   GraduationCap,
   Wrench,
+  ShieldCheck,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -78,6 +79,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           { title: "Shortlist", url: "/company/shortlist", icon: <ListChecks /> },
           { title: "Interview Rounds", url: "/company/interviews", icon: <Calendar /> },
           { title: "Notifications", url: "/company/notifications", icon: <Bell /> },
+        ],
+      }
+    } else if (role === "super_admin") {
+      return {
+        main: [
+          { title: "Dashboard", url: "/superadmin/dashboard", icon: <LayoutDashboard /> },
+          { title: "Professions", url: "/superadmin/professions", icon: <Briefcase /> },
+          { title: "Universities", url: "/superadmin/universities", icon: <Building2 /> },
+          { title: "Admins", url: "/superadmin/admins", icon: <ShieldCheck /> },
+        ],
+        secondary: [
+          { title: "Notifications", url: "/superadmin/notifications", icon: <Bell /> },
         ],
       }
     }

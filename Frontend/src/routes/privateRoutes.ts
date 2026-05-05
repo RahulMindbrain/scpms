@@ -22,6 +22,10 @@ import DocumentManagement from "@/pages/private/admin/documents/DocumentManageme
 import AdminJobManagement from "@/pages/private/admin/jobs/JobManagement";
 import DepartmentManagement from "@/pages/private/admin/department/DepartmentManagement";
 import SkillManagement from "@/pages/private/admin/skills/SkillManagement";
+import ProfessionManagement from "@/pages/private/superadmin/profession/ProfessionManagement";
+import SuperAdminDashboard from "@/pages/private/superadmin/dashboard/SuperAdminDashboard";
+import UniversityManagement from "@/pages/private/superadmin/university/UniversityManagement";
+import AdminManagement from "@/pages/private/superadmin/admins/AdminManagement";
 import CompanyDashboard from "@/pages/private/company/dashboard/Dashboard";
 import PostJob from "@/pages/private/company/jobs/PostJob";
 import ManageJobs from "@/pages/private/company/jobs/ManageJobs";
@@ -97,6 +101,22 @@ export const PrivateRoutes: RouteOptions<any>[] = [
     {
         path: "/admin/skills",
         component: SkillManagement,
+    },
+    {
+        path: "/superadmin/professions",
+        component: ProfessionManagement,
+    },
+    {
+        path: "/superadmin/dashboard",
+        component: SuperAdminDashboard,
+    },
+    {
+        path: "/superadmin/universities",
+        component: UniversityManagement,
+    },
+    {
+        path: "/superadmin/admins",
+        component: AdminManagement,
     },
 
 

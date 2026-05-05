@@ -6,7 +6,7 @@ interface PageHeaderProps {
   description?: string;
   badge?: string;
   icon?: LucideIcon;
-  variant?: "indigo" | "sky" | "emerald" | "amber" | "rose" | "cyan";
+  variant?: "indigo" | "sky" | "emerald" | "amber" | "rose" | "cyan" | "blue";
   children?: React.ReactNode;
 }
 
@@ -54,6 +54,12 @@ export function PageHeader({
       bubbleSecondary: "bg-sky-400",
       badgeIcon: "text-cyan-400",
       titleSpan: "text-cyan-600",
+    },
+    blue: {
+      bubblePrimary: "bg-blue-500",
+      bubbleSecondary: "bg-indigo-400",
+      badgeIcon: "text-blue-400",
+      titleSpan: "text-blue-600",
     },
   };
 
