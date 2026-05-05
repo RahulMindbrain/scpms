@@ -170,9 +170,7 @@ const CompanyManagement: React.FC = () => {
             className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
           />
         </div>
-        <Button onClick={() => setIsAddModalOpen(true)} className="h-10 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/20">
-          Onboard Partner
-        </Button>
+       
       </PageHeader>
 
       {/* Stats Grid */}
@@ -292,81 +290,7 @@ const CompanyManagement: React.FC = () => {
         </AnimatePresence>
       </div>
 
-      {/* Onboard Modal */}
-      <Modal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        title="Onboard Partner"
-        subtitle="Register a new corporate entity into the recruitment ecosystem"
-      >
-        <form onSubmit={handleAddSubmit} className="space-y-6 pt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="saas-label">Legal Name</label>
-              <div className="relative">
-                <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                <input
-                  value={newCompany.name}
-                  onChange={(e) => setNewCompany({ ...newCompany, name: e.target.value })}
-                  required
-                  className="w-full pl-11 pr-5 py-3 bg-muted/20 border border-border rounded-xl text-sm font-semibold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                  placeholder="Official entity name"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="saas-label">Sector</label>
-              <input
-                value={newCompany.sector}
-                onChange={(e) => setNewCompany({ ...newCompany, sector: e.target.value })}
-                className="w-full px-5 py-3 bg-muted/20 border border-border rounded-xl text-sm font-semibold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                placeholder="Technology, Finance, etc."
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <label className="saas-label">Base Location</label>
-              <div className="relative">
-                <Globe className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                <input
-                  value={newCompany.location}
-                  onChange={(e) => setNewCompany({ ...newCompany, location: e.target.value })}
-                  className="w-full pl-11 pr-5 py-3 bg-muted/20 border border-border rounded-xl text-sm font-semibold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                  placeholder="Headquarters base"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="saas-label">HR Email</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
-                <input
-                  value={newCompany.email}
-                  onChange={(e) => setNewCompany({ ...newCompany, email: e.target.value })}
-                  required
-                  type="email"
-                  className="w-full pl-11 pr-5 py-3 bg-muted/20 border border-border rounded-xl text-sm font-semibold focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-                  placeholder="hr@brand.com"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <label className="saas-label">Corporate Bio</label>
-            <textarea
-              value={newCompany.description}
-              onChange={(e) => setNewCompany({ ...newCompany, description: e.target.value })}
-              rows={3}
-              className="w-full px-5 py-3 bg-muted/20 border border-border rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all resize-none"
-              placeholder="Brief overview..."
-            />
-          </div>
-          <Button type="submit" className="w-full h-14 bg-primary text-white font-black uppercase tracking-widest text-xs rounded-xl shadow-xl shadow-primary/20">
-            Confirm Onboarding
-          </Button>
-        </form>
-      </Modal>
+ 
 
       {/* Jobs Modal */}
       <Modal
