@@ -60,7 +60,7 @@ export function PageHeader({
   const colors = variantMap[variant];
 
   return (
-    <section className="hero-banner relative overflow-hidden mb-8">
+    <section className="hero-banner relative overflow-visible mb-8" style={{ overflow: "visible" }}>
       <div className="hero-mesh">
         <div className={`absolute top-[-40%] left-[-20%] w-full h-full rounded-full blur-[150px] opacity-20 ${colors.bubblePrimary}`}></div>
         <div className={`absolute bottom-[-40%] right-[-20%] w-full h-full rounded-full blur-[150px] opacity-15 ${colors.bubbleSecondary}`}></div>

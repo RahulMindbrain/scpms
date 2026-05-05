@@ -137,10 +137,24 @@ const PostJob: React.FC = () => {
       }
     } else if (step === 3) {
       if (!formData.minCgpa) errors.minCgpa = "Minimum CGPA is required";
+      if (formData.minCgpa && Number(formData.minCgpa) < 0) {
+        errors.minCgpa = "Minimum CGPA cannot be negative";
+      } else if (formData.minCgpa && Number(formData.minCgpa) > 10) {
+        errors.minCgpa = "Minimum CGPA must be 10 or less";
+      }
       if (!formData.maxCgpa) {
         errors.maxCgpa = "Maximum CGPA is required";
+      } else if (Number(formData.maxCgpa) < 0) {
+        errors.maxCgpa = "Maximum CGPA cannot be negative";
       } else if (Number(formData.maxCgpa) > 10) {
         errors.maxCgpa = "Too big: expected number to be <=10";
+      }
+      if (
+        formData.minCgpa &&
+        formData.maxCgpa &&
+        Number(formData.minCgpa) > Number(formData.maxCgpa)
+      ) {
+        errors.maxCgpa = "Maximum CGPA must be greater than or equal to minimum CGPA";
       }
       if (selectedBranches.length === 0) errors.branches = "Select at least one branch";
     }
@@ -169,8 +183,8 @@ const PostJob: React.FC = () => {
         description: formData.description,
         salary: Number(formData.salary),
         location: formData.location,
-        minCgpa: Number(formData.minCgpa),
-        maxCgpa: Number(formData.maxCgpa),
+        minCgpa: Math.min(10, Math.max(0, Number(formData.minCgpa))),
+        maxCgpa: Math.min(10, Math.max(0, Number(formData.maxCgpa))),
         eligibleDepartmentIds: selectedBranches,
         skillIds: selectedSkills
       };
@@ -285,7 +299,7 @@ const PostJob: React.FC = () => {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 md:px-8 -mt-8 relative z-20">
+      <div className="max-w-4xl mx-auto px-4 md:px-8 mt-2 md:-mt-6 relative z-20">
         
         {/* Progress Stepper */}
         <div className="saas-card mb-8 p-4 flex items-center justify-between overflow-x-auto no-scrollbar gap-4">
@@ -416,6 +430,8 @@ const PostJob: React.FC = () => {
                     <input 
                       type="number" 
                       step="0.01" 
+                      min="0"
+                      max="10"
                       name="minCgpa" 
                       value={formData.minCgpa} 
                       onChange={handleInputChange}
@@ -433,6 +449,8 @@ const PostJob: React.FC = () => {
                     <input 
                       type="number" 
                       step="0.01" 
+                      min="0"
+                      max="10"
                       name="maxCgpa" 
                       value={formData.maxCgpa} 
                       onChange={handleInputChange}

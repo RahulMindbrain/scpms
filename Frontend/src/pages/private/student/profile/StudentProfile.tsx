@@ -107,11 +107,12 @@ const StudentProfile = () => {
       const yearInt = parseInt(updatedProfile.stats?.year);
       const passingYearInt = parseInt(updatedProfile.stats?.passingYear);
       const cgpaFloat = parseFloat(updatedProfile.stats?.cgpa);
+      const boundedCgpa = !isNaN(cgpaFloat) && cgpaFloat >= 0 && cgpaFloat <= 10 ? cgpaFloat : undefined;
 
       const commonPayload: any = {
         year: isNaN(yearInt) ? undefined : yearInt,
         passingYear: isNaN(passingYearInt) ? undefined : passingYearInt,
-        cgpa: (isNaN(cgpaFloat) || yearInt === 1) ? undefined : cgpaFloat,
+        cgpa: yearInt === 1 ? undefined : boundedCgpa,
         activeBacklogs: isNaN(parseInt(updatedProfile.stats?.activeBacklogs)) ? 0 : parseInt(updatedProfile.stats?.activeBacklogs),
         linkedinUrl: cleanUrl(updatedProfile.linkedinUrl),
         githubUrl: cleanUrl(updatedProfile.githubUrl),
@@ -378,7 +379,7 @@ const StudentProfile = () => {
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">CGPA Score</p>
-                  <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{profile.stats?.cgpa || '0.0'} <span className="text-sm font-normal text-slate-400">/ 10</span></h3>
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{Math.min(10, Math.max(0, parseFloat(profile.stats?.cgpa) || 0)).toFixed(2)} <span className="text-sm font-normal text-slate-400">/ 10</span></h3>
                 </div>
                 <div className="h-14 w-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
                   <Award className="h-7 w-7" />
@@ -462,7 +463,7 @@ const StudentProfile = () => {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     {[
                       { label: 'Department', value: profile.stats?.department || 'N/A', icon: Building2 },
-                      { label: 'CGPA', value: `${profile.stats?.cgpa || '0.0'} / 10`, icon: Award },
+                      { label: 'CGPA', value: `${Math.min(10, Math.max(0, parseFloat(profile.stats?.cgpa) || 0)).toFixed(2)} / 10`, icon: Award },
                       { label: 'Academic Year', value: profile.stats?.year ? `${profile.stats.year}${profile.stats.year === 1 ? 'st' : profile.stats.year === 2 ? 'nd' : profile.stats.year === 3 ? 'rd' : 'th'} Year` : 'N/A', icon: Layers },
                       { label: 'Passing Batch', value: profile.stats?.passingYear || 'N/A', icon: Rocket },
                     ].map((item, idx) => (

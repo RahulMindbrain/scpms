@@ -129,8 +129,16 @@ const AdminJobManagement: React.FC = () => {
   }, [jobs, searchTerm, sortBy, filterDepartment, filterLocation]);
 
   const locations = useMemo(() => {
-    const locs = new Set((Array.isArray(jobs) ? jobs : []).map(j => j.location).filter(Boolean));
-    return Array.from(locs);
+    const normalized = new Map<string, string>();
+    (Array.isArray(jobs) ? jobs : []).forEach((job) => {
+      const rawLocation = typeof job.location === 'string' ? job.location.trim() : '';
+      if (!rawLocation) return;
+      const key = rawLocation.toLowerCase();
+      if (!normalized.has(key)) {
+        normalized.set(key, rawLocation);
+      }
+    });
+    return Array.from(normalized.values()).sort((a, b) => a.localeCompare(b));
   }, [jobs]);
 
   const departments = useMemo(() => {
