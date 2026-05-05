@@ -1,5 +1,17 @@
 import { useEffect } from "react";
-import { LayoutDashboard, Users, Building2, Briefcase, ShieldCheck, Zap, ArrowUpRight } from "lucide-react";
+import { 
+  LayoutDashboard, 
+  Users, 
+  Building2, 
+  Briefcase, 
+  ShieldCheck, 
+  Zap, 
+  ArrowUpRight, 
+  CheckCircle2, 
+  Circle, 
+  ArrowRight,
+  Clock
+} from "lucide-react";
 import { AdminPageLayout } from "@/components/layout/AdminPageLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,22 +19,128 @@ import type { AppDispatch } from "@/redux/store/store";
 import type { RootState } from "@/redux/reducers/rootReducer";
 import { fetchUniversities, fetchAdmins } from "@/redux/thunks/superAdminThunk";
 
+const OnboardingFlow = ({ admins, universities, companies }: any) => {
+  const steps = [
+    { 
+      id: "superadmin", 
+      title: "Account Activation", 
+      desc: "Super Admin verification", 
+      icon: ShieldCheck,
+      count: admins.filter((a: any) => a.onboardingStep === 'ACTIVATE_ACCOUNT').length,
+      status: admins.some((a: any) => a.onboardingStep === 'ACTIVATE_ACCOUNT') ? 'attention' : 'completed'
+    },
+    { 
+      id: "university", 
+      title: "Univ. Acceptance", 
+      desc: "Handle node requests", 
+      icon: Building2,
+      count: admins.filter((a: any) => a.onboardingStep === 'UNIVERSITY_ACCEPTANCE').length,
+      status: admins.some((a: any) => a.onboardingStep === 'UNIVERSITY_ACCEPTANCE') ? 'attention' : 'pending'
+    },
+    { 
+      id: "profile", 
+      title: "Profile Genesis", 
+      desc: "Institutional setup", 
+      icon: Users,
+      count: admins.filter((a: any) => a.onboardingStep === 'CREATE_PROFILE').length,
+      status: admins.some((a: any) => a.onboardingStep === 'CREATE_PROFILE') ? 'attention' : 'pending'
+    },
+    { 
+      id: "company", 
+      title: "Company Active", 
+      desc: "Final authorization", 
+      icon: Briefcase,
+      count: companies.filter((c: any) => c.activationStep === 'PENDING_COMPANY_APPROVAL').length,
+      status: companies.some((c: any) => c.activationStep === 'PENDING_COMPANY_APPROVAL') ? 'attention' : 'pending'
+    }
+  ];
+
+  return (
+    <div className="saas-card">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h3 className="text-xl font-black text-foreground tracking-tight">Onboarding Pipeline</h3>
+          <p className="text-xs font-medium text-muted-foreground mt-0.5">Real-time status of entities moving through the system</p>
+        </div>
+        <div className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black text-indigo-600 uppercase tracking-widest">
+          Active Flow
+        </div>
+      </div>
+
+      <div className="relative">
+        {/* Connection Line */}
+        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-muted -translate-y-1/2 hidden lg:block" />
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+          {steps.map((step, idx) => (
+            <div key={step.id} className="relative group">
+              <div className={`p-6 rounded-3xl border transition-all duration-300 ${
+                step.status === 'attention' 
+                  ? 'bg-indigo-500/5 border-indigo-500/20 shadow-lg shadow-indigo-500/5' 
+                  : step.status === 'completed'
+                  ? 'bg-emerald-500/5 border-emerald-500/20'
+                  : 'bg-card border-border/50'
+              }`}>
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`size-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${
+                    step.status === 'attention' 
+                      ? 'bg-indigo-500 text-white' 
+                      : step.status === 'completed'
+                      ? 'bg-emerald-500 text-white'
+                      : 'bg-muted text-muted-foreground'
+                  }`}>
+                    <step.icon className="size-6" />
+                  </div>
+                  {step.count > 0 && (
+                    <span className="flex size-6 items-center justify-center rounded-full bg-rose-500 text-[10px] font-black text-white animate-bounce">
+                      {step.count}
+                    </span>
+                  )}
+                </div>
+                
+                <h4 className="text-sm font-black text-foreground mb-1 flex items-center gap-2">
+                  {step.title}
+                  {step.status === 'completed' && <CheckCircle2 className="size-3 text-emerald-500" />}
+                </h4>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{step.desc}</p>
+                
+                {step.status === 'attention' && (
+                  <div className="mt-4 flex items-center gap-1.5 text-[9px] font-black text-indigo-600 uppercase tracking-widest bg-indigo-500/10 w-fit px-2 py-0.5 rounded-md">
+                    <Clock className="size-3" /> Action Required
+                  </div>
+                )}
+              </div>
+              
+              {idx < steps.length - 1 && (
+                <div className="absolute top-1/2 -right-4 -translate-y-1/2 z-20 hidden lg:flex">
+                  <div className="size-8 rounded-full bg-card border border-border/50 flex items-center justify-center text-muted-foreground shadow-sm">
+                    <ArrowRight className="size-4" />
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const SuperAdminDashboard = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { user } = useSelector((state: RootState) => state.auth);
-  const { universities, admins } = useSelector((state: RootState) => state.superAdmin);
+  const { universities, admins, companies } = useSelector((state: RootState) => state.superAdmin);
 
   useEffect(() => {
     dispatch(fetchUniversities());
     dispatch(fetchAdmins());
-
   }, [dispatch]);
 
   const stats = [
     { label: "Total Universities", value: universities.length.toString(), icon: Building2, color: "text-blue-500", bg: "bg-blue-500/10" },
     { label: "Global Admins", value: admins.length.toString(), icon: ShieldCheck, color: "text-indigo-500", bg: "bg-indigo-500/10" },
+    { label: "Partner Companies", value: companies?.length.toString() || "0", icon: Briefcase, color: "text-amber-500", bg: "bg-amber-500/10" },
     { label: "Total Students", value: "4,250", icon: Users, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-
   ];
 
   return (
@@ -65,6 +183,9 @@ const SuperAdminDashboard = () => {
             </div>
           ))}
         </div>
+
+        {/* Onboarding Flow Visualization */}
+        <OnboardingFlow admins={admins} universities={universities} companies={companies} />
 
         {/* Quick Actions & System Health */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -119,7 +240,7 @@ const SuperAdminDashboard = () => {
                       <div className="flex items-center gap-3">
                          <div className="size-8 rounded-xl bg-indigo-500 flex items-center justify-center">
                             <ShieldCheck className="size-4" />
-                         </div>
+                          </div>
                          <span className="text-sm font-bold">Update Security Policy</span>
                       </div>
                       <ArrowUpRight className="size-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -128,7 +249,7 @@ const SuperAdminDashboard = () => {
                       <div className="flex items-center gap-3">
                          <div className="size-8 rounded-xl bg-emerald-500 flex items-center justify-center">
                             <Building2 className="size-4" />
-                         </div>
+                          </div>
                          <span className="text-sm font-bold">Onboard University</span>
                       </div>
                       <ArrowUpRight className="size-4 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -137,7 +258,7 @@ const SuperAdminDashboard = () => {
                       <div className="flex items-center gap-3">
                          <div className="size-8 rounded-xl bg-amber-500 flex items-center justify-center">
                             <Zap className="size-4" />
-                         </div>
+                          </div>
                          <span className="text-sm font-bold">System Maintenance</span>
                       </div>
                       <ArrowUpRight className="size-4 opacity-0 group-hover:opacity-100 transition-opacity" />

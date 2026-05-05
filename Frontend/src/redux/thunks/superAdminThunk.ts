@@ -55,3 +55,14 @@ export const updateAdminStatus = createAsyncThunk(
     return { ids, status };
   }
 );
+
+export const updateCompanyStatus = createAsyncThunk(
+  "superAdmin/updateCompanyStatus",
+  async ({ ids, status }: { ids: number[], status: boolean }, { dispatch }) => {
+    dispatch(setSubmitting(true));
+    await delay(800);
+    dispatch(mockUpdateCompanyStatus({ ids, status }));
+    dispatch(setSubmitting(false));
+    return { ids, status };
+  }
+);

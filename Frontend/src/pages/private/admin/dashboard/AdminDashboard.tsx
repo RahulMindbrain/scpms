@@ -327,6 +327,55 @@ const QuickActions = () => {
   )
 }
 
+const OnboardingOverlay = ({ step, user }: { step: string; user: any }) => {
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-background/80 backdrop-blur-xl">
+      <div className="max-w-md w-full saas-card border-indigo-500/30 shadow-2xl shadow-indigo-500/10 text-center space-y-8 p-10">
+        <div className="mx-auto size-20 rounded-3xl bg-indigo-600 flex items-center justify-center shadow-xl shadow-indigo-500/20">
+           {step === 'ACTIVATE_ACCOUNT' ? <ShieldCheck className="size-10 text-white" /> : 
+            step === 'UNIVERSITY_ACCEPTANCE' ? <Building2 className="size-10 text-white" /> : 
+            <UserPlus className="size-10 text-white" />}
+        </div>
+        
+        <div>
+          <h2 className="text-2xl font-black text-foreground tracking-tight mb-2">
+            {step === 'ACTIVATE_ACCOUNT' ? "Verification Pending" : 
+             step === 'UNIVERSITY_ACCEPTANCE' ? "University Acceptance" : 
+             "Profile Genesis"}
+          </h2>
+          <p className="text-sm font-medium text-muted-foreground">
+            {step === 'ACTIVATE_ACCOUNT' ? `Welcome ${user?.firstname}. Your account is currently awaiting Super Admin activation. Access will be granted shortly.` : 
+             step === 'UNIVERSITY_ACCEPTANCE' ? "Your account is active. Please send a request to join your university node to begin operations." : 
+             "Final step: Complete your institutional profile to finalize the onboarding process."}
+          </p>
+        </div>
+
+        <div className="space-y-4">
+           {step === 'UNIVERSITY_ACCEPTANCE' && (
+             <Button className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black shadow-lg shadow-indigo-500/20">
+               Request Acceptance
+             </Button>
+           )}
+           {step === 'CREATE_PROFILE' && (
+             <Button className="w-full h-12 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black shadow-lg shadow-indigo-500/20">
+               Initialize Profile
+             </Button>
+           )}
+           <Button variant="ghost" className="w-full text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+             Contact Support
+           </Button>
+        </div>
+        
+        <div className="pt-4 flex items-center justify-center gap-4">
+           <div className={`h-1.5 w-12 rounded-full ${step === 'ACTIVATE_ACCOUNT' ? 'bg-indigo-600 animate-pulse' : 'bg-emerald-500'}`} />
+           <div className={`h-1.5 w-12 rounded-full ${step === 'UNIVERSITY_ACCEPTANCE' ? 'bg-indigo-600 animate-pulse' : step === 'CREATE_PROFILE' || step === 'COMPLETED' ? 'bg-emerald-500' : 'bg-muted'}`} />
+           <div className={`h-1.5 w-12 rounded-full ${step === 'CREATE_PROFILE' ? 'bg-indigo-600 animate-pulse' : step === 'COMPLETED' ? 'bg-emerald-500' : 'bg-muted'}`} />
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function AdminDashboard() {
   const dispatch = useDispatch<AppDispatch>()
   const { data: dashboardData, loading: dashLoading, error } = useSelector((state: RootState) => state.dashboard)
@@ -339,6 +388,10 @@ export default function AdminDashboard() {
     dispatch(fetchSchedules(undefined))
     dispatch(fetchNotifications({ page: 1, limit: 10 }))
   }, [dispatch])
+
+  // Onboarding Logic
+  const onboardingStep = (user as any)?.onboardingStep || 'COMPLETED';
+  const showOnboarding = onboardingStep !== 'COMPLETED';
 
   if ((dashLoading || schedLoading || notifLoading) && !dashboardData) {
     return <Loader text="Synchronizing tactical data..." />
@@ -379,6 +432,8 @@ export default function AdminDashboard() {
 
   return (
     <AdminPageLayout>
+      {showOnboarding && <OnboardingOverlay step={onboardingStep} user={user} />}
+      
       <PageHeader
         title={`Command Center, ${user?.firstname || "Admin"}`}
         description="Unified interface for campus-wide placement operations and analytical intelligence."
