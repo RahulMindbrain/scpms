@@ -2,7 +2,6 @@ import { Router } from "express";
 import {
   createCompanyController,
   getCompanyProfileController,
-  requestUniversityController,
   updateCompanyController,
 } from "../controllers/company.controller";
 import { authorizeRoles } from "../middlewares/verifyRole";
@@ -24,7 +23,10 @@ import {
   updateApplicationController,
 } from "../controllers/application.controller";
 import requireActiveUser from "../middlewares/requireActiveUser";
-import { getCompanyRequestsController } from "../controllers/companyuniversity.controller";
+import {
+  getCompanyRequestsController,
+  requestUniversityController,
+} from "../controllers/companyuniversity.controller";
 
 const CompanyRoutes = Router();
 
@@ -34,7 +36,6 @@ CompanyRoutes.post(
   authorizeRoles("COMPANY"),
   validate(createCompanySchema),
   createCompanyController,
-  createCompanyController
 );
 
 CompanyRoutes.get(
