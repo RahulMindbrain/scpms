@@ -1,9 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { 
   Edit3, 
-  Trash2, 
   Search, 
-  Filter, 
   Plus, 
   Briefcase, 
   MapPin, 
@@ -13,7 +11,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useDispatch, useSelector } from 'react-redux';
-import { deleteCompanyJob, fetchCompanyJobs } from '@/redux/thunks/companyThunk';
+import { fetchCompanyJobs } from '@/redux/thunks/companyThunk';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import type { AppDispatch } from '@/redux/store/store';
 import {
@@ -27,7 +25,7 @@ import {
 } from "@/components/ui/pagination";
 import { Link } from 'react-router-dom';
 import Loader from '@/components/Loader';
-import { toast } from 'sonner';
+
 
 
 const ManageJobs: React.FC = () => {
@@ -119,9 +117,6 @@ const ManageJobs: React.FC = () => {
                 {jobs?.length || 0} Total Postings
               </span>
             </div>
-            {/* <button className="p-3 bg-card border border-border rounded-2xl hover:bg-muted transition-colors shadow-sm">
-              <Filter size={18} className="text-muted-foreground" />
-            </button> */}
           </div>
         </div>
 
@@ -220,26 +215,7 @@ const ManageJobs: React.FC = () => {
                           >
                             <Edit3 size={14} /> Modify
                           </Link>
-                          <button 
-                            className="p-2.5 text-muted-foreground hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all" 
-                            title="Delete Drive"
-                            onClick={async () => {
-                              const toastId = toast.loading("Deleting drive...");
-                              try {
-                                await dispatch(deleteCompanyJob(job.id)).unwrap();
-                                toast.success("Drive deleted successfully", { id: toastId });
-                                if (filteredJobs.length === 1 && page > 1) {
-                                  setPage((prev) => Math.max(prev - 1, 1));
-                                } else {
-                                  dispatch(fetchCompanyJobs({ page }));
-                                }
-                              } catch (error: any) {
-                                toast.error(error || "Failed to delete drive", { id: toastId });
-                              }
-                            }}
-                          >
-                            <Trash2 size={18} />
-                          </button>
+                      
 
                         </div>
                       </td>
