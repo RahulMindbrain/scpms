@@ -163,6 +163,7 @@ CREATE TABLE "Job" (
     "location" TEXT NOT NULL,
     "companyId" INTEGER NOT NULL,
     "interviewScheduleId" INTEGER,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Job_pkey" PRIMARY KEY ("id")
@@ -207,6 +208,8 @@ CREATE TABLE "JobUniversity" (
     "status" "JobStatus" NOT NULL DEFAULT 'PENDING',
     "approvedAt" TIMESTAMP(3),
     "rejectedAt" TIMESTAMP(3),
+    "rejectionReason" TEXT,
+    "rejectionCount" INTEGER NOT NULL DEFAULT 0,
     "salary" DOUBLE PRECISION NOT NULL,
     "description" TEXT,
     "minCgpa" DOUBLE PRECISION,

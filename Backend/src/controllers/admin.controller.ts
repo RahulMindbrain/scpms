@@ -113,7 +113,7 @@ export const getStudentsController = async (req: Request, res: Response) => {
 
 export const getCompaniesController = async (req: Request, res: Response) => {
   try {
-    const { page, limit, status } = req.query;
+    const { page, limit } = req.query;
 
     const parseNumber = (value: any) => {
       if (value === undefined) return undefined;
@@ -121,21 +121,12 @@ export const getCompaniesController = async (req: Request, res: Response) => {
       return Number.isFinite(num) ? num : undefined;
     };
 
-    const parseStatus = (value: unknown): "ACTIVE" | "INACTIVE" | undefined => {
-      if (value === "ACTIVE" || value === "INACTIVE") {
-        return value;
-      }
-      return undefined;
-    };
-
     const parsedPage = parseNumber(page);
     const parsedLimit = parseNumber(limit);
-    const parsedStatus = parseStatus(status);
 
     const params = {
       ...(parsedPage !== undefined && { page: parsedPage }),
       ...(parsedLimit !== undefined && { limit: parsedLimit }),
-      ...(parsedStatus !== undefined && { status: parsedStatus }),
     };
 
     const result = await getCompaniesService(params);

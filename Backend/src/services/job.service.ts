@@ -80,19 +80,9 @@ export const getJobsService = async (params: {
   });
 };
 
-export const updateJobService = async (id: number, data: any, userId: number) => {
+export const updateJobService = async (id: number, data: any) => {
   if (!id || isNaN(id)) {
     throw new Error("Invalid job id");
-  }
-
-  const job = await getJobById(id);
-  if (!job) {
-    throw new Error("Job not found");
-  }
-
-  const company = await getCompanyByUserId(userId);
-  if (!company || job.companyId !== company.id) {
-    throw new Error("Unauthorized to update this job");
   }
 
   const { eligibleDepartmentIds, skillIds, ...jobData } = data;

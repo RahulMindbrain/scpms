@@ -49,7 +49,6 @@ export const attachJobsToSchedule = async (
 };
 
 export const detachJobsFromSchedule = async (jobIds: number[]) => {
-
   return prisma.job.updateMany({
     where: {
       id: { in: jobIds },

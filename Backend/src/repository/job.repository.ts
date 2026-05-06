@@ -32,66 +32,6 @@ export const createJob = async (data: any) => {
   });
 };
 
-export const getJobs = async (params: {
-  page: number;
-  limit: number;
-  status?: JobStatus;
-  companyId?: number;
-}) => {
-  const { page, limit, status, companyId } = params;
-  const skip = (page - 1) * limit;
-
-  const where = {
-    ...(status && { status }),
-    ...(companyId && { companyId }),
-  };
-
-  const [data, total] = await Promise.all([
-    prisma.job.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy: { createdAt: "desc" },
-      include: {
-        company: true,
-        eligibleDepartments: true,
-        skills: true,
-      },
-
-    }),
-    prisma.job.count({ where }),
-  ]);
-
-  return {
-    data,
-    meta: {
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    },
-  };
-};
-export const getJobById = async (id: number) => {
-  return prisma.job.findUnique({
-    where: { id },
-    include: {
-      company: {
-        select: {
-          userId: true,
-          name: true,
-        },
-      },
-    },
-  });
-};
-
-export const getCompanyByUserId = async (userId: number) => {
-  return prisma.company.findUnique({
-    where: { userId },
-  });
-};
-
 export const updateJob = async (id: number, data: any) => {
   const {
     eligibleDepartmentIds,

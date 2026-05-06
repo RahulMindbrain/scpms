@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   createCompanyController,
   getCompanyProfileController,
+  requestUniversityController,
   updateCompanyController,
 } from "../controllers/company.controller";
 import { authorizeRoles } from "../middlewares/verifyRole";
@@ -13,20 +14,15 @@ import {
 import authenticateUser from "../middlewares/authenticateUser";
 import {
   createJobController,
-  deleteJobController,
   getJobsController,
   updateJobController,
 } from "../controllers/job.controller";
-import { createJobSchema, updateJobSchema } from "../validators/job.validator";
+import { createJobSchema } from "../validators/job.validator";
 import {
   getApplicationsController,
   updateApplicationController,
 } from "../controllers/application.controller";
 import requireActiveUser from "../middlewares/requireActiveUser";
-import {
-  getCompanyRequestsController,
-  requestUniversityController,
-} from "../controllers/companyuniversity.controller";
 import {
   getCompanyRequestsController,
   reapplyUniversityController,
@@ -88,7 +84,6 @@ CompanyRoutes.put(
   authenticateUser,
   requireActiveUser,
   authorizeRoles("COMPANY"),
-  validate(updateCompanySchema),
   updateJobController,
 );
 
