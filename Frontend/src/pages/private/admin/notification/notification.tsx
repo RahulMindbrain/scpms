@@ -29,6 +29,8 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { AdminPageLayout } from '@/components/layout/AdminPageLayout';
 import { PageHeader } from '@/components/PageHeader';
+import { useSocket } from '@/socket/SocketProvider';
+import { SOCKET_EVENTS } from '@/socket/socket.events';
 
 
 type NotificationFilter = 'all' | 'unread' | 'read';
@@ -52,9 +54,44 @@ const AdminNotificationPage = () => {
     loading = false,
   } = useSelector((state: RootState) => state.notification || {});
 
+  const { user } = useSelector((state: RootState) => state.auth);
+  const { socket } = useSocket();
+
   useEffect(() => {
     dispatch(fetchNotifications({ page: 1, limit: 50 }));
   }, [dispatch]);
+
+  useEffect(() => {
+    if (!socket || !user) return;
+    const handleConnect = () => {
+      socket.emit("join", { userId: user.id, role: user.role });
+    };
+    if (socket.connected) handleConnect();
+    socket.on("connect", handleConnect);
+    return () => { socket.off("connect", handleConnect); };
+  }, [socket, user]);
+
+  useEffect(() => {
+    if (!socket) return;
+    const handleUpdate = () => {
+      dispatch(fetchNotifications({ page: 1, limit: 50 }));
+    };
+    socket.on(SOCKET_EVENTS.NEW_APPLICATION, handleUpdate);
+    socket.on(SOCKET_EVENTS.NEW_USER_REGISTERED, handleUpdate);
+    socket.on(SOCKET_EVENTS.OFFER_ACCEPTED, handleUpdate);
+    socket.on(SOCKET_EVENTS.SCHEDULE_CREATED, handleUpdate);
+    socket.on(SOCKET_EVENTS.SCHEDULE_APPROVED, handleUpdate);
+    socket.on(SOCKET_EVENTS.SYSTEM_ALERT, handleUpdate);
+    
+    return () => {
+      socket.off(SOCKET_EVENTS.NEW_APPLICATION, handleUpdate);
+      socket.off(SOCKET_EVENTS.NEW_USER_REGISTERED, handleUpdate);
+      socket.off(SOCKET_EVENTS.OFFER_ACCEPTED, handleUpdate);
+      socket.off(SOCKET_EVENTS.SCHEDULE_CREATED, handleUpdate);
+      socket.off(SOCKET_EVENTS.SCHEDULE_APPROVED, handleUpdate);
+      socket.off(SOCKET_EVENTS.SYSTEM_ALERT, handleUpdate);
+    };
+  }, [dispatch, socket]);
 
   const handleMarkAllRead = async () => {
     try {

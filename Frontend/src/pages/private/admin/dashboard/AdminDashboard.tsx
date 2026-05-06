@@ -6,6 +6,8 @@ import { SectionCards } from "@/components/section-cards"
 import { fetchDashboardStats } from "@/redux/thunks/dashboardThunk"
 import { fetchSchedules } from "@/redux/thunks/interviewThunk"
 import type { RootState, AppDispatch } from "@/redux/store/store"
+import { useSocket } from "@/socket/SocketProvider"
+import { SOCKET_EVENTS } from "@/socket/socket.events"
 
 import { 
   LayoutDashboard, 
@@ -34,6 +36,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { cn } from "@/lib/utils"
 
 const NextInterviewCountdown = ({ schedules }: { schedules: any[] }) => {
   const [timeLeft, setTimeLeft] = useState<{ d: number; h: number; m: number; s: number } | null>(null);
@@ -207,7 +210,7 @@ const DeptStatsTable = ({ deptStats }: { deptStats: any[] }) => {
   )
 }
 
-const ActivityFeed = ({ notifications, loading }: { notifications: any[]; loading: boolean }) => {
+const ActivityFeed = ({ notifications, loading, socket }: { notifications: any[]; loading: boolean; socket: any }) => {
   const getNotificationStyles = (type: string) => {
     switch (type?.toUpperCase()) {
       case 'PLACEMENT':
@@ -287,8 +290,13 @@ const ActivityFeed = ({ notifications, loading }: { notifications: any[]; loadin
       
       <div className="mt-8 pt-6 border-t border-border/50">
         <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 flex items-center gap-4">
-          <div className="size-2 rounded-full bg-primary animate-ping" />
-          <p className="text-xs font-bold text-primary">Live Notification Sync Active</p>
+          <div className={cn(
+            "size-2 rounded-full",
+            socket?.connected ? "bg-primary animate-ping" : "bg-rose-500"
+          )} />
+          <p className="text-xs font-bold text-primary">
+            {socket?.connected ? "Live Notification Sync Active" : "Real-time Sync Interrupted"}
+          </p>
         </div>
       </div>
     </div>
@@ -333,12 +341,45 @@ export default function AdminDashboard() {
   const { schedules, loading: schedLoading } = useSelector((state: RootState) => state.interview)
   const { items: notifications, loading: notifLoading } = useSelector((state: RootState) => state.notification)
   const { user } = useSelector((state: RootState) => state.auth)
+  const { socket } = useSocket()
 
   useEffect(() => {
     dispatch(fetchDashboardStats())
     dispatch(fetchSchedules(undefined))
     dispatch(fetchNotifications({ page: 1, limit: 10 }))
   }, [dispatch])
+
+  useEffect(() => {
+    if (!socket || !user) return;
+    const handleConnect = () => {
+      socket.emit("join", { userId: user.id, role: user.role });
+    };
+    if (socket.connected) handleConnect();
+    socket.on("connect", handleConnect);
+    return () => { socket.off("connect", handleConnect); };
+  }, [socket, user]);
+
+  useEffect(() => {
+    if (!socket) return;
+    const handleUpdate = () => {
+      dispatch(fetchDashboardStats());
+      dispatch(fetchNotifications({ page: 1, limit: 10 }));
+      dispatch(fetchSchedules(undefined));
+    };
+    socket.on(SOCKET_EVENTS.NEW_APPLICATION, handleUpdate);
+    socket.on(SOCKET_EVENTS.NEW_USER_REGISTERED, handleUpdate);
+    socket.on(SOCKET_EVENTS.OFFER_ACCEPTED, handleUpdate);
+    socket.on(SOCKET_EVENTS.SCHEDULE_CREATED, handleUpdate);
+    socket.on(SOCKET_EVENTS.SCHEDULE_APPROVED, handleUpdate);
+    
+    return () => {
+      socket.off(SOCKET_EVENTS.NEW_APPLICATION, handleUpdate);
+      socket.off(SOCKET_EVENTS.NEW_USER_REGISTERED, handleUpdate);
+      socket.off(SOCKET_EVENTS.OFFER_ACCEPTED, handleUpdate);
+      socket.off(SOCKET_EVENTS.SCHEDULE_CREATED, handleUpdate);
+      socket.off(SOCKET_EVENTS.SCHEDULE_APPROVED, handleUpdate);
+    };
+  }, [dispatch, socket]);
 
   if ((dashLoading || schedLoading || notifLoading) && !dashboardData) {
     return <Loader text="Synchronizing tactical data..." />
@@ -389,9 +430,15 @@ export default function AdminDashboard() {
          <div className="flex items-center gap-3">
             <div className="hidden md:flex flex-col items-end mr-4">
                <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Network Status</span>
-               <div className="flex items-center gap-1.5 text-emerald-500 font-black text-xs uppercase">
-                  <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Synchronized
+               <div className={cn(
+                 "flex items-center gap-1.5 font-black text-xs uppercase transition-colors",
+                 socket?.connected ? "text-emerald-500" : "text-rose-500"
+               )}>
+                  <span className={cn(
+                    "size-1.5 rounded-full transition-all",
+                    socket?.connected ? "bg-emerald-500 animate-pulse" : "bg-rose-500"
+                  )} />
+                  {socket?.connected ? "Synchronized" : "Disconnected"}
                </div>
             </div>
            
@@ -427,7 +474,7 @@ export default function AdminDashboard() {
           </div>
           
           <div className="xl:col-span-4">
-            <ActivityFeed notifications={notifications} loading={notifLoading} />
+            <ActivityFeed notifications={notifications} loading={notifLoading} socket={socket} />
           </div>
         </div>
 
