@@ -1,10 +1,11 @@
 import { useEffect, useState, useMemo } from 'react';
 import {
   CheckCircle2, Clock, XCircle, Briefcase,
-  Search, ArrowRight, Sparkles, UserCircle,
-  Rocket, Calendar, Building2, 
+  Search, ArrowRight, Sparkles,
+  Calendar, Building2,
   ChevronDown, 
   Activity, Zap, ShieldCheck, Target,
+  Rocket,
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobApplications, updateApplicationStatus } from '@/redux/thunks/studentThunk';
@@ -19,60 +20,71 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from "@/components/ui/card";
 
-type Status = 'APPLIED' | 'SHORTLISTED' | 'TECHNICAL_ROUND' | 'HR_ROUND' | 'SELECTED' | 'REJECTED';
+type Status =
+  | 'APPLIED'
+  | 'SHORTLISTED'
+  | 'SELECTED'
+  | 'REJECTED'
+  | 'WITHDRAWN'
+  | 'NOT_ELIGIBLE';
 
-const STATUS_CONFIG: Record<Status, { label: string; color: string; bgColor: string; icon: any; shadow: string; accent: string }> = {
-  APPLIED: { 
-    label: 'Applied', 
-    color: 'text-blue-500', 
-    bgColor: 'bg-blue-500/10', 
+const STATUS_CONFIG: Record<
+  Status,
+  { label: string; color: string; bgColor: string; icon: any; shadow: string; accent: string }
+> = {
+  APPLIED: {
+    label: 'Applied',
+    color: 'text-blue-500',
+    bgColor: 'bg-blue-500/10',
     icon: Clock,
     shadow: 'shadow-blue-500/20',
-    accent: 'bg-blue-600'
+    accent: 'bg-blue-600',
   },
-  SHORTLISTED: { 
-    label: 'Shortlisted', 
-    color: 'text-purple-400', 
-    bgColor: 'bg-purple-500/10', 
+  SHORTLISTED: {
+    label: 'Shortlisted',
+    color: 'text-purple-400',
+    bgColor: 'bg-purple-500/10',
     icon: CheckCircle2,
     shadow: 'shadow-purple-500/20',
-    accent: 'bg-purple-500'
+    accent: 'bg-purple-500',
   },
-  TECHNICAL_ROUND: { 
-    label: 'Technical', 
-    color: 'text-blue-400', 
-    bgColor: 'bg-blue-500/10', 
-    icon: Rocket,
-    shadow: 'shadow-blue-500/20',
-    accent: 'bg-blue-500'
-  },
-  HR_ROUND: { 
-    label: 'HR Round', 
-    color: 'text-amber-400', 
-    bgColor: 'bg-amber-500/10', 
-    icon: UserCircle,
-    shadow: 'shadow-amber-500/20',
-    accent: 'bg-amber-500'
-  },
-  SELECTED: { 
-    label: 'Selected', 
-    color: 'text-emerald-400', 
-    bgColor: 'bg-emerald-500/10', 
+  SELECTED: {
+    label: 'Selected',
+    color: 'text-emerald-400',
+    bgColor: 'bg-emerald-500/10',
     icon: Sparkles,
     shadow: 'shadow-emerald-500/20',
-    accent: 'bg-emerald-500'
+    accent: 'bg-emerald-500',
   },
-  REJECTED: { 
-    label: 'Rejected', 
-    color: 'text-rose-400', 
-    bgColor: 'bg-rose-500/10', 
+  REJECTED: {
+    label: 'Rejected',
+    color: 'text-rose-400',
+    bgColor: 'bg-rose-500/10',
     icon: XCircle,
     shadow: 'shadow-rose-500/20',
-    accent: 'bg-rose-500'
+    accent: 'bg-rose-500',
+  },
+  WITHDRAWN: {
+    label: 'Withdrawn',
+    color: 'text-amber-400',
+    bgColor: 'bg-amber-500/10',
+    icon: XCircle,
+    shadow: 'shadow-amber-500/20',
+    accent: 'bg-amber-500',
+  },
+  NOT_ELIGIBLE: {
+    label: 'Not Eligible',
+    color: 'text-slate-400',
+    bgColor: 'bg-slate-500/10',
+    icon: Zap,
+    shadow: 'shadow-slate-500/20',
+    accent: 'bg-slate-500',
   },
 };
 
-const STAGES: Status[] = ['APPLIED', 'SHORTLISTED', 'TECHNICAL_ROUND', 'HR_ROUND', 'SELECTED'];
+// Funnel stages shown in the UI "track".
+// Terminal states (REJECTED/WITHDRAWN/NOT_ELIGIBLE) are mapped to these.
+const PIPELINE_STAGES: Array<'APPLIED' | 'SHORTLISTED' | 'SELECTED'> = ['APPLIED', 'SHORTLISTED', 'SELECTED'];
 
 /* ─── Premium Company Icon ─── */
 const CompanyIcon = ({ name, size = "md" }: { name: string, size?: "sm" | "md" | "lg" }) => {
@@ -116,10 +128,37 @@ const ApplicationCard = ({
   onAction: (id: number, action: "ACCEPT" | "REJECT") => void;
   updatingId: number | null;
 }) => {
-  const status = app.status as Status;
+  const statusRaw = String(app.status ?? 'APPLIED');
+  const status = (statusRaw in STATUS_CONFIG ? statusRaw : 'APPLIED') as Status;
+
   const isSelected = status === 'SELECTED';
   const isRejected = status === 'REJECTED';
-  const config = STATUS_CONFIG[status] || STATUS_CONFIG.APPLIED;
+  const isWithdrawn = status === 'WITHDRAWN';
+  const isNotEligible = status === 'NOT_ELIGIBLE';
+
+  const config = STATUS_CONFIG[status];
+
+  const pipelineIndex = (() => {
+    switch (status) {
+      case 'APPLIED':
+        return 0;
+      case 'SHORTLISTED':
+        return 1;
+      case 'SELECTED':
+        return 2;
+      // Terminal states: map to nearest funnel stage reached.
+      case 'REJECTED':
+        return 1;
+      case 'WITHDRAWN':
+        return 2;
+      case 'NOT_ELIGIBLE':
+        return 0;
+      default:
+        return 0;
+    }
+  })();
+
+  const isTerminal = isRejected || isWithdrawn || isNotEligible;
 
   return (
     <motion.div
@@ -186,19 +225,28 @@ const ApplicationCard = ({
                 {/* Visual Pipeline */}
                 <div className="relative px-4">
                   <div className="absolute top-4 left-8 right-8 h-px bg-slate-100 dark:bg-white/5" />
-                  {!isRejected && (
-                    <motion.div
-                      initial={{ width: 0 }}
-                      animate={{ width: `calc(${(Math.max(0, STAGES.indexOf(status)) / (STAGES.length - 1)) * 100}% - 20px)` }}
-                      className="absolute top-4 left-8 h-px bg-blue-600 z-0"
-                    />
-                  )}
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{
+                      width:
+                        PIPELINE_STAGES.length <= 1
+                          ? '0%'
+                          : `${Math.min(
+                              100,
+                              Math.max(
+                                0,
+                                (pipelineIndex / (PIPELINE_STAGES.length - 1)) * 100,
+                              ),
+                            )}%`,
+                    }}
+                    className="absolute top-4 left-8 h-px bg-blue-600 z-0"
+                  />
                   
                   <div className="relative z-10 flex justify-between">
-                    {STAGES.map((stage, idx) => {
-                      const stageIdx = STAGES.indexOf(status);
-                      const isPassed = idx < stageIdx || isSelected;
-                      const isCurrent = idx === stageIdx && !isRejected;
+                    {PIPELINE_STAGES.map((stage, idx) => {
+                      const reached = idx <= pipelineIndex;
+                      const isPassed = idx < pipelineIndex || (isTerminal && idx === pipelineIndex);
+                      const isCurrent = idx === pipelineIndex && !isTerminal;
                       const stageConfig = STATUS_CONFIG[stage];
                       const StageIcon = stageConfig.icon;
 
@@ -206,11 +254,19 @@ const ApplicationCard = ({
                         <div key={stage} className="flex flex-col items-center gap-2">
                           <div className={cn(
                             "w-8 h-8 rounded-lg flex items-center justify-center border transition-all duration-500",
-                            isPassed ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/20" :
-                            isCurrent ? "bg-white dark:bg-[#1e1f26] border-blue-600 text-blue-600 scale-110 shadow-lg" :
-                            "bg-white dark:bg-[#1e1f26] border-slate-100 dark:border-white/10 text-slate-300 dark:text-slate-700"
+                            isPassed
+                              ? "bg-blue-600 border-blue-600 text-white shadow-md shadow-blue-500/20"
+                              : isCurrent
+                                ? "bg-white dark:bg-[#1e1f26] border-blue-600 text-blue-600 scale-110 shadow-lg"
+                                : reached
+                                  ? "bg-white dark:bg-[#1e1f26] border-blue-500 text-blue-500 shadow-md shadow-blue-500/20"
+                                  : "bg-white dark:bg-[#1e1f26] border-slate-100 dark:border-white/10 text-slate-300 dark:text-slate-700"
                           )}>
-                            {isPassed ? <CheckCircle2 size={14} strokeWidth={3} /> : <StageIcon size={14} strokeWidth={2.5} />}
+                            {isPassed ? (
+                              <CheckCircle2 size={14} strokeWidth={3} />
+                            ) : (
+                              <StageIcon size={14} strokeWidth={2.5} />
+                            )}
                           </div>
                           <span className={cn(
                             "text-[8px] font-black uppercase tracking-tighter text-center max-w-[60px] leading-tight",
@@ -244,12 +300,32 @@ const ApplicationCard = ({
 
                   {isRejected ? (
                     <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-500/5 border border-rose-100 dark:border-rose-500/10">
-                       <div className="flex items-center gap-2 mb-3 text-rose-600 dark:text-rose-400">
+                      <div className="flex items-center gap-2 mb-3 text-rose-600 dark:text-rose-400">
                         <XCircle size={14} strokeWidth={3} />
                         <h4 className="text-[9px] font-black uppercase tracking-widest">Feedback</h4>
                       </div>
                       <p className="text-[11px] text-rose-800/80 dark:text-rose-200/60 leading-relaxed font-medium">
                         {app.reason || "The process for this role has been finalized. Your profile remains in our talent network."}
+                      </p>
+                    </div>
+                  ) : isNotEligible ? (
+                    <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-500/5 border border-slate-100 dark:border-slate-500/10">
+                      <div className="flex items-center gap-2 mb-3 text-slate-600 dark:text-slate-300">
+                        <Zap size={14} strokeWidth={3} />
+                        <h4 className="text-[9px] font-black uppercase tracking-widest">Eligibility</h4>
+                      </div>
+                      <p className="text-[11px] text-slate-700/80 dark:text-slate-200/60 leading-relaxed font-medium">
+                        {app.reason || "Based on your profile, this role was marked as not eligible."}
+                      </p>
+                    </div>
+                  ) : isWithdrawn ? (
+                    <div className="p-4 rounded-2xl bg-amber-50 dark:bg-amber-500/5 border border-amber-100 dark:border-amber-500/10">
+                      <div className="flex items-center gap-2 mb-3 text-amber-700 dark:text-amber-300">
+                        <XCircle size={14} strokeWidth={3} />
+                        <h4 className="text-[9px] font-black uppercase tracking-widest">Withdrawn</h4>
+                      </div>
+                      <p className="text-[11px] text-amber-800/80 dark:text-amber-200/60 leading-relaxed font-medium">
+                        {app.reason || "You withdrew your selection for this role."}
                       </p>
                     </div>
                   ) : isSelected ? (
@@ -360,7 +436,7 @@ const ApplicationStatus = () => {
       if (!matchesSearch) return false;
 
       if (activeFilter === "All") return true;
-      if (activeFilter === "Active") return !['SELECTED', 'REJECTED'].includes(app.status);
+      if (activeFilter === "Active") return !['SELECTED', 'REJECTED', 'WITHDRAWN', 'NOT_ELIGIBLE'].includes(app.status);
       if (activeFilter === "Shortlisted") return app.status === 'SHORTLISTED';
       if (activeFilter === "Rejected") return app.status === 'REJECTED';
       if (activeFilter === "Selected") return app.status === 'SELECTED';
@@ -371,7 +447,7 @@ const ApplicationStatus = () => {
 
   const stats = useMemo(() => {
     const total = applications.length;
-    const active = applications.filter((a: any) => !['SELECTED', 'REJECTED'].includes(a.status)).length;
+    const active = applications.filter((a: any) => ['APPLIED', 'SHORTLISTED'].includes(a.status)).length;
     const shortlisted = applications.filter((a: any) => a.status === 'SHORTLISTED').length;
     const selected = applications.filter((a: any) => a.status === 'SELECTED').length;
 
