@@ -26,12 +26,24 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarSeparator,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import useAuth from "@/redux/hooks/useAuth"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user, userType, fullName, initials } = useAuth()
+  const { state, isMobile } = useSidebar()
   const role = userType?.toLowerCase()
+
+  // Trigger window resize event when sidebar collapses/expands to fix chart layout issues
+  React.useEffect(() => {
+    if (!isMobile) {
+      const timer = setTimeout(() => {
+        window.dispatchEvent(new Event('resize'));
+      }, 310); // Slightly more than the 300ms transition
+      return () => clearTimeout(timer);
+    }
+  }, [state, isMobile]);
 
   const navigation = React.useMemo(() => {
     if (role === "admin") {

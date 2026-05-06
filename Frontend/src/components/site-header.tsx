@@ -62,7 +62,7 @@ export function SiteHeader() {
         </div>
 
         {/* Page title area */}
-        <div className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-500">
+        <div className="flex flex-col animate-in fade-in slide-in-from-left-4 duration-300">
           <h1 className="text-[18px] font-bold text-foreground tracking-tight leading-tight">{getTitle()}</h1>
         </div>
 

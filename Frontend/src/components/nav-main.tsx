@@ -7,6 +7,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  useSidebar,
 } from "@/components/ui/sidebar"
 
 export function NavMain({
@@ -19,6 +20,7 @@ export function NavMain({
   }[]
 }) {
   const location = useLocation()
+  const { isMobile, setOpenMobile } = useSidebar()
 
   return (
     <SidebarGroup>
@@ -43,7 +45,16 @@ export function NavMain({
                   group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
                 `}
               >
-                  <NavLink to={item.url} className="flex items-center w-full gap-3 px-2 relative cursor-pointer group/link group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0">
+                  <NavLink 
+                    to={item.url} 
+                    onClick={() => {
+                      if (isMobile) {
+                        // Small delay to allow navigation to initiate before closing sidebar
+                        setTimeout(() => setOpenMobile(false), 10);
+                      }
+                    }}
+                    className="flex items-center w-full gap-3 px-2 relative cursor-pointer group/link group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0"
+                  >
                     <span className={`size-4.5 flex items-center justify-center shrink-0 transition-colors duration-200 ${isActive ? "text-indigo-600 dark:text-white" : "text-slate-400 group-hover/link:text-slate-600 dark:group-hover/link:text-slate-300"}`}>
                       {item.icon}
                     </span>
