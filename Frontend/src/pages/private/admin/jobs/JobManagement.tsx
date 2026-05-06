@@ -170,8 +170,8 @@ const AdminJobManagement: React.FC = () => {
       </PageHeader>
 
       {/* Tabs & Filters Bar */}
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-6 pb-6 border-b border-border">
-        <div className="flex bg-muted/30 p-1 rounded-2xl border border-border w-full lg:w-auto overflow-x-auto scrollbar-hide">
+      <div className="flex flex-col xl:flex-row items-center justify-between gap-6 pb-8 border-b border-border">
+        <div className="flex bg-muted/20 p-1.5 rounded-2xl border border-border/50 w-full xl:w-auto overflow-x-auto no-scrollbar shadow-sm">
           {(['PENDING', 'APPROVED', 'REJECTED'] as const).map((tab) => {
             const config = STATUS_STYLES[tab];
             const isActive = activeTab === tab;
@@ -179,7 +179,7 @@ const AdminJobManagement: React.FC = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex items-center gap-2 px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${isActive
+                className={`flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${isActive
                   ? `bg-${config.color}-500/10 text-${config.color}-600 border border-${config.color}-500/20 shadow-sm`
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   }`}
@@ -191,13 +191,13 @@ const AdminJobManagement: React.FC = () => {
           })}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full xl:w-auto">
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-[160px] h-10 rounded-xl bg-background/50 border-border text-xs font-bold uppercase tracking-widest">
+            <SelectTrigger className="w-full xl:w-[160px] h-11 rounded-xl bg-background/50 border-border text-[10px] font-black uppercase tracking-widest hover:bg-background transition-colors">
               <ArrowUpDown className="size-3.5 mr-2 text-muted-foreground" />
               <SelectValue placeholder="Sort" />
             </SelectTrigger>
-            <SelectContent className="rounded-xl">
+            <SelectContent className="rounded-xl" position="popper">
               <SelectItem value="newest">Newest</SelectItem>
               <SelectItem value="oldest">Oldest</SelectItem>
               <SelectItem value="salary-high">Salary: High</SelectItem>
@@ -205,11 +205,11 @@ const AdminJobManagement: React.FC = () => {
           </Select>
 
           <Select value={filterDepartment} onValueChange={setFilterDepartment}>
-            <SelectTrigger className="w-[160px] h-10 rounded-xl bg-background/50 border-border text-xs font-bold uppercase tracking-widest">
+            <SelectTrigger className="w-full xl:w-[160px] h-11 rounded-xl bg-background/50 border-border text-[10px] font-black uppercase tracking-widest hover:bg-background transition-colors">
               <Filter className="size-3.5 mr-2 text-muted-foreground" />
               <SelectValue placeholder="Department" />
             </SelectTrigger>
-            <SelectContent className="rounded-xl">
+            <SelectContent className="rounded-xl" position="popper">
               <SelectItem value="all">All Depts</SelectItem>
               {departments.map((dept) => (
                 <SelectItem key={dept} value={dept}>{dept}</SelectItem>
@@ -218,11 +218,11 @@ const AdminJobManagement: React.FC = () => {
           </Select>
 
           <Select value={filterLocation} onValueChange={setFilterLocation}>
-            <SelectTrigger className="w-[160px] h-10 rounded-xl bg-background/50 border-border text-xs font-bold uppercase tracking-widest">
+            <SelectTrigger className="w-full xl:w-[160px] h-11 rounded-xl bg-background/50 border-border text-[10px] font-black uppercase tracking-widest hover:bg-background transition-colors">
               <MapPin className="size-3.5 mr-2 text-muted-foreground" />
               <SelectValue placeholder="Location" />
             </SelectTrigger>
-            <SelectContent className="rounded-xl">
+            <SelectContent className="rounded-xl" position="popper">
               <SelectItem value="all">All Locations</SelectItem>
               {locations.map(loc => (
                 <SelectItem key={loc} value={loc || 'Remote'}>{loc || 'Remote'}</SelectItem>

@@ -55,6 +55,8 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
     message: ""
   });
 
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   useEffect(() => {
     if (open) {
       dispatch(fetchCompanies({ page: 1, limit: 100 }));
@@ -91,6 +93,8 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSubmitting) return;
+
     if (!formData.startTime || !formData.endTime) {
       toast.error("Please select both start and end times");
       return;
@@ -101,6 +105,7 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
       return;
     }
 
+    setIsSubmitting(true);
     try {
       if (isCreate) {
         const payload = {
@@ -141,6 +146,8 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
       onOpenChange(false);
     } catch (error: any) {
       toast.error(error?.message || error?.toString() || "Something went wrong");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -308,15 +315,24 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
               type="button" 
               variant="ghost" 
               onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
               className="px-6 rounded-xl"
             >
               Cancel
             </Button>
             <Button 
               type="submit" 
+              disabled={isSubmitting}
               className="px-8 rounded-xl bg-primary shadow-lg shadow-primary/20 hover:shadow-none transition-all"
             >
-              {isCreate ? "Create Schedule" : "Save Changes"}
+              {isSubmitting ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Processing...
+                </span>
+              ) : (
+                isCreate ? "Create Schedule" : "Save Changes"
+              )}
             </Button>
           </div>
         </form>

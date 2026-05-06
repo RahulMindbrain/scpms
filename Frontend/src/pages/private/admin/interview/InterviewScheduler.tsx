@@ -45,6 +45,7 @@ const InterviewSchedulerPage: React.FC = () => {
   const [messageText, setMessageText] = useState('');
   const [msgLoading, setMsgLoading] = useState<number | null>(null);
   const [sendingMsg, setSendingMsg] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(fetchCompanies({ page: 1, limit: 100 }));
@@ -281,17 +282,30 @@ const InterviewSchedulerPage: React.FC = () => {
                       <Button 
                         variant="outline" 
                         size="icon" 
+                        disabled={deletingId === drive.id}
                         className="size-10 rounded-xl border-border text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 hover:border-rose-500/20 transition-all" 
                         onClick={(e) => {
                           e.stopPropagation();
+                          if (deletingId === drive.id) return;
+                          setDeletingId(drive.id);
                           const toastId = toast.loading("Removing schedule...");
                           dispatch(deleteSchedule(drive.id))
                             .unwrap()
-                            .then(() => toast.success("Schedule deleted", { id: toastId }))
-                            .catch((err) => toast.error(err || "Delete failed", { id: toastId }));
+                            .then(() => {
+                              toast.success("Schedule deleted", { id: toastId });
+                              setDeletingId(null);
+                            })
+                            .catch((err) => {
+                              toast.error(err || "Delete failed", { id: toastId });
+                              setDeletingId(null);
+                            });
                         }}
                       >
-                        <Trash2 size={16} />
+                        {deletingId === drive.id ? (
+                          <div className="w-4 h-4 border-2 border-rose-500/30 border-t-rose-500 rounded-full animate-spin" />
+                        ) : (
+                          <Trash2 size={16} />
+                        )}
                       </Button>
                     </div>
                     <div className="size-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground">
