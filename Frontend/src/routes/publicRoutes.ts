@@ -3,6 +3,7 @@ import type { RouteOptions } from "./type";
 import NotFound from "@/pages/public/notFound/notFound";
 import SignUp from "@/pages/public/signup/signup";
 import SignIn from "@/pages/public/signin/signIn";
+import SuperAdminSignIn from "@/pages/public/superadmin/SuperAdminSignIn";
 import ForgotPassword from "@/pages/public/forgotpassword/forget";
 
 export const PublicRoutes: RouteOptions<any>[] = [
@@ -19,6 +20,10 @@ export const PublicRoutes: RouteOptions<any>[] = [
         component: SignIn,
     },
     {
+        path: "/superadmin/login",
+        component: SuperAdminSignIn,
+    },
+    {
         path: "/Forgot",
         component: ForgotPassword,
     },
@@ -27,4 +32,5 @@ export const PublicRoutes: RouteOptions<any>[] = [
         path: "*",
         component: NotFound,
     },
+    
 ];

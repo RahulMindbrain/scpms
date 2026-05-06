@@ -45,6 +45,9 @@ const SignIn: React.FC = () => {
       if (role === "admin") navigate("/admin/dashboard", { replace: true });
       else if (role === "student") navigate("/student/dashboard", { replace: true });
       else if (role === "company") navigate("/company/dashboard", { replace: true });
+      else if (role === "super_admin" || role === "superadmin") {
+        navigate("/superadmin/dashboard", { replace: true });
+      }
     }
   }, [isAuthenticated, userType, navigate]);
 
