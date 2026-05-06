@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { CompanyApprovalStatus, Prisma } from "@prisma/client";
 import prisma from "../config/db";
 
 export const createCompany = async (
@@ -121,25 +121,104 @@ export const getCompanyDetails = async (userId: number) => {
 export const getCompanyById = async (id: number) => {
   return prisma.company.findUnique({
     where: { id },
+    include: {
+      user: true,
+    },
   });
 };
+
+// export const getCompanies = async (params: {
+//   page?: number;
+//   limit?: number;
+//   status?: "ACTIVE" | "INACTIVE";
+// }) => {
+//   const { page = 1, limit = 10, status } = params;
+
+//   const safePage = Math.max(1, page);
+//   const safeLimit = Math.max(1, limit);
+
+//   const skip = (safePage - 1) * safeLimit;
+
+//   const where = {
+//     ...(status && {
+//       user: {
+//         status,
+//       },
+//     }),
+//   };
+
+//   const [companies, total] = await Promise.all([
+//     prisma.company.findMany({
+//       where,
+//       skip,
+//       take: safeLimit,
+//       orderBy: { createdAt: "desc" },
+
+//       select: {
+//         id: true,
+//         name: true,
+//         description: true,
+//         createdAt: true,
+
+//         user: {
+//           select: {
+//             id: true,
+//             email: true,
+//             status: true,
+//           },
+//         },
+//       },
+//     }),
+
+//     prisma.company.count({ where }),
+//   ]);
+
+//   return {
+//     data: companies,
+//     meta: {
+//       total,
+//       page: safePage,
+//       limit: safeLimit,
+//       totalPages: Math.ceil(total / safeLimit),
+//     },
+//   };
+// };
 
 export const getCompanies = async (params: {
   page?: number;
   limit?: number;
   status?: "ACTIVE" | "INACTIVE";
+  universityId?: number;
+  companyApprovalStatus?: CompanyApprovalStatus;
 }) => {
-  const { page = 1, limit = 10, status } = params;
+  const {
+    page = 1,
+    limit = 10,
+    status,
+    universityId,
+    companyApprovalStatus,
+  } = params;
+
+  const MAX_LIMIT = 50;
 
   const safePage = Math.max(1, page);
-  const safeLimit = Math.max(1, limit);
+  const safeLimit = Math.min(Math.max(1, limit), MAX_LIMIT);
 
   const skip = (safePage - 1) * safeLimit;
 
   const where = {
     ...(status && {
-      user: {
-        status,
+      user: { status },
+    }),
+
+    ...(universityId && {
+      universities: {
+        some: {
+          universityId,
+          ...(companyApprovalStatus && {
+            status: companyApprovalStatus,
+          }),
+        },
       },
     }),
   };
@@ -156,7 +235,6 @@ export const getCompanies = async (params: {
         name: true,
         description: true,
         createdAt: true,
-
         user: {
           select: {
             id: true,

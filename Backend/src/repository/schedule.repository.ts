@@ -171,6 +171,7 @@ export const createScheduleWithJobs = async (
   scheduleData: {
     title: string;
     companyId: number;
+    universityId?: number;
     startTime: Date;
     endTime: Date;
     venue?: string;
@@ -183,7 +184,7 @@ export const createScheduleWithJobs = async (
       data: scheduleData,
     });
 
-    await tx.job.updateMany({
+    const updated = await tx.job.updateMany({
       where: {
         id: { in: jobIds },
         interviewScheduleId: null,
@@ -192,6 +193,10 @@ export const createScheduleWithJobs = async (
         interviewScheduleId: schedule.id,
       },
     });
+
+    if (updated.count !== jobIds.length) {
+      throw new Error("Some jobs were already scheduled");
+    }
 
     return tx.interviewSchedule.findUnique({
       where: { id: schedule.id },

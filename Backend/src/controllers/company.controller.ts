@@ -52,7 +52,7 @@ export const updateCompanyController = async (req: Request, res: Response) => {
   }
 };
 
-export const requestUniversitiesController = async (
+export const requestUniversityController = async (
   req: Request,
   res: Response,
 ) => {

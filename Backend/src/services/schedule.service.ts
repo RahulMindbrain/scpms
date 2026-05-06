@@ -28,6 +28,7 @@ import { emitToUsers } from "../socket";
 import { SOCKET_EVENTS } from "../socket.event";
 import { normalizeText } from "../utils/normalize.utils";
 import prisma from "../config/db";
+import { isCompanyApprovedForUniversity } from "../repository/company.university.repository";
 
 type CreateInterviewScheduleInput = {
   title: string;
@@ -37,6 +38,7 @@ type CreateInterviewScheduleInput = {
   endTime: Date | string;
   venue?: string;
   createdBy: number;
+  universityId: number;
 };
 
 type UpdateScheduleInput = {
@@ -56,7 +58,21 @@ export const createInterviewScheduleService = async (
   if (data.venue !== undefined) {
     data.venue = normalizeText(data.venue);
   }
-  const { companyId, jobIds, startTime, endTime, venue, createdBy } = data;
+
+  const {
+    companyId,
+    jobIds,
+    startTime,
+    endTime,
+    venue,
+    createdBy,
+    universityId,
+  } = data;
+
+  if (!companyId) throw new Error("CompanyId required");
+  if (!universityId) throw new Error("UniversityId required");
+  if (!jobIds || !jobIds.length)
+    throw new Error("At least one job is required");
 
   const start = new Date(startTime);
   const end = new Date(endTime);
@@ -68,12 +84,51 @@ export const createInterviewScheduleService = async (
   const company = await getCompanyById(companyId);
   if (!company) throw new Error("Company not found");
 
-  const jobs = await getJobsByIds(jobIds);
+  const isApproved = await isCompanyApprovedForUniversity(
+    companyId,
+    universityId,
+  );
+
+  if (!isApproved) {
+    throw new Error("Company not approved for this university");
+  }
+
+  const jobs = (await getJobsByIds(jobIds, {
+    include: {
+      universities: {
+        select: {
+          universityId: true,
+        },
+      },
+    },
+  })) as (Awaited<ReturnType<typeof getJobsByIds>>[number] & {
+    universities: { universityId: number }[];
+  })[];
+
+  if (jobs.length !== jobIds.length) {
+    throw new Error("Some jobs not found");
+  }
 
   for (const job of jobs) {
-    if (job.companyId !== companyId) throw new Error("Invalid job");
-    if (job.status !== "APPROVED") throw new Error("Job not approved");
-    if (job.interviewScheduleId) throw new Error("Already scheduled");
+    if (job.companyId !== companyId) {
+      throw new Error(`Job ${job.id} does not belong to company`);
+    }
+
+    if (job.status !== "APPROVED") {
+      throw new Error(`Job ${job.id} is not approved`);
+    }
+
+    const belongsToUniversity = job.universities?.some(
+      (u: any) => u.universityId === universityId,
+    );
+
+    if (!belongsToUniversity) {
+      throw new Error(`Job ${job.id} not available for this university`);
+    }
+
+    if (job.interviewScheduleId) {
+      throw new Error(`Job ${job.id} already scheduled`);
+    }
   }
 
   const conflict = await checkScheduleConflict(start, end, companyId, venue);
@@ -83,6 +138,7 @@ export const createInterviewScheduleService = async (
     {
       title: data.title,
       companyId,
+      universityId,
       startTime: start,
       endTime: end,
       ...(venue && { venue }),

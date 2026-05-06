@@ -1,73 +1,70 @@
 import { getCompanyByUserId } from "../repository/company.repository";
+import { findExistingCompanyUniversityPairs } from "../repository/company.university.repository";
 import { getDepartmentsByIds } from "../repository/department.repository";
 import {
   createJob,
   deleteJob,
   getJobById,
   getJobs,
+  //getJobsByIds,
   updateJob,
 } from "../repository/job.repository";
-
+import { createJobUniversity } from "../repository/job.university.repository";
 import { getSkillsByIds } from "../repository/skill.repostiory";
+import { getUniversitiesByIds } from "../repository/university.repository";
 import { normalizeText } from "../utils/normalize.utils";
 
 export const createJobService = async (data: any, userId: number) => {
-  const { eligibleDepartmentIds, skillIds } = data;
+  const { eligibleDepartmentIds, skillIds, ...jobData } = data;
 
   const company = await getCompanyByUserId(userId);
+  if (!company) throw new Error("Company profile not found");
 
-  if (data.title !== undefined) {
-    data.title = normalizeText(data.title);
+  if (jobData.title !== undefined) {
+    jobData.title = normalizeText(jobData.title);
+  }
+  if (jobData.description !== undefined) {
+    jobData.description = normalizeText(jobData.description);
+  }
+  if (jobData.location !== undefined) {
+    jobData.location = normalizeText(jobData.location);
   }
 
-  if (data.description !== undefined) {
-    data.description = normalizeText(data.description);
-  }
-
-  if (data.location !== undefined) {
-    data.location = normalizeText(data.location);
-  }
-
-  if (!company) {
-    throw new Error("Company profile not found");
-  }
-
+  let deptConnect: any[] | undefined;
   if (eligibleDepartmentIds?.length) {
     const departments = await getDepartmentsByIds(eligibleDepartmentIds);
-
-    const foundIds = departments.map((d) => d.id);
-
-    const missingIds = eligibleDepartmentIds.filter(
-      (id: number) => !foundIds.includes(id),
+    const foundIds = new Set(departments.map((d) => d.id));
+    const missing = eligibleDepartmentIds.filter(
+      (id: number) => !foundIds.has(id),
     );
-
-    if (missingIds.length) {
-      throw new Error(`Invalid department IDs: ${missingIds.join(", ")}`);
+    if (missing.length) {
+      throw new Error(`Invalid department IDs: ${missing.join(", ")}`);
     }
+    deptConnect = eligibleDepartmentIds.map((id: number) => ({ id }));
   }
 
+  let skillConnect: any[] | undefined;
   if (skillIds?.length) {
     const skills = await getSkillsByIds(skillIds);
-
-    const foundIds = skills.map((s) => s.id);
-
-    const missingIds = skillIds.filter((id: number) => !foundIds.includes(id));
-
-    if (missingIds.length) {
-      throw new Error(`Invalid skill IDs: ${missingIds.join(", ")}`);
+    const foundIds = new Set(skills.map((s) => s.id));
+    const missing = skillIds.filter((id: number) => !foundIds.has(id));
+    if (missing.length) {
+      throw new Error(`Invalid skill IDs: ${missing.join(", ")}`);
     }
+    skillConnect = skillIds.map((id: number) => ({ id }));
   }
 
   return createJob({
-    ...data,
+    ...jobData,
     companyId: company.id,
+    ...(deptConnect && { eligibleDepartments: { connect: deptConnect } }),
+    ...(skillConnect && { skills: { connect: skillConnect } }),
   });
 };
 
 export const getJobsService = async (params: {
   page?: number;
   limit?: number;
-  status?: "PENDING" | "APPROVED" | "REJECTED";
   companyId?: number;
 }) => {
   const page = params.page ?? 1;
@@ -76,25 +73,11 @@ export const getJobsService = async (params: {
   const finalLimit =
     params.limit ?? (Number.isFinite(envLimit) && envLimit > 0 ? envLimit : 10);
 
-  const query: {
-    page: number;
-    limit: number;
-    status?: "PENDING" | "APPROVED" | "REJECTED";
-    companyId?: number;
-  } = {
+  return getJobs({
     page,
     limit: finalLimit,
-  };
-
-  if (params.status !== undefined) {
-    query.status = params.status;
-  }
-
-  if (params.companyId !== undefined) {
-    query.companyId = params.companyId;
-  }
-
-  return getJobs(query);
+    ...(params.companyId && { companyId: params.companyId }),
+  });
 };
 
 export const updateJobService = async (id: number, data: any, userId: number) => {
@@ -112,55 +95,105 @@ export const updateJobService = async (id: number, data: any, userId: number) =>
     throw new Error("Unauthorized to update this job");
   }
 
-  if (data.title !== undefined) {
-    data.title = normalizeText(data.title);
+  const { eligibleDepartmentIds, skillIds, ...jobData } = data;
+
+  if (jobData.title !== undefined) {
+    jobData.title = normalizeText(jobData.title);
+  }
+  if (jobData.description !== undefined) {
+    jobData.description = normalizeText(jobData.description);
+  }
+  if (jobData.location !== undefined) {
+    jobData.location = normalizeText(jobData.location);
   }
 
-  if (data.description !== undefined) {
-    data.description = normalizeText(data.description);
-  }
-
-  if (data.location !== undefined) {
-    data.location = normalizeText(data.location);
-  }
-
-  // Validate eligible departments
-  const departmentIds = [
-    ...(data.eligibleDepartmentIds || []),
-    ...(data.addEligibleDepartmentIds || []),
-    ...(data.removeEligibleDepartmentIds || []),
-  ];
-
-  if (departmentIds.length) {
-    const departments = await getDepartmentsByIds(departmentIds);
-    const foundIds = departments.map((d) => d.id);
-    const missingIds = departmentIds.filter((id: number) => !foundIds.includes(id));
-
-    if (missingIds.length) {
-      throw new Error(`Invalid department IDs: ${missingIds.join(", ")}`);
+  let deptSet: any[] | undefined;
+  if (eligibleDepartmentIds) {
+    if (eligibleDepartmentIds.length) {
+      const departments = await getDepartmentsByIds(eligibleDepartmentIds);
+      const foundIds = new Set(departments.map((d) => d.id));
+      const missing = eligibleDepartmentIds.filter(
+        (id: number) => !foundIds.has(id),
+      );
+      if (missing.length) {
+        throw new Error(`Invalid department IDs: ${missing.join(", ")}`);
+      }
+      deptSet = eligibleDepartmentIds.map((id: number) => ({ id }));
+    } else {
+      deptSet = [];
     }
   }
 
-  // Validate skills
-  const skillIds = [
-    ...(data.skillIds || []),
-    ...(data.addSkillIds || []),
-    ...(data.removeSkillIds || []),
-  ];
-
-  if (skillIds.length) {
-    const skills = await getSkillsByIds(skillIds);
-    const foundIds = skills.map((s) => s.id);
-    const missingIds = skillIds.filter((id: number) => !foundIds.includes(id));
-
-    if (missingIds.length) {
-      throw new Error(`Invalid skill IDs: ${missingIds.join(", ")}`);
+  let skillSet: any[] | undefined;
+  if (skillIds) {
+    if (skillIds.length) {
+      const skills = await getSkillsByIds(skillIds);
+      const foundIds = new Set(skills.map((s) => s.id));
+      const missing = skillIds.filter((id: number) => !foundIds.has(id));
+      if (missing.length) {
+        throw new Error(`Invalid skill IDs: ${missing.join(", ")}`);
+      }
+      skillSet = skillIds.map((id: number) => ({ id }));
+    } else {
+      skillSet = [];
     }
   }
 
-  return updateJob(id, data);
+  return updateJob(id, {
+    ...jobData,
+    ...(deptSet !== undefined && {
+      eligibleDepartments: { set: deptSet },
+    }),
+    ...(skillSet !== undefined && {
+      skills: { set: skillSet },
+    }),
+  });
 };
 
 export const deleteJobService = async (id: number) => {
   return deleteJob(id);
+};
+
+export const sendJobToUniversitiesService = async (
+  jobId: number,
+  jobUniversities: any[],
+  userId: number,
+) => {
+  const job = await getJobById(jobId);
+  if (!job) throw new Error("Job not found");
+
+  const company = await getCompanyByUserId(userId);
+  if (!company || company.id !== job.companyId) {
+    throw new Error("Unauthorized");
+  }
+
+  if (!jobUniversities?.length) {
+    throw new Error("At least one university is required");
+  }
+
+  const universityIds = jobUniversities.map((u) => u.universityId);
+
+  const universities = await getUniversitiesByIds(universityIds);
+  if (universities.length !== universityIds.length) {
+    throw new Error("Some universities are invalid");
+  }
+
+  const approvals = await findExistingCompanyUniversityPairs(
+    company.id,
+    universityIds,
+  );
+
+  const approvedSet = new Set(
+    approvals.filter((a) => a.status === "APPROVED").map((a) => a.universityId),
+  );
+
+  const invalid = universityIds.filter((id) => !approvedSet.has(id));
+
+  if (invalid.length) {
+    throw new Error(
+      `Company not approved for universities: ${invalid.join(", ")}`,
+    );
+  }
+
+  return createJobUniversity(jobId, jobUniversities);
 };

@@ -2,14 +2,16 @@ import { z } from "zod";
 
 export const createStudentSchema = z
   .object({
-    departmentId: z.number().int().positive(),
+    universityId: z.number().int().positive().optional(),
 
-    year: z.number().int().min(1).max(4),
+    departmentId: z.number().int().positive().optional(),
 
-    passingYear: z.number().int().min(2000).max(2100),
+    year: z.number().int().min(1).max(4).optional(),
 
-    cgpa: z.number().min(0).max(10).optional(),
-    activeBacklogs: z.number().int().min(0).optional(),
+    passingYear: z.number().int().min(2000).max(2100).optional(),
+
+    cgpa: z.number().min(0).max(10).optional().optional(),
+
     resumeUrl: z.string().url().optional(),
 
     skillIds: z.array(z.number().int().positive()).optional(),

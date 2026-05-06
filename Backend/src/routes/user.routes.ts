@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createAdminController } from "../controllers/admin.controller";
+// import { createAdminController } from "../controllers/admin.controller";
 import {
   createUserController,
   getUserController,

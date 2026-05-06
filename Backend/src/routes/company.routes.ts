@@ -27,6 +27,10 @@ import {
   getCompanyRequestsController,
   requestUniversityController,
 } from "../controllers/companyuniversity.controller";
+import {
+  getCompanyRequestsController,
+  reapplyUniversityController,
+} from "../controllers/companyuniversity.controller";
 
 const CompanyRoutes = Router();
 
@@ -79,6 +83,15 @@ CompanyRoutes.post(
   createJobController,
 );
 
+CompanyRoutes.put(
+  "/post-job/:id",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("COMPANY"),
+  validate(updateCompanySchema),
+  updateJobController,
+);
+
 CompanyRoutes.get(
   "/get-jobs",
   authenticateUser,
@@ -101,6 +114,14 @@ CompanyRoutes.put(
   requireActiveUser,
   authorizeRoles("COMPANY"),
   updateApplicationController,
+);
+
+CompanyRoutes.put(
+  "/reapply-university",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("COMPANY"),
+  reapplyUniversityController,
 );
 
 export default CompanyRoutes;

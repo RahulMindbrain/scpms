@@ -2,6 +2,7 @@ import { Role } from "@prisma/client";
 
 import { z } from "zod";
 import { universitySchema } from "./university.validator";
+import { createStudentSchema } from "./sudent.validator";
 
 const baseSchema = z.object({
   firstname: z.string().min(2),
@@ -14,7 +15,7 @@ const baseSchema = z.object({
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/,
       "Password must contain uppercase, lowercase, number, and special character (@$!%*?& only)",
     ),
-  role: z.enum([Role.ADMIN, Role.COMPANY]),
+  role: z.nativeEnum(Role),
 });
 
 const companySchema = z.object({
@@ -24,15 +25,23 @@ const companySchema = z.object({
 
 export const registerSchema = z.discriminatedUnion("role", [
   z.object({
-    ...baseSchema,
+    ...baseSchema.shape,
     role: z.literal(Role.ADMIN),
     university: universitySchema,
   }),
 
   z.object({
-    ...baseSchema,
+    ...baseSchema.shape,
     role: z.literal(Role.COMPANY),
     company: companySchema,
+  }),
+
+  z.object({
+    ...baseSchema.shape,
+
+    role: z.literal(Role.STUDENT),
+
+    student: createStudentSchema,
   }),
 ]);
 
