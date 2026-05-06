@@ -61,6 +61,8 @@ const PrivateLoginRedirect = () => {
     return <Navigate to="/student/dashboard" replace />;
   } else if (role === "company") {
     return <Navigate to="/company/dashboard" replace />;
+  } else if (role === "super_admin" || role === "superadmin") {
+    return <Navigate to="/superadmin/dashboard" replace />;
   } else {
     return <HomePage />;
   }

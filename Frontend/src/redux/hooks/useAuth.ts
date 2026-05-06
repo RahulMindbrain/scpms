@@ -1,6 +1,6 @@
 import { useSelector } from "react-redux";
 import type { RootState } from "../store/store";
-import type { AdminUser, StudentUser, CompanyUser } from "../slices/authSlice";
+import type { AdminUser, StudentUser, CompanyUser, SuperAdminUser } from "../slices/authSlice";
 
 /**
  * Central auth hook — access user details anywhere in the app.
@@ -12,6 +12,7 @@ import type { AdminUser, StudentUser, CompanyUser } from "../slices/authSlice";
  *   const { adminData } = useAuth();    // only populated when role === "ADMIN"
  *   const { studentData } = useAuth();  // only populated when role === "STUDENT"
  *   const { companyData } = useAuth();  // only populated when role === "COMPANY"
+ *   const { superAdminData } = useAuth(); // only populated when role is superadmin
  */
 const useAuth = () => {
     const auth = useSelector((state: RootState) => state.auth);
@@ -34,7 +35,7 @@ const useAuth = () => {
         user,
         token: auth.token,
         isAuthenticated: auth.isAuthenticated,
-        userType: auth.userType,      // "ADMIN" | "STUDENT" | "COMPANY" | null
+        userType: auth.userType,      // "ADMIN" | "STUDENT" | "COMPANY" | "SUPER_ADMIN" | "SUPERADMIN" | null
         loading: auth.loading,
         error: auth.error,
 
@@ -47,11 +48,13 @@ const useAuth = () => {
         adminData: auth.adminData as AdminUser | null,
         studentData: auth.studentData as StudentUser | null,
         companyData: auth.companyData as CompanyUser | null,
+        superAdminData: auth.superAdminData as SuperAdminUser | null,
 
         // ── Role helpers ─────────────────────────────────────────────────────
         isAdmin: auth.userType === "ADMIN",
         isStudent: auth.userType === "STUDENT",
         isCompany: auth.userType === "COMPANY",
+        isSuperAdmin: auth.userType === "SUPER_ADMIN" || auth.userType === "SUPERADMIN",
     };
 };
 

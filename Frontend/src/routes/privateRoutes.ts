@@ -22,7 +22,6 @@ import DocumentManagement from "@/pages/private/admin/documents/DocumentManageme
 import AdminJobManagement from "@/pages/private/admin/jobs/JobManagement";
 import DepartmentManagement from "@/pages/private/admin/department/DepartmentManagement";
 import SkillManagement from "@/pages/private/admin/skills/SkillManagement";
-
 import SuperAdminDashboard from "@/pages/private/superadmin/dashboard/SuperAdminDashboard";
 import UniversityManagement from "@/pages/private/superadmin/university/UniversityManagement";
 import AdminManagement from "@/pages/private/superadmin/admins/AdminManagement";
@@ -103,7 +102,6 @@ export const PrivateRoutes: RouteOptions<any>[] = [
         path: "/admin/skills",
         component: SkillManagement,
     },
-
     {
         path: "/superadmin/dashboard",
         component: SuperAdminDashboard,
@@ -121,6 +119,7 @@ export const PrivateRoutes: RouteOptions<any>[] = [
         component: CompanyManagementSuperAdmin,
     },
 
+    
 
 
 

@@ -29,6 +29,13 @@ const RouteOutlet: React.FC = () => {
     return <AdminLayout />;
   }
 
+  if (location.pathname.startsWith("/superadmin")) {
+    if (role !== "super_admin" && role !== "superadmin") {
+      return <Navigate to="/login" replace />;
+    }
+    return <AdminLayout />;
+  }
+
   if (location.pathname.startsWith("/company")) {
     if (role !== "company") return <Navigate to="/login" replace />;
     return <CompanyLayout />;

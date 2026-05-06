@@ -81,7 +81,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           { title: "Notifications", url: "/company/notifications", icon: <Bell /> },
         ],
       }
-    } else if (role === "super_admin") {
+    } else if (role === "super_admin" || role === "superadmin") {
       return {
         main: [
           { title: "Dashboard", url: "/superadmin/dashboard", icon: <LayoutDashboard /> },

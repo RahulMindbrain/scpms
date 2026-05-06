@@ -27,5 +27,4 @@ export const PublicRoutes: RouteOptions<any>[] = [
         path: "*",
         component: NotFound,
     },
-    
 ];

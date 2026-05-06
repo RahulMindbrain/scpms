@@ -34,6 +34,10 @@ const routeTitles: Record<string, string> = {
   "/company/shortlist":      "Shortlist",
   "/company/interviews":     "Interview Rounds",
   "/company/notifications":  "Notifications",
+  "/superadmin/dashboard":   "Dashboard",
+  "/superadmin/universities":"Universities",
+  "/superadmin/admins":      "Admins",
+  "/superadmin/companies":   "Companies",
 }
 
 // Site Header component for the Indigo Nexus theme

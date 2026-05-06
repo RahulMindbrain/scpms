@@ -37,19 +37,29 @@ export interface CompanyUser {
     companyName?: string;
 }
 
+export interface SuperAdminUser {
+    id: number;
+    firstname: string;
+    lastname: string;
+    email: string;
+    role: "SUPER_ADMIN" | "SUPERADMIN";
+    status: string;
+}
+
 // ─── State ────────────────────────────────────────────────────────────────────
 
 interface AuthState {
     isAuthenticated: boolean;
-    userType: "ADMIN" | "STUDENT" | "COMPANY" | null;
+    userType: "ADMIN" | "STUDENT" | "COMPANY" | "SUPER_ADMIN" | "SUPERADMIN" | null;
 
     /** Full raw user object regardless of role */
-    user: AdminUser | StudentUser | CompanyUser | null;
+    user: AdminUser | StudentUser | CompanyUser | SuperAdminUser | null;
 
     /** Role-specific stores — only the relevant one is populated after login */
     adminData: AdminUser | null;
     studentData: StudentUser | null;
     companyData: CompanyUser | null;
+    superAdminData: SuperAdminUser | null;
 
     /** JWT token — set only if the API returns one (may be null for cookie-auth) */
     token: string | null;
@@ -74,6 +84,10 @@ const getInitialAuth = (): AuthState => {
                 adminData: role === "ADMIN" ? (user as AdminUser) : null,
                 studentData: role === "STUDENT" ? (user as StudentUser) : null,
                 companyData: role === "COMPANY" ? (user as CompanyUser) : null,
+                superAdminData:
+                    role === "SUPER_ADMIN" || role === "SUPERADMIN"
+                        ? (user as SuperAdminUser)
+                        : null,
                 token: token,
                 loading: false,
                 error: null,
@@ -90,6 +104,7 @@ const getInitialAuth = (): AuthState => {
         adminData: null,
         studentData: null,
         companyData: null,
+        superAdminData: null,
         token: null,
         loading: false,
         error: null,
@@ -112,6 +127,7 @@ const authSlice = createSlice({
             state.adminData = null;
             state.studentData = null;
             state.companyData = null;
+            state.superAdminData = null;
             state.token = null;
             state.error = null;
             // Clear token from axios default headers + localStorage
@@ -134,7 +150,7 @@ const authSlice = createSlice({
             // API shape: { success, message, data: { id, firstname, lastname, email, role, status }, token? }
             .addCase(loginUser.fulfilled, (state, action) => {
                 const payload = action.payload;
-                const user: AdminUser | StudentUser | CompanyUser = payload.data;
+                const user: AdminUser | StudentUser | CompanyUser | SuperAdminUser = payload.data;
                 const token: string | undefined = payload.token;
 
                 state.loading = false;
@@ -154,6 +170,8 @@ const authSlice = createSlice({
                     state.studentData = user as StudentUser;
                 } else if (normalizedRole === "COMPANY") {
                     state.companyData = user as CompanyUser;
+                } else if (normalizedRole === "SUPER_ADMIN" || normalizedRole === "SUPERADMIN") {
+                    state.superAdminData = user as SuperAdminUser;
                 }
 
                 // ── Token (if API returns one; otherwise falls back to cookie) ─
