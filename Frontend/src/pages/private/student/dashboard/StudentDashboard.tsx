@@ -75,6 +75,8 @@ export default function StudentDashboard() {
             <div className="bubble-sky"></div>
           </div>
           <div className="student-hero-texture"></div>
+          <div className="student-hero-glass-stroke"></div>
+          <div className="hero-scanline"></div>
           
           <div className="relative z-10">
             <div className="student-hero-badge mb-6">
@@ -232,6 +234,7 @@ export default function StudentDashboard() {
 
             {/* Recruiter Insight Card */}
             <div className="bg-primary rounded-[2rem] p-8 text-white relative overflow-hidden group">
+              <div className="glass-texture"></div>
               <div className="absolute top-0 right-0 p-6 opacity-10 transition-transform group-hover:scale-110">
                 <Sparkles size={80} />
               </div>
