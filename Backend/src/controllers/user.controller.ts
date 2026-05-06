@@ -12,19 +12,14 @@ export const createUserController = async (req: Request, res: Response) => {
     const { firstname, lastname, email, password, role } = req.body;
 
     if (!firstname || !lastname || !email || !password || !role) {
-      return sendError(res, 400, "All fields are required");
+      return sendError(res, 400, "All base fields are required");
     }
 
-    if (![Role.STUDENT, Role.COMPANY].includes(role)) {
+    if (![Role.STUDENT, Role.COMPANY, Role.ADMIN].includes(role)) {
       return sendError(res, 400, "Invalid role");
     }
-    const user = await createUserService(
-      firstname,
-      lastname,
-      email,
-      password,
-      role,
-    );
+
+    const user = await createUserService(req.body);
 
     return sendSuccess(res, 201, "User registered successfully", user);
   } catch (error: any) {

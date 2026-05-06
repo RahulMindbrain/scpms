@@ -92,10 +92,9 @@ model User {
   otpAttempts    Int       @default(0)
   otpGenerations Int       @default(0)
 
-  tokens            Token[]
-  notifications     Notification[]
-  sentMessages      ScheduleMessage[]
-
+  tokens        Token[]
+  notifications Notification[]
+  sentMessages  ScheduleMessage[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -216,8 +215,6 @@ model Company {
   universities       CompanyUniversity[]
 
   createdAt DateTime @default(now())
-
-  
 }
 
 model Admin {
@@ -225,7 +222,6 @@ model Admin {
   userId Int  @unique
   user   User @relation(fields: [userId], references: [id])
 
-  approvedJobs      Job[]               @relation("AdminApprovedJobs")
   schedules         InterviewSchedule[]
   universityId      Int
   university        University          @relation(fields: [universityId], references: [id])
@@ -264,36 +260,25 @@ model Department {
 }
 
 model Job {
-  id          Int    @id @default(autoincrement())
-  title       String
-  description String
-  salary      Float
-  location    String
+  id    Int    @id @default(autoincrement())
+  title String
 
-  status      JobStatus @default(PENDING)
-  minCgpa     Float?
-  maxCgpa     Float?
-  maxBacklogs Int?
+  location String
 
   companyId Int
   company   Company @relation(fields: [companyId], references: [id])
 
-  skills Skill[]
-
-  approvedBy Int?
-  approver   Admin? @relation("AdminApprovedJobs", fields: [approvedBy], references: [id], onDelete: SetNull)
-
+  skills              Skill[]
   interviewScheduleId Int?
   interviewSchedule   InterviewSchedule? @relation(fields: [interviewScheduleId], references: [id])
+  isDeleted Boolean @default(false)
 
-  applications Application[]
 
   eligibleDepartments Department[]
   universities        JobUniversity[]
 
   createdAt DateTime @default(now())
 
-  @@index([status])
   @@index([companyId])
   @@index([interviewScheduleId])
 }
@@ -301,23 +286,23 @@ model Job {
 model Application {
   id Int @id @default(autoincrement())
 
-  studentId Int
-  jobId     Int
+  studentId       Int
+  jobUniversityId Int
 
   status ApplicationStatus @default(APPLIED)
   reason String?
 
-  student    Student   @relation(fields: [studentId], references: [id])
-  job        Job       @relation(fields: [jobId], references: [id])
-  isAccepted Boolean   @default(false)
-  acceptedAt DateTime?
+  student       Student       @relation(fields: [studentId], references: [id])
+  jobUniversity JobUniversity @relation(fields: [jobUniversityId], references: [id])
+  isAccepted    Boolean       @default(false)
+  acceptedAt    DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  @@unique([studentId, jobId])
+  @@unique([studentId, jobUniversityId])
   @@index([studentId])
-  @@index([jobId])
+  @@index([jobUniversityId])
 }
 
 model CompanyUniversity {
@@ -351,12 +336,30 @@ model JobUniversity {
   jobId        Int
   universityId Int
 
+  sentAt     DateTime  @default(now())
+  status     JobStatus @default(PENDING)
+  approvedAt DateTime?
+  rejectedAt DateTime?
+
+  rejectionReason String?   
+  rejectionCount  Int @default(0) 
+
+
+  salary      Float
+  description String?
+  minCgpa     Float?
+  maxBacklogs Int?
+  openings    Int?
+
   job        Job        @relation(fields: [jobId], references: [id], onDelete: Cascade)
   university University @relation(fields: [universityId], references: [id], onDelete: Cascade)
+
+  applications Application[]
 
   @@unique([jobId, universityId])
   @@index([universityId])
   @@index([jobId])
+  @@index([status])
 }
 
 model Token {

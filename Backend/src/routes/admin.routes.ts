@@ -24,6 +24,7 @@ import {
 } from "../controllers/application.controller";
 import { sendBulkMailController } from "../controllers/bulkmail.controller";
 import { getCompanyById } from "../repository/company.repository";
+import requireActiveUser from "../middlewares/requireActiveUser";
 
 const adminRoutes = Router();
 
@@ -32,6 +33,7 @@ adminRoutes.post("/register", validate(adminSchema), registerAdminController);
 adminRoutes.get(
   "/get-students",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   getStudentsController,
 );
@@ -39,6 +41,7 @@ adminRoutes.get(
 adminRoutes.get(
   "/get-companies",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   getCompaniesController,
 );
@@ -46,6 +49,7 @@ adminRoutes.get(
 adminRoutes.get(
   "/get-inactive-students",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   getInactiveStudentsController,
 );
@@ -53,6 +57,7 @@ adminRoutes.get(
 adminRoutes.get(
   "/company-requests",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   getCompanyRequestsController,
 );
@@ -60,6 +65,7 @@ adminRoutes.get(
 adminRoutes.put(
   "/company-requests",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   updateCompanyRequestsController,
 );
@@ -67,6 +73,7 @@ adminRoutes.put(
 adminRoutes.put(
   "/activate-users",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   activateUsersController,
 );
@@ -74,6 +81,7 @@ adminRoutes.put(
 adminRoutes.get(
   "/get-inactive-companies",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   getInactiveCompaniesController,
 );
@@ -81,40 +89,46 @@ adminRoutes.get(
 adminRoutes.put(
   "/activate-companies",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   activateCompaniesController,
 );
 
-adminRoutes.put(
-  "/update-job-status",
-  authenticateUser,
-  authorizeRoles("ADMIN"),
-  updateJobStatusByAdminController,
-);
+// adminRoutes.put(
+//   "/update-job-status",
+//   authenticateUser,
+//   requireActiveUser,
+//   authorizeRoles("ADMIN"),
+//   updateJobStatusByAdminController,
+// );
 
 adminRoutes.get(
-  "/get-jobs",
+  "/jobs",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   getJobsController,
 );
 
 adminRoutes.get(
-  "/get-jobs",
+  "/applications",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   getApplicationsController,
 );
 
 adminRoutes.put(
-  "/get-jobs",
+  "/applications/:id",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   updateApplicationController,
 );
 adminRoutes.get(
   "/dashboard",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   getDashboardStatsController,
 );
@@ -122,6 +136,7 @@ adminRoutes.get(
 adminRoutes.post(
   "/send-mails",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   sendBulkMailController,
 );
@@ -129,6 +144,7 @@ adminRoutes.post(
 adminRoutes.get(
   "/get-jobs-company/:id",
   authenticateUser,
+  requireActiveUser,
   authorizeRoles("ADMIN"),
   getJobsByCompanyIdController,
 );

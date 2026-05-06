@@ -121,23 +121,23 @@ export const getPendingUsers = async () => {
   });
 };
 
-export const getPendingJobs = async () => {
-  return prisma.job.findMany({
-    where: { status: "PENDING" },
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      title: true,
-      createdAt: true,
+// export const getPendingJobs = async () => {
+//   return prisma.job.findMany({
+//     where: { status: "PENDING" },
+//     orderBy: { createdAt: "desc" },
+//     select: {
+//       id: true,
+//       title: true,
+//       createdAt: true,
 
-      company: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
-};
+//       company: {
+//         select: {
+//           name: true,
+//         },
+//       },
+//     },
+//   });
+// };
 
 export const getUsers = async (params: {
   page?: number;

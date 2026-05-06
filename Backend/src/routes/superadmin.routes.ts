@@ -18,28 +18,74 @@ import {
 
 import authenticateUser from "../middlewares/authenticateUser";
 import { authorizeRoles } from "../middlewares/verifyRole";
+import requireActiveUser from "../middlewares/requireActiveUser";
 
 const saRouter = Router();
 
-saRouter.use(authenticateUser);
-saRouter.use(authorizeRoles("SUPER_ADMIN"));
-
-saRouter.post("/", createSuperAdminController);
+saRouter.post("/register", createSuperAdminController);
 saRouter.get("/", getAllSuperAdminsController);
 saRouter.get("/:id", getSuperAdminByIdController);
-saRouter.put("/:id", updateSuperAdminController);
-saRouter.delete("/:id", deleteSuperAdminController);
+saRouter.put(
+  "/:id",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("SUPER_ADMIN"),
+  updateSuperAdminController,
+);
+saRouter.delete(
+  "/:id",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("SUPER_ADMIN"),
+  deleteSuperAdminController,
+);
 
-saRouter.get("/admins", getAdminsController);
+saRouter.get(
+  "/admins",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("SUPER_ADMIN"),
+  getAdminsController,
+);
 
-saRouter.put("/admins/activate", activateAdminsController);
+saRouter.put(
+  "/admins/activate",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("SUPER_ADMIN"),
+  activateAdminsController,
+);
 
-saRouter.put("/admins/deactivate", deactivateAdminsController);
+saRouter.put(
+  "/admins/deactivate",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("SUPER_ADMIN"),
+  deactivateAdminsController,
+);
 
-saRouter.get("/companies", getCompaniesController);
+saRouter.get(
+  "/companies",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("SUPER_ADMIN"),
+  getCompaniesController,
+);
 
-saRouter.put("/companies/activate", activateCompaniesController);
+saRouter.put(
+  "/companies/activate",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("SUPER_ADMIN"),
+  activateCompaniesController,
+);
 
-saRouter.get("/universities", getUniversitiesController);
+saRouter.get(
+  "/universities",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("SUPER_ADMIN"),
+  getUniversitiesController,
+);
 
 export default saRouter;

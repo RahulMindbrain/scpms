@@ -34,14 +34,10 @@ import {
   activateCompanies,
   getCompanies,
   getCompanyById,
+  getCompanyByUserId,
   getInactiveCompanies,
 } from "../repository/company.repository";
-import {
-  getJobById,
-  getJobsByIds,
-  updateJobStatus,
-  updateJobStatusBulk,
-} from "../repository/job.repository";
+import { getJobById } from "../repository/job.repository";
 import { sendEmailService } from "./mail/mail.service";
 import { emitToUsers } from "../socket";
 import { SOCKET_EVENTS } from "../socket.event";
@@ -55,11 +51,17 @@ import {
 } from "../utils/normalize.utils";
 import prisma from "../config/db";
 import {
+  getPendingCompanyRequestsByIds,
   getRequestsByUniversity,
+  hasApprovedUniversity,
   updateCompanyRequestStatus,
-} from "../repository/compnay.university.repository";
+} from "../repository/company.university.repository";
 import { updateCompanyUniversityStatus } from "../repository/superadmin.repository";
 import { getUniversityByAdminId } from "../repository/university.repository";
+import {
+  getJobUniversities,
+  updateJobUniversityStatus,
+} from "../repository/job.university.repository";
 
 export const registerAdminService = async (data: {
   firstname: string;
@@ -310,133 +312,208 @@ export const getInactiveCompaniesService = async (params: {
   return getInactiveCompanies({ page, limit });
 };
 
-export const updateJobStatusByAdminService = async (
-  jobIds: number[],
-  status: JobStatus,
+export const updateJobUniversityStatusService = async (
+  ids: number[],
+  status: "APPROVED" | "REJECTED",
   adminId: number,
 ) => {
-  if (
-    !([JobStatus.APPROVED, JobStatus.REJECTED] as JobStatus[]).includes(status)
-  ) {
-    throw new Error("Invalid status. Only APPROVED or REJECTED allowed");
+  const admin = await getUniversityByAdminId(adminId);
+
+  if (!admin || !admin.university) {
+    throw new Error("Admin not linked to any university");
   }
 
-  const jobs = (await getJobsByIds(jobIds, {
-    include: {
-      company: true,
-    },
-  })) as (Job & { company: Company })[];
-
-  if (!jobs.length) {
-    throw new Error("No jobs found");
-  }
-
-  const invalidJobs = jobs.filter((job) => job.status !== JobStatus.PENDING);
-
-  if (invalidJobs.length) {
-    throw new Error(
-      `Some jobs already processed: ${invalidJobs.map((j) => j.id).join(", ")}`,
-    );
-  }
-
-  const result =
-    jobIds.length === 1
-      ? await updateJobStatus(jobIds[0]!, status, adminId)
-      : await updateJobStatusBulk(jobIds, status, adminId);
-
-  if (status === JobStatus.APPROVED) {
-    runInBackground(async () => {
-      await Promise.all(
-        jobs.map(async (job) => {
-          try {
-            const students = await getEligibleUnplacedStudents(job.id);
-
-            if (!students.length) return;
-
-            const userIds = students.map((s) => s.userId);
-            const emails = students.map((s) => s.user.email);
-
-            emitToUsers(userIds, SOCKET_EVENTS.NEW_JOB, {
-              jobId: job.id,
-              title: job.title,
-              company: job.company.name,
-              location: job.location,
-            });
-
-            await sendEmailService({
-              recipients: emails,
-              subject: `New Job Opportunity: ${job.title}`,
-              html: `
-                <p>A new job has been posted.</p>
-                <p><strong>${job.title}</strong> at ${job.company.name}</p>
-              `,
-            });
-
-            await createManyNotifications(
-              userIds.map((userId) => ({
-                userId,
-                title: "New Job Posted",
-                message: `New job: ${job.title} at ${job.company.name}`,
-                type: NotificationType.JOB_POSTED,
-              })),
-            );
-          } catch (err) {
-            console.error(`Notification failed for job ${job.id}`, err);
-          }
-        }),
-      );
-    });
-  }
-
-  return result;
+  return updateJobUniversityStatus(ids, status, admin.university.id);
 };
 
 export const activateCompaniesService = async (userIds: number[]) => {
-  const users = await getUsersByIds(userIds);
+  try {
+    const users = await getUsersByIds(userIds);
 
-  if (!users.length) {
-    throw new Error("No users found");
+    if (!users.length) {
+      throw new Error("No users found");
+    }
+
+    const nonCompanyUsers = users.filter((u) => u.role !== "COMPANY");
+
+    if (nonCompanyUsers.length) {
+      throw new Error(
+        `Some users are not companies: ${nonCompanyUsers
+          .map((u) => u.id)
+          .join(", ")}`,
+      );
+    }
+
+    const alreadyActive = users.filter((u) => u.status === "ACTIVE");
+
+    if (alreadyActive.length) {
+      throw new Error(
+        `Some companies already active: ${alreadyActive
+          .map((u) => u.id)
+          .join(", ")}`,
+      );
+    }
+
+    const validUserIds: number[] = [];
+
+    const rejected: {
+      userId: number;
+      reason: string;
+    }[] = [];
+
+    for (const user of users) {
+      try {
+        const company = await getCompanyByUserId(user.id);
+
+        if (!company) {
+          rejected.push({
+            userId: user.id,
+            reason: "Company profile not found",
+          });
+
+          continue;
+        }
+
+        validUserIds.push(user.id);
+      } catch (innerErr: any) {
+        rejected.push({
+          userId: user.id,
+          reason: innerErr.message || "Validation failed",
+        });
+      }
+    }
+
+    if (!validUserIds.length) {
+      throw new Error("No companies eligible for activation");
+    }
+
+    const activated = await activateCompanies(validUserIds);
+
+    return {
+      activatedCount: activated.count ?? validUserIds.length,
+
+      activatedIds: validUserIds,
+
+      rejected,
+    };
+  } catch (err: any) {
+    throw new Error(err.message || "Failed to activate companies");
   }
-
-  const nonCompanyUsers = users.filter((u) => u.role !== "COMPANY");
-
-  if (nonCompanyUsers.length) {
-    throw new Error(
-      `Some users are not companies: ${nonCompanyUsers
-        .map((u) => u.id)
-        .join(", ")}`,
-    );
-  }
-
-  const alreadyActive = users.filter((u) => u.status === "ACTIVE");
-
-  if (alreadyActive.length) {
-    throw new Error(
-      `Some companies already active: ${alreadyActive
-        .map((u) => u.id)
-        .join(", ")}`,
-    );
-  }
-
-  if (userIds.length === 1) {
-    return activateCompanies(userIds);
-  }
-
-  return activateCompanies(userIds);
 };
 
-export const getDashboardStatsService = async () => {
+// export const getDashboardStatsService = async () => {
+//   try {
+//     const [students, totalPlaced, salaryData] = await Promise.all([
+//       getDeptWiseStats(),
+//       getTotalPlacedStudentsRepo(),
+//       getSalaryDataRepo(),
+//     ]);
+
+//     const deptMap: any = {};
+
+//     students.forEach((student) => {
+//       const dept = student.department.name;
+
+//       if (!deptMap[dept]) {
+//         deptMap[dept] = {
+//           total: 0,
+//           placed: 0,
+//         };
+//       }
+
+//       deptMap[dept].total++;
+
+//       if (
+//         student.applications.some(
+//           (app) =>
+//             app.status === "SELECTED" &&
+//             app.jobUniversity.universityId === student.universityId,
+//         )
+//       ) {
+//         deptMap[dept].placed++;
+//       }
+//     });
+
+//     const deptStats = Object.entries(deptMap).map(([dept, data]: any) => ({
+//       department: dept,
+//       totalStudents: data.total,
+//       placedStudents: data.placed,
+//       percentage:
+//         data.total > 0
+//           ? Number(((data.placed / data.total) * 100).toFixed(2))
+//           : 0,
+//     }));
+
+//     let totalSalary = 0;
+
+//     const deptSalaryMap: any = {};
+
+//     salaryData.forEach((item) => {
+//       const salary = item.jobUniversity?.salary;
+//       if (!salary) return;
+//       const deptId = item.student.departmentId;
+
+//       totalSalary += salary;
+
+//       if (!deptSalaryMap[deptId]) {
+//         deptSalaryMap[deptId] = [];
+//       }
+
+//       deptSalaryMap[deptId].push(salary);
+//     });
+
+//     const avgSalary =
+//       salaryData.length > 0 ? Math.round(totalSalary / salaryData.length) : 0;
+
+//     const deptAvgSalary = Object.entries(deptSalaryMap).map(
+//       ([deptId, salaries]: any) => ({
+//         departmentId: Number(deptId),
+//         avgSalary: Math.round(
+//           salaries.reduce((a: number, b: number) => a + b, 0) / salaries.length,
+//         ),
+//       }),
+//     );
+
+//     return {
+//       totalPlacedStudents: totalPlaced,
+//       avgSalary,
+//       deptStats,
+//       deptAvgSalary,
+//     };
+//   } catch (error) {
+//     console.error("Dashboard Service Error:", error);
+//     throw error;
+//   }
+// };
+
+export const getDashboardStatsService = async (userId: number) => {
   try {
+    const admin = await getUniversityByAdminId(userId);
+
+    if (!admin || !admin.university) {
+      throw new Error("Admin not linked to any university");
+    }
+
+    const universityId = admin.university.id;
+
     const [students, totalPlaced, salaryData] = await Promise.all([
-      getDeptWiseStats(),
-      getTotalPlacedStudentsRepo(),
-      getSalaryDataRepo(),
+      getDeptWiseStats(universityId),
+      getTotalPlacedStudentsRepo(universityId),
+      getSalaryDataRepo(universityId),
     ]);
 
-    const deptMap: any = {};
+    const deptMap: Record<
+      string,
+      {
+        total: number;
+        placed: number;
+      }
+    > = {};
 
     students.forEach((student) => {
-      const dept = student.department.name;
+      const dept = student.department?.name;
+
+      if (!dept) return;
 
       if (!deptMap[dept]) {
         deptMap[dept] = {
@@ -447,12 +524,18 @@ export const getDashboardStatsService = async () => {
 
       deptMap[dept].total++;
 
-      if (student.applications.length > 0) {
+      const isPlaced = student.applications?.some(
+        (app) =>
+          app.status === "SELECTED" &&
+          app.jobUniversity?.universityId === universityId,
+      );
+
+      if (isPlaced) {
         deptMap[dept].placed++;
       }
     });
 
-    const deptStats = Object.entries(deptMap).map(([dept, data]: any) => ({
+    const deptStats = Object.entries(deptMap).map(([dept, data]) => ({
       department: dept,
       totalStudents: data.total,
       placedStudents: data.placed,
@@ -462,36 +545,68 @@ export const getDashboardStatsService = async () => {
           : 0,
     }));
 
-    let totalSalary = 0;
-
-    const deptSalaryMap: any = {};
+    const studentSalaryMap: Record<number, number> = {};
 
     salaryData.forEach((item) => {
-      const salary = item.job.salary;
+      const studentId = item.student.id;
+      const salary = item.jobUniversity?.salary;
+
+      if (!salary) return;
+
+      if (
+        !studentSalaryMap[studentId] ||
+        salary > studentSalaryMap[studentId]
+      ) {
+        studentSalaryMap[studentId] = salary;
+      }
+    });
+
+    let totalSalary = 0;
+
+    const deptSalaryMap: Record<number, number[]> = {};
+
+    const processedStudents = new Set<number>();
+
+    salaryData.forEach((item) => {
+      const studentId = item.student.id;
+
+      if (processedStudents.has(studentId)) return;
+
+      const finalSalary = studentSalaryMap[studentId];
+
+      if (!finalSalary) return;
+
       const deptId = item.student.departmentId;
 
-      totalSalary += salary;
+      totalSalary += finalSalary;
 
       if (!deptSalaryMap[deptId]) {
         deptSalaryMap[deptId] = [];
       }
 
-      deptSalaryMap[deptId].push(salary);
+      deptSalaryMap[deptId].push(finalSalary);
+
+      processedStudents.add(studentId);
     });
 
+    const totalStudentsPlaced = Object.keys(studentSalaryMap).length;
+
     const avgSalary =
-      salaryData.length > 0 ? Math.round(totalSalary / salaryData.length) : 0;
+      totalStudentsPlaced > 0
+        ? Math.round(totalSalary / totalStudentsPlaced)
+        : 0;
 
     const deptAvgSalary = Object.entries(deptSalaryMap).map(
-      ([deptId, salaries]: any) => ({
+      ([deptId, salaries]) => ({
         departmentId: Number(deptId),
         avgSalary: Math.round(
-          salaries.reduce((a: number, b: number) => a + b, 0) / salaries.length,
+          salaries.reduce((a, b) => a + b, 0) / salaries.length,
         ),
       }),
     );
 
     return {
+      universityId,
       totalPlacedStudents: totalPlaced,
       avgSalary,
       deptStats,
@@ -507,26 +622,19 @@ export const getJobsByCompanyIdServices = async (params: {
   companyId: number;
   page: number;
   limit: number;
-  status?: JobStatus;
+  status?: "PENDING" | "APPROVED" | "REJECTED";
+  universityId?: number;
 }) => {
   try {
-    const query: {
-      page: number;
-      limit: number;
-      status?: JobStatus;
-      companyId: number;
-    } = {
-      page: params.page,
-      limit: params.limit,
-      companyId: params.companyId,
-    };
+    const { companyId, page, limit, status, universityId } = params;
 
-    if (params.status !== undefined) {
-      query.status = params.status;
-    }
-
-    const jobs = await getJobs(query);
-    return jobs;
+    return getJobUniversities({
+      page,
+      limit,
+      companyId,
+      ...(status && { status }),
+      ...(universityId && { universityId }),
+    });
   } catch (error: any) {
     console.log(error);
     throw error;
@@ -551,14 +659,26 @@ export const updateCompanyRequestsService = async (
 ) => {
   const admin = await getUniversityByAdminId(adminId);
 
-  if (!admin) {
+  if (!admin || !admin.university) {
     throw new Error("Admin not found");
   }
 
+  const universityId = admin.university.id;
+
+  const validRequests = await getPendingCompanyRequestsByIds(ids, universityId);
+
+  const validIds = new Set(validRequests.map((r) => r.id));
+  const invalidIds = ids.filter((id) => !validIds.has(id));
+
+  if (invalidIds.length) {
+    throw new Error(
+      `Invalid or unauthorized request IDs: ${invalidIds.join(", ")}`,
+    );
+  }
+
   return updateCompanyUniversityStatus(
-    ids,
+    validRequests.map((r) => r.id),
     status,
     adminId,
-    admin.university.id,
   );
 };

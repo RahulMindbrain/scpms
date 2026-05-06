@@ -32,3 +32,92 @@ export const getUniversityByAdminId = async (adminId: number) => {
     },
   });
 };
+
+export const getActiveUniversitiesByIds = async (ids: number[]) => {
+  return prisma.university.findMany({
+    where: {
+      id: { in: ids },
+      status: "ACTIVE",
+    },
+    select: {
+      id: true,
+    },
+  });
+};
+
+export const getUniversities = async (
+  page: number,
+  limit: number,
+  search?: string,
+) => {
+  const skip = (page - 1) * limit;
+
+  const where: any = {
+    status: "ACTIVE",
+
+    ...(search && {
+      OR: [
+        {
+          name: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+
+        {
+          code: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+
+        {
+          city: {
+            contains: search,
+            mode: "insensitive",
+          },
+        },
+      ],
+    }),
+  };
+
+  const [data, total] = await Promise.all([
+    prisma.university.findMany({
+      where,
+
+      skip,
+
+      take: limit,
+
+      orderBy: {
+        name: "asc",
+      },
+
+      select: {
+        id: true,
+        name: true,
+        code: true,
+        city: true,
+        state: true,
+        country: true,
+      },
+    }),
+
+    prisma.university.count({
+      where,
+    }),
+  ]);
+
+  return {
+    data,
+
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      hasNextPage: page * limit < total,
+      hasPreviousPage: page > 1,
+    },
+  };
+};

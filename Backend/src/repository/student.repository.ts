@@ -23,6 +23,7 @@ export const createStudent = async (userId: number, data: any) => {
   return prisma.student.create({
     data: {
       userId,
+      universityId: data.universityId,
       departmentId: data.departmentId,
       year: data.year,
       passingYear: data.passingYear,
@@ -95,6 +96,7 @@ export const getStudentByUserId = async (userId: number) => {
           email: true,
         },
       },
+      university: true,
       department: {
         select: {
           id: true,
@@ -393,49 +395,83 @@ export const getInactiveStudentUsers = async (params: {
   };
 };
 
-export const getDeptWiseStats = async () => {
+export const getDeptWiseStats = async (universityId: number) => {
   return prisma.student.findMany({
+    where: {
+      universityId,
+    },
+
     select: {
       id: true,
+      universityId: true,
+
       department: {
         select: {
-          id: true,
           name: true,
         },
       },
+
       applications: {
         where: {
           status: "SELECTED",
+
+          jobUniversity: {
+            universityId,
+          },
         },
-        select: { id: true },
+
+        select: {
+          status: true,
+
+          jobUniversity: {
+            select: {
+              universityId: true,
+            },
+          },
+        },
       },
     },
   });
 };
 
-export const getTotalPlacedStudentsRepo = async () => {
+export const getTotalPlacedStudentsRepo = async (universityId: number) => {
   const result = await prisma.application.groupBy({
     by: ["studentId"],
+
     where: {
       status: "SELECTED",
+
+      jobUniversity: {
+        universityId,
+      },
     },
   });
 
   return result.length;
 };
 
-export const getSalaryDataRepo = async () => {
+export const getSalaryDataRepo = async (universityId: number) => {
   return prisma.application.findMany({
     where: {
       status: "SELECTED",
-    },
-    select: {
-      job: {
-        select: { salary: true },
+
+      jobUniversity: {
+        universityId,
       },
+    },
+
+    select: {
       student: {
         select: {
+          id: true,
           departmentId: true,
+        },
+      },
+
+      jobUniversity: {
+        select: {
+          salary: true,
+          universityId: true,
         },
       },
     },
@@ -613,7 +649,9 @@ export const getAppliedStudentsForJobs = async (jobIds: number[]) => {
 
   return prisma.application.findMany({
     where: {
-      jobId: { in: jobIds },
+      jobUniversity: {
+        jobId: { in: jobIds },
+      },
     },
     select: {
       student: {

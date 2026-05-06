@@ -17,6 +17,8 @@ import scheduleRoute from "./routes/schedule.routes.js";
 import { attachQueryLogger } from "./middlewares/queryLogger.js";
 import notificationRouter from "./routes/notification.routes.js";
 import saRouter from "./routes/superadmin.routes.js";
+import jobUniversityRouter from "./routes/job.university.routes.js";
+import universityRoutes from "./routes/university.routes.js";
 
 const app = express();
 
@@ -59,6 +61,8 @@ app.use("/skills", Skillsroute);
 app.use("/interview-schedule", scheduleRoute);
 app.use("/notification", notificationRouter);
 app.use("/superadmin", saRouter);
+app.use("/job-universities", jobUniversityRouter);
+app.use("/university", universityRoutes);
 
 app.use(attachQueryLogger);
 

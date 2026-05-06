@@ -23,7 +23,10 @@ import {
   updateApplicationController,
 } from "../controllers/application.controller";
 import requireActiveUser from "../middlewares/requireActiveUser";
-import { getCompanyRequestsController } from "../controllers/companyuniversity.controller";
+import {
+  getCompanyRequestsController,
+  reapplyUniversityController,
+} from "../controllers/companyuniversity.controller";
 
 const CompanyRoutes = Router();
 
@@ -81,7 +84,6 @@ CompanyRoutes.put(
   authenticateUser,
   requireActiveUser,
   authorizeRoles("COMPANY"),
-  validate(updateCompanySchema),
   updateJobController,
 );
 
@@ -107,6 +109,14 @@ CompanyRoutes.put(
   requireActiveUser,
   authorizeRoles("COMPANY"),
   updateApplicationController,
+);
+
+CompanyRoutes.put(
+  "/reapply-university",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("COMPANY"),
+  reapplyUniversityController,
 );
 
 export default CompanyRoutes;
