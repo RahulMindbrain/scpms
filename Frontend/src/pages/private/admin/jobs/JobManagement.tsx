@@ -14,13 +14,15 @@ import {
   MoreVertical,
   ChevronLeft,
   ChevronRight,
-  CheckCircle2
+  CheckCircle2,
+  Info
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobs, updateJobStatus } from '@/redux/thunks/driveThunk';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/modal';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,6 +43,7 @@ import Loader from '@/components/Loader';
 import { AdminPageLayout } from '@/components/layout/AdminPageLayout';
 import { PageHeader } from '@/components/PageHeader';
 import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 const STATUS_STYLES = {
   PENDING: {
@@ -67,6 +70,8 @@ const AdminJobManagement: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>('newest');
   const [filterDepartment, setFilterDepartment] = useState<string>('all');
   const [filterLocation, setFilterLocation] = useState<string>('all');
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<any>(null);
 
   useEffect(() => {
     dispatch(fetchJobs({ status: activeTab, page, limit: PAGE_LIMIT }));
@@ -179,12 +184,21 @@ const AdminJobManagement: React.FC = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${isActive
-                  ? `bg-${config.color}-500/10 text-${config.color}-600 border border-${config.color}-500/20 shadow-sm`
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                className={`flex items-center gap-2.5 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap border ${isActive
+                  ? tab === 'PENDING' ? 'bg-amber-500/10 text-amber-600 border-amber-500/20 shadow-sm' :
+                    tab === 'APPROVED' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20 shadow-sm' :
+                    'bg-rose-500/10 text-rose-600 border-rose-500/20 shadow-sm'
+                  : 'text-muted-foreground border-transparent hover:text-foreground hover:bg-muted/50'
                   }`}
               >
-                <config.icon className={`size-3.5 ${isActive ? `text-${config.color}-600` : 'text-muted-foreground'}`} />
+                <config.icon className={cn(
+                  "size-3.5",
+                  isActive ? (
+                    tab === 'PENDING' ? 'text-amber-600' :
+                    tab === 'APPROVED' ? 'text-emerald-600' :
+                    'text-rose-600'
+                  ) : 'text-muted-foreground'
+                )} />
                 {tab}
               </button>
             );
@@ -233,7 +247,7 @@ const AdminJobManagement: React.FC = () => {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {loading ? (
           <div className="col-span-full py-32 flex justify-center">
             <Loader text="Retrieving job listings..." />
@@ -249,17 +263,17 @@ const AdminJobManagement: React.FC = () => {
                 exit={{ opacity: 0, scale: 0.95 }}
                 className="group saas-card overflow-hidden h-full flex flex-col"
               >
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 bg-muted/50 rounded-2xl flex items-center justify-center border border-border group-hover:border-primary/30 transition-all duration-300 shadow-sm overflow-hidden">
+                <div className="flex items-start justify-between mb-6 gap-4">
+                  <div className="flex items-start gap-4 min-w-0">
+                    <div className="shrink-0 w-14 h-14 bg-muted/50 rounded-2xl flex items-center justify-center border border-border group-hover:border-primary/30 transition-all duration-300 shadow-sm overflow-hidden">
                       {job.company?.logo ? (
                         <img src={job.company.logo} alt={job.company.name} className="w-10 h-10 object-contain" />
                       ) : (
                         <Building2 className="w-7 h-7 text-muted-foreground group-hover:text-primary transition-colors" />
                       )}
                     </div>
-                    <div className="overflow-hidden">
-                      <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors truncate tracking-tight pr-4">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors truncate tracking-tight">
                         {job.title}
                       </h3>
                       <p className="text-sm text-muted-foreground font-medium truncate">{job.company?.name}</p>
@@ -267,7 +281,7 @@ const AdminJobManagement: React.FC = () => {
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="size-8 rounded-full">
+                      <Button variant="ghost" size="icon" className="shrink-0 size-8 rounded-full">
                         <MoreVertical className="size-4 text-muted-foreground" />
                       </Button>
                     </DropdownMenuTrigger>
@@ -313,25 +327,36 @@ const AdminJobManagement: React.FC = () => {
 
                 <div className="pt-5 border-t border-border mt-auto">
                   {activeTab === 'PENDING' ? (
-                    <div className="flex items-center gap-3">
-                      <Button
-                        className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-10 font-black uppercase tracking-widest text-[10px] shadow-lg shadow-emerald-500/10 active:scale-95 transition-all"
-                        onClick={() => handleStatusUpdate([job.id], 'APPROVED')}
-                      >
-                        <CheckCircle className="size-3.5 mr-1.5" /> Approve
-                      </Button>
+                    <div className="space-y-3">
                       <Button
                         variant="outline"
-                        className="flex-1 border-rose-500/20 text-rose-600 hover:bg-rose-500/10 rounded-xl h-10 font-black uppercase tracking-widest text-[10px] active:scale-95 transition-all"
-                        onClick={() => handleStatusUpdate([job.id], 'REJECTED')}
+                        className="w-full border-border hover:bg-primary/5 hover:text-primary rounded-xl h-10 font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 group/btn active:scale-[0.98] transition-all"
+                        onClick={() => { setSelectedJob(job); setIsDetailsModalOpen(true); }}
                       >
-                        <XCircle className="size-3.5 mr-1.5" /> Reject
+                        View Specifications
+                        <ExternalLink className="size-3.5 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
                       </Button>
+                      <div className="flex items-center gap-3">
+                        <Button
+                          className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-10 font-black uppercase tracking-widest text-[10px] shadow-lg shadow-emerald-500/10 active:scale-95 transition-all"
+                          onClick={() => handleStatusUpdate([job.id], 'APPROVED')}
+                        >
+                          <CheckCircle className="size-3.5 mr-1.5" /> Approve
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="flex-1 border-rose-500/20 text-rose-600 hover:bg-rose-500/10 rounded-xl h-10 font-black uppercase tracking-widest text-[10px] active:scale-95 transition-all"
+                          onClick={() => handleStatusUpdate([job.id], 'REJECTED')}
+                        >
+                          <XCircle className="size-3.5 mr-1.5" /> Reject
+                        </Button>
+                      </div>
                     </div>
                   ) : (
                     <Button
                       variant="outline"
                       className="w-full border-border hover:bg-primary/5 hover:text-primary rounded-xl h-10 font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 group/btn active:scale-[0.98] transition-all"
+                      onClick={() => { setSelectedJob(job); setIsDetailsModalOpen(true); }}
                     >
                       Details
                       <ExternalLink className="size-3.5 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
@@ -364,6 +389,80 @@ const AdminJobManagement: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Details Modal */}
+      <Modal
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+        title="Job Specification"
+        subtitle={selectedJob?.company?.name || "Corporate Listing"}
+        maxWidth="sm:max-w-2xl"
+      >
+        {selectedJob && (
+          <div className="space-y-8 py-2">
+            <div className="flex items-center justify-between pb-6 border-b border-border">
+              <div className="space-y-1">
+                 <h2 className="text-2xl font-black text-foreground tracking-tight leading-none uppercase">{selectedJob.title}</h2>
+                 <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em] pt-2">Ref ID: JOB-{selectedJob.id.toString().padStart(4, '0')}</p>
+              </div>
+              <Badge className={`px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest bg-${STATUS_STYLES[selectedJob.status as keyof typeof STATUS_STYLES]?.color || 'slate'}-500/10 text-${STATUS_STYLES[selectedJob.status as keyof typeof STATUS_STYLES]?.color || 'slate'}-600 border border-${STATUS_STYLES[selectedJob.status as keyof typeof STATUS_STYLES]?.color || 'slate'}-500/20`}>
+                {selectedJob.status}
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+               <div className="p-5 rounded-2xl bg-muted/30 border border-border group hover:border-emerald-500/20 transition-all">
+                  <div className="flex items-center gap-2 text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2">
+                    <IndianRupee className="size-3.5 text-emerald-500" /> Remuneration
+                  </div>
+                  <p className="text-lg font-black text-foreground">{selectedJob.salary} LPA <span className="text-[10px] text-muted-foreground font-bold">(Fixed + Variable)</span></p>
+               </div>
+               <div className="p-5 rounded-2xl bg-muted/30 border border-border group hover:border-rose-500/20 transition-all">
+                  <div className="flex items-center gap-2 text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2">
+                    <MapPin className="size-3.5 text-rose-500" /> Work Location
+                  </div>
+                  <p className="text-lg font-black text-foreground">{selectedJob.location || 'Remote Base'}</p>
+               </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="flex items-center gap-2 text-[10px] font-black text-foreground uppercase tracking-[0.2em]">
+                <Info className="size-4 text-primary" /> Role Description
+              </div>
+              <div className="p-6 bg-muted/20 border border-border rounded-[1.5rem]">
+                <p className="text-muted-foreground leading-relaxed text-sm whitespace-pre-line font-medium">
+                  {selectedJob.description || "No detailed job description provided for this listing."}
+                </p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 text-[10px] font-black text-foreground uppercase tracking-[0.2em]">
+                <CheckCircle2 className="size-4 text-sky-500" /> Eligible Departments
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {(Array.isArray(selectedJob.eligibleDepartments) ? selectedJob.eligibleDepartments : []).map((dept: any) => (
+                  <Badge key={dept.id} variant="outline" className="px-4 py-2 rounded-xl border-border bg-background text-[10px] font-black uppercase tracking-widest">
+                    {dept.name}
+                  </Badge>
+                ))}
+                {(!selectedJob.eligibleDepartments || selectedJob.eligibleDepartments.length === 0) && (
+                  <p className="text-xs text-muted-foreground italic font-medium">All departments are eligible for this role.</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end pt-4">
+               <Button 
+                onClick={() => setIsDetailsModalOpen(false)}
+                className="px-10 h-12 bg-slate-900 hover:bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest transition-all shadow-xl active:scale-95"
+               >
+                 Close Overview
+               </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
 
       {/* Pagination */}
       {!loading && filteredAndSortedJobs.length > 0 && (

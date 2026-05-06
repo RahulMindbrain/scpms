@@ -228,11 +228,11 @@ const InterviewSchedulerPage: React.FC = () => {
                   {/* Main Info */}
                   <div className="flex-1 p-6 sm:p-8 flex flex-col justify-center gap-6">
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                      <div className="space-y-2">
-                        <h3 className="text-xl font-bold text-foreground tracking-tight leading-tight group-hover:text-primary transition-colors">{drive.title}</h3>
-                        <div className="inline-flex items-center gap-2 text-primary font-black text-[10px] bg-primary/5 border border-primary/10 px-3 py-1.5 rounded-xl uppercase tracking-widest">
-                          <Building2 size={13} />
-                          {drive.company?.name || "Corporate Partner"}
+                      <div className="space-y-2 min-w-0 flex-1">
+                        <h3 className="text-xl font-bold text-foreground tracking-tight leading-tight group-hover:text-primary transition-colors truncate">{drive.title}</h3>
+                        <div className="inline-flex items-center gap-2 text-primary font-black text-[10px] bg-primary/5 border border-primary/10 px-3 py-1.5 rounded-xl uppercase tracking-widest max-w-full">
+                          <Building2 className="shrink-0" size={13} />
+                          <span className="truncate">{drive.company?.name || "Corporate Partner"}</span>
                         </div>
                       </div>
                       <Badge className={cn(
