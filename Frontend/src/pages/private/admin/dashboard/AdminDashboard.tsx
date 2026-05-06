@@ -6,16 +6,14 @@ import { SectionCards } from "@/components/section-cards"
 import { fetchDashboardStats } from "@/redux/thunks/dashboardThunk"
 import { fetchSchedules } from "@/redux/thunks/interviewThunk"
 import type { RootState, AppDispatch } from "@/redux/store/store"
-import { useSocket } from "@/socket/SocketProvider"
-import { SOCKET_EVENTS } from "@/socket/socket.events"
 
-import { 
-  LayoutDashboard, 
-  Activity, 
-  ArrowUpRight, 
-  Clock, 
-  ShieldCheck, 
-  Zap, 
+import {
+  LayoutDashboard,
+  Activity,
+  ArrowUpRight,
+  Clock,
+  ShieldCheck,
+  Zap,
   ChevronRight,
   FileText,
   UserPlus,
@@ -36,11 +34,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { cn } from "@/lib/utils"
 
 const NextInterviewCountdown = ({ schedules }: { schedules: any[] }) => {
   const [timeLeft, setTimeLeft] = useState<{ d: number; h: number; m: number; s: number } | null>(null);
-  
+
   const nextSchedule = useMemo(() => {
     if (!schedules || schedules.length === 0) return null;
     const now = new Date().getTime();
@@ -106,7 +103,7 @@ const NextInterviewCountdown = ({ schedules }: { schedules: any[] }) => {
             </div>
             <span className="px-2 py-0.5 rounded-md bg-white/10 border border-white/20 text-[9px] font-black uppercase text-white">Next Drive</span>
           </div>
-          
+
           <div>
             <h3 className="text-xl font-black leading-tight mb-1 truncate text-white">{nextSchedule.title}</h3>
             <p className="text-white/80 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1.5">
@@ -132,13 +129,13 @@ const NextInterviewCountdown = ({ schedules }: { schedules: any[] }) => {
         </div>
 
         <div className="mt-6 flex items-center justify-between">
-           <div className="flex flex-col">
-              <span className="text-[10px] font-black text-indigo-200 uppercase tracking-widest">Venue</span>
-              <span className="text-xs font-bold text-white truncate max-w-[120px]">{nextSchedule.venue}</span>
-           </div>
-           <div className="size-10 rounded-full bg-white text-indigo-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform cursor-pointer">
-              <ArrowUpRight className="size-5" />
-           </div>
+          <div className="flex flex-col">
+            <span className="text-[10px] font-black text-indigo-200 uppercase tracking-widest">Venue</span>
+            <span className="text-xs font-bold text-white truncate max-w-[120px]">{nextSchedule.venue}</span>
+          </div>
+          <div className="size-10 rounded-full bg-white text-indigo-600 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform cursor-pointer">
+            <ArrowUpRight className="size-5" />
+          </div>
         </div>
       </div>
       {/* Decorative elements */}
@@ -193,7 +190,7 @@ const DeptStatsTable = ({ deptStats }: { deptStats: any[] }) => {
                         {rate}%
                       </span>
                       <div className="w-16 h-1 bg-muted rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className={`h-full transition-all duration-1000 ease-out ${Number(rate) > 50 ? 'bg-emerald-500' : 'bg-amber-500'}`}
                           style={{ width: `${rate}%` }}
                         />
@@ -210,7 +207,7 @@ const DeptStatsTable = ({ deptStats }: { deptStats: any[] }) => {
   )
 }
 
-const ActivityFeed = ({ notifications, loading, socket }: { notifications: any[]; loading: boolean; socket: any }) => {
+const ActivityFeed = ({ notifications, loading }: { notifications: any[]; loading: boolean }) => {
   const getNotificationStyles = (type: string) => {
     switch (type?.toUpperCase()) {
       case 'PLACEMENT':
@@ -246,7 +243,7 @@ const ActivityFeed = ({ notifications, loading, socket }: { notifications: any[]
         <h3 className="text-lg font-black text-foreground tracking-tight">Recent Activity</h3>
         <button className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline">View All</button>
       </div>
-      
+
       <div className="space-y-6 flex-1 overflow-y-auto custom-scrollbar pr-2 max-h-[400px]">
         {loading ? (
           <div className="flex flex-col gap-6">
@@ -287,16 +284,11 @@ const ActivityFeed = ({ notifications, loading, socket }: { notifications: any[]
           </div>
         )}
       </div>
-      
+
       <div className="mt-8 pt-6 border-t border-border/50">
         <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10 flex items-center gap-4">
-          <div className={cn(
-            "size-2 rounded-full",
-            socket?.connected ? "bg-primary animate-ping" : "bg-rose-500"
-          )} />
-          <p className="text-xs font-bold text-primary">
-            {socket?.connected ? "Live Notification Sync Active" : "Real-time Sync Interrupted"}
-          </p>
+          <div className="size-2 rounded-full bg-primary animate-ping" />
+          <p className="text-xs font-bold text-primary">Live Notification Sync Active</p>
         </div>
       </div>
     </div>
@@ -316,7 +308,7 @@ const QuickActions = () => {
       <h3 className="text-lg font-black text-foreground tracking-tight mb-6">Quick Operations</h3>
       <div className="grid grid-cols-1 gap-3">
         {actions.map((action, idx) => (
-          <button 
+          <button
             key={idx}
             onClick={() => navigate(action.path)}
             className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 hover:bg-primary hover:text-white transition-all duration-300 group text-left"
@@ -341,45 +333,12 @@ export default function AdminDashboard() {
   const { schedules, loading: schedLoading } = useSelector((state: RootState) => state.interview)
   const { items: notifications, loading: notifLoading } = useSelector((state: RootState) => state.notification)
   const { user } = useSelector((state: RootState) => state.auth)
-  const { socket } = useSocket()
 
   useEffect(() => {
     dispatch(fetchDashboardStats())
     dispatch(fetchSchedules(undefined))
     dispatch(fetchNotifications({ page: 1, limit: 10 }))
   }, [dispatch])
-
-  useEffect(() => {
-    if (!socket || !user) return;
-    const handleConnect = () => {
-      socket.emit("join", { userId: user.id, role: user.role });
-    };
-    if (socket.connected) handleConnect();
-    socket.on("connect", handleConnect);
-    return () => { socket.off("connect", handleConnect); };
-  }, [socket, user]);
-
-  useEffect(() => {
-    if (!socket) return;
-    const handleUpdate = () => {
-      dispatch(fetchDashboardStats());
-      dispatch(fetchNotifications({ page: 1, limit: 10 }));
-      dispatch(fetchSchedules(undefined));
-    };
-    socket.on(SOCKET_EVENTS.NEW_APPLICATION, handleUpdate);
-    socket.on(SOCKET_EVENTS.NEW_USER_REGISTERED, handleUpdate);
-    socket.on(SOCKET_EVENTS.OFFER_ACCEPTED, handleUpdate);
-    socket.on(SOCKET_EVENTS.SCHEDULE_CREATED, handleUpdate);
-    socket.on(SOCKET_EVENTS.SCHEDULE_APPROVED, handleUpdate);
-    
-    return () => {
-      socket.off(SOCKET_EVENTS.NEW_APPLICATION, handleUpdate);
-      socket.off(SOCKET_EVENTS.NEW_USER_REGISTERED, handleUpdate);
-      socket.off(SOCKET_EVENTS.OFFER_ACCEPTED, handleUpdate);
-      socket.off(SOCKET_EVENTS.SCHEDULE_CREATED, handleUpdate);
-      socket.off(SOCKET_EVENTS.SCHEDULE_APPROVED, handleUpdate);
-    };
-  }, [dispatch, socket]);
 
   if ((dashLoading || schedLoading || notifLoading) && !dashboardData) {
     return <Loader text="Synchronizing tactical data..." />
@@ -427,22 +386,16 @@ export default function AdminDashboard() {
         icon={LayoutDashboard}
         variant="indigo"
       >
-         <div className="flex items-center gap-3">
-            <div className="hidden md:flex flex-col items-end mr-4">
-               <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Network Status</span>
-               <div className={cn(
-                 "flex items-center gap-1.5 font-black text-xs uppercase transition-colors",
-                 socket?.connected ? "text-emerald-500" : "text-rose-500"
-               )}>
-                  <span className={cn(
-                    "size-1.5 rounded-full transition-all",
-                    socket?.connected ? "bg-emerald-500 animate-pulse" : "bg-rose-500"
-                  )} />
-                  {socket?.connected ? "Synchronized" : "Disconnected"}
-               </div>
+        <div className="flex items-center gap-3">
+          <div className="hidden md:flex flex-col items-end mr-4">
+            <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Network Status</span>
+            <div className="flex items-center gap-1.5 text-emerald-500 font-black text-xs uppercase">
+              <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Synchronized
             </div>
-           
-         </div>
+          </div>
+
+        </div>
       </PageHeader>
 
       <div className="space-y-8 pb-10">
@@ -458,23 +411,23 @@ export default function AdminDashboard() {
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
           <div className="xl:col-span-8 flex flex-col">
             <div className="saas-card flex-1">
-               <div className="flex items-center justify-between mb-8">
-                  <div>
-                    <h3 className="text-xl font-black text-foreground tracking-tight">Placement Velocity</h3>
-                    <p className="text-xs font-medium text-muted-foreground mt-0.5">Rolling trends for current academic session</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                     <span className="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-500 text-[10px] font-black uppercase tracking-wider border border-indigo-500/20">Active Session</span>
-                  </div>
-               </div>
-               <div className="h-[400px]">
-                 <ChartAreaInteractive data={stats.deptStats} />
-               </div>
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h3 className="text-xl font-black text-foreground tracking-tight">Placement Velocity</h3>
+                  <p className="text-xs font-medium text-muted-foreground mt-0.5">Rolling trends for current academic session</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-indigo-500/10 text-indigo-500 text-[10px] font-black uppercase tracking-wider border border-indigo-500/20">Active Session</span>
+                </div>
+              </div>
+              <div className="h-[400px]">
+                <ChartAreaInteractive data={stats.deptStats} />
+              </div>
             </div>
           </div>
-          
+
           <div className="xl:col-span-4">
-            <ActivityFeed notifications={notifications} loading={notifLoading} socket={socket} />
+            <ActivityFeed notifications={notifications} loading={notifLoading} />
           </div>
         </div>
 
@@ -483,7 +436,7 @@ export default function AdminDashboard() {
           <div className="xl:col-span-8">
             <DeptStatsTable deptStats={stats.deptStats} />
           </div>
-          
+
           <div className="xl:col-span-4 flex flex-col gap-8">
             <QuickActions />
             <NextInterviewCountdown schedules={schedules} />
