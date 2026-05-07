@@ -27,10 +27,11 @@ const AdminManagement = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { admins, loading, isSubmitting } = useSelector((state: RootState) => state.superAdmin);
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("ALL");
 
   useEffect(() => {
-    dispatch(fetchAdmins());
-  }, [dispatch]);
+    dispatch(fetchAdmins(statusFilter === "ALL" ? undefined : statusFilter));
+  }, [dispatch, statusFilter]);
 
   const handleStatusChange = async (ids: number[], status: boolean) => {
     try {
@@ -68,23 +69,41 @@ const AdminManagement = () => {
 
       <div className="space-y-8 pb-10">
         <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
-          <div className="relative w-full md:w-96 group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
-            <Input
-              placeholder="Search administrators..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-11 h-12 bg-card border-border/50 rounded-2xl shadow-sm focus:ring-primary/10 transition-all"
-            />
+          <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+            <div className="relative w-full md:w-80 group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+              <Input
+                placeholder="Search administrators..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-11 h-12 bg-card border-border/50 rounded-2xl shadow-sm focus:ring-primary/10 transition-all"
+              />
+            </div>
+            
+            <div className="flex p-1.5 bg-muted/30 backdrop-blur-xl rounded-2xl border border-border/50 self-start">
+              {[
+                { id: 'ALL', label: 'All nodes' },
+                { id: 'ACTIVE', label: 'Active' },
+                { id: 'INACTIVE', label: 'Pending' }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setStatusFilter(tab.id)}
+                  className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${
+                    statusFilter === tab.id 
+                      ? 'bg-card text-indigo-600 shadow-sm shadow-indigo-500/10 border border-border/50' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <Button 
-            className="rounded-2xl h-12 px-8 font-black uppercase tracking-widest text-[11px] gap-2 shadow-lg shadow-indigo-500/20"
-            onClick={() => navigate("/superadmin/admins/register")}
-          >
-            <User className="size-4" /> Add Administrator
-          </Button>
         </div>
+
+
 
         <div className="saas-card overflow-hidden">
           <div className="overflow-x-auto">

@@ -45,8 +45,9 @@ const superAdminSlice = createSlice({
       })
       .addCase(fetchUniversities.fulfilled, (state, action) => {
         state.loading = false;
-        state.universities = action.payload;
+        state.universities = action.payload.data;
       })
+
       .addCase(fetchUniversities.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
@@ -58,8 +59,9 @@ const superAdminSlice = createSlice({
       })
       .addCase(fetchAdmins.fulfilled, (state, action) => {
         state.loading = false;
-        state.admins = action.payload;
+        state.admins = action.payload.data;
       })
+
       .addCase(fetchAdmins.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
@@ -71,8 +73,9 @@ const superAdminSlice = createSlice({
       })
       .addCase(fetchCompanies.fulfilled, (state, action) => {
         state.loading = false;
-        state.companies = action.payload;
+        state.companies = action.payload.data;
       })
+
       .addCase(fetchCompanies.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
@@ -84,8 +87,9 @@ const superAdminSlice = createSlice({
       })
       .addCase(addUniversity.fulfilled, (state, action) => {
         state.isSubmitting = false;
-        state.universities.push(action.payload);
+        state.universities.push(action.payload.data);
       })
+
       .addCase(addUniversity.rejected, (state, action) => {
         state.isSubmitting = false;
         state.error = action.payload as string;
