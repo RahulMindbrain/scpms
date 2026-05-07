@@ -1,14 +1,14 @@
 import { useEffect } from "react";
-import { 
-  LayoutDashboard, 
-  Users, 
-  Building2, 
-  Briefcase, 
-  ShieldCheck, 
-  Zap, 
-  ArrowUpRight, 
-  CheckCircle2, 
-  Circle, 
+import {
+  LayoutDashboard,
+  Users,
+  Building2,
+  Briefcase,
+  ShieldCheck,
+  Zap,
+  ArrowUpRight,
+  CheckCircle2,
+  Circle,
   ArrowRight,
   Clock
 } from "lucide-react";
@@ -18,37 +18,37 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "@/redux/store/store";
 import type { RootState } from "@/redux/reducers/rootReducer";
 import { fetchUniversities } from "@/redux/thunks/superadmin/universityThunks";
-import {fetchAdmins} from "@/redux/thunks/superadmin/adminThunks"
+import { fetchAdmins } from "@/redux/thunks/superadmin/adminThunks"
 const OnboardingFlow = ({ admins, universities, companies }: any) => {
   const steps = [
-    { 
-      id: "superadmin", 
-      title: "Account Activation", 
-      desc: "Super Admin verification", 
+    {
+      id: "superadmin",
+      title: "Account Activation",
+      desc: "Super Admin verification",
       icon: ShieldCheck,
       count: admins.filter((a: any) => a.onboardingStep === 'ACTIVATE_ACCOUNT').length,
       status: admins.some((a: any) => a.onboardingStep === 'ACTIVATE_ACCOUNT') ? 'attention' : 'completed'
     },
-    { 
-      id: "university", 
-      title: "Univ. Acceptance", 
-      desc: "Handle node requests", 
+    {
+      id: "university",
+      title: "Univ. Acceptance",
+      desc: "Handle node requests",
       icon: Building2,
       count: admins.filter((a: any) => a.onboardingStep === 'UNIVERSITY_ACCEPTANCE').length,
       status: admins.some((a: any) => a.onboardingStep === 'UNIVERSITY_ACCEPTANCE') ? 'attention' : 'pending'
     },
-    { 
-      id: "profile", 
-      title: "Profile Genesis", 
-      desc: "Institutional setup", 
+    {
+      id: "profile",
+      title: "Profile Genesis",
+      desc: "Institutional setup",
       icon: Users,
       count: admins.filter((a: any) => a.onboardingStep === 'CREATE_PROFILE').length,
       status: admins.some((a: any) => a.onboardingStep === 'CREATE_PROFILE') ? 'attention' : 'pending'
     },
-    { 
-      id: "company", 
-      title: "Company Active", 
-      desc: "Final authorization", 
+    {
+      id: "company",
+      title: "Company Active",
+      desc: "Final authorization",
       icon: Briefcase,
       count: companies.filter((c: any) => c.activationStep === 'PENDING_COMPANY_APPROVAL').length,
       status: companies.some((c: any) => c.activationStep === 'PENDING_COMPANY_APPROVAL') ? 'attention' : 'pending'
@@ -70,25 +70,23 @@ const OnboardingFlow = ({ admins, universities, companies }: any) => {
       <div className="relative">
         {/* Connection Line */}
         <div className="absolute top-1/2 left-0 w-full h-0.5 bg-muted -translate-y-1/2 hidden lg:block" />
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
           {steps.map((step, idx) => (
             <div key={step.id} className="relative group">
-              <div className={`p-6 rounded-3xl border transition-all duration-300 ${
-                step.status === 'attention' 
-                  ? 'bg-indigo-500/5 border-indigo-500/20 shadow-lg shadow-indigo-500/5' 
+              <div className={`p-6 rounded-3xl border transition-all duration-300 ${step.status === 'attention'
+                  ? 'bg-indigo-500/5 border-indigo-500/20 shadow-lg shadow-indigo-500/5'
                   : step.status === 'completed'
-                  ? 'bg-emerald-500/5 border-emerald-500/20'
-                  : 'bg-card border-border/50'
-              }`}>
+                    ? 'bg-emerald-500/5 border-emerald-500/20'
+                    : 'bg-card border-border/50'
+                }`}>
                 <div className="flex items-start justify-between mb-4">
-                  <div className={`size-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${
-                    step.status === 'attention' 
-                      ? 'bg-indigo-500 text-white' 
+                  <div className={`size-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${step.status === 'attention'
+                      ? 'bg-indigo-500 text-white'
                       : step.status === 'completed'
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-muted text-muted-foreground'
-                  }`}>
+                        ? 'bg-emerald-500 text-white'
+                        : 'bg-muted text-muted-foreground'
+                    }`}>
                     <step.icon className="size-6" />
                   </div>
                   {step.count > 0 && (
@@ -97,20 +95,20 @@ const OnboardingFlow = ({ admins, universities, companies }: any) => {
                     </span>
                   )}
                 </div>
-                
+
                 <h4 className="text-sm font-black text-foreground mb-1 flex items-center gap-2">
                   {step.title}
                   {step.status === 'completed' && <CheckCircle2 className="size-3 text-emerald-500" />}
                 </h4>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{step.desc}</p>
-                
+
                 {step.status === 'attention' && (
                   <div className="mt-4 flex items-center gap-1.5 text-[9px] font-black text-indigo-600 uppercase tracking-widest bg-indigo-500/10 w-fit px-2 py-0.5 rounded-md">
                     <Clock className="size-3" /> Action Required
                   </div>
                 )}
               </div>
-              
+
               {idx < steps.length - 1 && (
                 <div className="absolute top-1/2 -right-4 -translate-y-1/2 z-20 hidden lg:flex">
                   <div className="size-8 rounded-full bg-card border border-border/50 flex items-center justify-center text-muted-foreground shadow-sm">
@@ -198,7 +196,7 @@ const SuperAdminDashboard = () => {
                 </div>
                 <button className="text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:underline">Full Audit</button>
               </div>
-              
+
               <div className="space-y-6">
                 {[
                   { node: "Central API Cluster", status: "Operational", load: "24%", color: "bg-emerald-500" },
@@ -215,13 +213,13 @@ const SuperAdminDashboard = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-6">
-                       <div className="hidden sm:flex flex-col items-end">
-                          <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Resource Load</span>
-                          <div className="w-24 h-1 bg-muted rounded-full mt-1">
-                             <div className={`h-full ${shard.color} rounded-full`} style={{ width: shard.load }} />
-                          </div>
-                       </div>
-                       <span className="text-sm font-black text-foreground tabular-nums">{shard.load}</span>
+                      <div className="hidden sm:flex flex-col items-end">
+                        <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Resource Load</span>
+                        <div className="w-24 h-1 bg-muted rounded-full mt-1">
+                          <div className={`h-full ${shard.color} rounded-full`} style={{ width: shard.load }} />
+                        </div>
+                      </div>
+                      <span className="text-sm font-black text-foreground tabular-nums">{shard.load}</span>
                     </div>
                   </div>
                 ))}
@@ -236,35 +234,35 @@ const SuperAdminDashboard = () => {
               <div className="relative z-10">
                 <h3 className="text-xl font-black text-foreground tracking-tight">SuperAdmin Broadcast</h3>
                 <p className="text-sm text-slate-400 mb-8 font-medium">Issue high-level directives to all system administrators.</p>
-                
+
                 <div className="space-y-4">
-                   <button className="w-full p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center justify-between group">
-                      <div className=" flex text-xl font-black text-foreground tracking-tight">
-                         <div className="size-8 rounded-xl bg-indigo-500 flex items-center justify-center">
-                            <ShieldCheck className="size-4" />
-                          </div>
-                         <span className="text-sm font-bold">Update Security Policy</span>
+                  <button className="w-full p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center justify-between group">
+                    <div className=" flex text-xl font-black text-foreground tracking-tight">
+                      <div className="size-8 rounded-xl bg-indigo-500 flex items-center justify-center">
+                        <ShieldCheck className="size-4" />
                       </div>
-                      <ArrowUpRight className="size-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                   </button>
-                   <button className="w-full p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center justify-between group">
-                      <div className="flex items-center gap-3">
-                         <div className="size-8 rounded-xl bg-emerald-500 flex items-center justify-center">
-                            <Building2 className="size-4" />
-                          </div>
-                         <span className="text-sm font-bold">Onboard University</span>
+                      <span className="text-sm font-black text-muted-foreground uppercase tracking-widest">Update Security Policy</span>
+                    </div>
+                    <ArrowUpRight className="size-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </button>
+                  <button className="w-full p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center justify-between group">
+                    <div className="flex items-center gap-3">
+                      <div className="size-8 rounded-xl bg-emerald-500 flex items-center justify-center">
+                        <Building2 className="size-4" />
                       </div>
-                      <ArrowUpRight className="size-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                   </button>
-                   <button className="w-full p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center justify-between group">
-                      <div className="flex items-center gap-3">
-                         <div className="size-8 rounded-xl bg-amber-500 flex items-center justify-center">
-                            <Zap className="size-4" />
-                          </div>
-                         <span className="text-sm font-bold">System Maintenance</span>
+                      <span className="text-sm font-black text-muted-foreground uppercase tracking-widest">Onboard University</span>
+                    </div>
+                    <ArrowUpRight className="size-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </button>
+                  <button className="w-full p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center justify-between group">
+                    <div className="flex items-center gap-3">
+                      <div className="size-8 rounded-xl bg-amber-500 flex items-center justify-center">
+                        <Zap className="size-4" />
                       </div>
-                      <ArrowUpRight className="size-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                   </button>
+                      <span className="text-sm font-black text-muted-foreground uppercase tracking-widest">System Maintenance</span>
+                    </div>
+                    <ArrowUpRight className="size-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                  </button>
                 </div>
               </div>
               {/* Background gradient */}
