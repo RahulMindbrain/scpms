@@ -4,7 +4,7 @@ export const createJobUniversity = async (
   jobId: number,
   jobUniversities: any[],
 ) => {
-  return prisma.jobUniversity.createMany({
+  await prisma.jobUniversity.createMany({
     data: jobUniversities.map((u) => ({
       jobId,
       universityId: u.universityId,
@@ -14,7 +14,35 @@ export const createJobUniversity = async (
       openings: u.openings,
       description: u.description,
     })),
+
     skipDuplicates: true,
+  });
+
+  return prisma.jobUniversity.findMany({
+    where: {
+      jobId,
+      universityId: {
+        in: jobUniversities.map((u) => u.universityId),
+      },
+    },
+
+    include: {
+      university: {
+        select: {
+          id: true,
+          name: true,
+          city: true,
+          state: true,
+        },
+      },
+
+      job: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+    },
   });
 };
 
@@ -26,25 +54,75 @@ export const updateJobUniversityStatus = async (
 ) => {
   const now = new Date();
 
-  return prisma.jobUniversity.updateMany({
+  await prisma.jobUniversity.updateMany({
     where: {
       id: { in: ids },
       universityId,
       status: "PENDING",
     },
+
     data: {
       status,
-      ...(status === "APPROVED" && { approvedAt: now }),
+
+      ...(status === "APPROVED" && {
+        approvedAt: now,
+      }),
 
       ...(status === "REJECTED" && {
         rejectedAt: now,
-        rejectionReason: reason,
+
         rejectionCount: {
           increment: 1,
         },
+
+        ...(reason && {
+          rejectionReason: reason,
+        }),
       }),
     },
   });
+
+  const data = await prisma.jobUniversity.findMany({
+    where: {
+      id: { in: ids },
+      universityId,
+    },
+
+    include: {
+      university: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+
+      job: {
+        select: {
+          id: true,
+          title: true,
+          location: true,
+
+          company: {
+            select: {
+              id: true,
+              name: true,
+
+              user: {
+                select: {
+                  email: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  return {
+    count: data.length,
+    data,
+  };
 };
 
 export const updateJobUniversities = async (jobId: number, updates: any[]) => {

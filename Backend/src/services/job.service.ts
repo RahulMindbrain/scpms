@@ -15,51 +15,59 @@ import { getUniversitiesByIds } from "../repository/university.repository";
 import { normalizeText } from "../utils/normalize.utils";
 
 export const createJobService = async (data: any, userId: number) => {
-  const { eligibleDepartmentIds, skillIds, ...jobData } = data;
+  const { eligibleDepartmentIds, skillIds, universities, ...jobData } = data;
 
   const company = await getCompanyByUserId(userId);
-  if (!company) throw new Error("Company profile not found");
+
+  if (!company) {
+    throw new Error("Company profile not found");
+  }
 
   if (jobData.title !== undefined) {
     jobData.title = normalizeText(jobData.title);
   }
-  if (jobData.description !== undefined) {
-    jobData.description = normalizeText(jobData.description);
-  }
+
   if (jobData.location !== undefined) {
     jobData.location = normalizeText(jobData.location);
   }
 
-  let deptConnect: any[] | undefined;
   if (eligibleDepartmentIds?.length) {
     const departments = await getDepartmentsByIds(eligibleDepartmentIds);
+
     const foundIds = new Set(departments.map((d) => d.id));
+
     const missing = eligibleDepartmentIds.filter(
       (id: number) => !foundIds.has(id),
     );
+
     if (missing.length) {
       throw new Error(`Invalid department IDs: ${missing.join(", ")}`);
     }
-    deptConnect = eligibleDepartmentIds.map((id: number) => ({ id }));
   }
 
-  let skillConnect: any[] | undefined;
   if (skillIds?.length) {
     const skills = await getSkillsByIds(skillIds);
+
     const foundIds = new Set(skills.map((s) => s.id));
+
     const missing = skillIds.filter((id: number) => !foundIds.has(id));
+
     if (missing.length) {
       throw new Error(`Invalid skill IDs: ${missing.join(", ")}`);
     }
-    skillConnect = skillIds.map((id: number) => ({ id }));
   }
 
-  return createJob({
-    ...jobData,
+  const job = await createJob({
+    title: jobData.title,
+    location: jobData.location,
+
     companyId: company.id,
-    ...(deptConnect && { eligibleDepartments: { connect: deptConnect } }),
-    ...(skillConnect && { skills: { connect: skillConnect } }),
+
+    eligibleDepartmentIds,
+    skillIds,
   });
+
+  return job;
 };
 
 export const getJobsService = async (params: {

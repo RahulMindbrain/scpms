@@ -8,6 +8,8 @@ import {
 import { authorizeRoles } from "../middlewares/verifyRole";
 import requireActiveUser from "../middlewares/requireActiveUser";
 import authenticateUser from "../middlewares/authenticateUser";
+import { validate } from "../middlewares/validate";
+import { createJobUniversitySchema } from "../validators/jobUniversity.validator";
 
 const jobUniversityRouter = express.Router();
 
@@ -16,6 +18,7 @@ jobUniversityRouter.post(
   authenticateUser,
   requireActiveUser,
   authorizeRoles("COMPANY"),
+  validate(createJobUniversitySchema),
   sendJobToUniversitiesController,
 );
 

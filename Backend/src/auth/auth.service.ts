@@ -124,6 +124,7 @@ export const forgotPasswordService = async (email: string) => {
   }
 
   const { otp, hashedOtp } = await generateOtp();
+  console.log(otp);
 
   const updated = await storeOtpByUserId(user.id, hashedOtp, OTP_EXPIRY);
 
@@ -151,6 +152,7 @@ export const resendOtpService = async (email: string) => {
   }
 
   const { otp, hashedOtp } = await generateOtp();
+  console.log(otp);
 
   const updated = await storeOtpByUserId(user.id, hashedOtp, OTP_EXPIRY);
 
