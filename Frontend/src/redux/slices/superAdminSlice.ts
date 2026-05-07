@@ -1,13 +1,18 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { 
-  fetchUniversities, 
-  fetchAdmins, 
-  fetchCompanies, 
-  updateAdminStatus, 
-  updateCompanyStatus,
-  activateAdmin
-} from "../thunks/superAdminThunk";
 
+import { fetchUniversities } from "../thunks/superadmin/universityThunks";
+
+import {
+  fetchAdmins,
+  updateAdminStatus,
+  activateAdmin,
+  registerAdmin,
+} from "../thunks/superadmin/adminThunks";
+
+import {
+  fetchCompanies,
+  updateCompanyStatus,
+} from "../thunks/superadmin/companyThunks";
 
 
 interface SuperAdminState {

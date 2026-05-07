@@ -40,7 +40,7 @@ const routeTitles: Record<string, string> = {
   "/superadmin/companies":   "Companies",
 }
 
-// Site Header component for the Indigo Nexus theme
+// Site Header component for the Indigo SuperAdmin theme
 export function SiteHeader() {
   const location = useLocation()
 

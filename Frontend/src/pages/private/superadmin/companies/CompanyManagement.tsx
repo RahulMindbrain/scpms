@@ -18,7 +18,7 @@ import { AdminPageLayout } from "@/components/layout/AdminPageLayout";
 import { PageHeader } from "@/components/PageHeader";
 import Loader from "@/components/Loader";
 
-import { updateCompanyStatus } from "@/redux/thunks/superAdminThunk";
+import { updateCompanyStatus } from "@/redux/thunks/superadmin/companyThunks";
 
 const CompanyManagement = () => {
   const dispatch = useDispatch<AppDispatch>();

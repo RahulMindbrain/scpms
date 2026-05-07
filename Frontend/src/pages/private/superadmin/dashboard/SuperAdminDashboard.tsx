@@ -17,8 +17,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "@/redux/store/store";
 import type { RootState } from "@/redux/reducers/rootReducer";
-import { fetchUniversities, fetchAdmins } from "@/redux/thunks/superAdminThunk";
-
+import { fetchUniversities } from "@/redux/thunks/superadmin/universityThunks";
+import {fetchAdmins} from "@/redux/thunks/superadmin/adminThunks"
 const OnboardingFlow = ({ admins, universities, companies }: any) => {
   const steps = [
     { 
@@ -148,7 +148,7 @@ const SuperAdminDashboard = () => {
       <PageHeader
         title={`Global Command Center, ${user?.firstname || "Super Admin"}`}
         description="Unified oversight and management of the entire CPMS ecosystem."
-        badge="Nexus Control"
+        badge="SuperAdmin Control"
         icon={LayoutDashboard}
         variant="indigo"
       >
@@ -157,7 +157,7 @@ const SuperAdminDashboard = () => {
             <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Network Status</span>
             <div className="flex items-center gap-1.5 text-emerald-500 font-black text-xs uppercase">
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Nexus Online
+              SuperAdmin Online
             </div>
           </div>
         </div>
@@ -230,14 +230,16 @@ const SuperAdminDashboard = () => {
           </div>
 
           <div className="lg:col-span-4">
-            <div className="saas-card h-full bg-slate-900 text-white border-none relative overflow-hidden">
+            <div className="saas-card h-full relative overflow-hidden
+  bg-slate-950 text-white border border-slate-800
+  dark:bg-slate-900 dark:border-slate-800">
               <div className="relative z-10">
-                <h3 className="text-xl font-black tracking-tight mb-2">Nexus Broadcast</h3>
+                <h3 className="text-xl font-black text-foreground tracking-tight">SuperAdmin Broadcast</h3>
                 <p className="text-sm text-slate-400 mb-8 font-medium">Issue high-level directives to all system administrators.</p>
                 
                 <div className="space-y-4">
                    <button className="w-full p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center justify-between group">
-                      <div className="flex items-center gap-3">
+                      <div className=" flex text-xl font-black text-foreground tracking-tight">
                          <div className="size-8 rounded-xl bg-indigo-500 flex items-center justify-center">
                             <ShieldCheck className="size-4" />
                           </div>

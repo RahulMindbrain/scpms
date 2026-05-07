@@ -19,7 +19,7 @@ import { AdminPageLayout } from "@/components/layout/AdminPageLayout";
 import { PageHeader } from "@/components/PageHeader";
 import Loader from "@/components/Loader";
 
-import { fetchAdmins, updateAdminStatus, activateAdmin } from "@/redux/thunks/superAdminThunk";
+import { fetchAdmins, updateAdminStatus, activateAdmin } from "@/redux/thunks/superadmin/adminThunks";
 
 
 const AdminManagement = () => {

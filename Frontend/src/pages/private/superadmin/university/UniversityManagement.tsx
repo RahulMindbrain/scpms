@@ -3,7 +3,7 @@ import { Building2, Search, Plus, MapPin, Mail, ChevronRight, Pencil } from "luc
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "@/redux/store/store";
 import type { RootState } from "@/redux/reducers/rootReducer";
-import { fetchUniversities } from "@/redux/thunks/superAdminThunk";
+import { fetchUniversities } from "@/redux/thunks/superadmin/universityThunks";
 
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";

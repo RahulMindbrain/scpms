@@ -10,7 +10,9 @@ import { Label } from "@/components/ui/label";
 import { AdminPageLayout } from "@/components/layout/AdminPageLayout";
 import { PageHeader } from "@/components/PageHeader";
 import { toast } from "sonner";
-import { fetchAdmins, registerAdmin, fetchUniversities } from "@/redux/thunks/superAdminThunk";
+import { fetchAdmins, registerAdmin } from "@/redux/thunks/superadmin/adminThunks";
+
+import { fetchUniversities } from "@/redux/thunks/superadmin/universityThunks";
 import {
   Select,
   SelectContent,
