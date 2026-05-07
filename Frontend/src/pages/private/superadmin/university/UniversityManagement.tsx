@@ -3,7 +3,8 @@ import { Building2, Search, Plus, MapPin, Mail, ChevronRight, Pencil } from "luc
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "@/redux/store/store";
 import type { RootState } from "@/redux/reducers/rootReducer";
-import { fetchUniversities, addUniversity } from "@/redux/thunks/superAdminThunk";
+import { fetchUniversities } from "@/redux/thunks/superAdminThunk";
+
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,16 +31,9 @@ import Loader from "@/components/Loader";
 
 const UniversityManagement = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { universities, loading, isSubmitting } = useSelector((state: RootState) => state.superAdmin);
+  const { universities, loading } = useSelector((state: RootState) => state.superAdmin);
   
   const [search, setSearch] = useState("");
-  const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [newUniversity, setNewUniversity] = useState({
-    name: "",
-    domain: "",
-    address: "",
-    contactEmail: "",
-  });
 
   useEffect(() => {
     dispatch(fetchUniversities());
@@ -50,22 +44,6 @@ const UniversityManagement = () => {
     u.domain?.toLowerCase().includes(search.trim().toLowerCase())
   );
 
-  const handleAdd = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newUniversity.name || !newUniversity.domain) {
-      toast.error("Name and Domain are required.");
-      return;
-    }
-
-    try {
-      await dispatch(addUniversity(newUniversity)).unwrap();
-      toast.success("University registered successfully.");
-      setNewUniversity({ name: "", domain: "", address: "", contactEmail: "" });
-      setIsCreateOpen(false);
-    } catch (error: any) {
-      toast.error(error || "Failed to register university.");
-    }
-  };
 
   return (
     <AdminPageLayout>
@@ -75,84 +53,9 @@ const UniversityManagement = () => {
         badge="Node Management"
         icon={Building2}
         variant="blue"
-      >
-        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-          <DialogTrigger asChild>
-            <Button className="h-11 px-6 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl shadow-lg shadow-blue-500/20 transition-all active:scale-95">
-              <Plus className="w-4 h-4 mr-2" /> Add University
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px] p-0 overflow-hidden border-none rounded-3xl">
-            <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-8 text-white">
-              <DialogHeader>
-                <DialogTitle className="text-2xl font-black">New Institution</DialogTitle>
-                <DialogDescription className="text-blue-100/70 font-medium">
-                  Register a new university node into the CPMS ecosystem.
-                </DialogDescription>
-              </DialogHeader>
-            </div>
-            <form onSubmit={handleAdd} className="p-8 space-y-4 bg-card">
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">University Name</label>
-                <Input
-                  required
-                  placeholder="e.g. Stanford University"
-                  value={newUniversity.name}
-                  onChange={(e) => setNewUniversity({ ...newUniversity, name: e.target.value })}
-                  className="h-12 bg-muted/30 border-border/50 rounded-xl focus:ring-primary/20 transition-all font-bold"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Official Domain</label>
-                <Input
-                  required
-                  placeholder="e.g. stanford.edu"
-                  value={newUniversity.domain}
-                  onChange={(e) => setNewUniversity({ ...newUniversity, domain: e.target.value })}
-                  className="h-12 bg-muted/30 border-border/50 rounded-xl focus:ring-primary/20 transition-all font-bold"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Contact Email</label>
-                <Input
-                  type="email"
-                  placeholder="admin@university.edu"
-                  value={newUniversity.contactEmail}
-                  onChange={(e) => setNewUniversity({ ...newUniversity, contactEmail: e.target.value })}
-                  className="h-12 bg-muted/30 border-border/50 rounded-xl focus:ring-primary/20 transition-all font-bold"
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground ml-1">Location Address</label>
-                <Input
-                  placeholder="Street, City, State"
-                  value={newUniversity.address}
-                  onChange={(e) => setNewUniversity({ ...newUniversity, address: e.target.value })}
-                  className="h-12 bg-muted/30 border-border/50 rounded-xl focus:ring-primary/20 transition-all font-bold"
-                />
-              </div>
-              <DialogFooter className="gap-3 pt-4">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="flex-1 h-12 rounded-xl font-bold"
-                  onClick={() => setIsCreateOpen(false)}
-                  disabled={isSubmitting}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="submit"
-                  className="flex-1 h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-black shadow-lg shadow-blue-500/20"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? <Loader size="sm" /> : "Register Node"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </PageHeader>
+      />
+
+
 
       <div className="space-y-8 pb-10">
         <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">

@@ -3,12 +3,11 @@ import {
   fetchUniversities, 
   fetchAdmins, 
   fetchCompanies, 
-  addUniversity, 
-  registerAdmin, 
   updateAdminStatus, 
   updateCompanyStatus,
   activateAdmin
 } from "../thunks/superAdminThunk";
+
 
 
 interface SuperAdminState {
@@ -81,33 +80,8 @@ const superAdminSlice = createSlice({
         state.error = action.payload as string;
       })
 
-      // Add University
-      .addCase(addUniversity.pending, (state) => {
-        state.isSubmitting = true;
-      })
-      .addCase(addUniversity.fulfilled, (state, action) => {
-        state.isSubmitting = false;
-        state.universities.push(action.payload.data);
-      })
-
-      .addCase(addUniversity.rejected, (state, action) => {
-        state.isSubmitting = false;
-        state.error = action.payload as string;
-      })
-
-      // Register Admin
-      .addCase(registerAdmin.pending, (state) => {
-        state.isSubmitting = true;
-      })
-      .addCase(registerAdmin.fulfilled, (state) => {
-        state.isSubmitting = false;
-      })
-      .addCase(registerAdmin.rejected, (state, action) => {
-        state.isSubmitting = false;
-        state.error = action.payload as string;
-      })
-
       // Update Admin Status
+
       .addCase(updateAdminStatus.pending, (state) => {
         state.isSubmitting = true;
       })

@@ -14,15 +14,5 @@ export const fetchUniversities = createAsyncThunk(
 );
 
 
-export const addUniversity = createAsyncThunk(
-  "superAdmin/addUniversity",
-  async (data: any, { rejectWithValue }) => {
-    try {
-      const response = await postAPI<any>("/superadmin/universities", data);
-      return response;
-    } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to add university");
-    }
-  }
-);
+
 
