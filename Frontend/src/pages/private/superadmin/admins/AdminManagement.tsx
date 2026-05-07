@@ -19,7 +19,8 @@ import { AdminPageLayout } from "@/components/layout/AdminPageLayout";
 import { PageHeader } from "@/components/PageHeader";
 import Loader from "@/components/Loader";
 
-import { fetchAdmins, updateAdminStatus } from "@/redux/thunks/superAdminThunk";
+import { fetchAdmins, updateAdminStatus, activateAdmin } from "@/redux/thunks/superAdminThunk";
+
 
 const AdminManagement = () => {
   const navigate = useNavigate();
@@ -40,9 +41,18 @@ const AdminManagement = () => {
     }
   };
 
+  const handleActivate = async (ids: number[]) => {
+    try {
+      await dispatch(activateAdmin(ids)).unwrap();
+      toast.success("Administrator activated successfully.");
+    } catch (error: any) {
+      toast.error(error || "Failed to activate administrator.");
+    }
+  };
+
   const filteredAdmins = admins.filter((a: any) =>
-    `${a.firstname} ${a.lastname}`.toLowerCase().includes(search.trim().toLowerCase()) ||
-    a.email.toLowerCase().includes(search.trim().toLowerCase())
+    `${a.user.firstname} ${a.user.lastname}`.toLowerCase().includes(search.trim().toLowerCase()) ||
+    a.user.email.toLowerCase().includes(search.trim().toLowerCase())
   );
 
 
@@ -119,9 +129,9 @@ const AdminManagement = () => {
                           </div>
                           <div>
                             <span className="font-black text-foreground group-hover:text-indigo-600 transition-colors block leading-tight">
-                              {admin.firstname} {admin.lastname}
+                               {admin.user.firstname} {admin.user.lastname}
                             </span>
-                            <span className="text-[10px] font-bold text-muted-foreground">{admin.email}</span>
+                            <span className="text-[10px] font-bold text-muted-foreground">{admin.user.email}</span>
                           </div>
                         </div>
                       </TableCell>
@@ -150,34 +160,47 @@ const AdminManagement = () => {
                       </TableCell>
                       <TableCell className="text-center py-5">
                          <span className={`px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${
-                           admin.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 border-rose-500/20'
+                           admin.user.status === 'ACTIVE' ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20' : 'bg-rose-500/10 text-rose-600 border-rose-500/20'
                          }`}>
-                           {admin.status}
+                           {admin.user.status}
                          </span>
                       </TableCell>
                       <TableCell className="text-right py-5 pr-8">
                         <div className="flex justify-end gap-2">
-                          {admin.status === 'INACTIVE' ? (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="h-8 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 gap-1.5 font-black text-[10px] uppercase tracking-wider"
-                              onClick={() => void handleStatusChange([admin.id], true)}
-                              disabled={isSubmitting}
-                            >
-                              <CheckCircle className="w-3.5 h-3.5" /> Activate
-                            </Button>
+                          {admin.user.status === 'INACTIVE' ? (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 gap-1.5 font-black text-[10px] uppercase tracking-wider"
+                                onClick={() => void handleActivate([admin.user.id])}
+                                disabled={isSubmitting}
+                              >
+                                <CheckCircle className="w-3.5 h-3.5" /> Accept
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="h-8 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-500/10 gap-1.5 font-black text-[10px] uppercase tracking-wider"
+                                onClick={() => void handleStatusChange([admin.user.id], false)}
+                                disabled={isSubmitting}
+                              >
+                                <XCircle className="w-3.5 h-3.5" /> Reject
+                              </Button>
+                            </>
                           ) : (
                             <Button
                               variant="ghost"
                               size="sm"
                               className="h-8 rounded-lg text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-500/10 gap-1.5 font-black text-[10px] uppercase tracking-wider"
-                              onClick={() => void handleStatusChange([admin.id], false)}
+                              onClick={() => void handleStatusChange([admin.user.id], false)}
                               disabled={isSubmitting}
                             >
                               <XCircle className="w-3.5 h-3.5" /> Deactivate
                             </Button>
                           )}
+
+
                           <Button
                             variant="ghost"
                             size="icon"

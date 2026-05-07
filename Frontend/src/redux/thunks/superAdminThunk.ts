@@ -86,3 +86,16 @@ export const updateCompanyStatus = createAsyncThunk(
     }
   }
 );
+
+export const activateAdmin = createAsyncThunk(
+  "superAdmin/activateAdmin",
+  async (ids: number[], { rejectWithValue }) => {
+    try {
+      const response = await putAPI<any>("/superadmin/activate", { ids });
+      return { ids, data: response.data };
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to activate administrator");
+    }
+  }
+);
+

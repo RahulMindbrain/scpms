@@ -6,8 +6,10 @@ import {
   addUniversity, 
   registerAdmin, 
   updateAdminStatus, 
-  updateCompanyStatus 
+  updateCompanyStatus,
+  activateAdmin
 } from "../thunks/superAdminThunk";
+
 
 interface SuperAdminState {
   universities: any[];
@@ -109,8 +111,9 @@ const superAdminSlice = createSlice({
         state.isSubmitting = false;
         const { ids, status } = action.payload;
         state.admins = state.admins.map(admin => 
-          ids.includes(admin.id) ? { ...admin, status: status ? 'ACTIVE' : 'INACTIVE' } : admin
+          ids.includes(admin.user.id) ? { ...admin, user: { ...admin.user, status: status ? 'ACTIVE' : 'INACTIVE' } } : admin
         );
+
       })
       .addCase(updateAdminStatus.rejected, (state, action) => {
         state.isSubmitting = false;
@@ -132,8 +135,26 @@ const superAdminSlice = createSlice({
         state.isSubmitting = false;
         state.error = action.payload as string;
       })
+      
+      // Activate Admin
+      .addCase(activateAdmin.pending, (state) => {
+        state.isSubmitting = true;
+      })
+      .addCase(activateAdmin.fulfilled, (state, action) => {
+        state.isSubmitting = false;
+        const { ids } = action.payload;
+        state.admins = state.admins.map(admin => 
+          ids.includes(admin.user.id) ? { ...admin, user: { ...admin.user, status: 'ACTIVE' } } : admin
+        );
+      })
+
+      .addCase(activateAdmin.rejected, (state, action) => {
+        state.isSubmitting = false;
+        state.error = action.payload as string;
+      })
   },
 });
+
 
 export const { clearError } = superAdminSlice.actions;
 export default superAdminSlice.reducer;

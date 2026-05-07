@@ -64,6 +64,15 @@ saRouter.put(
   deactivateAdminsController,
 );
 
+saRouter.put(
+  "/activate",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("SUPER_ADMIN"),
+  activateAdminsController,
+);
+
+
 saRouter.get(
   "/companies",
   authenticateUser,
