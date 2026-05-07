@@ -175,6 +175,10 @@ const PostJob: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Prevent double submission
+    if (isSubmitting) return;
+
     if (!validateStep(3)) return;
 
     try {
