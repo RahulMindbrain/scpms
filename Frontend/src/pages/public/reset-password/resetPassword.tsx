@@ -2,14 +2,28 @@ import React, { useState } from 'react';
 import { Lock, Eye, EyeOff, ChevronLeft, ArrowRight, GraduationCap, CheckCircle2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import forgot from '../../../assets/forgot.png';
+import { toast } from 'sonner';
 
 const ResetPassword: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,9}$/;
+
+    if (!passwordRegex.test(newPassword)) {
+      return toast.error("Password must contain at least one uppercase, one lowercase letter, and one special character");
+    }
+
+    if (newPassword !== confirmPassword) {
+      return toast.error("Passwords do not match");
+    }
+
     // Simulate API call
     setIsSuccess(true);
   };
@@ -73,6 +87,10 @@ const ResetPassword: React.FC = () => {
                 <input 
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
+                  maxLength={9}
+                  required
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
                   className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium"
                 />
                 <button 
@@ -97,6 +115,10 @@ const ResetPassword: React.FC = () => {
                 <input 
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder="••••••••"
+                  maxLength={9}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium"
                 />
                 <button 
@@ -115,11 +137,15 @@ const ResetPassword: React.FC = () => {
               <ul className="text-xs text-blue-800 space-y-1">
                 <li className="flex items-center gap-2">
                   <div className="w-1 h-1 bg-blue-400 rounded-full"></div>
-                  Minimum 8 characters long
+                  Between 6 and 9 characters long
                 </li>
                 <li className="flex items-center gap-2">
                   <div className="w-1 h-1 bg-blue-400 rounded-full"></div>
-                  Must contain at least one special character
+                  At least one uppercase and one lowercase letter
+                </li>
+                <li className="flex items-center gap-2">
+                  <div className="w-1 h-1 bg-blue-400 rounded-full"></div>
+                  At least one special character
                 </li>
               </ul>
             </div>

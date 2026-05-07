@@ -95,8 +95,10 @@ const ForgotPassword: React.FC = () => {
     if (newPassword !== confirmPassword) {
       return toast.error("Passwords do not match");
     }
-    if (newPassword.length < 6) {
-      return toast.error("Password must be at least 6 characters long");
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,9}$/;
+
+    if (!passwordRegex.test(newPassword)) {
+      return toast.error("Password must contain at least one uppercase, one lowercase letter, and one special character");
     }
 
     setIsLoading(true);
@@ -250,6 +252,7 @@ const ForgotPassword: React.FC = () => {
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="••••••••"
                     required
+                    maxLength={9}
                     className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium"
                   />
                   <button
@@ -273,6 +276,7 @@ const ForgotPassword: React.FC = () => {
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="••••••••"
                     required
+                    maxLength={9}
                     className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium"
                   />
                   <button

@@ -86,7 +86,7 @@ const SignUp: React.FC = () => {
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,9}$/;
 
   if (!form.fullName.trim()) {
     return toast.error("Full name is required", { id: "register-toast" });
@@ -102,7 +102,7 @@ const SignUp: React.FC = () => {
 
   if (!passwordRegex.test(form.password)) {
     return toast.error(
-      "Password must contain at least one uppercase and one lowercase letter",
+      "Password must contain at least one uppercase, one lowercase letter, and one special character",
       { id: "register-toast" }
     );
   }
@@ -113,6 +113,10 @@ const SignUp: React.FC = () => {
 
   if (form.password.length < 6) {
     return toast.error("Password must be at least 6 characters long", { id: "register-toast" });
+  }
+
+  if (form.password.length > 9) {
+    return toast.error("Password must not exceed 9 characters", { id: "register-toast" });
   }
 
   const names = form.fullName.trim().split(/\s+/);
@@ -260,7 +264,16 @@ const SignUp: React.FC = () => {
                     <label className="text-sm font-semibold text-slate-700 ml-1">Password</label>
                     <div className="relative">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                      <input name="password" type={showPassword ? "text" : "password"} value={form.password} onChange={handleChange} required placeholder="••••••••" className={inputClasses} />
+                      <input 
+                        name="password" 
+                        type={showPassword ? "text" : "password"} 
+                        value={form.password} 
+                        onChange={handleChange} 
+                        required 
+                        placeholder="••••••••" 
+                        maxLength={9}
+                        className={inputClasses} 
+                      />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
@@ -274,7 +287,16 @@ const SignUp: React.FC = () => {
                     <label className="text-sm font-semibold text-slate-700 ml-1">Confirm Password</label>
                     <div className="relative">
                       <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
-                      <input name="confirmPassword" type={showConfirmPassword ? "text" : "password"} value={form.confirmPassword} onChange={handleChange} required placeholder="••••••••" className={inputClasses} />
+                      <input 
+                        name="confirmPassword" 
+                        type={showConfirmPassword ? "text" : "password"} 
+                        value={form.confirmPassword} 
+                        onChange={handleChange} 
+                        required 
+                        placeholder="••••••••" 
+                        maxLength={9}
+                        className={inputClasses} 
+                      />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
