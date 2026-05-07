@@ -679,6 +679,6 @@ export const updateCompanyRequestsService = async (
   return updateCompanyUniversityStatus(
     validRequests.map((r) => r.id),
     status,
-    adminId,
+    admin.id,
   );
 };

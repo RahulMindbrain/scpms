@@ -291,6 +291,29 @@ export const getCompanyRequestsForUniversity = async (universityId: number) => {
   });
 };
 
+// export const updateCompanyUniversityStatus = async (
+//   ids: number[],
+//   status: "APPROVED" | "REJECTED",
+//   adminId: number,
+//   universityId?: number,
+// ) => {
+//   const now = new Date();
+
+//   return prisma.companyUniversity.updateMany({
+//     where: {
+//       id: { in: ids },
+//       status: "PENDING",
+//       ...(universityId && { universityId }),
+//     },
+//     data: {
+//       status,
+//       approvedBy: adminId,
+//       ...(status === "APPROVED" && { approvedAt: now }),
+//       ...(status === "REJECTED" && { rejectedAt: now }),
+//     },
+//   });
+// };
+
 export const updateCompanyUniversityStatus = async (
   ids: number[],
   status: "APPROVED" | "REJECTED",
@@ -299,17 +322,52 @@ export const updateCompanyUniversityStatus = async (
 ) => {
   const now = new Date();
 
-  return prisma.companyUniversity.updateMany({
+  await prisma.companyUniversity.updateMany({
     where: {
       id: { in: ids },
       status: "PENDING",
       ...(universityId && { universityId }),
     },
+
     data: {
       status,
       approvedBy: adminId,
-      ...(status === "APPROVED" && { approvedAt: now }),
-      ...(status === "REJECTED" && { rejectedAt: now }),
+
+      ...(status === "APPROVED" && {
+        approvedAt: now,
+      }),
+
+      ...(status === "REJECTED" && {
+        rejectedAt: now,
+      }),
+    },
+  });
+
+  return prisma.companyUniversity.findMany({
+    where: {
+      id: { in: ids },
+    },
+
+    include: {
+      company: {
+        select: {
+          id: true,
+          name: true,
+
+          user: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
+
+      university: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
   });
 };

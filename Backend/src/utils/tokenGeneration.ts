@@ -1,7 +1,7 @@
 import jwt, { Secret } from "jsonwebtoken";
 import type { StringValue } from "ms";
 
-type Role = "STUDENT" | "COMPANY" | "ADMIN";
+import { Role } from "@prisma/client";
 
 export const generateAccessToken = (id: number, role: Role) => {
   const JWT_SECRET = process.env.JWT_SECRET;
@@ -10,11 +10,9 @@ export const generateAccessToken = (id: number, role: Role) => {
   if (!JWT_SECRET) throw new Error("JWT_SECRET is not defined");
   if (!ACCESS_TTL) throw new Error("JWT_ACCESS_TTL is not defined");
 
-  return jwt.sign(
-    { id, role },
-    JWT_SECRET as Secret,
-    { expiresIn: ACCESS_TTL as StringValue | number }
-  );
+  return jwt.sign({ id, role }, JWT_SECRET as Secret, {
+    expiresIn: ACCESS_TTL as StringValue | number,
+  });
 };
 
 export const generateRefreshToken = (id: number, role: Role) => {
@@ -24,9 +22,7 @@ export const generateRefreshToken = (id: number, role: Role) => {
   if (!JWT_SECRET) throw new Error("JWT_SECRET is not defined");
   if (!REFRESH_TTL) throw new Error("JWT_REFRESH_TTL is not defined");
 
-  return jwt.sign(
-    { id, role },
-    JWT_SECRET as Secret,
-    { expiresIn: REFRESH_TTL as StringValue | number }
-  );
+  return jwt.sign({ id, role }, JWT_SECRET as Secret, {
+    expiresIn: REFRESH_TTL as StringValue | number,
+  });
 };

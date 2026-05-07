@@ -55,7 +55,7 @@ adminRoutes.get(
 );
 
 adminRoutes.get(
-  "/company-requests",
+  "/university/company-requests",
   authenticateUser,
   requireActiveUser,
   authorizeRoles("ADMIN"),
@@ -63,7 +63,7 @@ adminRoutes.get(
 );
 
 adminRoutes.put(
-  "/company-requests",
+  "/university/company-requests",
   authenticateUser,
   requireActiveUser,
   authorizeRoles("ADMIN"),

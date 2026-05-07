@@ -11,7 +11,7 @@ import {
   getInactiveCompaniesService,
   getInactiveStudentsService,
   getStudentsService,
-  updateJobStatusByAdminService,
+  // updateJobStatusByAdminService,
   registerAdminService,
   updateCompanyRequestsService,
   getCompanyRequestsService,
@@ -287,55 +287,56 @@ export const getInactiveCompaniesController = async (
   }
 };
 
-export const updateJobStatusByAdminController = async (
-  req: Request,
-  res: Response,
-) => {
-  try {
-    const { jobId, jobIds, status } = req.body;
-    const user = res.locals.user;
+// export const updateJobStatusByAdminController = async (
+//   req: Request,
+//   res: Response,
+// ) => {
+//   try {
+//     const { jobId, jobIds, status } = req.body;
+//     const user = res.locals.user;
 
-    if (!user?.id) {
-      return sendError(res, 401, "Unauthorized");
-    }
+//     if (!user?.id) {
+//       return sendError(res, 401, "Unauthorized");
+//     }
 
-    if (user.role !== "ADMIN") {
-      return sendError(res, 403, "Only admin can perform this action");
-    }
+//     if (user.role !== "ADMIN") {
+//       return sendError(res, 403, "Only admin can perform this action");
+//     }
 
-    if (!status) {
-      return sendError(res, 400, "status is required");
-    }
+//     if (!status) {
+//       return sendError(res, 400, "status is required");
+//     }
 
-    const ids = jobIds ?? (jobId ? [jobId] : []);
+//     const ids = jobIds ?? (jobId ? [jobId] : []);
 
-    if (!ids.length) {
-      return sendError(res, 400, "jobId or jobIds is required");
-    }
+//     if (!ids.length) {
+//       return sendError(res, 400, "jobId or jobIds is required");
+//     }
 
-    const updatedJobs = await updateJobStatusByAdminService(
-      ids.map(Number),
-      status as JobStatus,
-      user.id,
-    );
+//     const updatedJobs = await updateJobStatusByAdminService(
+//       ids.map(Number),
+//       status as JobStatus,
+//       user.id,
+//     );
 
-    return sendSuccess(
-      res,
-      200,
-      "Job status updated successfully",
-      updatedJobs,
-    );
-  } catch (error: any) {
-    return sendError(res, 400, error.message);
-  }
-};
+//     return sendSuccess(
+//       res,
+//       200,
+//       "Job status updated successfully",
+//       updatedJobs,
+//     );
+//   } catch (error: any) {
+//     return sendError(res, 400, error.message);
+//   }
+// };
 
 export const getDashboardStatsController = async (
   _req: Request,
   res: Response,
 ) => {
+  const user = res.locals.user;
   try {
-    const data = await getDashboardStatsService();
+    const data = await getDashboardStatsService(user.id);
 
     return sendSuccess(res, 200, "Dashboard stats fetched successfully", data);
   } catch (error: any) {
@@ -379,6 +380,7 @@ export const getCompanyRequestsController = async (
   res: Response,
 ) => {
   try {
+    console.log("hi");
     const user = res.locals.user;
     const university = await getUniversityByAdminId(user.id);
 

@@ -2,16 +2,17 @@ import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload, Secret } from "jsonwebtoken";
 import { sendError } from "../utils/response";
 import prisma from "../config/db";
+import { Role, Status } from "@prisma/client";
 
 interface JwtUserPayload extends JwtPayload {
   id: number;
-  role: "STUDENT" | "COMPANY" | "ADMIN";
+  role: Role;
 }
 
 export interface AuthUser {
   id: number;
-  role: "STUDENT" | "COMPANY" | "ADMIN";
-  status: "ACTIVE" | "INACTIVE";
+  role: Role;
+  status: Status;
 }
 
 const authenticateUser = async (

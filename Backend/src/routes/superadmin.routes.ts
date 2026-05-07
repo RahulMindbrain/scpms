@@ -24,21 +24,6 @@ const saRouter = Router();
 
 saRouter.post("/register", createSuperAdminController);
 saRouter.get("/", getAllSuperAdminsController);
-saRouter.get("/:id", getSuperAdminByIdController);
-saRouter.put(
-  "/:id",
-  authenticateUser,
-  requireActiveUser,
-  authorizeRoles("SUPER_ADMIN"),
-  updateSuperAdminController,
-);
-saRouter.delete(
-  "/:id",
-  authenticateUser,
-  requireActiveUser,
-  authorizeRoles("SUPER_ADMIN"),
-  deleteSuperAdminController,
-);
 
 saRouter.get(
   "/admins",
@@ -96,5 +81,22 @@ saRouter.get(
   authorizeRoles("SUPER_ADMIN"),
   getUniversitiesController,
 );
+
+saRouter.get("/:id", getSuperAdminByIdController);
+saRouter.put(
+  "/:id",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("SUPER_ADMIN"),
+  updateSuperAdminController,
+);
+saRouter.delete(
+  "/:id",
+  authenticateUser,
+  requireActiveUser,
+  authorizeRoles("SUPER_ADMIN"),
+  deleteSuperAdminController,
+);
+// console.log("super admin routes hit");
 
 export default saRouter;
