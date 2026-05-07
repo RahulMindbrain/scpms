@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { ShieldCheck, Search, CheckCircle, XCircle, ChevronRight, User } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "@/redux/store/store";
@@ -21,6 +22,7 @@ import Loader from "@/components/Loader";
 import { fetchAdmins, updateAdminStatus } from "@/redux/thunks/superAdminThunk";
 
 const AdminManagement = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { admins, loading, isSubmitting } = useSelector((state: RootState) => state.superAdmin);
   const [search, setSearch] = useState("");
@@ -65,6 +67,13 @@ const AdminManagement = () => {
               className="pl-11 h-12 bg-card border-border/50 rounded-2xl shadow-sm focus:ring-primary/10 transition-all"
             />
           </div>
+
+          <Button 
+            className="rounded-2xl h-12 px-8 font-black uppercase tracking-widest text-[11px] gap-2 shadow-lg shadow-indigo-500/20"
+            onClick={() => navigate("/superadmin/admins/register")}
+          >
+            <User className="size-4" /> Add Administrator
+          </Button>
         </div>
 
         <div className="saas-card overflow-hidden">

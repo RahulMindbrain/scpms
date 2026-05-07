@@ -14,7 +14,7 @@ const RouteOutlet: React.FC = () => {
 
   if (!isAuthenticated) {
     if (location.pathname.startsWith("/superadmin")) {
-      return <Navigate to="/superadmin/login" replace state={{ from: location }} />;
+      return <Navigate to="/login" replace state={{ from: location }} />;
     }
     return <Navigate to="/login" replace />;
   }
@@ -34,7 +34,7 @@ const RouteOutlet: React.FC = () => {
 
   if (location.pathname.startsWith("/superadmin")) {
     if (role !== "super_admin" && role !== "superadmin") {
-      return <Navigate to="/superadmin/login" replace />;
+      return <Navigate to="/login" replace />;
     }
     return <AdminLayout />;
   }
