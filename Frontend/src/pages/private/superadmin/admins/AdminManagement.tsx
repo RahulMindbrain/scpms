@@ -20,6 +20,7 @@ import { PageHeader } from "@/components/PageHeader";
 import Loader from "@/components/Loader";
 
 import { fetchAdmins, updateAdminStatus, activateAdmin } from "@/redux/thunks/superadmin/adminThunks";
+import { CreateAdminModal } from "./components/CreateAdminModal";
 
 
 const AdminManagement = () => {
@@ -28,7 +29,7 @@ const AdminManagement = () => {
   const { admins, loading, isSubmitting } = useSelector((state: RootState) => state.superAdmin);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
-
+const [openCreateModal, setOpenCreateModal] = useState(false);
   useEffect(() => {
     dispatch(fetchAdmins(statusFilter === "ALL" ? undefined : statusFilter));
   }, [dispatch, statusFilter]);
@@ -80,6 +81,12 @@ const AdminManagement = () => {
               />
             </div>
             
+          <Button 
+            className="rounded-2xl h-12 px-8 font-black uppercase tracking-widest text-[11px] gap-2 shadow-lg shadow-indigo-500/20"
+            onClick={() => setOpenCreateModal(true)}
+>
+            <User className="size-4" /> Add Administrator
+          </Button>
             <div className="flex p-1.5 bg-muted/30 backdrop-blur-xl rounded-2xl border border-border/50 self-start">
               {[
                 { id: 'ALL', label: 'All nodes' },
@@ -107,6 +114,7 @@ const AdminManagement = () => {
 
         <div className="saas-card overflow-hidden">
           <div className="overflow-x-auto">
+            
             <Table>
               <TableHeader>
                 <TableRow className="border-border/50 hover:bg-transparent">
@@ -237,7 +245,13 @@ const AdminManagement = () => {
           </div>
         </div>
       </div>
+      <CreateAdminModal
+  open={openCreateModal}
+  onClose={() => setOpenCreateModal(false)}
+  onSuccess={() => dispatch(fetchAdmins())}
+/>
     </AdminPageLayout>
+    
   );
 };
 
