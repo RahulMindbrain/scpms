@@ -25,7 +25,7 @@ export const registerAdmin = createAsyncThunk(
   async (payload: any, { rejectWithValue }) => {
     try {
       const response = await postAPI<any>(
-        "/superadmin/register",
+        "/users/register",
         payload
       );
 
