@@ -86,8 +86,9 @@ const ResetPassword: React.FC = () => {
                 </div>
                 <input 
                   type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  maxLength={9}
+                  placeholder=""
+                  minLength={6}
+                  maxLength={16}
                   required
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -114,8 +115,9 @@ const ResetPassword: React.FC = () => {
                 </div>
                 <input 
                   type={showConfirmPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  maxLength={9}
+                  placeholder=""
+                  minLength={6}
+                  maxLength={16}
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}

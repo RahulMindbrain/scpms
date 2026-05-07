@@ -150,7 +150,7 @@ const SignIn: React.FC = () => {
               <input
                 type="email"
                 required
-                placeholder="name@example.com"
+                placeholder=""
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-500 placeholder-gray-400"
@@ -171,10 +171,11 @@ const SignIn: React.FC = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 required
-                placeholder="••••••••"
+                placeholder=""
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                maxLength={9}
+                minLength={6}
+                maxLength={16}
                 className="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-500 placeholder-gray-400"
               />
               <button

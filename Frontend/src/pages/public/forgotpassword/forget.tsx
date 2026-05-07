@@ -158,7 +158,8 @@ const ForgotPassword: React.FC = () => {
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
                   placeholder="Enter 6-digit OTP"
-                  maxLength={6}
+                  minLength={6}
+                  maxLength={16}
                   required
                   className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium tracking-[0.5em]"
                 />
@@ -250,9 +251,10 @@ const ForgotPassword: React.FC = () => {
                     type={showNewPassword ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder=""
                     required
-                    maxLength={9}
+                    minLength={6}
+                    maxLength={16}
                     className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium"
                   />
                   <button
@@ -274,9 +276,10 @@ const ForgotPassword: React.FC = () => {
                     type={showConfirmPassword ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••••"
+                    placeholder=""
                     required
-                    maxLength={9}
+                    minLength={6}
+                    maxLength={16}
                     className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium"
                   />
                   <button

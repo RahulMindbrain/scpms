@@ -86,7 +86,7 @@ const SignUp: React.FC = () => {
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
 
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,9}$/;
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,16}$/;
 
   if (!form.fullName.trim()) {
     return toast.error("Full name is required", { id: "register-toast" });
@@ -115,8 +115,8 @@ const SignUp: React.FC = () => {
     return toast.error("Password must be at least 6 characters long", { id: "register-toast" });
   }
 
-  if (form.password.length > 9) {
-    return toast.error("Password must not exceed 9 characters", { id: "register-toast" });
+  if (form.password.length > 16) {
+    return toast.error("Password must not exceed 16 characters", { id: "register-toast" });
   }
 
   const names = form.fullName.trim().split(/\s+/);
@@ -270,8 +270,9 @@ const SignUp: React.FC = () => {
                         value={form.password} 
                         onChange={handleChange} 
                         required 
-                        placeholder="••••••••" 
-                        maxLength={9}
+                        placeholder="" 
+                        minLength={6}
+                        maxLength={16}
                         className={inputClasses} 
                       />
                       <button
@@ -293,8 +294,9 @@ const SignUp: React.FC = () => {
                         value={form.confirmPassword} 
                         onChange={handleChange} 
                         required 
-                        placeholder="••••••••" 
-                        maxLength={9}
+                        placeholder="" 
+                        minLength={6}
+                        maxLength={16}
                         className={inputClasses} 
                       />
                       <button
