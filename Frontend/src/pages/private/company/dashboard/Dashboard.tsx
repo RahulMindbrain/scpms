@@ -7,10 +7,13 @@ import type { RootState } from "@/redux/reducers/rootReducer"
 import type { AppDispatch } from "@/redux/store/store"
 import { fetchCompanyJobs, fetchJobApplications } from "@/redux/thunks/companyThunk"
 import { fetchUpcomingEvents } from "@/redux/thunks/notificationThunks"
+import { toast } from "sonner"
 
 import Loader from "@/components/Loader"
 import CountdownTimer from "@/components/CountdownTimer"
 import { Calendar, Clock, MapPin, Sparkles } from "lucide-react"
+import { useSocket } from "@/socket/SocketProvider"
+import { SOCKET_EVENTS } from "@/socket/socket.events"
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>()
@@ -18,11 +21,32 @@ export default function Dashboard() {
   const { upcomingEvents = [] } = useSelector((state: RootState) => state.notification || {})
 
   const nextEvent = upcomingEvents.length > 0 ? upcomingEvents[0] : null
+  const { socket } = useSocket()
 
-  useEffect(() => {
+  const handleUpdate = () => {
+    console.log("🔄 Company Dashboard: Refreshing data...");
+    toast.success("Dashboard Synchronized", {
+      description: "Latest applications and job status have been updated."
+    });
     dispatch(fetchCompanyJobs({ page: 1, limit: 100 }))
     dispatch(fetchJobApplications({ page: 1 }))
     dispatch(fetchUpcomingEvents())
+  }
+
+  useEffect(() => {
+    if (!socket) return
+
+    socket.on(SOCKET_EVENTS.NEW_APPLICATION, handleUpdate)
+    socket.on(SOCKET_EVENTS.OFFER_ACCEPTED, handleUpdate)
+
+    return () => {
+      socket.off(SOCKET_EVENTS.NEW_APPLICATION, handleUpdate)
+      socket.off(SOCKET_EVENTS.OFFER_ACCEPTED, handleUpdate)
+    }
+  }, [socket, dispatch])
+
+  useEffect(() => {
+    handleUpdate()
   }, [dispatch])
 
   const metrics = useMemo(() => {

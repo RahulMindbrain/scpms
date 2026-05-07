@@ -6,6 +6,7 @@ import {
   CalendarClock,
   FileText,
   User,
+
   Briefcase,
   ChevronRight,
   Sparkles,
@@ -18,7 +19,7 @@ import type { RootState } from "@/redux/reducers/rootReducer"
 import { fetchUpcomingEvents, fetchUnreadCount } from "@/redux/thunks/notificationThunks"
 import { useSocket } from "@/socket/SocketProvider"
 import { SOCKET_EVENTS } from "@/socket/socket.events"
-
+import { toast } from "sonner";
 
 export default function StudentDashboard() {
   const dispatch = useDispatch<AppDispatch>()
@@ -28,41 +29,83 @@ export default function StudentDashboard() {
     (state: RootState) => state.notification || {}
   )
 
+
+ // ✅ ADDED: get user
   const { user } = useSelector((state: RootState) => state.auth)
+
   const nextEvent = upcomingEvents.length > 0 ? upcomingEvents[0] : null
 
+  // 🔍 DIAGNOSTIC: Log state changes
   useEffect(() => {
-    dispatch(fetchUpcomingEvents())
-    dispatch(fetchUnreadCount())
-  }, [dispatch])
+    console.log("📊 UI STATE UPDATE:", {
+      upcomingEventsCount: upcomingEvents.length,
+      unreadCount,
+      socketConnected: socket?.connected,
+      socketId: socket?.id
+    });
+  }, [upcomingEvents, unreadCount, socket]);
 
-  useEffect(() => {
-    if (!socket || !user) return;
-    const handleConnect = () => {
-      socket.emit("join", { userId: user.id, role: user.role });
-    };
-    if (socket.connected) handleConnect();
-    socket.on("connect", handleConnect);
-    return () => { socket.off("connect", handleConnect); };
-  }, [socket, user]);
-
+  // 🔍 DIAGNOSTIC: Log socket events
   useEffect(() => {
     if (!socket) return;
-    const handleUpdate = () => {
-      dispatch(fetchUpcomingEvents());
-      dispatch(fetchUnreadCount());
+    
+    const onAny = (event: string, ...args: any[]) => {
+      console.log(`📡 RAW SOCKET EVENT: ${event}`, args);
     };
-    socket.on(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED, handleUpdate);
-    socket.on(SOCKET_EVENTS.NEW_JOB, handleUpdate);
-    socket.on(SOCKET_EVENTS.SCHEDULE_APPROVED, handleUpdate);
-    socket.on(SOCKET_EVENTS.SCHEDULE_CREATED, handleUpdate);
-    return () => {
-      socket.off(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED, handleUpdate);
-      socket.off(SOCKET_EVENTS.NEW_JOB, handleUpdate);
-      socket.off(SOCKET_EVENTS.SCHEDULE_APPROVED, handleUpdate);
-      socket.off(SOCKET_EVENTS.SCHEDULE_CREATED, handleUpdate);
-    };
-  }, [dispatch, socket]);
+    
+    socket.onAny(onAny);
+    return () => { socket.offAny(onAny); };
+  }, [socket]);
+
+useEffect(() => {
+  if (!socket) {
+    console.log("⚠️ No socket instance available in StudentDashboard");
+    return;
+  }
+
+  const handleUpdate = () => {
+    console.log("🔄 Socket Event Received: Refreshing Dashboard Data...");
+    dispatch(fetchUpcomingEvents());
+    dispatch(fetchUnreadCount());
+  };
+
+  const handleNewJob = (data: any) => {
+    console.log("🆕 New Job Event Received:", data);
+    handleUpdate();
+    toast.success("New Job Opportunity", {
+      description: data?.title ? `A new position "${data.title}" has been posted.` : "A new job opportunity is available."
+    });
+  };
+
+  const handleScheduleUpdate = (data: any) => {
+    console.log("📅 Schedule Event Received:", data);
+    handleUpdate();
+    toast.info("Schedule Updated", {
+      description: `New event: ${data?.title || "Check your dashboard"}`
+    });
+  };
+
+  const handleStatusUpdate = (data: any) => {
+    console.log("📝 Application Status Updated:", data);
+    // Refresh data but don't show toast here as SocketProvider handles the global notification
+    handleUpdate();
+  };
+
+  socket.on(SOCKET_EVENTS.NEW_JOB, handleNewJob);
+  socket.on(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED, handleStatusUpdate);
+  socket.on(SOCKET_EVENTS.SCHEDULE_CREATED, handleScheduleUpdate);
+  socket.on(SOCKET_EVENTS.SCHEDULE_APPROVED, handleScheduleUpdate);
+
+  console.log("✅ Socket Listeners Attached in StudentDashboard");
+
+  return () => {
+    console.log("🚿 Cleaning up socket listeners in StudentDashboard");
+    socket.off(SOCKET_EVENTS.NEW_JOB, handleNewJob);
+    socket.off(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED, handleStatusUpdate);
+    socket.off(SOCKET_EVENTS.SCHEDULE_CREATED, handleScheduleUpdate);
+    socket.off(SOCKET_EVENTS.SCHEDULE_APPROVED, handleScheduleUpdate);
+  };
+}, [socket, dispatch]);
 
   return (
     <div className="flex-1 flex flex-col bg-background min-h-screen">
@@ -82,7 +125,10 @@ export default function StudentDashboard() {
             <div className="student-hero-badge mb-6">
               <span>Student Overview</span>
             </div>
-            <h1 className="student-hero-title text-3xl md:text-5xl">
+            <h1 
+              className="student-hero-title text-3xl md:text-5xl cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => toast.success("Toast System Operational ✅", { description: "You just triggered a manual test toast." })}
+            >
               Welcome back, <span className="text-primary">{user?.firstname || "Student"}</span>
             </h1>
             <p className="student-hero-description mt-4 text-base md:text-lg">

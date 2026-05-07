@@ -26,6 +26,9 @@ import { fetchNotifications } from "@/redux/thunks/notificationThunks"
 import { AdminPageLayout } from "@/components/layout/AdminPageLayout"
 import { PageHeader } from "@/components/PageHeader"
 import Loader from "@/components/Loader"
+import { useSocket } from "@/socket/SocketProvider"
+import { SOCKET_EVENTS } from "@/socket/socket.events"
+import { toast } from "sonner"
 import {
   Table,
   TableBody,
@@ -333,11 +336,41 @@ export default function AdminDashboard() {
   const { schedules, loading: schedLoading } = useSelector((state: RootState) => state.interview)
   const { items: notifications, loading: notifLoading } = useSelector((state: RootState) => state.notification)
   const { user } = useSelector((state: RootState) => state.auth)
+  const { socket } = useSocket()
 
-  useEffect(() => {
+  const handleRefresh = () => {
+    console.log("🔄 Admin Dashboard: Tactical Refresh Initiated...");
+    toast.info("Tactical Data Synchronized", {
+      description: "Real-time updates have been applied to your command center."
+    });
     dispatch(fetchDashboardStats())
     dispatch(fetchSchedules(undefined))
     dispatch(fetchNotifications({ page: 1, limit: 10 }))
+  }
+
+  useEffect(() => {
+    if (!socket) {
+      console.log("⚠️ Admin Dashboard: No socket connection found.");
+      return
+    }
+
+    console.log("🛠️ Admin Dashboard: Attaching socket listeners...");
+    socket.on(SOCKET_EVENTS.NEW_USER_REGISTERED, handleRefresh)
+    socket.on(SOCKET_EVENTS.NEW_APPLICATION, handleRefresh)
+    socket.on(SOCKET_EVENTS.OFFER_ACCEPTED, handleRefresh)
+    socket.on(SOCKET_EVENTS.SYSTEM_ALERT, handleRefresh)
+
+    return () => {
+      console.log("🧹 Admin Dashboard: Detaching socket listeners...");
+      socket.off(SOCKET_EVENTS.NEW_USER_REGISTERED, handleRefresh)
+      socket.off(SOCKET_EVENTS.NEW_APPLICATION, handleRefresh)
+      socket.off(SOCKET_EVENTS.OFFER_ACCEPTED, handleRefresh)
+      socket.off(SOCKET_EVENTS.SYSTEM_ALERT, handleRefresh)
+    }
+  }, [socket, dispatch])
+
+  useEffect(() => {
+    handleRefresh()
   }, [dispatch])
 
   if ((dashLoading || schedLoading || notifLoading) && !dashboardData) {

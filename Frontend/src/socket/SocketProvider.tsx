@@ -4,9 +4,6 @@ import { socket } from "./socket.config";
 import { SOCKET_EVENTS } from "./socket.events";
 import { toast } from "sonner";
 import type { RootState } from "../redux/reducers/rootReducer";
-import { addNotification as addReduxNotification } from "@/redux/slices/notificationSlice";
-import { useDispatch } from "react-redux";
-import type { AppDispatch } from "@/redux/store/store";
 
 export interface NotificationItem {
     id: string;
@@ -37,13 +34,11 @@ export const useSocket = () => {
 
 export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const { isAuthenticated, user, userType } = useSelector((state: RootState) => state.auth);
-    const dispatch = useDispatch<AppDispatch>();
     const [notifications, setNotifications] = useState<NotificationItem[]>([]);
 
-    const addNotification = useCallback((title: string, message: string, type: string = 'SYSTEM') => {
-        const id = Date.now().toString() + Math.random().toString(36).substring(2, 9);
+    const addNotification = useCallback((title: string, message: string) => {
         const newNotification: NotificationItem = {
-            id,
+            id: Date.now().toString() + Math.random().toString(36).substring(2, 9),
             title,
             message,
             timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
@@ -54,17 +49,7 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             const updated = [newNotification, ...prev];
             return updated.slice(0, 10);
         });
-
-        // Sync with Redux for persistence across components (like AdminDashboard feed)
-        dispatch(addReduxNotification({
-            id,
-            title,
-            message,
-            type,
-            read: false,
-            createdAt: new Date().toISOString()
-        } as any));
-    }, [dispatch]);
+    }, []);
 
     const markAsRead = useCallback((id: string) => {
         setNotifications((prev) => 
@@ -118,30 +103,22 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     useEffect(() => {
         if (!isAuthenticated) return;
 
-        // Common listeners for Admin & Company
-        if (userType === 'ADMIN' || userType === 'COMPANY') {
-            socket.on(SOCKET_EVENTS.NEW_APPLICATION, (data) => {
-                const title = "New Job Application!";
-                const message = `${data.studentName || 'A student'} applied for "${data.jobTitle || 'a position'}"`;
-                toast.info(title, { description: message });
-                addNotification(title, message, 'PLACEMENT');
-            });
-
-            socket.on(SOCKET_EVENTS.OFFER_ACCEPTED, (data) => {
-                const title = "Offer Accepted!";
-                const message = `${data.studentName} has accepted the offer for "${data.jobTitle}".`;
-                toast.success(title, { description: message });
-                addNotification(title, message, 'PLACEMENT');
-            });
-        }
-
         // Role-based listeners
         if (userType === 'STUDENT') {
             socket.on(SOCKET_EVENTS.APPLICATION_STATUS_UPDATED, (data) => {
                 const title = "Application Update";
                 const message = `Your application was ${data.status.toLowerCase()}`;
                 toast.success(title, { description: message });
-                addNotification(title, message, 'INTERVIEW');
+                addNotification(title, message);
+            });
+        }
+
+        if (userType === 'COMPANY') {
+            socket.on(SOCKET_EVENTS.NEW_APPLICATION, (data) => {
+                const title = "New Job Application!";
+                const message = `${data.studentName || 'A student'} applied for a job`;
+                toast.info(title, { description: message });
+                addNotification(title, message);
             });
         }
 
@@ -150,20 +127,20 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 const title = "New Registration";
                 const message = `New ${data.role ? data.role.toLowerCase() : 'user'} registered`;
                 toast.info(title, { description: message });
-                addNotification(title, message, 'SYSTEM');
-            });
-
-            socket.on(SOCKET_EVENTS.SCHEDULE_CREATED, (data) => {
-                const title = "New Schedule Created";
-                const message = `A new interview schedule "${data.title}" was generated.`;
-                toast.info(title, { description: message });
-                addNotification(title, message, 'INTERVIEW');
+                addNotification(title, message);
             });
         }
 
+        socket.on(SOCKET_EVENTS.OFFER_ACCEPTED, (data) => {
+            const title = "Offer Accepted!";
+            const message = `${data.studentName} has accepted the offer for "${data.jobTitle}".`;
+            toast.success(title, { description: message });
+            addNotification(title, message);
+        });
+
         socket.on(SOCKET_EVENTS.SYSTEM_ALERT, (data) => {
             toast.warning("System Alert", { description: data.message });
-            addNotification("System Alert", data.message, 'SYSTEM');
+            addNotification("System Alert", data.message);
         });
 
         socket.on("connect_error", (err) => {
@@ -176,10 +153,9 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             socket.off(SOCKET_EVENTS.NEW_USER_REGISTERED);
             socket.off(SOCKET_EVENTS.OFFER_ACCEPTED);
             socket.off(SOCKET_EVENTS.SYSTEM_ALERT);
-            socket.off(SOCKET_EVENTS.SCHEDULE_CREATED);
             socket.off("connect_error");
         };
-    }, [userType, addNotification, isAuthenticated]);
+    }, [socket, userType, addNotification]);
 
     return (
         <SocketContext.Provider value={{
