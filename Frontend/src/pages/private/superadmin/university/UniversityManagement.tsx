@@ -32,7 +32,7 @@ import Loader from "@/components/Loader";
 const UniversityManagement = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { universities, loading } = useSelector((state: RootState) => state.superAdmin);
-  
+
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -105,7 +105,7 @@ const UniversityManagement = () => {
                       <TableCell className="py-5">
                         <div className="flex items-center gap-3">
                           <div className="size-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
-                             <Building2 className="size-5" />
+                            <Building2 className="size-5" />
                           </div>
                           <div>
                             <span className="font-black text-foreground group-hover:text-blue-600 transition-colors block leading-tight">
@@ -116,10 +116,10 @@ const UniversityManagement = () => {
                         </div>
                       </TableCell>
                       <TableCell className="py-5">
-                         <div className="flex flex-col">
-                            <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{uni.contactEmail || "N/A"}</span>
-                            <span className="text-[10px] text-muted-foreground">Direct Admin Channel</span>
-                         </div>
+                        <div className="flex flex-col">
+                          <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{uni.contactEmail || "N/A"}</span>
+                          <span className="text-[10px] text-muted-foreground">Direct Admin Channel</span>
+                        </div>
                       </TableCell>
                       <TableCell className="py-5">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
@@ -128,14 +128,14 @@ const UniversityManagement = () => {
                         </div>
                       </TableCell>
                       <TableCell className="text-right py-5 pr-8">
-                         <div className="flex justify-end gap-2">
-                            <Button variant="ghost" size="icon" className="size-9 rounded-xl text-blue-600">
-                               <Pencil className="size-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" className="size-9 rounded-xl text-muted-foreground">
-                               <ChevronRight className="size-4" />
-                            </Button>
-                         </div>
+                        <div className="flex justify-end gap-2">
+                          <Button variant="ghost" size="icon" className="size-9 rounded-xl text-blue-600">
+                            <Pencil className="size-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" className="size-9 rounded-xl text-muted-foreground">
+                            <ChevronRight className="size-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))

@@ -135,6 +135,22 @@ const superAdminSlice = createSlice({
         state.isSubmitting = false;
         state.error = action.payload as string;
       })
+
+      // Register Admin
+      .addCase(registerAdmin.pending, (state) => {
+        state.isSubmitting = true;
+      })
+      .addCase(registerAdmin.fulfilled, (state, action) => {
+        state.isSubmitting = false;
+        if (action.payload.success && action.payload.data) {
+          // Prepend the new admin to the list
+          state.admins = [action.payload.data, ...state.admins];
+        }
+      })
+      .addCase(registerAdmin.rejected, (state, action) => {
+        state.isSubmitting = false;
+        state.error = action.payload as string;
+      })
   },
 });
 
