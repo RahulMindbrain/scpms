@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getAPI, postAPI } from "@/apis/api";
+import { getAPI, postAPI, putAPI } from "@/apis/api";
 
 // FETCH REQUESTS
 export const fetchCompanyRequests =
@@ -37,8 +37,7 @@ export const requestUniversity =
           await postAPI<any>(
             "/company/request-university",
             {
-              universityId:
-                universityIds,
+              universityIds,
             }
           );
 
@@ -47,6 +46,34 @@ export const requestUniversity =
         return rejectWithValue(
           error.message ||
             "Failed to send request"
+        );
+      }
+    }
+  );
+
+// REAPPLY REQUEST
+export const reapplyUniversity =
+  createAsyncThunk(
+    "company/reapplyUniversity",
+
+    async (
+      universityIds: number[],
+      { rejectWithValue }
+    ) => {
+      try {
+        const response =
+          await putAPI<any>(
+            "/company/reapply-university",
+            {
+              universityIds,
+            }
+          );
+
+        return response.data;
+      } catch (error: any) {
+        return rejectWithValue(
+          error.message ||
+            "Failed to reapply request"
         );
       }
     }

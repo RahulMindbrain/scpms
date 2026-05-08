@@ -33,6 +33,7 @@ const routeTitles: Record<string, string> = {
   "/company/applicants":     "Applicants",
   "/company/shortlist":      "Shortlist",
   "/company/interviews":     "Interview Rounds",
+  "/company/university":     "Universities",
   "/company/notifications":  "Notifications",
   "/superadmin/dashboard":   "Dashboard",
   "/superadmin/universities":"Universities",

@@ -212,7 +212,7 @@ const CompanyManagement = () => {
                   disabled={isSubmitting}
                 >
                   <XCircle className="w-3.5 h-3.5" />
-                  Deactivate
+                  Delete
                 </Button>
               )}
 
