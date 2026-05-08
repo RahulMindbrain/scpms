@@ -5,13 +5,16 @@ CREATE TYPE "Status" AS ENUM ('ACTIVE', 'INACTIVE');
 CREATE TYPE "Role" AS ENUM ('STUDENT', 'COMPANY', 'ADMIN', 'SUPER_ADMIN');
 
 -- CreateEnum
+CREATE TYPE "InterviewRound" AS ENUM ('APTITUDE', 'GROUP_DISCUSSION', 'HR', 'TECHNICAL', 'MANAGERIAL', 'FINAL');
+
+-- CreateEnum
 CREATE TYPE "CompanyApprovalStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
 -- CreateEnum
 CREATE TYPE "JobStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
 -- CreateEnum
-CREATE TYPE "ApplicationStatus" AS ENUM ('APPLIED', 'SHORTLISTED', 'REJECTED', 'SELECTED', 'WITHDRAWN', 'NOT_ELIGIBLE');
+CREATE TYPE "ApplicationStatus" AS ENUM ('APPLIED', 'SHORTLISTED', 'REJECTED', 'SELECTED', 'WITHDRAWN', 'NOT_ELIGIBLE', 'OFFER_ACCEPTED', 'OFFER_REJECTED');
 
 -- CreateEnum
 CREATE TYPE "ScheduleStatus" AS ENUM ('SCHEDULED', 'ONGOING', 'COMPLETED', 'CANCELLED');
@@ -175,6 +178,7 @@ CREATE TABLE "Application" (
     "studentId" INTEGER NOT NULL,
     "jobUniversityId" INTEGER NOT NULL,
     "status" "ApplicationStatus" NOT NULL DEFAULT 'APPLIED',
+    "currentRound" "InterviewRound",
     "reason" TEXT,
     "isAccepted" BOOLEAN NOT NULL DEFAULT false,
     "acceptedAt" TIMESTAMP(3),
@@ -182,6 +186,19 @@ CREATE TABLE "Application" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Application_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ApplicationStatusHistory" (
+    "id" SERIAL NOT NULL,
+    "applicationId" INTEGER NOT NULL,
+    "status" "ApplicationStatus" NOT NULL,
+    "round" "InterviewRound",
+    "reason" TEXT,
+    "createdBy" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "ApplicationStatusHistory_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -360,6 +377,9 @@ CREATE INDEX "Application_jobUniversityId_idx" ON "Application"("jobUniversityId
 CREATE UNIQUE INDEX "Application_studentId_jobUniversityId_key" ON "Application"("studentId", "jobUniversityId");
 
 -- CreateIndex
+CREATE INDEX "ApplicationStatusHistory_applicationId_idx" ON "ApplicationStatusHistory"("applicationId");
+
+-- CreateIndex
 CREATE INDEX "CompanyUniversity_companyId_idx" ON "CompanyUniversity"("companyId");
 
 -- CreateIndex
@@ -469,6 +489,9 @@ ALTER TABLE "Application" ADD CONSTRAINT "Application_studentId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "Application" ADD CONSTRAINT "Application_jobUniversityId_fkey" FOREIGN KEY ("jobUniversityId") REFERENCES "JobUniversity"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ApplicationStatusHistory" ADD CONSTRAINT "ApplicationStatusHistory_applicationId_fkey" FOREIGN KEY ("applicationId") REFERENCES "Application"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "CompanyUniversity" ADD CONSTRAINT "CompanyUniversity_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
