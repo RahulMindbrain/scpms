@@ -115,7 +115,7 @@ const AdminManagement = () => {
   gap-1
 ">
               {[
-                { id: 'ALL', label: 'All nodes' },
+                { id: 'ALL', label: 'All Admin' },
                 { id: 'ACTIVE', label: 'Active' },
                 { id: 'INACTIVE', label: 'Pending' }
               ].map((tab) => (

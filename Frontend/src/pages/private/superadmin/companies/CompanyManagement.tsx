@@ -96,9 +96,9 @@ const CompanyManagement = () => {
                   <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground py-5">
                     Company
                   </TableHead>
-                  <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground py-5">
+                  {/* <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground py-5">
                     Activation Step
-                  </TableHead>
+                  </TableHead> */}
                   <TableHead className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground py-5 text-center">
                     Status
                   </TableHead>
