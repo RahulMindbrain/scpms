@@ -102,7 +102,7 @@ export const CreateAdminModal = ({ open, onClose, onSuccess }: Props) => {
                     <User className="size-4" />
                   </div>
                   <h3 className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">
-                    Personnel Identity
+                    Admin Details
                   </h3>
                 </div>
 
@@ -165,7 +165,7 @@ export const CreateAdminModal = ({ open, onClose, onSuccess }: Props) => {
                     <ShieldCheck className="size-4" />
                   </div>
                   <h3 className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em]">
-                    Institutional Node
+                    Institutional Details
                   </h3>
                 </div>
 
