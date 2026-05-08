@@ -74,6 +74,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           { title: "Post Job", url: "/company/post-job", icon: <PlusCircle /> },
           { title: "Manage Jobs", url: "/company/jobs", icon: <Briefcase /> },
           { title: "Applicants", url: "/company/applicants", icon: <Users /> },
+          { title: "Universities", url: "/company/university", icon: <GraduationCap />},
+
         ],
         secondary: [
           { title: "Shortlist", url: "/company/shortlist", icon: <ListChecks /> },

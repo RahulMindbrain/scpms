@@ -25,7 +25,7 @@ import SkillManagement from "@/pages/private/admin/skills/SkillManagement";
 import SuperAdminDashboard from "@/pages/private/superadmin/dashboard/SuperAdminDashboard";
 import UniversityManagement from "@/pages/private/superadmin/university/UniversityManagement";
 import AdminManagement from "@/pages/private/superadmin/admins/AdminManagement";
-
+import UniversityRequest from "@/pages/private/company/university/University";
 import CompanyManagementSuperAdmin from "@/pages/private/superadmin/companies/CompanyManagement";
 import CompanyDashboard from "@/pages/private/company/dashboard/Dashboard";
 import PostJob from "@/pages/private/company/jobs/PostJob";
@@ -36,6 +36,7 @@ import InterviewRounds from "@/pages/private/company/selection/InterviewRounds";
 import UpdateResults from "@/pages/private/company/selection/UpdateResults";
 import CompanyProfile from "@/pages/private/company/profile/CompanyProfile";
 import CompanyNotificationPage from "@/pages/private/company/notification/Notification";
+import { University } from "lucide-react";
 
 export const PrivateRoutes: RouteOptions<any>[] = [
     {
@@ -199,4 +200,8 @@ export const PrivateRoutes: RouteOptions<any>[] = [
         path: "/company/notifications",
         component: CompanyNotificationPage
     },
+{
+    path: "/company/university",
+    component:University 
+}
 ];
