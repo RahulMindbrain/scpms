@@ -1,8 +1,35 @@
-import { ApplicationStatus } from "@prisma/client";
+import { ApplicationStatus, InterviewRound, Prisma } from "@prisma/client";
 import prisma from "../config/db";
 
-export const createApplication = async (data: any) => {
-  return prisma.application.create({ data });
+export const createApplication = async (
+  tx: Prisma.TransactionClient,
+  data: any,
+) => {
+  return tx.application.create({
+    data,
+
+    include: {
+      student: {
+        include: {
+          user: true,
+        },
+      },
+
+      jobUniversity: {
+        include: {
+          job: {
+            include: {
+              company: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
 };
 
 export const getApplications = async (
@@ -15,23 +42,15 @@ export const getApplications = async (
     console.log(user);
     let where: any = {};
 
-    // =========================
-    // ROLE BASE FILTER
-    // =========================
-
     if (user.role === "STUDENT") {
-      where.studentId = user.studentId; // ✅ correct
+      where.studentId = user.studentId;
     } else if (user.role === "COMPANY") {
       where.job = {
-        companyId: user.companyId, // ✅ correct
+        companyId: user.companyId,
       };
     } else if (user.role === "ADMIN") {
-      // no restriction
     }
     console.log("WHERE:", where);
-    // =========================
-    // FILTERS
-    // =========================
 
     if (filters.studentId) {
       where.studentId = filters.studentId;
@@ -65,7 +84,6 @@ export const getApplications = async (
         take: limit,
         orderBy: { createdAt: "desc" },
 
-        // ✅ FIXED SELECT
         select: {
           id: true,
           status: true,
@@ -97,7 +115,7 @@ export const getApplications = async (
               department: {
                 select: {
                   id: true,
-                  name: true, // ✅ THIS IS WHAT YOU WANTED
+                  name: true,
                 },
               },
 
@@ -134,20 +152,52 @@ export const getApplications = async (
   }
 };
 
-export const updateApplicationStatus = async (id: number, status: any) => {
-  return prisma.application.update({
+export const updateApplicationStatus = async (
+  tx: Prisma.TransactionClient,
+
+  id: number,
+
+  data: {
+    status: ApplicationStatus;
+
+    currentRound?: any;
+
+    reason?: string;
+  },
+) => {
+  return tx.application.update({
     where: { id },
-    data: { status },
+
+    data: {
+      status: data.status,
+
+      ...(data.currentRound && {
+        currentRound: data.currentRound,
+      }),
+
+      ...(data.reason && {
+        reason: data.reason,
+      }),
+    },
+
     include: {
       student: {
-        select: {
-          userId: true,
+        include: {
+          user: true,
         },
       },
-      job: {
-        select: {
-          id: true,
-          title: true,
+
+      jobUniversity: {
+        include: {
+          job: {
+            include: {
+              company: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -234,29 +284,52 @@ export const getApplicationsBySchedule = async (
     limit > 0;
 
   const where = {
-    job: {
-      interviewScheduleId: scheduleId,
+    jobUniversity: {
+      job: {
+        interviewScheduleId: scheduleId,
+      },
     },
   };
+
   if (!isPaginated) {
     const applications = await prisma.application.findMany({
       where,
-      orderBy: { createdAt: "asc" },
+
+      orderBy: {
+        createdAt: "asc",
+      },
 
       select: {
         id: true,
+
         status: true,
-        job: { select: { id: true, title: true } },
+
+        currentRound: true,
+
+        jobUniversity: {
+          select: {
+            id: true,
+
+            job: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
+        },
+
         student: {
           select: {
             id: true,
-            departmentId: true,
+
             department: {
               select: {
                 id: true,
                 name: true,
               },
             },
+
             user: {
               select: {
                 firstname: true,
@@ -271,36 +344,67 @@ export const getApplicationsBySchedule = async (
 
     return applications.map((app) => ({
       applicationId: app.id,
+
       status: app.status,
-      jobId: app.job.id,
-      jobTitle: app.job.title,
+
+      currentRound: app.currentRound,
+
+      jobUniversityId: app.jobUniversity.id,
+
+      jobId: app.jobUniversity.job.id,
+
+      jobTitle: app.jobUniversity.job.title,
+
       studentId: app.student.id,
-      // departmentId: app.student.departmentId,
+
       department: app.student.department,
+
       name: `${app.student.user.firstname} ${app.student.user.lastname}`,
+
       email: app.student.user.email,
     }));
   }
 
-  // 🔹 PAGINATED → return data + meta
   const skip = (page - 1) * limit;
 
   const [applications, total] = await Promise.all([
     prisma.application.findMany({
       where,
+
       skip,
+
       take: limit,
-      orderBy: { createdAt: "asc" },
+
+      orderBy: {
+        createdAt: "asc",
+      },
 
       select: {
         id: true,
+
         status: true,
-        job: { select: { id: true, title: true } },
+
+        currentRound: true,
+
+        jobUniversity: {
+          select: {
+            id: true,
+
+            job: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
+        },
+
         student: {
           select: {
             id: true,
-            // departmentId: true,
+
             department: true,
+
             user: {
               select: {
                 firstname: true,
@@ -313,27 +417,43 @@ export const getApplicationsBySchedule = async (
       },
     }),
 
-    prisma.application.count({ where }),
+    prisma.application.count({
+      where,
+    }),
   ]);
 
   const mapped = applications.map((app) => ({
     applicationId: app.id,
+
     status: app.status,
-    jobId: app.job.id,
-    jobTitle: app.job.title,
+
+    currentRound: app.currentRound,
+
+    jobUniversityId: app.jobUniversity.id,
+
+    jobId: app.jobUniversity.job.id,
+
+    jobTitle: app.jobUniversity.job.title,
+
     studentId: app.student.id,
-    // departmentId: app.student.departmentId,
+
     department: app.student.department,
+
     name: `${app.student.user.firstname} ${app.student.user.lastname}`,
+
     email: app.student.user.email,
   }));
 
   return {
     data: mapped,
+
     meta: {
       total,
+
       page,
+
       limit,
+
       totalPages: Math.ceil(total / limit),
     },
   };
@@ -341,25 +461,88 @@ export const getApplicationsBySchedule = async (
 
 export const getScheduleJobsDetails = async (scheduleId: number) => {
   return prisma.interviewSchedule.findUnique({
-    where: { id: scheduleId },
+    where: {
+      id: scheduleId,
+    },
+
     include: {
       company: {
         select: {
           name: true,
         },
       },
+
       jobs: {
         select: {
           id: true,
+
           title: true,
+
           status: true,
-          _count: {
+
+          jobUniversities: {
             select: {
-              applications: true,
+              id: true,
+
+              universityId: true,
+
+              status: true,
+
+              _count: {
+                select: {
+                  applications: true,
+                },
+              },
             },
           },
         },
       },
+    },
+  });
+};
+
+export const createApplicationHistory = async (
+  tx: Prisma.TransactionClient,
+
+  data: {
+    applicationId: number;
+
+    status: ApplicationStatus;
+
+    round?: InterviewRound | null;
+
+    reason?: string | null;
+
+    remarks?: string | null;
+
+    createdBy?: number | null;
+  },
+) => {
+  return tx.applicationStatusHistory.create({
+    data: {
+      applicationId: data.applicationId,
+
+      status: data.status,
+
+      ...(data.round !== null &&
+        data.round !== undefined && {
+          round: data.round,
+        }),
+
+      ...(data.reason !== null &&
+        data.reason !== undefined && {
+          reason: data.reason,
+        }),
+
+      ...(data.remarks !== null &&
+        data.remarks !== undefined && {
+          remarks: data.remarks,
+        }),
+
+      ...(data.createdBy !== null &&
+        data.createdBy !== undefined && {
+          createdBy: data.createdBy,
+        }),
     },
   });
 };

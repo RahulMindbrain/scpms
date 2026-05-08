@@ -8,7 +8,7 @@ import {
   getInactiveStudentsController,
   getJobsByCompanyIdController,
   getStudentsController,
-  updateJobStatusByAdminController,
+  // updateJobStatusByAdminController,
   registerAdminController,
   getCompanyRequestsController,
   updateCompanyRequestsController,

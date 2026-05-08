@@ -1,3 +1,5 @@
+import { Request, Response } from "express";
+
 import {
   createApplicationService,
   deleteApplicationService,
@@ -5,8 +7,8 @@ import {
   getScheduleApplicationsService,
   updateApplicationService,
 } from "../services/application.service";
+
 import { sendError, sendSuccess } from "../utils/response";
-import { Request, Response } from "express";
 
 export const createApplicationController = async (
   req: Request,
@@ -14,23 +16,29 @@ export const createApplicationController = async (
 ) => {
   try {
     const user = res.locals.user;
-    const { jobId } = req.body;
+
+    const { jobUniversityId } = req.body;
 
     if (!user?.id) {
       return sendError(res, 401, "Unauthorized");
     }
 
-    const parsedJobId = Number(jobId);
+    const parsedJobUniversityId = Number(jobUniversityId);
 
-    if (!Number.isInteger(parsedJobId) || parsedJobId <= 0) {
-      return sendError(res, 400, "Invalid jobId");
+    if (
+      !Number.isInteger(parsedJobUniversityId) ||
+      parsedJobUniversityId <= 0
+    ) {
+      return sendError(res, 400, "Invalid jobUniversityId");
     }
 
-    const data = await createApplicationService(user.id, parsedJobId);
+    const data = await createApplicationService(user.id, parsedJobUniversityId);
 
     return sendSuccess(res, 201, "Applied successfully", data);
   } catch (error: any) {
-    return sendError(res, 400, error.message);
+    console.error("Create Application Error:", error);
+
+    return sendError(res, 400, error.message || "Failed to create application");
   }
 };
 
@@ -41,25 +49,39 @@ export const getApplicationsController = async (
   try {
     const user = res.locals.user;
 
+    if (!user?.id) {
+      return sendError(res, 401, "Unauthorized");
+    }
+
     const filters = {
       applicationId: req.query.applicationId
         ? Number(req.query.applicationId)
         : undefined,
-      jobId: req.query.jobId ? Number(req.query.jobId) : undefined,
+
+      jobUniversityId: req.query.jobUniversityId
+        ? Number(req.query.jobUniversityId)
+        : undefined,
+
       companyId: req.query.companyId ? Number(req.query.companyId) : undefined,
+
       studentId: req.query.studentId ? Number(req.query.studentId) : undefined,
+
       status: req.query.status as any,
+
+      currentRound: req.query.currentRound as any,
     };
 
     const page = req.query.page ? Number(req.query.page) : 1;
+
     const limit = req.query.limit ? Number(req.query.limit) : 10;
 
     const data = await getApplicationsService(user, filters, page, limit);
 
     return sendSuccess(res, 200, "Applications fetched", data);
   } catch (error: any) {
-    console.error("Controller Error:", error);
-    return sendError(res, 500, "Failed to fetch applications");
+    console.error("Get Applications Error:", error);
+
+    return sendError(res, 500, error.message || "Failed to fetch applications");
   }
 };
 
@@ -67,22 +89,57 @@ export const updateApplicationController = async (
   req: Request,
   res: Response,
 ) => {
-  // const { id } = req.body;
-  const { id } = req.params;
-  console.log(id);
-  const { status } = req.body;
+  try {
+    const user = res.locals.user;
 
-  const data = await updateApplicationService(Number(id), status);
-  return sendSuccess(res, 200, "Application updated", data);
+    if (!user?.id) {
+      return sendError(res, 401, "Unauthorized");
+    }
+
+    const applicationId = Number(req.params.id);
+
+    if (!Number.isInteger(applicationId) || applicationId <= 0) {
+      return sendError(res, 400, "Invalid application id");
+    }
+
+    const { status, currentRound, reason, remarks } = req.body;
+
+    const data = await updateApplicationService({
+      applicationId,
+      status,
+      currentRound,
+      reason,
+      remarks,
+      updatedBy: user.id,
+    });
+
+    return sendSuccess(res, 200, "Application updated successfully", data);
+  } catch (error: any) {
+    console.error("Update Application Error:", error);
+
+    return sendError(res, 400, error.message || "Failed to update application");
+  }
 };
 
 export const deleteApplicationController = async (
   req: Request,
   res: Response,
 ) => {
-  const { id } = req.params;
-  await deleteApplicationService(Number(id));
-  return sendSuccess(res, 200, "Application deleted");
+  try {
+    const applicationId = Number(req.params.id);
+
+    if (!Number.isInteger(applicationId) || applicationId <= 0) {
+      return sendError(res, 400, "Invalid application id");
+    }
+
+    await deleteApplicationService(applicationId);
+
+    return sendSuccess(res, 200, "Application deleted successfully");
+  } catch (error: any) {
+    console.error("Delete Application Error:", error);
+
+    return sendError(res, 400, error.message || "Failed to delete application");
+  }
 };
 
 export const getScheduleApplicationsController = async (
@@ -92,17 +149,24 @@ export const getScheduleApplicationsController = async (
   try {
     const scheduleId = Number(req.params.id);
 
-    if (isNaN(scheduleId)) {
+    if (!Number.isInteger(scheduleId) || scheduleId <= 0) {
       return sendError(res, 400, "Invalid schedule id");
     }
 
-    const page = req.query.page ? Number(req.query.page) : undefined;
-    const limit = req.query.limit ? Number(req.query.limit) : undefined;
+    const page = req.query.page ? Number(req.query.page) : 1;
+
+    const limit = req.query.limit ? Number(req.query.limit) : 10;
 
     const data = await getScheduleApplicationsService(scheduleId, page, limit);
 
     return sendSuccess(res, 200, "Applications fetched", data);
-  } catch (err: any) {
-    return sendError(res, 400, err.message);
+  } catch (error: any) {
+    console.error("Schedule Applications Error:", error);
+
+    return sendError(
+      res,
+      400,
+      error.message || "Failed to fetch schedule applications",
+    );
   }
 };
