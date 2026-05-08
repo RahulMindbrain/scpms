@@ -169,24 +169,35 @@ export const getJobUniversities = async (params: {
   const skip = (page - 1) * limit;
 
   const where: any = {
-    ...(universityId && { universityId }),
-    ...(status && { status }),
-
-    ...(companyId && {
-      job: { companyId },
+    ...(universityId && {
+      universityId,
     }),
 
-    ...(departmentId && {
-      job: {
-        eligibleDepartments: {
-          some: { id: departmentId },
-        },
-      },
+    ...(status && {
+      status,
     }),
 
     ...(minCgpa && {
-      minCgpa: { lte: minCgpa },
+      minCgpa: {
+        lte: minCgpa,
+      },
     }),
+
+    job: {
+      isDeleted: false,
+
+      ...(companyId && {
+        companyId,
+      }),
+
+      ...(departmentId && {
+        eligibleDepartments: {
+          some: {
+            id: departmentId,
+          },
+        },
+      }),
+    },
   };
 
   const [data, total] = await Promise.all([
@@ -307,6 +318,38 @@ export const getJobUniversitiesByJobAndUniversityIds = async (
     select: {
       universityId: true,
       status: true,
+    },
+  });
+};
+
+export const getJobUniversityById = async (id: number) => {
+  return prisma.jobUniversity.findUnique({
+    where: { id },
+
+    include: {
+      job: {
+        include: {
+          company: {
+            include: {
+              user: true,
+            },
+          },
+        },
+      },
+
+      departments: true,
+    },
+  });
+};
+
+export const getApplicationByStudentAndJobUniversity = async (
+  studentId: number,
+  jobUniversityId: number,
+) => {
+  return prisma.application.findFirst({
+    where: {
+      studentId,
+      jobUniversityId,
     },
   });
 };

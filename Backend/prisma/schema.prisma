@@ -19,6 +19,15 @@ enum Role {
   SUPER_ADMIN
 }
 
+enum InterviewRound {
+  APTITUDE
+  GROUP_DISCUSSION
+  HR
+  TECHNICAL
+  MANAGERIAL
+  FINAL
+}
+
 enum CompanyApprovalStatus {
   PENDING
   APPROVED
@@ -38,6 +47,8 @@ enum ApplicationStatus {
   SELECTED
   WITHDRAWN
   NOT_ELIGIBLE
+  OFFER_ACCEPTED
+  OFFER_REJECTED
 }
 
 enum ScheduleStatus {
@@ -290,6 +301,9 @@ model Application {
   jobUniversityId Int
 
   status ApplicationStatus @default(APPLIED)
+
+  currentRound InterviewRound?
+
   reason String?
 
   student       Student       @relation(fields: [studentId], references: [id])
@@ -297,12 +311,34 @@ model Application {
   isAccepted    Boolean       @default(false)
   acceptedAt    DateTime?
 
+  history ApplicationStatusHistory[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@unique([studentId, jobUniversityId])
   @@index([studentId])
   @@index([jobUniversityId])
+}
+
+model ApplicationStatusHistory {
+  id Int @id @default(autoincrement())
+
+  applicationId Int
+
+  application Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  status ApplicationStatus
+
+  round InterviewRound?
+
+  reason String?
+
+  createdBy Int?
+
+  createdAt DateTime @default(now())
+
+  @@index([applicationId])
 }
 
 model CompanyUniversity {

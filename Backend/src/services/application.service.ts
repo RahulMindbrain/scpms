@@ -1,26 +1,36 @@
-import { NotificationType } from "@prisma/client";
+import { ApplicationStatus, NotificationType } from "@prisma/client";
+
 import prisma from "../config/db";
+
 import {
   createApplication,
+  createApplicationHistory,
   deleteApplication,
   getApplicationById,
   getApplications,
   getApplicationsBySchedule,
   updateApplicationStatus,
 } from "../repository/application.repository";
+
 import { getCompanyByUserId } from "../repository/company.repository";
+
 import {
-  getApplicationByStudentAndJob,
-  getJobById,
-} from "../repository/job.repository";
+  getApplicationByStudentAndJobUniversity,
+  getJobUniversityById,
+} from "../repository/job.university.repository";
+
 import { getStudentByUserId } from "../repository/student.repository";
+
 import { emitToUser } from "../socket";
+
 import { SOCKET_EVENTS } from "../socket.event";
+
 import { createNotification } from "../repository/notification.repository";
+import { sendMail } from "../utils/mails/transporter.mail";
 
 export const createApplicationService = async (
   userId: number,
-  jobId: number,
+  jobUniversityId: number,
 ) => {
   const student = await getStudentByUserId(userId);
 
@@ -28,53 +38,131 @@ export const createApplicationService = async (
     throw new Error("Student profile not found");
   }
 
-  const job = await getJobById(jobId);
+  const jobUniversity = await getJobUniversityById(jobUniversityId);
 
-  if (!job) {
-    throw new Error("Job not found");
+  if (!jobUniversity) {
+    throw new Error("Job university not found");
   }
 
-  const existing = await getApplicationByStudentAndJob(student.id, jobId);
+  if (jobUniversity.job.isDeleted) {
+    throw new Error("Job is no longer available");
+  }
+
+  if (jobUniversity.status !== "APPROVED") {
+    throw new Error("Job is not approved");
+  }
+
+  if (jobUniversity.universityId !== student.university.id) {
+    throw new Error("You cannot apply for this job");
+  }
+
+  const existing = await getApplicationByStudentAndJobUniversity(
+    student.id,
+    jobUniversityId,
+  );
 
   if (existing) {
     throw new Error("Already applied to this job");
   }
 
-  let application;
+  let applicationStatus: ApplicationStatus | undefined;
 
-  if (job.minCgpa && student.cgpa && student.cgpa < job.minCgpa) {
-    application = await createApplication({
-      studentId: student.id,
-      jobId,
-      status: "NOT_ELIGIBLE",
-      reason: "CGPA below requirement",
-    });
+  let rejectionReason: string | undefined;
 
-    return application;
+  if (
+    jobUniversity.minCgpa &&
+    student.cgpa &&
+    student.cgpa < jobUniversity.minCgpa
+  ) {
+    applicationStatus = ApplicationStatus.NOT_ELIGIBLE;
+
+    rejectionReason = "CGPA below requirement";
   }
 
-  application = await createApplication({
-    studentId: student.id,
-    jobId,
+  const application = await prisma.$transaction(async (tx) => {
+    const createdApplication = await createApplication(tx, {
+      studentId: student.id,
+
+      jobUniversityId,
+
+      ...(applicationStatus && {
+        status: applicationStatus,
+      }),
+
+      ...(rejectionReason && {
+        reason: rejectionReason,
+      }),
+    });
+
+    await createApplicationHistory(tx, {
+      applicationId: createdApplication.id,
+
+      status: createdApplication.status,
+
+      round: createdApplication.currentRound,
+
+      reason: createdApplication.reason,
+
+      createdBy: userId,
+    });
+
+    return createdApplication;
   });
 
-  emitToUser(job.company.userId, SOCKET_EVENTS.NEW_APPLICATION, {
-    applicationId: application.id,
-    jobId,
-    studentId: student.id,
-    studentName: student.user
-      ? `${student.user.firstname} ${student.user.lastname ?? ""}`.trim()
-      : "Unknown",
-  });
+  emitToUser(
+    jobUniversity.job.company.userId,
+
+    SOCKET_EVENTS.NEW_APPLICATION,
+
+    {
+      applicationId: application.id,
+
+      jobUniversityId,
+
+      studentId: student.id,
+
+      studentName: student.user
+        ? `${student.user.firstname} ${student.user.lastname ?? ""}`.trim()
+        : "Unknown",
+    },
+  );
 
   await createNotification({
-    userId: job.company.userId,
+    userId: jobUniversity.job.company.userId,
+
     title: "New Application",
-    message: `New application received for ${job.title}`,
+
+    message: `New application received for ${jobUniversity.job.title}`,
+
     type: NotificationType.APPLICATION_SUBMITTED,
-    // entityId: application.id,
-    //entityType: "APPLICATION",
   });
+
+  try {
+    await sendMail({
+      to: jobUniversity.job.company.user.email,
+
+      subject: "New Student Application",
+
+      html: `
+        <h2>New Application Received</h2>
+
+        <p>
+          A new student has applied for
+          <strong>
+            ${jobUniversity.job.title}
+          </strong>
+        </p>
+
+        <p>
+          Student:
+          ${student.user?.firstname}
+          ${student.user?.lastname ?? ""}
+        </p>
+      `,
+    });
+  } catch (mailErr) {
+    console.error("Application mail failed", mailErr);
+  }
 
   return application;
 };
@@ -86,7 +174,9 @@ export const getApplicationsService = async (
   limit: number,
 ) => {
   try {
-    let enrichedUser: any = { ...user };
+    let enrichedUser: any = {
+      ...user,
+    };
 
     if (user.role === "COMPANY") {
       const company = await getCompanyByUserId(user.id);
@@ -111,42 +201,149 @@ export const getApplicationsService = async (
     return await getApplications(enrichedUser, filters, page, limit);
   } catch (error) {
     console.error("Service Error:", error);
+
     throw error;
   }
 };
 
-export const updateApplicationService = async (id: number, status: any) => {
-  const application = await updateApplicationStatus(id, status);
+export const updateApplicationService = async ({
+  applicationId,
+  status,
+  currentRound,
+  reason,
+  remarks,
+  updatedBy,
+}: {
+  applicationId: number;
+
+  status: ApplicationStatus;
+
+  currentRound?: any;
+
+  reason?: string;
+
+  remarks?: string;
+
+  updatedBy: number;
+}) => {
+  const existing = await getApplicationById(applicationId);
+
+  if (!existing) {
+    throw new Error("Application not found");
+  }
+
+  if (existing.status === "REJECTED" && status !== "REJECTED") {
+    throw new Error("Rejected applications cannot be updated");
+  }
+
+  if (
+    existing.status === "OFFER_ACCEPTED" ||
+    existing.status === "OFFER_REJECTED"
+  ) {
+    throw new Error("Offer already finalized");
+  }
+
+  const application = await prisma.$transaction(async (tx) => {
+    const updatedApplication = await updateApplicationStatus(
+      tx,
+      applicationId,
+      {
+        status,
+
+        currentRound,
+
+        ...(reason && {
+          reason,
+        }),
+      },
+    );
+
+    await createApplicationHistory(tx, {
+      applicationId,
+
+      status,
+
+      round: currentRound ?? null,
+
+      reason: reason ?? null,
+
+      remarks: remarks ?? null,
+
+      createdBy: updatedBy ?? null,
+    });
+
+    return updatedApplication;
+  });
 
   emitToUser(
     application.student.userId,
+
     SOCKET_EVENTS.APPLICATION_STATUS_UPDATED,
+
     {
       applicationId: application.id,
+
       status: application.status,
-      jobId: application.job.id,
-      jobTitle: application.job.title,
+
+      currentRound: application.currentRound,
+
+      jobUniversityId: application.jobUniversity.id,
+
+      jobTitle: application.jobUniversity.job.title,
     },
   );
 
   try {
-    if (status === "SELECTED") {
-      await createNotification({
-        userId: application.student.userId,
-        title: "Application Selected",
-        message: `You have been shortlisted for ${application.job.title}`,
-        type: NotificationType.APPLICATION_SELECTED,
-      });
+    let title = "Application Updated";
+
+    let message = `Your application for ${application.jobUniversity.job.title} has been updated`;
+
+    if (status === "SHORTLISTED") {
+      title = "Application Shortlisted";
+
+      message = `You have been shortlisted for ${currentRound ?? "next round"} in ${application.jobUniversity.job.title}`;
     }
 
     if (status === "REJECTED") {
-      await createNotification({
-        userId: application.student.userId,
-        title: "Application Update",
-        message: `Your application was not selected for ${application.job.title}`,
-        type: NotificationType.APPLICATION_REJECTED,
-      });
+      title = "Application Rejected";
+
+      message = `Your application was rejected${currentRound ? ` in ${currentRound}` : ""} for ${application.jobUniversity.job.title}`;
     }
+
+    if (status === "SELECTED") {
+      title = "Application Selected";
+
+      message = `Congratulations! You have been selected for ${application.jobUniversity.job.title}`;
+    }
+
+    await createNotification({
+      userId: application.student.userId,
+
+      title,
+
+      message,
+
+      type:
+        status === "REJECTED"
+          ? NotificationType.APPLICATION_REJECTED
+          : NotificationType.APPLICATION_SELECTED,
+    });
+
+    await sendMail({
+      to: application.student.user.email,
+
+      subject: title,
+
+      html: `
+          <h2>${title}</h2>
+
+          <p>${message}</p>
+
+          ${reason ? `<p><strong>Reason:</strong> ${reason}</p>` : ""}
+
+          ${remarks ? `<p><strong>Remarks:</strong> ${remarks}</p>` : ""}
+        `,
+    });
   } catch (err) {
     console.error("Notification failed", err);
   }
@@ -187,5 +384,7 @@ export const deleteApplicationService = async (id: number) => {
 
   await deleteApplication(id);
 
-  return { deleted: true };
+  return {
+    deleted: true,
+  };
 };
