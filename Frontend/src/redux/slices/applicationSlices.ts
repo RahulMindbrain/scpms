@@ -26,10 +26,22 @@ const applicationsSlice = createSlice({
       })
       .addCase(fetchApplications.fulfilled, (state, action) => {
         state.loading = false;
-        // Handle both paginated (action.payload.data) and non-paginated (action.payload as array) responses
-        state.applications = Array.isArray(action.payload) 
-          ? action.payload 
-          : (action.payload?.data || []);
+        const payload = action.payload;
+
+        // Normalize API shapes:
+        // - array
+        // - { data: [...] }
+        // - { data: { applications: [...] } }
+        // - { applications: [...] }
+        state.applications = Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : Array.isArray(payload?.data?.applications)
+              ? payload.data.applications
+              : Array.isArray(payload?.applications)
+                ? payload.applications
+                : [];
       })
       .addCase(fetchApplications.rejected, (state, action) => {
         state.loading = false;

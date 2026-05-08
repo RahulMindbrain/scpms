@@ -10,6 +10,7 @@ import Loader from '@/components/Loader';
 const Shortlist: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { applications, loading } = useSelector((state: RootState) => state.application);
+  const safeApplications = Array.isArray(applications) ? applications : [];
 
   const [search, setSearch] = useState("");
   const [branchFilter, setBranchFilter] = useState("All");
@@ -20,7 +21,7 @@ const Shortlist: React.FC = () => {
 
 
   // Transform and Filter Data
-  const filteredData = applications
+  const filteredData = safeApplications
     ?.filter((app: any) => app.status === "SHORTLISTED")
     ?.map((app: any) => ({
       ...app,
@@ -36,9 +37,9 @@ const Shortlist: React.FC = () => {
   // Get unique branches for filter
   const uniqueBranches = Array.from(
     new Set(
-      applications
-        ?.filter((app: any) => app.status === "SHORTLISTED")
-        ?.map((app: any) => app.department?.name)
+      safeApplications
+        .filter((app: any) => app.status === "SHORTLISTED")
+        .map((app: any) => app.department?.name)
         .filter(Boolean)
     )
   );

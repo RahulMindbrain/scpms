@@ -26,6 +26,7 @@ import SuperAdminDashboard from "@/pages/private/superadmin/dashboard/SuperAdmin
 import UniversityManagement from "@/pages/private/superadmin/university/UniversityManagement";
 import AdminManagement from "@/pages/private/superadmin/admins/AdminManagement";
 import UniversityRequest from "@/pages/private/company/university/University";
+import SendJobUniversityRequest from "@/pages/private/company/university/SendJobUniversityRequest";
 import CompanyManagementSuperAdmin from "@/pages/private/superadmin/companies/CompanyManagement";
 import CompanyDashboard from "@/pages/private/company/dashboard/Dashboard";
 import PostJob from "@/pages/private/company/jobs/PostJob";
@@ -202,5 +203,9 @@ export const PrivateRoutes: RouteOptions<any>[] = [
 {
     path: "/company/university",
     component: UniversityRequest
+},
+{
+    path: "/company/university/send-job",
+    component: SendJobUniversityRequest
 }
 ];

@@ -38,61 +38,137 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     if (role === "admin") {
       return {
         main: [
-          { title: "Dashboard", url: "/admin/dashboard", icon: <LayoutDashboard /> },
+          {
+            title: "Dashboard",
+            url: "/admin/dashboard",
+            icon: <LayoutDashboard />,
+          },
           { title: "Students", url: "/admin/students", icon: <Users /> },
           { title: "Companies", url: "/admin/companies", icon: <Building2 /> },
-          { title: "Placement Drives", url: "/admin/drives", icon: <Briefcase /> },
+          {
+            title: "Placement Drives",
+            url: "/admin/drives",
+            icon: <Briefcase />,
+          },
           { title: "Manage Jobs", url: "/admin/jobs", icon: <ListChecks /> },
-          { title: "Applications", url: "/admin/applications", icon: <FileText /> },
-          { title: "Interview Scheduler", url: "/admin/event-management", icon: <Calendar /> },
+          {
+            title: "Applications",
+            url: "/admin/applications",
+            icon: <FileText />,
+          },
+          {
+            title: "Interview Scheduler",
+            url: "/admin/event-management",
+            icon: <Calendar />,
+          },
           { title: "Skills", url: "/admin/skills", icon: <Wrench /> },
         ],
         secondary: [
           { title: "Bulk Email", url: "/admin/bulk-email", icon: <Mail /> },
-          { title: "Notifications", url: "/admin/notification", icon: <Bell /> },
-          { title: "Departments", url: "/admin/departments", icon: <Building2 /> },
+          {
+            title: "Notifications",
+            url: "/admin/notification",
+            icon: <Bell />,
+          },
+          {
+            title: "Departments",
+            url: "/admin/departments",
+            icon: <Building2 />,
+          },
         ],
       }
     } else if (role === "student") {
       return {
         main: [
-          { title: "Dashboard", url: "/student/dashboard", icon: <LayoutDashboard /> },
+          {
+            title: "Dashboard",
+            url: "/student/dashboard",
+            icon: <LayoutDashboard />,
+          },
           { title: "My Profile", url: "/student/profile", icon: <User /> },
-          { title: "Eligibility", url: "/student/eligibility", icon: <CheckCircle /> },
+          {
+            title: "Eligibility",
+            url: "/student/eligibility",
+            icon: <CheckCircle />,
+          },
           { title: "Job Listings", url: "/student/jobs", icon: <Briefcase /> },
-          { title: "My Applications", url: "/student/application", icon: <FileSearch /> },
+          {
+            title: "My Applications",
+            url: "/student/application",
+            icon: <FileSearch />,
+          },
         ],
         secondary: [
-          { title: "Notifications", url: "/student/notifications", icon: <Bell /> },
+          {
+            title: "Notifications",
+            url: "/student/notifications",
+            icon: <Bell />,
+          },
         ],
       }
     } else if (role === "company") {
       return {
         main: [
-          { title: "Dashboard", url: "/company/dashboard", icon: <LayoutDashboard /> },
+          {
+            title: "Dashboard",
+            url: "/company/dashboard",
+            icon: <LayoutDashboard />,
+          },
           { title: "Profile", url: "/company/profile", icon: <Building2 /> },
           { title: "Post Job", url: "/company/post-job", icon: <PlusCircle /> },
           { title: "Manage Jobs", url: "/company/jobs", icon: <Briefcase /> },
+          { title: "Send Job Request", url: "/company/university/send-job", icon: <PlusCircle /> },
           { title: "Applicants", url: "/company/applicants", icon: <Users /> },
-          { title: "Universities", url: "/company/university", icon: <GraduationCap />},
-
+          {
+            title: "Universities",
+            url: "/company/university",
+            icon: <GraduationCap />,
+          },
         ],
         secondary: [
-          { title: "Shortlist", url: "/company/shortlist", icon: <ListChecks /> },
-          { title: "Interview Rounds", url: "/company/interviews", icon: <Calendar /> },
-          { title: "Notifications", url: "/company/notifications", icon: <Bell /> },
+          {
+            title: "Shortlist",
+            url: "/company/shortlist",
+            icon: <ListChecks />,
+          },
+          {
+            title: "Interview Rounds",
+            url: "/company/interviews",
+            icon: <Calendar />,
+          },
+          {
+            title: "Notifications",
+            url: "/company/notifications",
+            icon: <Bell />,
+          },
         ],
       }
     } else if (role === "super_admin" || role === "superadmin") {
       return {
         main: [
-          { title: "Dashboard", url: "/superadmin/dashboard", icon: <LayoutDashboard /> },
-          { title: "Universities", url: "/superadmin/universities", icon: <Building2 /> },
+          {
+            title: "Dashboard",
+            url: "/superadmin/dashboard",
+            icon: <LayoutDashboard />,
+          },
+          {
+            title: "Universities",
+            url: "/superadmin/universities",
+            icon: <Building2 />,
+          },
           { title: "Admins", url: "/superadmin/admins", icon: <ShieldCheck /> },
-          { title: "Companies", url: "/superadmin/companies", icon: <Briefcase /> },
+          {
+            title: "Companies",
+            url: "/superadmin/companies",
+            icon: <Briefcase />,
+          },
         ],
         secondary: [
-          { title: "Notifications", url: "/superadmin/notifications", icon: <Bell /> },
+          {
+            title: "Notifications",
+            url: "/superadmin/notifications",
+            icon: <Bell />,
+          },
         ],
       }
     }
@@ -105,29 +181,30 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     avatar: initials,
   }
 
-
-
-
   return (
     <Sidebar
       collapsible="icon"
-      className="border-r border-sidebar-border bg-sidebar dark:bg-[#0B0E14] transition-all duration-300"
+      className="border-r border-sidebar-border bg-sidebar transition-all duration-300 dark:bg-[#0B0E14]"
       {...props}
     >
-      <SidebarHeader className="h-16 flex items-center px-3 shrink-0 overflow-hidden border-b border-sidebar-border/30">
-        <div className="flex items-center gap-3 w-full justify-start group-data-[collapsible=icon]:justify-center">
-          <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-blue-600 shadow-sm shrink-0">
+      <SidebarHeader className="flex h-16 shrink-0 items-center overflow-hidden border-b border-sidebar-border/30 px-3">
+        <div className="flex w-full items-center justify-start gap-3 group-data-[collapsible=icon]:justify-center">
+          <div className="flex aspect-square size-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 shadow-sm">
             <GraduationCap className="size-5 text-white" />
           </div>
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
-            <span className="text-[15px] font-bold tracking-tight text-slate-900 dark:text-white">CPMS</span>
-            <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-wider">{role} Portal</span>
+            <span className="text-[15px] font-bold tracking-tight text-slate-900 dark:text-white">
+              CPMS
+            </span>
+            <span className="text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
+              {role} Portal
+            </span>
           </div>
         </div>
       </SidebarHeader>
 
       {/* ── Navigation ── */}
-      <SidebarContent className="px-1 py-4 gap-1 no-scrollbar">
+      <SidebarContent className="no-scrollbar gap-1 px-1 py-4">
         <NavMain items={navigation.main} />
         <SidebarSeparator className="my-2 opacity-50" />
         <NavSecondary items={navigation.secondary} />
@@ -138,7 +215,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
-
-
   )
 }
