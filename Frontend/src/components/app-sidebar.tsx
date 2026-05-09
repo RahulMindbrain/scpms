@@ -162,13 +162,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: "/superadmin/companies",
             icon: <Briefcase />,
           },
-        ],
-        secondary: [
           {
             title: "Notifications",
             url: "/superadmin/notifications",
             icon: <Bell />,
           },
+        ],
+        secondary: [
         ],
       }
     }

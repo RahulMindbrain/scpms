@@ -37,6 +37,7 @@ import InterviewRounds from "@/pages/private/company/selection/InterviewRounds";
 import UpdateResults from "@/pages/private/company/selection/UpdateResults";
 import CompanyProfile from "@/pages/private/company/profile/CompanyProfile";
 import CompanyNotificationPage from "@/pages/private/company/notification/Notification";
+import SuperAdminNotification from "@/pages/private/superadmin/notification/SuperAdminNotification";
 
 export const PrivateRoutes: RouteOptions<any>[] = [
     {
@@ -119,6 +120,10 @@ export const PrivateRoutes: RouteOptions<any>[] = [
     {
         path: "/superadmin/companies",
         component: CompanyManagementSuperAdmin,
+    },
+    {
+        path: "/superadmin/notifications",
+        component: SuperAdminNotification,
     },
 
 
