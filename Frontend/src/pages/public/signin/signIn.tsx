@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from "react";
-import { Mail, Lock, ArrowRight, Eye, EyeOff, GraduationCap } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import illustration from "../../../assets/img.jpg";
-import camp from "../../../assets/camp.jpg"
-import campp from "../../../assets/campp.jpg";
 import { useDispatch, useSelector } from "react-redux";
+import { loginUser } from "@/redux/thunks/loginThunk";
 import type { AppDispatch } from "../../../redux/store/store";
 import type { RootState } from "../../../redux/reducers/rootReducer";
-import { toast } from "sonner";
-import { loginUser } from "@/redux/thunks/loginThunk";
+import { GraduationCap, Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
+import { toast } from "sonner";
+import { motion } from "framer-motion";
+
+// Import Assets
+import imgBG from "@/assets/img.jpg";
 
 const SignIn: React.FC = () => {
-  const dispatch = useDispatch<AppDispatch>();
-  const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
+  
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { isAuthenticated, userType } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
@@ -34,158 +34,162 @@ const SignIn: React.FC = () => {
     }
   }, [isAuthenticated, userType, navigate]);
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) return toast.error("Please enter credentials");
     
-    // Custom Validation
-    if (!email) return toast.error("Please enter your email address", { id: "auth-toast" });
-    if (!password) return toast.error("Please enter your password", { id: "auth-toast" });
-    
-    if (isLoading) return;
     setIsLoading(true);
-
     try {
-      const result = await dispatch(
-        loginUser({ email: email.toLowerCase(), password })
-      ).unwrap();
-
-      const user = result.data;
-      toast.success(`Signed in as ${user.role.toLowerCase()}.`, { id: "auth-toast" });
-    } catch (error: any) {
-      console.error("Login error:", error);
-      const message = typeof error === 'string' ? error : (error?.message || "Invalid email or password");
-      toast.error(message, { id: "auth-toast" });
+      await dispatch(loginUser({ email: email.toLowerCase(), password })).unwrap();
+      toast.success("Signed in successfully");
+    } catch (err: any) {
+      toast.error(err?.message || "Invalid credentials");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const images = [illustration, camp, campp];
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % images.length);
-    }, 4000); 
-    return () => clearInterval(interval);
-  }, [images.length]);
-
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-[#02040a] font-sans overflow-hidden">
-      {/* LEFT SIDE - FORM */}
-      <div className="w-full md:w-1/2 flex items-center justify-center px-4 sm:px-6 md:px-12 py-10 md:py-12 bg-white dark:bg-[#0b0f1a]">
-        <div className="w-full max-w-sm sm:max-w-md">
-          {/* Brand Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-2">
-                <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg bg-gradient-to-br from-blue-700 to-slate-900">
-                  <GraduationCap size={24} />
-                </div>
-                <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Smart CPMS</span>
-              </div>
-              <ModeToggle />
+    <div className="min-h-screen w-full flex bg-white dark:bg-[#02040a] font-sans selection:bg-blue-500/30">
+      
+      {/* Left Column: Branding & Image */}
+      <div className="hidden lg:flex lg:w-[45%] xl:w-[40%] relative overflow-hidden flex-col justify-between p-12 xl:p-16">
+        {/* Background Image with Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={imgBG} 
+            alt="Campus Architecture" 
+            className="w-full h-full object-cover grayscale-[20%] brightness-[0.4]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/40 to-slate-950/90"></div>
+        </div>
+
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-16">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <GraduationCap className="text-white" size={24} />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome Back</h2>
-            <p className="text-gray-500 dark:text-slate-400 mt-2">Centralized Placement Management System</p>
+            <span className="text-xl font-bold tracking-tight text-white uppercase">Smart CPMS</span>
           </div>
 
-          <form className="space-y-5" onSubmit={handleSubmit}>
-            {/* Email Address */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Email Address
-              </label>
+          <div className="max-w-md">
+            <h1 className="text-4xl xl:text-5xl font-bold text-white leading-[1.1] mb-8 tracking-tight">
+              Connect with <span className="text-blue-500">Elite</span> Opportunities.
+            </h1>
+            <p className="text-slate-400 text-lg leading-relaxed mb-12">
+              The professional bridge between top-tier talent and world-class organizations. Manage your career trajectory with precision.
+            </p>
+
+            <div className="space-y-6">
+              {[
+                "Advanced Career Tracking",
+                "Verified Industry Partners",
+                "Automated Application Workflows"
+              ].map((text, i) => (
+                <div key={i} className="flex items-center gap-4 text-slate-300">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                    <ShieldCheck className="text-blue-500" size={14} />
+                  </div>
+                  <span className="text-sm font-medium">{text}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="relative z-10 pt-12 border-t border-white/5">
+          <p className="text-slate-500 text-xs font-medium uppercase tracking-[0.2em]">
+            © 2024 Smart CPMS. Global Talent Ecosystem.
+          </p>
+        </div>
+      </div>
+
+      {/* Right Column: Sign In Form */}
+      <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 xl:p-24 relative bg-white dark:bg-[#0b0f1a]">
+        <div className="absolute top-12 right-12">
+          <ModeToggle />
+        </div>
+        <motion.div 
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-sm space-y-10"
+        >
+          <div className="space-y-3">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">Sign In</h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">
+              Enter your credentials to access your secure dashboard.
+            </p>
+          </div>
+
+          <form className="space-y-6" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Email Address</label>
               <div className="relative group">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
                 <input
                   type="email"
                   required
-                  placeholder="name@example.com"
+                  placeholder="name@organization.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-[#02040a] border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-600 focus:ring-2 focus:ring-indigo-600/20 outline-none transition-all"
+                  className="w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm"
                 />
               </div>
             </div>
 
-            {/* Password */}
-            <div>
-              <div className="flex justify-between items-center mb-1.5">
-                <label className="text-sm font-medium text-gray-700">Password</label>
-                <Link to="/Forgot" className="text-sm font-semibold text-indigo-600 hover:text-indigo-700">
-                  Forgot password?
+            <div className="space-y-2">
+              <div className="flex justify-between items-center px-1">
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Password</label>
+                <Link to="/Forgot" className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors">
+                  Forgot?
                 </Link>
               </div>
               <div className="relative group">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
                 <input
                   type={showPassword ? "text" : "password"}
                   required
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 bg-gray-50 dark:bg-[#02040a] border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-600 focus:ring-2 focus:ring-indigo-600/20 outline-none transition-all"
+                  className="w-full pl-11 pr-11 py-3.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full bg-gradient-to-br from-blue-700 to-slate-900 active:scale-[0.99] transition-all duration-200 text-white font-semibold py-3 sm:py-3.5 rounded-xl flex items-center justify-center gap-2 shadow-xl shadow-indigo-100 mt-2 ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-xl shadow-blue-500/20 disabled:opacity-70 active:scale-[0.98]"
             >
-              {isLoading ? "Signing in..." : "Sign In to Dashboard"}
+              {isLoading ? "Authenticating..." : "Sign In to Account"}
               {!isLoading && <ArrowRight size={18} />}
             </button>
 
-            {/* Signup Link */}
-            <p className="text-sm font-medium text-gray-500 dark:text-slate-400 text-center mt-6">
-              New to the platform? {" "}
-              <Link to="/signup" className="text-indigo-600 dark:text-blue-400 font-bold hover:underline">
-                Register here
-              </Link>
-            </p>
+            <div className="text-center pt-4">
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                Don't have an account?{" "}
+                <Link to="/signup" className="text-blue-600 hover:text-blue-700 transition-colors font-bold">
+                  Create an Identity
+                </Link>
+              </p>
+            </div>
           </form>
-        </div>
-      </div>
+        </motion.div>
 
-      {/* RIGHT SIDE - VISUALS */}
-      <div className="hidden md:flex w-full md:w-1/2 bg-gradient-to-br from-blue-700 to-slate-900 items-center justify-center p-6 lg:p-12 relative overflow-hidden">
-        {/* Abstract Background Shapes */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-indigo-400/20 rounded-full -ml-48 -mb-48 blur-3xl"></div>
-
-        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2rem] p-6 sm:p-8 md:p-10 text-center text-white w-full max-w-sm md:max-w-md shadow-2xl relative z-10">
-          <div className="bg-white p-4 rounded-2xl mb-8 shadow-2xl transform -rotate-2 hover:rotate-0 transition-transform duration-500 inline-block">
-            <img
-              src={images[currentIndex]}
-              alt="Placement Stats"
-              className="w-32 sm:w-40 md:w-48 h-auto rounded-lg transition-all duration-700" />
-          </div>
-
-          <h3 className="text-2xl font-bold mb-4">Accelerate Your Career</h3>
-          <p className="text-indigo-100/90 leading-relaxed text-sm">
-            Automating the end-to-end recruitment lifecycle. Real-time interaction between Students, Admins, and Recruiting Companies.
+        {/* Subtle Bottom Link */}
+        <div className="absolute bottom-12 text-center w-full px-6">
+          <p className="text-[10px] text-slate-400 dark:text-slate-600 font-medium uppercase tracking-[0.15em]">
+            Secure Enterprise Gateway • AES-256 Encryption
           </p>
-
-          <div className="mt-8 flex gap-1.5 justify-center">
-            {images.map((_, index) => (
-              <span
-                key={index}
-                className={`h-1 rounded-full transition-all ${currentIndex === index ? "w-8 bg-white" : "w-2 bg-white/40"
-                  }`}
-              />
-            ))}
-          </div>
         </div>
       </div>
     </div>
