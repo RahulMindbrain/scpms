@@ -1,9 +1,10 @@
-﻿import {
+import {
   Mail, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
   Briefcase, FileText, Building2,
   CheckCircle, Globe, MapPin,
-  Award, Layers, Cpu, Rocket
+  Award, Layers, Cpu, Rocket,
+  AlertCircle, Clock, ShieldAlert
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
@@ -27,6 +28,7 @@ import Loader from '@/components/Loader';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import ProfileApprovalPending from '@/components/status/ProfileApprovalPending';
 import { Progress } from "@/components/ui/progress";
 
 const StudentProfile = () => {
@@ -38,6 +40,7 @@ const StudentProfile = () => {
   const [showExperienceModal, setShowExperienceModal] = useState(false)
   const [showCertificateModal, setShowCertificateModal] = useState(false)
   const [showProfileEditDialog, setShowProfileEditDialog] = useState(false)
+  const [showPendingDialog, setShowPendingDialog] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewName, setPreviewName] = useState<string>('');
   const [isPdfPreview, setIsPdfPreview] = useState(false);
@@ -292,6 +295,30 @@ const StudentProfile = () => {
         animate="visible"
         className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8"
       >
+        {user?.status !== 'ACTIVE' && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-amber-500/10 border border-amber-500/20 rounded-3xl p-6 flex flex-col md:flex-row items-center justify-between gap-6 backdrop-blur-md"
+          >
+            <div className="flex items-center gap-4">
+              <div className="h-12 w-12 rounded-2xl bg-amber-500/20 flex items-center justify-center text-amber-600">
+                <ShieldAlert className="h-6 w-6" />
+              </div>
+              <div className="text-center md:text-left">
+                <h3 className="text-lg font-black text-slate-900 dark:text-white tracking-tight">Account Pending Approval</h3>
+                <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">Your profile is under review by the university. Some features are currently limited.</p>
+              </div>
+            </div>
+            <Button 
+              onClick={() => setShowPendingDialog(true)}
+              variant="outline"
+              className="rounded-2xl border-amber-500/30 text-amber-600 hover:bg-amber-500/10 h-12 px-8 font-bold"
+            >
+              View Details
+            </Button>
+          </motion.div>
+        )}
      
        {/* Hero Section */}
         <motion.div variants={itemVariants} className="relative group/hero">
@@ -320,10 +347,17 @@ const StudentProfile = () => {
                       <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight drop-shadow-lg">
                         {profile.name}
                       </h1>
-                      <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/40">
-                        <CheckCircle className="h-3 w-3" />
-                        Verified Student
-                      </div>
+                      {user?.status === 'ACTIVE' ? (
+                        <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/40">
+                          <CheckCircle className="h-3 w-3" />
+                          Verified Student
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 bg-amber-500 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-lg shadow-amber-500/40">
+                          <Clock className="h-3 w-3" />
+                          Pending Approval
+                        </div>
+                      )}
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
@@ -360,11 +394,21 @@ const StudentProfile = () => {
                 {/* Edit Button moved inside banner for better composition */}
                 <div className="pt-4 md:pt-0">
                   <Button
-                    onClick={() => setShowProfileEditDialog(true)}
+                    onClick={() => {
+                      if (user?.status === 'ACTIVE') {
+                        setShowProfileEditDialog(true);
+                      } else {
+                        setShowPendingDialog(true);
+                      }
+                    }}
                     className="bg-white text-slate-900 hover:bg-blue-50 rounded-2xl px-6 h-12 font-black shadow-xl transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center gap-3 text-sm"
                   >
-                    <Edit3 className="h-4.5 w-4.5 text-blue-600" />
-                    Edit Profile
+                    {user?.status === 'ACTIVE' ? (
+                      <Edit3 className="h-4.5 w-4.5 text-blue-600" />
+                    ) : (
+                      <ShieldAlert className="h-4.5 w-4.5 text-amber-600" />
+                    )}
+                    {user?.status === 'ACTIVE' ? 'Edit Profile' : 'Approval Pending'}
                   </Button>
                 </div>
               </div>
@@ -426,7 +470,7 @@ const StudentProfile = () => {
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Active Backlogs</p>
-                  <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{profile.stats?.activeBacklogs || '0'}</h3>
+                  <h3 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{Math.max(0, parseInt(profile.stats?.activeBacklogs) || 0)}</h3>
                 </div>
                 <div className="h-14 w-14 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-600 dark:text-rose-400 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
                   <Layers className="h-7 w-7" />
@@ -497,7 +541,7 @@ const StudentProfile = () => {
                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Career Timeline & Roles</p>
                       </div>
                     </div>
-                    <Button onClick={() => setShowExperienceModal(true)} variant="ghost" size="sm" className="text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all">
+                    <Button onClick={() => user?.status === 'ACTIVE' ? setShowExperienceModal(true) : setShowPendingDialog(true)} variant="ghost" size="sm" className="text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all">
                       <Plus className="h-4 w-4 mr-2" /> Add Entry
                     </Button>
                   </div>
@@ -514,6 +558,10 @@ const StudentProfile = () => {
                               <h4 className="font-bold text-slate-900 dark:text-white">{exp.role}</h4>
                               <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-rose-500 opacity-0 group-hover/timeline:opacity-100 transition-opacity"
                                 onClick={() => {
+                                  if (user?.status !== 'ACTIVE') {
+                                    setShowPendingDialog(true);
+                                    return;
+                                  }
                                   const expId = profile.experiences[i]?.id;
                                   const updated = profile.experiences.filter((_: any, idx: number) => idx !== i);
                                   setProfile({ ...profile, experiences: updated });
@@ -594,7 +642,7 @@ const StudentProfile = () => {
                     <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Quick Actions</h4>
                     <div className="grid grid-cols-2 gap-3">
                       <Button
-                        onClick={() => setShowProjectModal(true)}
+                        onClick={() => user?.status === 'ACTIVE' ? setShowProjectModal(true) : setShowPendingDialog(true)}
                         variant="outline"
                         className="rounded-xl border-slate-200 dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-500/30 transition-all h-auto py-3 flex-col gap-2"
                       >
@@ -604,7 +652,7 @@ const StudentProfile = () => {
                         <span className="text-xs font-bold">Add Project</span>
                       </Button>
                       <Button
-                        onClick={() => setShowExperienceModal(true)}
+                        onClick={() => user?.status === 'ACTIVE' ? setShowExperienceModal(true) : setShowPendingDialog(true)}
                         variant="outline"
                         className="rounded-xl border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-200 dark:hover:border-emerald-500/30 transition-all h-auto py-3 flex-col gap-2"
                       >
@@ -634,7 +682,7 @@ const StudentProfile = () => {
                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Professional Recognition</p>
                       </div>
                     </div>
-                    <Button onClick={() => setShowCertificateModal(true)} variant="ghost" size="sm" className="text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 rounded-xl px-3 py-1.5">
+                    <Button onClick={() => user?.status === 'ACTIVE' ? setShowCertificateModal(true) : setShowPendingDialog(true)} variant="ghost" size="sm" className="text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 rounded-xl px-3 py-1.5">
                       <Plus className="h-5 w-5" />
                     </Button>
                   </div>
@@ -666,6 +714,10 @@ const StudentProfile = () => {
                             </div>
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-rose-500 opacity-0 group-hover/cert:opacity-100 transition-opacity shrink-0"
                               onClick={() => {
+                                if (user?.status !== 'ACTIVE') {
+                                  setShowPendingDialog(true);
+                                  return;
+                                }
                                 const certId = profile.certificates[i]?.id;
                                 const updated = profile.certificates.filter((_: any, idx: number) => idx !== i);
                                 setProfile({ ...profile, certificates: updated });
@@ -734,7 +786,7 @@ const StudentProfile = () => {
               </div>
             </div>
             <Button
-              onClick={() => setShowProjectModal(true)}
+              onClick={() => user?.status === 'ACTIVE' ? setShowProjectModal(true) : setShowPendingDialog(true)}
               className="bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl border border-slate-200/60 dark:border-white/[0.1] text-slate-700 dark:text-white hover:bg-purple-500 hover:text-white dark:hover:bg-purple-500 transition-all rounded-[1.5rem] px-8 h-14 text-xs font-black uppercase tracking-widest shadow-sm"
             >
               <Plus className="h-5 w-5 mr-3" /> Add Project
@@ -758,6 +810,10 @@ const StudentProfile = () => {
                         </div>
                         <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-400 hover:text-rose-500 opacity-0 group-hover:opacity-100 transition-all"
                           onClick={() => {
+                            if (user?.status !== 'ACTIVE') {
+                              setShowPendingDialog(true);
+                              return;
+                            }
                             const projId = profile.projects[i]?.id;
                             const updated = profile.projects.filter((_: any, idx: number) => idx !== i);
                             setProfile({ ...profile, projects: updated });
@@ -834,6 +890,19 @@ const StudentProfile = () => {
           onSave={handleSave}
           isLoading={backendLoading}
         />
+
+        {/* Approval Pending Dialog */}
+        <Dialog open={showPendingDialog} onOpenChange={setShowPendingDialog}>
+          <DialogContent className="max-w-xl p-0 bg-transparent border-none shadow-none overflow-visible">
+            <ProfileApprovalPending 
+              onClose={() => setShowPendingDialog(false)} 
+              onContactSupport={() => {
+                setShowPendingDialog(false);
+                toast.info("Support contact initiated. Our team will reach out soon.");
+              }}
+            />
+          </DialogContent>
+        </Dialog>
 
         {/* Document Preview Dialog */}
         <Dialog

@@ -24,9 +24,9 @@ import { getAPI } from "@/apis/api";
 const profileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   email: z.string().email("Invalid email address"),
-  linkedinUrl: z.string().url("Invalid LinkedIn URL").or(z.literal("")).nullable(),
-  githubUrl: z.string().url("Invalid GitHub URL").or(z.literal("")).nullable(),
-  portfolioUrl: z.string().url("Invalid Portfolio URL").or(z.literal("")).nullable(),
+  linkedinUrl: z.preprocess((val) => (val === "" || val === null ? undefined : val), z.string().url("Invalid LinkedIn URL").optional()),
+  githubUrl: z.preprocess((val) => (val === "" || val === null ? undefined : val), z.string().url("Invalid GitHub URL").optional()),
+  portfolioUrl: z.preprocess((val) => (val === "" || val === null ? undefined : val), z.string().url("Invalid Portfolio URL").optional()),
   stats: z.object({
     cgpa: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(0, "CGPA cannot be negative").max(10, "CGPA must be 10 or less").optional()),
     year: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(1, "Year must be at least 1").max(5, "Year must be 5 or less")),
@@ -34,7 +34,7 @@ const profileSchema = z.object({
     departmentId: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(1, "Required")),
     activeBacklogs: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(0, "Cannot be negative").default(0)),
   }),
-  resumeUrl: z.string().url("Invalid Resume URL").or(z.literal("")).nullable(),
+  resumeUrl: z.preprocess((val) => (val === "" || val === null ? undefined : val), z.string().url("Invalid Resume URL").optional()),
 });
 
 type SkillOption = {
@@ -271,6 +271,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       placeholder="0.0"
                       className={`h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500 ${errors['stats.cgpa'] ? 'border-rose-500' : ''}`}
                       value={formData.stats?.cgpa || ""}
+                      min="0"
+                      max="10"
                       onChange={(e) => updateStat("cgpa", e.target.value)}
                     />
                     {errors['stats.cgpa'] && <p className="text-[10px] text-rose-500 font-bold uppercase">{errors['stats.cgpa']}</p>}
@@ -283,6 +285,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       type="number"
                       className={`h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500 ${errors['stats.year'] ? 'border-rose-500' : ''}`}
                       value={formData.stats?.year || ""}
+                      min="1"
+                      max="5"
                       onChange={(e) => updateStat("year", e.target.value)}
                     />
                   </div>
@@ -294,6 +298,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       type="number"
                       className={`h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500 ${errors['stats.passingYear'] ? 'border-rose-500' : ''}`}
                       value={formData.stats?.passingYear || ""}
+                      min="2000"
+                      max="2100"
                       onChange={(e) => updateStat("passingYear", e.target.value)}
                     />
                   </div>
@@ -306,6 +312,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                       placeholder="0"
                       className={`h-11 rounded-xl border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 focus:ring-blue-500 ${errors['stats.activeBacklogs'] ? 'border-rose-500' : ''}`}
                       value={formData.stats?.activeBacklogs ?? ""}
+                      min="0"
                       onChange={(e) => updateStat("activeBacklogs", e.target.value)}
                     />
                   </div>
@@ -316,7 +323,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
               <TabsContent value="social" className="space-y-6">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="linkedinUrl" className="text-sm font-bold text-slate-700 dark:text-slate-300">LinkedIn URL</Label>
+                    <Label htmlFor="linkedinUrl" className="text-sm font-bold text-slate-700 dark:text-slate-300">LinkedIn URL <span className="text-[10px] font-normal text-slate-400 font-sans ml-1">(Optional)</span></Label>
                     <div className="relative">
                       <LinkIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input
@@ -329,7 +336,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="githubUrl" className="text-sm font-bold text-slate-700 dark:text-slate-300">GitHub URL</Label>
+                    <Label htmlFor="githubUrl" className="text-sm font-bold text-slate-700 dark:text-slate-300">GitHub URL <span className="text-[10px] font-normal text-slate-400 font-sans ml-1">(Optional)</span></Label>
                     <div className="relative">
                       <Code2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input
@@ -342,7 +349,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="portfolioUrl" className="text-sm font-bold text-slate-700 dark:text-slate-300">Portfolio Website URL</Label>
+                    <Label htmlFor="portfolioUrl" className="text-sm font-bold text-slate-700 dark:text-slate-300">Portfolio Website URL <span className="text-[10px] font-normal text-slate-400 font-sans ml-1">(Optional)</span></Label>
                     <div className="relative">
                       <Globe className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       <Input
