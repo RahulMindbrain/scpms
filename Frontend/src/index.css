@@ -482,44 +482,7 @@
   scrollbar-color: rgba(0, 82, 255, 0.2) transparent;
 }
 
-.light .bg-\[\#111319\],
-.light .bg-\[\#111827\],
-.light .bg-\[\#0c0e14\],
-.light .bg-\[\#191b22\],
-.light .bg-\[\#1e1f26\],
-.light .bg-\[\#1f2937\],
-.light .bg-slate-950,
-.light .bg-slate-900 {
-  background-color: var(--background) !important;
-}
-
-.light .text-\[\#e2e2eb\],
-.light .text-slate-200 {
-  color: var(--foreground) !important;
-}
-
-.light .text-\[\#c7c4d7\],
-.light .text-\[\#908fa0\],
-.light .text-slate-400,
-.light ::placeholder {
-  color: var(--muted-foreground) !important;
-}
-
-/* Specifically target search inputs and form elements */
-.light input,
-.light select,
-.light textarea {
-  background-color: var(--background) !important;
-  color: var(--foreground) !important;
-  border-color: var(--border) !important;
-}
-
-.light .border-\[rgba\(255\,255\,255\,0\.06\)\],
-.light .border-\[rgba\(255\,255\,255\,0\.08\)\],
-.light .border-white\/5,
-.light .border-white\/10 {
-  border-color: var(--border) !important;
-}
+/* Removed aggressive overrides to allow Tailwind theme classes to function correctly */
 
 .light .glass-card,
 .light .glass-modal {
@@ -933,4 +896,31 @@ option {
   background: linear-gradient(to bottom right, #ffffff, #94a3b8);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* ============================================================
+   UI ENHANCEMENTS & ANIMATIONS
+   ============================================================ */
+
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-15px); }
+  100% { transform: translateY(0px); }
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 4s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }

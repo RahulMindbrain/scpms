@@ -19,6 +19,7 @@ import type { AppDispatch } from "../../../redux/store/store";
 import type { RootState } from "../../../redux/reducers/rootReducer";
 import { registerUser } from "../../../redux/thunks/registerThunk";
 import { toast } from "sonner";
+import { ModeToggle } from "@/components/mode-toggle";
 
 type RegisterRole = "STUDENT" | "COMPANY";
 
@@ -129,10 +130,10 @@ const SignUp: React.FC = () => {
     }
   };
 
-  const inputClasses = "w-full pl-12 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all duration-200 outline-none text-slate-700 placeholder:text-slate-400";
+  const inputClasses = "w-full pl-12 pr-4 py-3.5 bg-slate-50 dark:bg-[#02040a] border border-slate-200 dark:border-white/10 rounded-2xl focus:bg-white dark:focus:bg-[#0b0f1a] focus:ring-4 focus:ring-indigo-600/10 focus:border-indigo-600 transition-all duration-200 outline-none text-slate-700 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-600";
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 font-sans">
+    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-[#02040a] font-sans">
       {/* LEFT SIDE BRANDING (Same as yours) */}
       <div className="hidden md:flex w-full md:w-[40%] bg-gradient-to-br from-blue-700 to-slate-900 items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-3xl"></div>
@@ -153,20 +154,23 @@ const SignUp: React.FC = () => {
       </div>
 
       {/* RIGHT SIDE */}
-      <div className="w-full md:w-[60%] flex items-center justify-center px-6 py-12 bg-white">
+      <div className="w-full md:w-[60%] flex items-center justify-center px-6 py-12 bg-white dark:bg-[#0b0f1a] relative">
+        <div className="absolute top-8 right-8">
+          <ModeToggle />
+        </div>
         <div className="w-full max-w-lg">
           {step === 1 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 text-center md:text-left">
-              <h2 className="text-4xl font-black text-slate-900 mb-3 tracking-tight">Get Started</h2>
-              <p className="text-slate-500 text-lg mb-10">Select your account type to continue</p>
+              <h2 className="text-4xl font-black text-slate-900 dark:text-white mb-3 tracking-tight">Get Started</h2>
+              <p className="text-slate-500 dark:text-slate-400 text-lg mb-10">Select your account type to continue</p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                <button onClick={() => handleRoleSelect("STUDENT")} className={`group p-8 rounded-[2rem] border-2 transition-all ${activeRole === "STUDENT" ? "border-indigo-600 bg-indigo-50/30" : "border-slate-100 hover:border-indigo-200"}`}>
+                <button onClick={() => handleRoleSelect("STUDENT")} className={`group p-8 rounded-[2rem] border-2 transition-all ${activeRole === "STUDENT" ? "border-indigo-600 bg-indigo-50/30 dark:bg-indigo-500/10" : "border-slate-100 dark:border-white/5 hover:border-indigo-200 dark:hover:border-indigo-500/50"}`}>
                   <GraduationCap size={32} className="mx-auto mb-4 text-slate-400 group-hover:text-indigo-600" />
-                  <h3 className="font-bold">Student</h3>
+                  <h3 className="font-bold text-slate-900 dark:text-white">Student</h3>
                 </button>
-                <button onClick={() => handleRoleSelect("COMPANY")} className={`group p-8 rounded-[2rem] border-2 transition-all ${activeRole === "COMPANY" ? "border-indigo-600 bg-indigo-50/30" : "border-slate-100 hover:border-indigo-200"}`}>
+                <button onClick={() => handleRoleSelect("COMPANY")} className={`group p-8 rounded-[2rem] border-2 transition-all ${activeRole === "COMPANY" ? "border-indigo-600 bg-indigo-50/30 dark:bg-indigo-500/10" : "border-slate-100 dark:border-white/5 hover:border-indigo-200 dark:hover:border-indigo-500/50"}`}>
                   <Briefcase size={28} className="mx-auto mb-4 text-slate-400 group-hover:text-indigo-600" />
-                  <h3 className="font-bold">Company</h3>
+                  <h3 className="font-bold text-slate-900 dark:text-white">Company</h3>
                 </button>
               </div>
             </div>
@@ -174,27 +178,27 @@ const SignUp: React.FC = () => {
 
           {step === 2 && (
             <form className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500" onSubmit={handleSubmit}>
-              <button type="button" onClick={() => setStep(1)} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 mb-4">
+              <button type="button" onClick={() => setStep(1)} className="flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-blue-400 mb-4">
                 <ChevronLeft size={18} /> Back
               </button>
 
-              <h2 className="text-3xl font-black text-slate-900">{activeRole === "STUDENT" ? "Student" : "Company"} Registration</h2>
+              <h2 className="text-3xl font-black text-slate-900 dark:text-white">{activeRole === "STUDENT" ? "Student" : "Company"} Registration</h2>
 
               <div className="grid grid-cols-1 gap-4">
                 {/* COMPANY SPECIFIC FIELDS */}
                 {activeRole === "COMPANY" && (
                   <>
                     <div className="space-y-1">
-                      <label className="text-sm font-semibold text-slate-700 ml-1">Company Name</label>
+                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Company Name</label>
                       <div className="relative">
-                        <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                        <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={20} />
                         <input name="companyName" value={form.companyName} onChange={handleChange} required placeholder="Microsoft" className={inputClasses} />
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <label className="text-sm font-semibold text-slate-700 ml-1">Company Description</label>
+                      <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Company Description</label>
                       <div className="relative">
-                        <FileText className="absolute left-4 top-5 text-slate-400" size={20} />
+                        <FileText className="absolute left-4 top-5 text-slate-400 dark:text-slate-500" size={20} />
                         <textarea name="description" value={form.description} onChange={handleChange} required placeholder="Brief about your company..." className={`${inputClasses} pl-12 min-h-[100px] py-4`} />
                       </div>
                     </div>
@@ -203,37 +207,37 @@ const SignUp: React.FC = () => {
 
                 {/* SHARED FIELDS */}
                 <div className="space-y-1">
-                  <label className="text-sm font-semibold text-slate-700 ml-1">Contact Person Name</label>
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Contact Person Name</label>
                   <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={20} />
                     <input name="fullName" value={form.fullName} onChange={handleChange} required placeholder="Enter full name" className={inputClasses} />
                   </div>
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-sm font-semibold text-slate-700 ml-1">Email Address</label>
+                  <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Email Address</label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={20} />
                     <input name="email" type="email" value={form.email} onChange={handleChange} required placeholder="name@example.com" className={inputClasses} />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1 relative">
-                    <label className="text-sm font-semibold text-slate-700 ml-1">Password</label>
-                    <Lock className="absolute left-4 top-[46px] -translate-y-1/2 text-slate-400" size={20} />
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">Password</label>
+                    <Lock className="absolute left-4 top-[46px] -translate-y-1/2 text-slate-400 dark:text-slate-500" size={20} />
                     <input name="password" type={showPassword ? "text" : "password"} value={form.password} onChange={handleChange} required placeholder="••••••••" className={inputClasses} />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-[46px] -translate-y-1/2 text-slate-400">
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-[46px] -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors">
                       {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
                   <div className="space-y-1 relative">
-                    <label className="text-sm font-semibold text-slate-700 ml-1">
+                    <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 ml-1">
                       Confirm password
                     </label>
 
                     <Lock
-                      className="absolute left-4 top-[46px] -translate-y-1/2 text-slate-400"
+                      className="absolute left-4 top-[46px] -translate-y-1/2 text-slate-400 dark:text-slate-500"
                       size={20}
                     />
 
@@ -250,7 +254,7 @@ const SignUp: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-4 top-[46px] -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                      className="absolute right-4 top-[46px] -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                     >
                       {showConfirmPassword ? (
                         <EyeOff size={18} />
@@ -262,7 +266,7 @@ const SignUp: React.FC = () => {
                 </div>
               </div>
 
-              <button type="submit" disabled={isSubmitting} className={`w-full bg-indigo-700 text-white font-bold py-4 rounded-2xl mt-4 ${isSubmitting ? 'opacity-70' : ''}`}>
+              <button type="submit" disabled={isSubmitting} className={`w-full bg-indigo-700 text-white font-bold py-4 rounded-2xl mt-4 shadow-xl shadow-indigo-500/10 active:scale-[0.98] transition-all ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}>
                 {isSubmitting ? "Processing..." : "Initialize Profile"}
               </button>
             </form>

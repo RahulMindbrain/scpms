@@ -9,6 +9,7 @@ import type { AppDispatch } from "../../../redux/store/store";
 import type { RootState } from "../../../redux/reducers/rootReducer";
 import { toast } from "sonner";
 import { loginUser } from "@/redux/thunks/loginThunk";
+import { ModeToggle } from "@/components/mode-toggle";
 
 const SignIn: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -70,20 +71,23 @@ const SignIn: React.FC = () => {
   }, [images.length]);
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 font-sans overflow-hidden">
+    <div className="min-h-screen flex flex-col md:flex-row bg-slate-50 dark:bg-[#02040a] font-sans overflow-hidden">
       {/* LEFT SIDE - FORM */}
-      <div className="w-full md:w-1/2 flex items-center justify-center px-4 sm:px-6 md:px-12 py-10 md:py-12 bg-white">
+      <div className="w-full md:w-1/2 flex items-center justify-center px-4 sm:px-6 md:px-12 py-10 md:py-12 bg-white dark:bg-[#0b0f1a]">
         <div className="w-full max-w-sm sm:max-w-md">
           {/* Brand Header */}
           <div className="mb-8">
-            <div className="flex items-center gap-2 mb-6">
-              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg bg-gradient-to-br from-blue-700 to-slate-900">
-                <GraduationCap size={24} />
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2">
+                <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white shadow-lg bg-gradient-to-br from-blue-700 to-slate-900">
+                  <GraduationCap size={24} />
+                </div>
+                <span className="text-xl font-bold tracking-tight text-gray-900 dark:text-white">Smart CPMS</span>
               </div>
-              <span className="text-xl font-bold tracking-tight text-gray-900">Smart CPMS</span>
+              <ModeToggle />
             </div>
-            <h2 className="text-3xl font-bold text-gray-900">Welcome Back</h2>
-            <p className="text-gray-500 mt-2">Centralized Placement Management System</p>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white">Welcome Back</h2>
+            <p className="text-gray-500 dark:text-slate-400 mt-2">Centralized Placement Management System</p>
           </div>
 
           <form className="space-y-5" onSubmit={handleSubmit}>
@@ -93,14 +97,14 @@ const SignIn: React.FC = () => {
                 Email Address
               </label>
               <div className="relative group">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 group-focus-within:text-indigo-600 transition-colors" size={18} />
                 <input
                   type="email"
                   required
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-500 placeholder-gray-400"
+                  className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-[#02040a] border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-600 focus:ring-2 focus:ring-indigo-600/20 outline-none transition-all"
                 />
               </div>
             </div>
@@ -114,19 +118,19 @@ const SignIn: React.FC = () => {
                 </Link>
               </div>
               <div className="relative group">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-600 transition-colors" size={18} />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 group-focus-within:text-indigo-600 transition-colors" size={18} />
                 <input
                   type={showPassword ? "text" : "password"}
                   required
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-500 placeholder-gray-400"
+                  className="w-full pl-10 pr-10 py-3 bg-gray-50 dark:bg-[#02040a] border border-gray-200 dark:border-white/10 rounded-xl text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-slate-600 focus:ring-2 focus:ring-indigo-600/20 outline-none transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-slate-500 hover:text-gray-600 dark:hover:text-slate-300 transition-colors"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -144,9 +148,9 @@ const SignIn: React.FC = () => {
             </button>
 
             {/* Signup Link */}
-            <p className="text-sm font-medium text-gray-500 text-center mt-6">
+            <p className="text-sm font-medium text-gray-500 dark:text-slate-400 text-center mt-6">
               New to the platform? {" "}
-              <Link to="/signup" className="text-indigo-600 font-bold hover:underline">
+              <Link to="/signup" className="text-indigo-600 dark:text-blue-400 font-bold hover:underline">
                 Register here
               </Link>
             </p>
