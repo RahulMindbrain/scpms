@@ -1,297 +1,292 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react";
 import {
   Building2,
   GraduationCap,
   MapPin,
   Search,
   ChevronRight,
-} from "lucide-react"
+  Sparkles,
+  ArrowUpRight,
+  RefreshCw,
+} from "lucide-react";
 
-import { toast } from "sonner"
-import { useDispatch, useSelector } from "react-redux"
+import { toast } from "sonner";
+import { useDispatch, useSelector } from "react-redux";
 
-import type { RootState } from "@/redux/reducers/rootReducer"
-import type { AppDispatch } from "@/redux/store/store"
+import type { RootState } from "@/redux/reducers/rootReducer";
+import type { AppDispatch } from "@/redux/store/store";
 import {
   fetchCompanyRequests,
   reapplyUniversity,
   requestUniversity,
-} from "@/redux/thunks/superadmin/companyUniversityThunk"
-import { getAPI } from "@/apis/api"
-
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
+} from "@/redux/thunks/superadmin/companyUniversityThunk";
+import { getAPI } from "@/apis/api";
+import Loader from "@/components/Loader";
 
 const UniversityRequest = () => {
-  const dispatch = useDispatch<AppDispatch>()
-  const [search, setSearch] = useState("")
-  const [universities, setUniversities] = useState<any[]>([])
-  const [isUniversityLoading, setIsUniversityLoading] = useState(false)
-  const [reapplyingUniversityId, setReapplyingUniversityId] = useState<
-    number | null
-  >(null)
+  const dispatch = useDispatch<AppDispatch>();
+  const [search, setSearch] = useState("");
+  const [universities, setUniversities] = useState<any[]>([]);
+  const [isUniversityLoading, setIsUniversityLoading] = useState(false);
+  const [reapplyingUniversityId, setReapplyingUniversityId] = useState<number | null>(null);
 
   const companyUniversityState = useSelector(
     (state: RootState) => state.companyUniversity
-  )
+  );
 
-  const requests = companyUniversityState?.requests || []
-  const loading = companyUniversityState?.loading || false
+  const requests = companyUniversityState?.requests || [];
+  const loading = companyUniversityState?.loading || false;
 
   useEffect(() => {
-    dispatch(fetchCompanyRequests())
-  }, [dispatch])
+    dispatch(fetchCompanyRequests());
+  }, [dispatch]);
 
   useEffect(() => {
     const loadUniversities = async () => {
       try {
-        setIsUniversityLoading(true)
+        setIsUniversityLoading(true);
         const response = await getAPI<any>("/university", {
           page: 1,
           limit: 200,
-        })
-        const rows = response?.data?.data || []
-        setUniversities(Array.isArray(rows) ? rows : [])
+        });
+        const rows = response?.data?.data || [];
+        setUniversities(Array.isArray(rows) ? rows : []);
       } catch (error: any) {
-        toast.error(error?.message || "Failed to load universities")
-        setUniversities([])
+        toast.error(error?.message || "Failed to load universities");
+        setUniversities([]);
       } finally {
-        setIsUniversityLoading(false)
+        setIsUniversityLoading(false);
       }
-    }
+    };
 
-    loadUniversities()
-  }, [])
+    loadUniversities();
+  }, []);
 
   const filteredUniversities = useMemo(() => {
     return universities.filter((u: any) =>
       u?.name?.toLowerCase().includes(search.toLowerCase())
-    )
-  }, [universities, search])
+    );
+  }, [universities, search]);
 
   const handleRequest = async (universityId: number) => {
     try {
-      await dispatch(requestUniversity([universityId])).unwrap()
-      toast.success("Request sent successfully")
-      dispatch(fetchCompanyRequests())
+      await dispatch(requestUniversity([universityId])).unwrap();
+      toast.success("Request sent successfully");
+      dispatch(fetchCompanyRequests());
     } catch (error: any) {
-      toast.error(error?.message || error || "Failed to send request")
+      toast.error(error?.message || error || "Failed to send request");
     }
-  }
+  };
 
   const handleReapply = async (universityId: number) => {
     try {
-      setReapplyingUniversityId(universityId)
-      await dispatch(reapplyUniversity([universityId])).unwrap()
-      toast.success("Reapplied successfully")
-      dispatch(fetchCompanyRequests())
+      setReapplyingUniversityId(universityId);
+      await dispatch(reapplyUniversity([universityId])).unwrap();
+      toast.success("Reapplied successfully");
+      dispatch(fetchCompanyRequests());
     } catch (error: any) {
-      toast.error(error?.message || error || "Failed to reapply request")
+      toast.error(error?.message || error || "Failed to reapply request");
     } finally {
-      setReapplyingUniversityId(null)
+      setReapplyingUniversityId(null);
     }
-  }
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "APPROVED":
         return (
-          <Badge className="border-emerald-200 bg-emerald-100 text-[10px] font-bold text-emerald-700 uppercase">
-            Active
-          </Badge>
-        )
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider">
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            Approved
+          </div>
+        );
       case "REJECTED":
         return (
-          <Badge
-            variant="destructive"
-            className="text-[10px] font-bold uppercase"
-          >
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-destructive/10 border border-destructive/20 text-destructive text-[10px] font-black uppercase tracking-wider">
+            <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
             Rejected
-          </Badge>
-        )
+          </div>
+        );
       default:
         return (
-          <Badge className="border-amber-200 bg-amber-100 text-[10px] font-bold text-amber-700 uppercase">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider">
+            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-bounce" />
             Pending
-          </Badge>
-        )
+          </div>
+        );
     }
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-background p-8 font-sans text-foreground">
-      <div className="mx-auto max-w-6xl space-y-8">
-        {/* HERO SECTION - Styled after the "Corporate Partners" banner */}
-        <div className="relative overflow-hidden rounded-[32px] border border-border bg-linear-to-br from-orange-100/50 to-amber-100/30 p-10 dark:from-orange-950/20 dark:to-amber-950/10">
-          <div className="relative z-10">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1">
-              <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-500" />
-              <span className="text-[10px] font-black tracking-wider text-blue-600 uppercase">
-                University Access
-              </span>
-            </div>
+    <div className="min-h-screen pb-20 animate-in fade-in duration-1000">
+      <div className=" space-y-10">
 
-            <div className="mb-4 flex items-center gap-4">
-              <div className="rounded-xl bg-orange-500 p-3 shadow-lg shadow-orange-200">
-                <GraduationCap className="h-8 w-8 text-white" />
+        {/* Hero Header */}
+        <div className="p-4 md:p-10">
+          <div className="company-hero-banner relative overflow-hidden group min-h-[320px] flex flex-col justify-center">
+            <div className="hero-mesh">
+              <div className="bubble-primary blur-[120px] opacity-40" />
+              <div className="bubble-secondary blur-[100px] opacity-30" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-32 -mt-32 animate-pulse" />
+            </div>
+            <div className="hero-texture opacity-10" />
+
+            <div className="relative z-10 space-y-6 max-w-3xl">
+              <div className="hero-badge backdrop-blur-md bg-white/10 border-white/20">
+                <Sparkles size={14} className="text-blue-200" />
+                University Network
               </div>
-              <h1 className="text-4xl font-extrabold tracking-tight text-foreground">
+              <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-tight">
                 Academic Partners
               </h1>
+              <p className="text-lg text-blue-50/80 font-medium leading-relaxed max-w-2xl">
+                Manage your institutional connections and monitor placement affiliation status.
+              </p>
             </div>
-
-            <p className="max-w-2xl text-lg text-muted-foreground">
-              Connect with educational institutions to expand your placement
-              network and reach top-tier student talent.
-            </p>
           </div>
         </div>
 
-        {/* SEARCH BAR - Floating Style */}
-        <div className="group relative max-w-md">
-          <Search className="absolute top-1/2 left-4 h-5 w-5 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-blue-500" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search for universities..."
-            className="h-14 rounded-2xl border-border bg-card pl-12 text-base transition-all focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/40"
-          />
-        </div>
+        <div className="px-4 md:px-10 -mt-16 relative z-20">
+          <div className="saas-card p-0 overflow-hidden border-none bg-card/90 backdrop-blur-xl shadow-2xl shadow-black/5">
 
-        {/* TABLE SECTION - Based on the reference image table */}
-        <Card className="overflow-hidden rounded-[24px] border-border bg-card shadow-sm">
-          <CardContent className="p-0">
+            {/* Search & Actions Header */}
+            <div className="p-8 border-b border-border/40 bg-muted/10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="space-y-1">
+                <h2 className="text-xl font-black text-foreground tracking-tight">University Directory</h2>
+                <p className="text-xs text-muted-foreground font-medium">Monitoring {universities.length} academic institutions available for syndication.</p>
+              </div>
+
+              <div className="group relative w-full md:w-80">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search campus name..."
+                  className="saas-input h-12 !pl-12 bg-background/50 border-border/50 focus:bg-background transition-all outline-none"
+                />
+              </div>
+            </div>
+
             <div className="overflow-x-auto">
-              <table className="w-full border-collapse text-left">
+              <table className="saas-table">
                 <thead>
-                  <tr className="border-b border-border">
-                    <th className="px-8 py-5 text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
-                      #
-                    </th>
-                    <th className="px-8 py-5 text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
-                      University
-                    </th>
-                    <th className="px-8 py-5 text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
-                      Location
-                    </th>
-                    <th className="px-8 py-5 text-center text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
-                      Status
-                    </th>
-                    <th className="px-8 py-5 text-right text-[11px] font-bold tracking-widest text-muted-foreground uppercase">
-                      Actions
-                    </th>
+                  <tr>
+                    <th>#</th>
+                    <th>Institution & Campus</th>
+                    <th>Geographic Location</th>
+                    <th className="text-center">Affiliation Status</th>
+                    <th className="text-right">Connectivity Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border/60">
-                  {(loading || isUniversityLoading) && (
+                <tbody className="divide-y divide-border/40">
+                  {(loading || isUniversityLoading) ? (
                     <tr>
-                      <td
-                        colSpan={5}
-                        className="px-8 py-8 text-center text-sm text-muted-foreground"
-                      >
-                        Loading universities...
+                      <td colSpan={5} className="py-20 text-center">
+                        <div className="flex flex-col items-center gap-4">
+                          <Loader size="lg" />
+                          <span className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">Syncing Academic Data...</span>
+                        </div>
                       </td>
                     </tr>
+                  ) : filteredUniversities.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} className="py-20 text-center">
+                        <div className="flex flex-col items-center gap-2 opacity-50">
+                          <Search size={40} className="text-muted-foreground mb-2" />
+                          <span className="text-sm font-bold text-foreground">No universities found</span>
+                          <span className="text-xs text-muted-foreground">Try refining your search parameters.</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredUniversities.map((uni, idx) => {
+                      const req = requests.find((r: any) => r.universityId === uni.id);
+                      return (
+                        <tr key={uni.id} className="group hover:bg-primary/[0.02] transition-colors">
+                          <td className="w-16 text-center font-black text-[10px] text-muted-foreground/50">
+                            {(idx + 1).toString().padStart(2, "0")}
+                          </td>
+                          <td>
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border border-primary/10 group-hover:scale-110 transition-transform duration-500 shadow-sm">
+                                <Building2 className="h-6 w-6 text-primary" />
+                              </div>
+                              <div className="space-y-1">
+                                <div className="text-sm font-black text-foreground group-hover:text-primary transition-colors">
+                                  {uni.name}
+                                </div>
+                                <div className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-tight flex items-center gap-2">
+                                  <span className="px-1.5 py-0.5 rounded bg-muted/50 border border-border/50">ID: {String(uni.id).slice(-6).toUpperCase()}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-muted/30 border border-border/40 text-xs font-bold text-muted-foreground">
+                              <MapPin className="h-3.5 w-3.5 text-primary/60" />
+                              {uni.city}, {uni.state}
+                            </div>
+                          </td>
+                          <td className="text-center">
+                            {req ? (
+                              getStatusBadge(req.status)
+                            ) : (
+                              <span className="text-[10px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">
+                                Not Connected
+                              </span>
+                            )}
+                          </td>
+                          <td className="text-right">
+                            {!req && (
+                              <button
+                                onClick={() => handleRequest(uni.id)}
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-[10px] font-black uppercase tracking-wider shadow-lg shadow-primary/10 hover:shadow-primary/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300"
+                              >
+                                Request Connection <ArrowUpRight size={14} />
+                              </button>
+                            )}
+                            {req?.status === "REJECTED" && (
+                              <button
+                                disabled={reapplyingUniversityId === uni.id}
+                                onClick={() => handleReapply(uni.id)}
+                                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-500 text-white text-[10px] font-black uppercase tracking-wider shadow-lg shadow-amber-500/10 hover:shadow-amber-500/30 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 disabled:opacity-50"
+                              >
+                                {reapplyingUniversityId === uni.id ? (
+                                  <><RefreshCw size={14} className="animate-spin" /> Reapplying...</>
+                                ) : (
+                                  <>Retry Connection <RefreshCw size={14} /></>
+                                )}
+                              </button>
+                            )}
+                            {req && req.status !== "REJECTED" && (
+                              <div className="flex justify-end pr-4 opacity-20">
+                                <ChevronRight className="h-5 w-5" />
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })
                   )}
-                  {!loading &&
-                    !isUniversityLoading &&
-                    filteredUniversities.length === 0 && (
-                      <tr>
-                        <td
-                          colSpan={5}
-                          className="px-8 py-8 text-center text-sm text-muted-foreground"
-                        >
-                          No universities found for the current search.
-                        </td>
-                      </tr>
-                    )}
-                  {filteredUniversities.map((uni, idx) => {
-                    const req = requests.find(
-                      (r: any) => r.universityId === uni.id
-                    )
-
-                    return (
-                      <tr
-                        key={uni.id}
-                        className="group transition-colors hover:bg-muted/40"
-                      >
-                        <td className="px-8 py-6 text-sm font-medium text-muted-foreground">
-                          {(idx + 1).toString().padStart(2, "0")}
-                        </td>
-                        <td className="px-8 py-6">
-                          <div className="flex items-center gap-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-orange-200/50 bg-orange-100/60 dark:border-orange-900/40 dark:bg-orange-900/20">
-                              <Building2 className="h-5 w-5 text-orange-500" />
-                            </div>
-                            <div>
-                              <div className="font-bold text-foreground">
-                                {uni.name}
-                              </div>
-                              <div className="text-xs text-muted-foreground">
-                                ID: {uni.id}
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-8 py-6">
-                          <div className="flex items-center text-sm text-muted-foreground">
-                            <MapPin className="mr-1.5 h-3.5 w-3.5 text-muted-foreground/70" />
-                            {uni.city}, {uni.state}
-                          </div>
-                        </td>
-                        <td className="px-8 py-6 text-center">
-                          {req ? (
-                            getStatusBadge(req.status)
-                          ) : (
-                            <span className="text-[10px] font-bold text-muted-foreground/60 uppercase">
-                              No Request
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-8 py-6 text-right">
-                          {!req && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => handleRequest(uni.id)}
-                              className="text-xs font-bold text-blue-600 uppercase hover:bg-blue-100/50 hover:text-blue-700 dark:hover:bg-blue-900/30"
-                            >
-                              Send Request{" "}
-                              <ChevronRight className="ml-1 h-4 w-4" />
-                            </Button>
-                          )}
-                          {req?.status === "REJECTED" && (
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              disabled={reapplyingUniversityId === uni.id}
-                              onClick={() => handleReapply(uni.id)}
-                              className="text-xs font-bold text-orange-600 uppercase hover:bg-orange-100/60 hover:text-orange-700 dark:hover:bg-orange-900/30"
-                            >
-                              {reapplyingUniversityId === uni.id
-                                ? "Reapplying..."
-                                : "Reapply"}
-                            </Button>
-                          )}
-                          {req && req.status !== "REJECTED" && (
-                            <div className="text-slate-300">
-                              <ChevronRight className="ml-auto h-5 w-5" />
-                            </div>
-                          )}
-                        </td>
-                      </tr>
-                    )
-                  })}
                 </tbody>
               </table>
             </div>
-          </CardContent>
-        </Card>
+
+            {/* Footer Stats */}
+            <div className="p-6 border-t border-border/40 bg-muted/5 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+              <div className="flex items-center gap-4">
+                <span>Active Network: {requests.filter((r: any) => r.status === "APPROVED").length}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Building2 size={12} className="text-primary" /> University Directory
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default UniversityRequest
+export default UniversityRequest;

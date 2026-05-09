@@ -1,5 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
-import { Building2, ChevronRight, Send, Sparkles } from "lucide-react";
+import {
+  Building2,
+  ChevronRight,
+  Send,
+  Sparkles,
+  GraduationCap,
+  Briefcase,
+  Info,
+  Target,
+  BookOpen,
+  AlertCircle,
+  AlignLeft,
+  IndianRupee,
+  Plus
+} from "lucide-react";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
@@ -9,10 +23,7 @@ import type { AppDispatch } from "@/redux/store/store";
 import { fetchCompanyJobs } from "@/redux/thunks/companyThunk";
 import { sendJobToUniversity } from "@/redux/thunks/superadmin/companyUniversityThunk";
 import { getAPI } from "@/apis/api";
-
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import Loader from "@/components/Loader";
 
 const SendJobUniversityRequest = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -117,135 +128,240 @@ const SendJobUniversityRequest = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-8 text-foreground">
-      <div className="mx-auto max-w-4xl space-y-8">
-        <div className="relative overflow-hidden rounded-[28px] border border-border bg-linear-to-br from-blue-100/50 to-indigo-100/30 p-8 dark:from-blue-950/20 dark:to-indigo-950/10">
-          <div className="relative z-10 space-y-4">
-            <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3 py-1">
-              <Sparkles className="h-3.5 w-3.5 text-blue-600" />
-              <span className="text-[10px] font-black uppercase tracking-wider text-blue-600">
-                Company Request
-              </span>
+    <div className="min-h-screen pb-20 animate-in fade-in duration-1000">
+      <div className=" space-y-10">
+
+        {/* Hero Header - Matching PostJob.tsx exactly */}
+        <div className="p-4 md:p-10">
+          <div className="company-hero-banner relative overflow-hidden group min-h-[320px] flex flex-col justify-center">
+            <div className="hero-mesh">
+              <div className="bubble-primary blur-[120px] opacity-40" />
+              <div className="bubble-secondary blur-[100px] opacity-30" />
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-32 -mt-32 animate-pulse" />
             </div>
-            <h1 className="text-3xl font-extrabold tracking-tight">Send Job to University</h1>
-            <p className="text-sm text-muted-foreground">
-              Map a job to a university and share eligibility details in one request.
-            </p>
+            <div className="hero-texture opacity-10" />
+
+            <div className="relative z-10 space-y-6 max-w-3xl">
+              <div className="hero-badge backdrop-blur-md bg-white/10 border-white/20">
+                <Sparkles size={14} className="text-blue-200" />
+                Job Syndication
+              </div>
+              <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight leading-tight">
+                Send Job <br />
+                to University
+              </h1>
+              <p className="text-lg text-blue-50/80 font-medium leading-relaxed max-w-2xl">
+                Distribute your job postings across targeted academic institutions and campus placement systems.
+              </p>
+            </div>
           </div>
         </div>
 
-        <Card className="rounded-2xl border-border bg-card shadow-sm">
-          <CardContent className="p-6 md:p-8">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                    Select Job
-                  </label>
-                  <select
-                    className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
-                    value={formData.jobId}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, jobId: e.target.value }))}
-                  >
-                    <option value="">Choose job</option>
-                    {companyJobs.map((job: any) => (
-                      <option key={job.id} value={job.id}>
-                        {job.title} (#{job.id})
-                      </option>
-                    ))}
-                  </select>
+        <div className="px-4 md:px-10 -mt-16 relative z-20">
+          <div className="saas-card p-10 md:p-12 space-y-12 bg-card/90 backdrop-blur-xl shadow-2xl shadow-black/5">
+            <form onSubmit={handleSubmit} className="space-y-12">
+
+              <div className="space-y-3">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/5 text-primary rounded-full text-[10px] font-bold uppercase tracking-wider border border-primary/10">
+                  <Target size={12} /> Syndication Logic
+                </div>
+                <h2 className="text-2xl font-black text-foreground tracking-tight">Channel Selection</h2>
+                <p className="text-muted-foreground font-medium max-w-lg">Map your recruitment manifest to the appropriate academic destination.</p>
+              </div>
+
+              {/* Selection Section */}
+              <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
+                <div className="space-y-4">
+                  <label className="saas-label">Active Job Opportunity</label>
+                  <div className="relative group">
+                    <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+                    <select
+                      className="saas-input h-14 !pl-16 appearance-none bg-muted/20 border-border/50 hover:border-primary/30 focus:bg-background focus:ring-8 focus:ring-primary/5 transition-all duration-300 outline-none cursor-pointer font-bold"
+                      value={formData.jobId}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, jobId: e.target.value }))}
+                    >
+                      <option value="">Choose a manifest...</option>
+                      {companyJobs.map((job: any) => (
+                        <option key={job.id} value={job.id}>
+                          {job.title} — ID: {String(job.id).slice(-6).toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-muted-foreground pointer-events-none" size={18} />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                    Select University
-                  </label>
-                  <select
-                    className="h-10 w-full rounded-md border border-border bg-background px-3 text-sm"
-                    value={formData.universityId}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, universityId: e.target.value }))
-                    }
-                    disabled={isUniversityLoading}
-                  >
-                    <option value="">
-                      {isUniversityLoading ? "Loading universities..." : "Choose university"}
-                    </option>
-                    {universities.map((uni: any) => (
-                      <option key={uni.id} value={uni.id}>
-                        {uni.name} (#{uni.id})
+                <div className="space-y-4">
+                  <label className="saas-label">Destination University</label>
+                  <div className="relative group">
+                    <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+                    <select
+                      className="saas-input h-14 !pl-16 appearance-none bg-muted/20 border-border/50 hover:border-primary/30 focus:bg-background focus:ring-8 focus:ring-primary/5 transition-all duration-300 outline-none cursor-pointer font-bold"
+                      value={formData.universityId}
+                      onChange={(e) => setFormData((prev) => ({ ...prev, universityId: e.target.value }))}
+                      disabled={isUniversityLoading}
+                    >
+                      <option value="">
+                        {isUniversityLoading ? "Syncing universities..." : "Select university campus..."}
                       </option>
-                    ))}
-                  </select>
+                      {universities.map((uni: any) => (
+                        <option key={uni.id} value={uni.id}>
+                          {uni.name} (ID: {String(uni.id).slice(-6).toUpperCase()})
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 rotate-90 text-muted-foreground pointer-events-none" size={18} />
+                  </div>
                 </div>
               </div>
 
               {selectedJob && (
-                <div className="rounded-xl border border-blue-200 bg-blue-50/70 px-4 py-3 text-xs text-blue-700 dark:border-blue-900/40 dark:bg-blue-950/20 dark:text-blue-300">
-                  Selected job: <span className="font-semibold">{selectedJob.title}</span> (#
-                  {selectedJob.id})
+                <div className="animate-in slide-in-from-top-2 duration-500 flex items-center gap-5 rounded-[2rem] border border-primary/10 bg-primary/5 p-6 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16" />
+                  <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Building2 className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="space-y-1 relative z-10">
+                    <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Active Manifest Selection</h4>
+                    <p className="text-sm font-bold text-foreground">
+                      Syndicating <span className="text-primary italic">"{selectedJob.title}"</span> to the targeted university channel.
+                    </p>
+                  </div>
                 </div>
               )}
 
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <Input
-                  type="number"
-                  placeholder="Salary (e.g. 1200000)"
-                  value={formData.salary}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, salary: e.target.value }))}
-                />
-                <Input
-                  type="number"
-                  step="0.01"
-                  placeholder="Min CGPA (e.g. 7.0)"
-                  value={formData.minCgpa}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, minCgpa: e.target.value }))}
-                />
-                <Input
-                  type="number"
-                  placeholder="Max Backlogs (e.g. 1)"
-                  value={formData.maxBacklogs}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, maxBacklogs: e.target.value }))
-                  }
-                />
-                <Input
-                  type="number"
-                  placeholder="Openings (e.g. 5)"
-                  value={formData.openings}
-                  onChange={(e) => setFormData((prev) => ({ ...prev, openings: e.target.value }))}
-                />
+              {/* Eligibility & Targeting Section */}
+              <div className="space-y-8">
+                <div className="space-y-3">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Calibration Parameters</h3>
+                  <div className="h-px w-full bg-border/50" />
+                </div>
+
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                  <div className="space-y-4">
+                    <label className="saas-label">Annual Salary (INR)</label>
+                    <div className="relative group">
+                      <IndianRupee className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+                      <input
+                        type="number"
+                        min="0"
+                        placeholder="e.g. 1200000"
+                        className="saas-input h-14 !pl-16 bg-muted/20 border-border/50 hover:border-primary/30 focus:bg-background focus:ring-8 focus:ring-primary/5 transition-all outline-none"
+                        value={formData.salary}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (Number(val) < 0) return;
+                          setFormData((prev) => ({ ...prev, salary: val }));
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <label className="saas-label">Min CGPA</label>
+                    <div className="relative group">
+                      <BookOpen className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="e.g. 7.5"
+                        className="saas-input h-14 !pl-16 bg-muted/20 border-border/50 hover:border-primary/30 focus:bg-background focus:ring-8 focus:ring-primary/5 transition-all outline-none"
+                        value={formData.minCgpa}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (Number(val) < 0) return;
+                          setFormData((prev) => ({ ...prev, minCgpa: val }));
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <label className="saas-label">Max Backlogs</label>
+                    <div className="relative group">
+                      <AlertCircle className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+                      <input
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        className="saas-input h-14 !pl-16 bg-muted/20 border-border/50 hover:border-primary/30 focus:bg-background focus:ring-8 focus:ring-primary/5 transition-all outline-none"
+                        value={formData.maxBacklogs}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (Number(val) < 0) return;
+                          setFormData((prev) => ({ ...prev, maxBacklogs: val }));
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <label className="saas-label">Openings</label>
+                    <div className="relative group">
+                      <Plus className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+                      <input
+                        type="number"
+                        min="0"
+                        placeholder="15"
+                        className="saas-input h-14 !pl-16 bg-muted/20 border-border/50 hover:border-primary/30 focus:bg-background focus:ring-8 focus:ring-primary/5 transition-all outline-none"
+                        value={formData.openings}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (Number(val) < 0) return;
+                          setFormData((prev) => ({ ...prev, openings: val }));
+                        }}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
-                  Description
-                </label>
-                <textarea
-                  rows={4}
-                  placeholder="Write a short opportunity description..."
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData((prev) => ({ ...prev, description: e.target.value }))
-                  }
-                  className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/20"
-                />
+              <div className="space-y-4">
+                <label className="saas-label">Syndication Instructions</label>
+                <div className="relative group">
+                  <AlignLeft className="absolute left-5 top-6 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
+                  <textarea
+                    rows={6}
+                    placeholder="Articulate specific requirements or university-specific details..."
+                    value={formData.description}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
+                    className="saas-input !pl-16 py-6 bg-muted/20 border-border/50 hover:border-primary/30 focus:bg-background focus:ring-8 focus:ring-primary/5 transition-all resize-none leading-relaxed outline-none"
+                  />
+                </div>
               </div>
 
-              <div className="flex justify-end">
-                <Button type="submit" disabled={loading} className="text-xs font-bold uppercase">
-                  {loading ? "Sending..." : "Send Request"}
-                  {!loading && <Send className="ml-2 h-4 w-4" />}
-                  {loading && <ChevronRight className="ml-2 h-4 w-4 animate-pulse" />}
-                </Button>
+              <div className="flex flex-col md:flex-row items-center justify-between gap-8 pt-10">
+                <div className="p-6 bg-primary/5 border border-primary/10 rounded-[2rem] flex items-start gap-4 flex-1">
+                  <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <Info size={16} className="text-primary" />
+                  </div>
+                  <div className="space-y-1">
+                    <h5 className="text-[10px] font-black text-primary uppercase tracking-wider">Syndication Protocol</h5>
+                    <p className="text-[11px] text-primary/70 font-bold leading-relaxed">
+                      By confirming, this manifest will be instantly routed to the university's placement system.
+                      Ensure all parameters are within legal and corporate compliance.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="group relative flex items-center justify-center gap-4 px-12 py-5 bg-primary text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-2xl hover:shadow-primary/30 hover:-translate-y-1.5 active:translate-y-0 transition-all duration-500 overflow-hidden w-full md:w-auto min-w-[240px]"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shine_2s_infinite] transition-transform" />
+                  {loading ? (
+                    <><Loader size="sm" /> Transmitting...</>
+                  ) : (
+                    <>Send Job Request <Send className="h-4 w-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" /></>
+                  )}
+                </button>
               </div>
             </form>
-          </CardContent>
-        </Card>
-
- 
+          </div>
+        </div>
       </div>
     </div>
+
+
   );
 };
 

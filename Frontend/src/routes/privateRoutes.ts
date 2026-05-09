@@ -201,11 +201,11 @@ export const PrivateRoutes: RouteOptions<any>[] = [
         component: CompanyNotificationPage
     },
 {
-    path: "/company/university",
+    path: "/company/university-list",
     component: UniversityRequest
 },
 {
-    path: "/company/university/send-job",
+    path: "/company/send-job-to-university",
     component: SendJobUniversityRequest
 }
 ];

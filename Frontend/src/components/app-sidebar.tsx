@@ -117,11 +117,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           { title: "Profile", url: "/company/profile", icon: <Building2 /> },
           { title: "Post Job", url: "/company/post-job", icon: <PlusCircle /> },
           { title: "Manage Jobs", url: "/company/jobs", icon: <Briefcase /> },
-          { title: "Send Job Request", url: "/company/university/send-job", icon: <PlusCircle /> },
+          { title: "Send Job Request", url: "/company/send-job-to-university", icon: <PlusCircle /> },
           { title: "Applicants", url: "/company/applicants", icon: <Users /> },
           {
             title: "Universities",
-            url: "/company/university",
+            url: "/company/university-list",
             icon: <GraduationCap />,
           },
         ],

@@ -2,12 +2,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast } from 'sonner';
 import {
-  Briefcase, 
-  MapPin, 
-  AlignLeft, 
-  CheckCircle2, 
-  Zap, 
-  BookOpen, 
+  Briefcase,
+  MapPin,
+  AlignLeft,
+  CheckCircle2,
+  Zap,
+  BookOpen,
   FileText,
   IndianRupee,
   X,
@@ -34,7 +34,7 @@ const PostJob: React.FC = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const editJobId = searchParams.get('jobId');
-  
+
   const { loading: isSubmitting, jobs } = useSelector((state: RootState) => state.company);
   const { departments, loading: loadingDepts } = useSelector((state: RootState) => state.department);
   const { skills, loading: loadingSkills } = useSelector((state: RootState) => state.skill);
@@ -124,7 +124,7 @@ const PostJob: React.FC = () => {
 
   const validateStep = (step: number) => {
     const errors: Record<string, string> = {};
-    
+
     if (step === 1) {
       if (!formData.title) errors.title = "Job title is required";
       if (!formData.salary) errors.salary = "Salary is required";
@@ -196,7 +196,7 @@ const PostJob: React.FC = () => {
       }
     } catch (error: any) {
       console.error("Job Posting Error:", error);
-      
+
       // Handle structured backend validation errors (e.g. Zod errors from API)
       if (error?.data?.errors && Array.isArray(error.data.errors)) {
         const backendErrors: Record<string, string> = {};
@@ -206,7 +206,7 @@ const PostJob: React.FC = () => {
           backendErrors[path] = err.message;
         });
         setFormErrors(backendErrors);
-        
+
         // Logical step jumping based on where the error is
         if (backendErrors.title || backendErrors.salary || backendErrors.location) {
           setCurrentStep(1);
@@ -215,15 +215,15 @@ const PostJob: React.FC = () => {
         } else if (backendErrors.minCgpa || backendErrors.maxCgpa || backendErrors.branches) {
           setCurrentStep(3);
         }
-        
-        toast.error("Form Validation Failed", { 
+
+        toast.error("Form Validation Failed", {
           description: "We found some issues in Step 0" + currentStep + ". Please review the red highlighted fields.",
           icon: <AlertCircle className="text-destructive" size={20} />
         });
       } else {
         // Fallback for general error messages
         const errorMsg = error?.data?.message || error?.message || "An unexpected error occurred while publishing the job drive.";
-        toast.error("Submission Failed", { 
+        toast.error("Submission Failed", {
           description: errorMsg,
           icon: <X className="text-destructive" size={20} />
         });
@@ -265,7 +265,7 @@ const PostJob: React.FC = () => {
             <div className="bubble-secondary" />
           </div>
           <div className="hero-texture" />
-          
+
           <div className="relative z-10 space-y-4">
             <div className="hero-badge">
               <Sparkles size={12} className="animate-pulse" />
@@ -276,7 +276,7 @@ const PostJob: React.FC = () => {
               <span>Job Drive</span>
             </h1>
             <p className="hero-description max-w-xl">
-              {editJobId 
+              {editJobId
                 ? "Update the parameters, eligibility, and description of your existing recruitment drive."
                 : "Follow our professional recruitment wizard to configure your job posting. Break down requirements into logical steps for maximum precision."
               }
@@ -286,17 +286,17 @@ const PostJob: React.FC = () => {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 md:px-8 -mt-8 relative z-20">
-        
+
         {/* Progress Stepper */}
         <div className="saas-card mb-8 p-4 flex items-center justify-between overflow-x-auto no-scrollbar gap-4">
           {steps.map((step, index) => (
             <React.Fragment key={step.id}>
-              <div 
+              <div
                 className={`flex items-center gap-3 shrink-0 transition-all duration-300 ${currentStep >= step.id ? 'text-primary' : 'text-muted-foreground/50'}`}
               >
                 <div className={`
                   w-10 h-10 rounded-xl flex items-center justify-center transition-all duration-500
-                  ${currentStep === step.id ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-110' : 
+                  ${currentStep === step.id ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-110' :
                     currentStep > step.id ? 'bg-primary/10 text-primary' : 'bg-muted/50'}
                 `}>
                   {currentStep > step.id ? <CheckCircle2 size={18} /> : <step.icon size={18} />}
@@ -315,7 +315,7 @@ const PostJob: React.FC = () => {
 
         {/* Form Sections */}
         <form onSubmit={handleSubmit} className="space-y-8">
-          
+
           {currentStep === 1 && (
             <div className="saas-card p-8 space-y-8 animate-in slide-in-from-right-4 duration-500">
               <div className="space-y-2">
@@ -328,14 +328,14 @@ const PostJob: React.FC = () => {
                   <label className="saas-label">Job Title</label>
                   <div className="relative group">
                     <Zap className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${formErrors.title ? 'text-destructive' : 'text-muted-foreground group-focus-within:text-primary'}`} size={16} />
-                    <input 
-                      type="text" 
-                      name="title" 
-                      value={formData.title} 
+                    <input
+                      type="text"
+                      name="title"
+                      value={formData.title}
                       onChange={handleInputChange}
-                      placeholder="e.g. Senior Software Engineer" 
-                      className={`saas-input saas-input-with-icon ${formErrors.title ? 'border-destructive ring-4 ring-destructive/10' : ''}`} 
-                      required 
+                      placeholder="e.g. Senior Software Engineer"
+                      className={`saas-input saas-input-with-icon ${formErrors.title ? 'border-destructive ring-4 ring-destructive/10' : ''}`}
+                      required
                     />
                   </div>
                   {renderError('title')}
@@ -362,14 +362,14 @@ const PostJob: React.FC = () => {
                   <label className="saas-label">Work Location</label>
                   <div className="relative group">
                     <MapPin className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${formErrors.location ? 'text-destructive' : 'text-muted-foreground group-focus-within:text-primary'}`} size={16} />
-                    <input 
-                      type="text" 
-                      name="location" 
-                      value={formData.location} 
+                    <input
+                      type="text"
+                      name="location"
+                      value={formData.location}
                       onChange={handleInputChange}
-                      placeholder="e.g. Bangalore, India (Hybrid)" 
-                      className={`saas-input saas-input-with-icon ${formErrors.location ? 'border-destructive ring-4 ring-destructive/10' : ''}`} 
-                      required 
+                      placeholder="e.g. Bangalore, India (Hybrid)"
+                      className={`saas-input saas-input-with-icon ${formErrors.location ? 'border-destructive ring-4 ring-destructive/10' : ''}`}
+                      required
                     />
                   </div>
                   {renderError('location')}
@@ -387,14 +387,14 @@ const PostJob: React.FC = () => {
 
               <div className="relative group">
                 <AlignLeft className={`absolute left-4 top-4 transition-colors ${formErrors.description ? 'text-destructive' : 'text-muted-foreground group-focus-within:text-primary'}`} size={16} />
-                <textarea 
-                  name="description" 
-                  value={formData.description} 
-                  onChange={handleInputChange} 
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
                   rows={10}
                   placeholder="Provide a comprehensive description of the role, daily tasks, and what makes your company a great place to work..."
                   className={`saas-input saas-input-with-icon py-4 resize-none min-h-[250px] ${formErrors.description ? 'border-destructive ring-4 ring-destructive/10' : ''}`}
-                  required 
+                  required
                 />
               </div>
               {renderError('description')}
@@ -413,15 +413,15 @@ const PostJob: React.FC = () => {
                   <label className="saas-label">Min CGPA</label>
                   <div className="relative group">
                     <BookOpen className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${formErrors.minCgpa ? 'text-destructive' : 'text-muted-foreground group-focus-within:text-primary'}`} size={16} />
-                    <input 
-                      type="number" 
-                      step="0.01" 
-                      name="minCgpa" 
-                      value={formData.minCgpa} 
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="minCgpa"
+                      value={formData.minCgpa}
                       onChange={handleInputChange}
-                      placeholder="0.00" 
-                      className={`saas-input saas-input-with-icon ${formErrors.minCgpa ? 'border-destructive ring-4 ring-destructive/10' : ''}`} 
-                      required 
+                      placeholder="0.00"
+                      className={`saas-input saas-input-with-icon ${formErrors.minCgpa ? 'border-destructive ring-4 ring-destructive/10' : ''}`}
+                      required
                     />
                   </div>
                   {renderError('minCgpa')}
@@ -430,15 +430,15 @@ const PostJob: React.FC = () => {
                   <label className="saas-label">Max CGPA</label>
                   <div className="relative group">
                     <CheckCircle2 className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${formErrors.maxCgpa ? 'text-destructive' : 'text-muted-foreground group-focus-within:text-primary'}`} size={16} />
-                    <input 
-                      type="number" 
-                      step="0.01" 
-                      name="maxCgpa" 
-                      value={formData.maxCgpa} 
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="maxCgpa"
+                      value={formData.maxCgpa}
                       onChange={handleInputChange}
-                      placeholder="10.00" 
-                      className={`saas-input saas-input-with-icon ${formErrors.maxCgpa ? 'border-destructive ring-4 ring-destructive/10' : ''}`} 
-                      required 
+                      placeholder="10.00"
+                      className={`saas-input saas-input-with-icon ${formErrors.maxCgpa ? 'border-destructive ring-4 ring-destructive/10' : ''}`}
+                      required
                     />
                   </div>
                   {renderError('maxCgpa')}
@@ -476,7 +476,7 @@ const PostJob: React.FC = () => {
                     {renderError('branches')}
 
                     {isBranchOpen && (
-                      <div 
+                      <div
                         className="absolute z-[100] w-full mt-2 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-top-2 duration-300"
                         onMouseDown={(e) => e.stopPropagation()}
                       >
@@ -532,7 +532,7 @@ const PostJob: React.FC = () => {
                     </div>
 
                     {isSkillOpen && (
-                      <div 
+                      <div
                         className="absolute z-[100] w-full mt-2 bg-card border border-border rounded-2xl shadow-2xl overflow-hidden animate-in slide-in-from-top-2 duration-300"
                         onMouseDown={(e) => e.stopPropagation()}
                       >
@@ -588,7 +588,7 @@ const PostJob: React.FC = () => {
               <div className="p-6 bg-primary/5 border border-primary/10 rounded-3xl flex gap-4">
                 <Info size={24} className="text-primary shrink-0" />
                 <p className="text-xs text-primary/70 font-semibold leading-relaxed">
-                  Upon publishing, this job drive will be immediately visible to all students meeting the 
+                  Upon publishing, this job drive will be immediately visible to all students meeting the
                   CGPA and branch criteria. Please ensure all information is accurate.
                 </p>
               </div>
@@ -601,9 +601,8 @@ const PostJob: React.FC = () => {
               type="button"
               onClick={prevStep}
               disabled={currentStep === 1 || isSubmitting}
-              className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl font-bold text-xs transition-all ${
-                currentStep === 1 ? 'opacity-0 pointer-events-none' : 'bg-muted hover:bg-muted/80 text-muted-foreground'
-              }`}
+              className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl font-bold text-xs transition-all ${currentStep === 1 ? 'opacity-0 pointer-events-none' : 'bg-muted hover:bg-muted/80 text-muted-foreground'
+                }`}
             >
               <ChevronLeft size={16} /> Back
             </button>

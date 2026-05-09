@@ -237,7 +237,7 @@ const ManageJobs: React.FC = () => {
                       <td className="px-8 py-6">
                         <div className="flex items-center justify-end gap-3">
                           <Link
-                            to={`/company/university/send-job?jobId=${job.id}`}
+                            to={`/company/send-job-to-university?jobId=${job.id}`}
                             className="flex items-center gap-2 rounded-xl bg-blue-500/10 px-4 py-2 text-[10px] font-black tracking-widest text-blue-600 uppercase shadow-sm transition-all hover:bg-blue-500 hover:text-white"
                             title="Send Job to University"
                           >
