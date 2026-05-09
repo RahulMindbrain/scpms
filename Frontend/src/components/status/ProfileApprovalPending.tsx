@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ShieldAlert, Clock, CheckCircle2, AlertCircle, ExternalLink, HelpCircle } from 'lucide-react';
+import { ShieldAlert, Clock, CheckCircle2, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';

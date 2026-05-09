@@ -7,7 +7,6 @@ import {
   Mail,
   XCircle,
   ExternalLink,
-  Globe,
   Briefcase,
   Users,
   LayoutGrid
@@ -41,16 +40,8 @@ const CompanyManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { companies: reduxCompanies, loading, error } = useSelector((state: RootState) => state.company);
 
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [filter, setFilter] = useState('All');
   const [searchTerm, setSearchTerm] = useState('');
-  const [newCompany, setNewCompany] = useState({
-    name: '',
-    sector: '',
-    location: '',
-    email: '',
-    description: ''
-  });
 
   const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null);
   const [isJobsModalOpen, setIsJobsModalOpen] = useState(false);
@@ -97,12 +88,6 @@ const CompanyManagement: React.FC = () => {
     });
   }, [companies, searchTerm, filter]);
 
-  const handleAddSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast.info("Integration for adding companies is coming soon.");
-    setIsAddModalOpen(false);
-    setNewCompany({ name: '', sector: '', location: '', email: '', description: '' });
-  };
 
   const toggleApproval = async (_id: number, userId: number, currentStatus: string) => {
     if (currentStatus === 'Pending') {

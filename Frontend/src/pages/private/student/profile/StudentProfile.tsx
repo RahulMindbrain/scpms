@@ -4,7 +4,7 @@ import {
   Briefcase, FileText, Building2,
   CheckCircle, Globe, MapPin,
   Award, Layers, Cpu, Rocket,
-  AlertCircle, Clock, ShieldAlert
+  Clock, ShieldAlert
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
@@ -27,7 +27,6 @@ import ProfileEditDialog from './modal/ProfileEditDialog';
 import Loader from '@/components/Loader';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import ProfileApprovalPending from '@/components/status/ProfileApprovalPending';
 import { Progress } from "@/components/ui/progress";
 

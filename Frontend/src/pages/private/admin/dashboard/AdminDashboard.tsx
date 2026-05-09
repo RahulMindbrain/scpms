@@ -14,7 +14,6 @@ import {
   Clock,
   ShieldCheck,
   Zap,
-  ChevronRight,
   FileText,
   UserPlus,
   Mail,
