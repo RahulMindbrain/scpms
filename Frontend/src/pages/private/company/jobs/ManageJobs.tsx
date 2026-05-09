@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useDispatch, useSelector } from "react-redux"
-import { fetchCompanyJobs } from "@/redux/thunks/companyThunk"
+import { fetchCompanyJobs, deleteCompanyJob } from "@/redux/thunks/companyThunk"
 import type { RootState } from "@/redux/reducers/rootReducer"
 import type { AppDispatch } from "@/redux/store/store"
 import {
@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/pagination"
 import { Link } from "react-router-dom"
 import Loader from "@/components/Loader"
+import { toast } from "sonner"
 
 const ManageJobs: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -36,11 +37,22 @@ const ManageJobs: React.FC = () => {
   const [page, setPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
 
-  // Modal States
-
   useEffect(() => {
     dispatch(fetchCompanyJobs({ page }))
   }, [dispatch, page])
+
+  const handleDelete = async (id: number) => {
+    if (!window.confirm("Are you sure you want to delete this job drive?")) return
+    
+    try {
+      await dispatch(deleteCompanyJob(id)).unwrap()
+      toast.success("Job drive deleted successfully")
+      // Re-fetch the current page to ensure sync
+      dispatch(fetchCompanyJobs({ page }))
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete job drive")
+    }
+  }
 
   const formatSalary = (salary: number) => {
     if (salary >= 100000) {
@@ -251,6 +263,7 @@ const ManageJobs: React.FC = () => {
                             <Edit3 size={14} /> Modify
                           </Link>
                           <button
+                            onClick={() => handleDelete(job.id)}
                             className="rounded-xl p-2.5 text-muted-foreground transition-all hover:bg-rose-500/10 hover:text-rose-500"
                             title="Delete Drive"
                           >
