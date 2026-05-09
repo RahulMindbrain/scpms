@@ -1,4 +1,4 @@
-﻿import {
+import {
   Mail, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
   Briefcase, FileText, Building2,
@@ -26,7 +26,6 @@ import ProfileEditDialog from './modal/ProfileEditDialog';
 import Loader from '@/components/Loader';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 
 const StudentProfile = () => {

@@ -3,7 +3,6 @@ import {
   Edit3,
   Trash2,
   Search,
-  Filter,
   Plus,
   Briefcase,
   MapPin,

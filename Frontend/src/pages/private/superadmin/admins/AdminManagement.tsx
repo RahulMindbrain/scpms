@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { ShieldCheck, Search, CheckCircle, XCircle, ChevronRight, User, MapPin } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "@/redux/store/store";
@@ -24,7 +23,6 @@ import { CreateAdminModal } from "./components/CreateAdminModal";
 
 
 const AdminManagement = () => {
-  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { admins, loading, isSubmitting } = useSelector((state: RootState) => state.superAdmin);
   const [search, setSearch] = useState("");

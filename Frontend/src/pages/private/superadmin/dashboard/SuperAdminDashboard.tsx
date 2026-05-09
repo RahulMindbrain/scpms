@@ -8,7 +8,6 @@ import {
   Zap,
   ArrowUpRight,
   CheckCircle2,
-  Circle,
   ArrowRight,
   Clock
 } from "lucide-react";
@@ -19,7 +18,7 @@ import type { AppDispatch } from "@/redux/store/store";
 import type { RootState } from "@/redux/reducers/rootReducer";
 import { fetchUniversities } from "@/redux/thunks/superadmin/universityThunks";
 import { fetchAdmins } from "@/redux/thunks/superadmin/adminThunks"
-const OnboardingFlow = ({ admins, universities, companies }: any) => {
+const OnboardingFlow = ({ admins, companies }: any) => {
   const steps = [
     {
       id: "superadmin",

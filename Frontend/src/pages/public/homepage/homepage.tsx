@@ -15,8 +15,6 @@ import {
   CheckCircle2,
   Building2,
   LogOut,
-  Moon,
-  Sun,
 } from 'lucide-react';
 import { ModeToggle } from '@/components/mode-toggle';
 import type { LucideIcon } from 'lucide-react';

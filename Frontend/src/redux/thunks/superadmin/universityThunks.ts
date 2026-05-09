@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { getAPI, postAPI } from "@/apis/api";
+import { getAPI } from "@/apis/api";
 
 export const fetchUniversities = createAsyncThunk(
   "superAdmin/fetchUniversities",

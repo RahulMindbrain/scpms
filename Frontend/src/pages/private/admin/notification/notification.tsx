@@ -12,13 +12,11 @@ import {
   Search,
   CheckCircle2,
   Calendar,
-  User,
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import {
-  fetchNotifications,
   markAllNotificationsAsRead,
   markNotificationAsRead,
   deleteNotification,
