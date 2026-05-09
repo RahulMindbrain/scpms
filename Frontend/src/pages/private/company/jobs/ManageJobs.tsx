@@ -13,7 +13,7 @@ import {
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useDispatch, useSelector } from "react-redux"
-import { fetchCompanyJobs, deleteCompanyJob } from "@/redux/thunks/companyThunk"
+import { fetchCompanyJobs } from "@/redux/thunks/companyThunk"
 import type { RootState } from "@/redux/reducers/rootReducer"
 import type { AppDispatch } from "@/redux/store/store"
 import {
@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/pagination"
 import { Link } from "react-router-dom"
 import Loader from "@/components/Loader"
-import { toast } from "sonner"
 
 const ManageJobs: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -37,22 +36,11 @@ const ManageJobs: React.FC = () => {
   const [page, setPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState("")
 
+  // Modal States
+
   useEffect(() => {
     dispatch(fetchCompanyJobs({ page }))
   }, [dispatch, page])
-
-  const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this job drive?")) return
-    
-    try {
-      await dispatch(deleteCompanyJob(id)).unwrap()
-      toast.success("Job drive deleted successfully")
-      // Re-fetch the current page to ensure sync
-      dispatch(fetchCompanyJobs({ page }))
-    } catch (error: any) {
-      toast.error(error?.message || "Failed to delete job drive")
-    }
-  }
 
   const formatSalary = (salary: number) => {
     if (salary >= 100000) {
@@ -221,27 +209,26 @@ const ManageJobs: React.FC = () => {
                           <span className="text-xs">
                             {job.createdAt
                               ? new Date(job.createdAt).toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    month: "short",
-                                    day: "2-digit",
-                                    year: "numeric",
-                                  }
-                                )
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "2-digit",
+                                  year: "numeric",
+                                }
+                              )
                               : "N/A"}
                           </span>
                         </div>
                       </td>
                       <td className="px-6 py-6">
                         <Badge
-                          className={`rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase shadow-sm ${
-                            job.status === "APPROVED" || job.status === "Active"
+                          className={`rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase shadow-sm ${job.status === "APPROVED" || job.status === "Active"
                               ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600"
                               : job.status === "REJECTED" ||
-                                  job.status === "Closed"
+                                job.status === "Closed"
                                 ? "border-rose-500/20 bg-rose-500/10 text-rose-600"
                                 : "border-primary/20 bg-primary/10 text-primary"
-                          } `}
+                            } `}
                         >
                           {job.status}
                         </Badge>
@@ -263,7 +250,6 @@ const ManageJobs: React.FC = () => {
                             <Edit3 size={14} /> Modify
                           </Link>
                           <button
-                            onClick={() => handleDelete(job.id)}
                             className="rounded-xl p-2.5 text-muted-foreground transition-all hover:bg-rose-500/10 hover:text-rose-500"
                             title="Delete Drive"
                           >

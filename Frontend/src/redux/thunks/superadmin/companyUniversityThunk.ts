@@ -9,7 +9,7 @@ export const fetchCompanyRequests = createAsyncThunk(
     try {
       const response = await getAPI<any>("/company/requests")
 
-      return response
+      return response.data
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch requests")
     }
@@ -26,7 +26,7 @@ export const requestUniversity = createAsyncThunk(
         universityIds,
       })
 
-      return response
+      return response.data
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to send request")
     }
@@ -43,7 +43,7 @@ export const reapplyUniversity = createAsyncThunk(
         universityIds,
       })
 
-      return response
+      return response.data
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to reapply request")
     }
@@ -69,7 +69,7 @@ export const sendJobToUniversity = createAsyncThunk(
   ) => {
     try {
       const response = await postAPI<any>("/job-universities/send", payload)
-      return response
+      return response.data
     } catch (error: any) {
       return rejectWithValue(
         error?.message || "Failed to send job to university"

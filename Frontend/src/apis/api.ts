@@ -123,7 +123,7 @@ export const getAPI = async <T>(
 ): Promise<T> => {
   try {
     const response = await api.get<T>(endpoint, {
-      params: { ...params, _t: Date.now() },
+      params,
       data, // 👈 important (GET body)
       headers,
       responseType,
