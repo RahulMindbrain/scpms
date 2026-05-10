@@ -31,6 +31,7 @@ const InterviewSchedulerPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { schedules, loading } = useSelector((state: RootState) => state.interview);
   const { companies } = useSelector((state: RootState) => state.company);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -284,8 +285,16 @@ const InterviewSchedulerPage: React.FC = () => {
                       <Button variant="outline" size="icon" className="size-10 rounded-xl border-border text-muted-foreground hover:text-primary hover:bg-primary/5 hover:border-primary/20 transition-all" onClick={(e) => handleOpenEdit(e, drive)}>
                         <Edit3 size={16} />
                       </Button>
-                      <Button variant="outline" size="icon" className="size-10 rounded-xl border-border text-muted-foreground hover:text-amber-600 hover:bg-amber-500/10 hover:border-amber-500/20 transition-all" onClick={(e) => handleOpenMessages(e, drive)}>
+                      <Button variant="outline" size="icon" className="size-10 rounded-xl border-border text-muted-foreground hover:text-amber-600 hover:bg-amber-500/10 hover:border-amber-500/20 transition-all relative group" onClick={(e) => handleOpenMessages(e, drive)}>
                         <MessageSquare size={16} />
+                        {drive.messages && drive.messages.length > 0 && drive.messages[drive.messages.length - 1].senderId !== user?.id && (
+                          <span className="absolute -top-2 -right-2 flex h-4 w-4">
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-4 w-4 bg-amber-500 text-[8px] font-black text-white items-center justify-center border-2 border-background shadow-sm">
+                              1
+                            </span>
+                          </span>
+                        )}
                       </Button>
                       <Button 
                         variant="outline" 
@@ -437,40 +446,52 @@ const InterviewSchedulerPage: React.FC = () => {
                 <Loader size="sm" text="Syncing communications..." />
               </div>
             ) : activeSchedule?.messages && activeSchedule.messages.length > 0 ? (
-              [...activeSchedule.messages].reverse().map((msg: any) => (
-                <div key={msg.id} className={cn(
-                  "p-5 rounded-2xl border transition-all space-y-2",
-                  msg.isAdmin 
-                    ? "bg-primary/[0.03] border-primary/10 mr-8" 
-                    : "bg-emerald-500/[0.03] border-emerald-500/10 ml-8"
-                )}>
-                  <div className="flex items-center justify-between mb-1">
-                    <div className="flex items-center gap-2.5">
+              [...activeSchedule.messages].reverse().map((msg: any, index: number) => {
+                const isMe = msg.sender?.id === user?.id;
+                return (
+                  <div key={msg.id} className={cn(
+                    "p-4 rounded-2xl border transition-all max-w-[85%]",
+                    isMe 
+                      ? "bg-primary text-white border-primary/20 ml-auto rounded-tr-none" 
+                      : "bg-muted/40 border-border/50 mr-auto rounded-tl-none"
+                  )}>
+                    <div className={cn(
+                      "flex items-center gap-2 mb-2",
+                      isMe && "flex-row-reverse"
+                    )}>
                       <div className={cn(
                         "w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black shadow-sm",
-                        msg.isAdmin ? "bg-primary text-white" : "bg-emerald-500 text-white"
+                        isMe ? "bg-white/20 text-white" : "bg-primary text-white"
                       )}>
-                        {msg.isAdmin ? 'A' : 'C'}
+                        {(isMe ? 'A' : (activeSchedule?.company?.name || 'C')).charAt(0)}
                       </div>
                       <span className={cn(
-                        "text-[10px] font-black uppercase tracking-widest",
-                        msg.isAdmin ? "text-primary" : "text-emerald-600"
+                        "text-[9px] font-black uppercase tracking-widest",
+                        isMe ? "text-white/80" : "text-primary"
                       )}>
-                        {msg.isAdmin 
-                          ? (msg.senderName || activeSchedule?.adminName || 'Placement Admin')
-                          : (msg.senderName || activeSchedule?.company?.name || 'Corporate Partner')
-                        }
+                        {isMe ? 'You' : (activeSchedule?.company?.name || 'Corporate Partner')}
                       </span>
+                      {index === 0 && !isMe && (
+                        <Badge className="bg-amber-500 text-white border-none text-[7px] px-1.5 py-0 h-3 font-black uppercase tracking-tighter animate-pulse">NEW</Badge>
+                      )}
+                      {msg.createdAt && (
+                        <span className={cn(
+                          "text-[8px] font-bold opacity-40 ml-auto",
+                          isMe && "ml-0 mr-auto"
+                        )}>
+                          {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                      )}
                     </div>
-                    {msg.createdAt && (
-                      <span className="text-[9px] font-bold text-muted-foreground/50">
-                        {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </span>
-                    )}
+                    <p className={cn(
+                      "text-[11px] leading-relaxed font-bold",
+                      isMe ? "text-white" : "text-muted-foreground"
+                    )}>
+                      {msg.message}
+                    </p>
                   </div>
-                  <p className="text-sm text-foreground font-medium leading-relaxed">{msg.message}</p>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="flex flex-col items-center justify-center py-16 text-center space-y-4 bg-muted/10 rounded-3xl border border-dashed border-border">
                 <MessageSquare className="size-10 text-muted-foreground/30" />

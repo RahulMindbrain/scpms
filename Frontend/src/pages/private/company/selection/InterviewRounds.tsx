@@ -41,6 +41,7 @@ interface InterviewSchedule {
 const CompanyInterviewManager: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { schedules, loading } = useSelector((state: RootState) => state.interview);
+  const { user } = useSelector((state: RootState) => state.auth);
 
   const [selectedSchedule, setSelectedSchedule] = useState<InterviewSchedule | null>(null);
   const [isApplicationsModalOpen, setIsApplicationsModalOpen] = useState(false);
@@ -330,10 +331,18 @@ const CompanyInterviewManager: React.FC = () => {
                         </button>
                         <button
                           onClick={() => handleOpenMessages(schedule)}
-                          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-amber-500/10 text-[10px] font-bold text-muted-foreground hover:text-amber-600 transition-all border border-border/50 uppercase tracking-widest group/btn"
+                          className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-amber-500/10 text-[10px] font-bold text-muted-foreground hover:text-amber-600 transition-all border border-border/50 uppercase tracking-widest group/btn relative"
                         >
                           <MessageSquare size={12} className="group-hover/btn:scale-110 transition-transform" />
                           <span>Discussions {(schedule.messages?.length || 0) > 0 && `(${schedule.messages.length})`}</span>
+                          {schedule.messages && schedule.messages.length > 0 && schedule.messages[schedule.messages.length - 1].senderId !== user?.id && (
+                            <span className="absolute -top-2 -right-2 flex h-4 w-4">
+                              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                              <span className="relative inline-flex rounded-full h-4 w-4 bg-amber-500 text-[8px] font-black text-white items-center justify-center border-2 border-background shadow-sm">
+                                1
+                              </span>
+                            </span>
+                          )}
                         </button>
                       </div>
                     </div>
@@ -522,37 +531,50 @@ const CompanyInterviewManager: React.FC = () => {
                 <p className="text-[10px] font-black text-muted-foreground tracking-widest uppercase">Loading Conversation...</p>
               </div>
             ) : activeSchedule?.messages && activeSchedule.messages.length > 0 ? (
-              [...activeSchedule.messages].reverse().map((msg: any) => (
-                <div key={msg.id} className={cn(
-                  "p-5 rounded-2xl border transition-all",
-                  msg.isAdmin
-                    ? "bg-primary/[0.03] border-primary/10 mr-8"
-                    : "bg-muted/40 border-border/50 ml-8"
-                )}>
-                  <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2.5">
+              [...activeSchedule.messages].reverse().map((msg: any, index: number) => {
+                const isMe = msg.sender?.id === user?.id;
+                return (
+                  <div key={msg.id} className={cn(
+                    "p-4 rounded-2xl border transition-all max-w-[85%]",
+                    isMe 
+                      ? "bg-primary text-white border-primary/20 ml-auto rounded-tr-none" 
+                      : "bg-muted/40 border-border/50 mr-auto rounded-tl-none"
+                  )}>
+                    <div className={cn(
+                      "flex items-center gap-2 mb-2",
+                      isMe && "flex-row-reverse"
+                    )}>
                       <div className={cn(
-                        "w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-black shadow-sm",
-                        msg.isAdmin ? "bg-primary text-white" : "bg-emerald-500 text-white"
+                        "w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black shadow-sm",
+                        isMe ? "bg-white/20 text-white" : "bg-primary text-white"
                       )}>
-                        {msg.isAdmin ? 'A' : 'Y'}
+                        {(msg.sender?.firstname || (isMe ? 'Y' : 'A')).charAt(0)}
                       </div>
                       <span className={cn(
-                        "text-[10px] font-black uppercase tracking-widest",
-                        msg.isAdmin ? "text-primary" : "text-emerald-600"
+                        "text-[9px] font-black uppercase tracking-widest",
+                        isMe ? "text-white/80" : "text-primary"
                       )}>
-                        {msg.isAdmin ? (activeSchedule?.adminName || 'Placement Admin') : 'TPO'}
+                        {isMe ? 'You' : 'Placement Admin'}
+                      </span>
+                      {index === 0 && !isMe && (
+                        <Badge className="bg-amber-500 text-white border-none text-[7px] px-1.5 py-0 h-3 font-black uppercase tracking-tighter animate-pulse">NEW</Badge>
+                      )}
+                      <span className={cn(
+                        "text-[8px] font-bold opacity-40 ml-auto",
+                        isMe && "ml-0 mr-auto"
+                      )}>
+                        {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                     </div>
-                    <span className="text-[9px] font-bold text-muted-foreground/50">
-                      {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </span>
+                    <p className={cn(
+                      "text-[11px] leading-relaxed font-bold",
+                      isMe ? "text-white" : "text-muted-foreground"
+                    )}>
+                      {msg.message}
+                    </p>
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed font-bold">
-                    {msg.message}
-                  </p>
-                </div>
-              ))
+                );
+              })
             ) : (
               <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 rounded-[2.5rem] border-2 border-dashed border-border/50 bg-muted/5">
                 <div className="w-14 h-14 bg-muted/50 rounded-2xl flex items-center justify-center">
