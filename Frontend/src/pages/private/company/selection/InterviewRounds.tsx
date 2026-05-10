@@ -72,10 +72,10 @@ const CompanyInterviewManager: React.FC = () => {
   const handleUpdateStatus = async (id: number, status: 'APPROVED' | 'REJECTED') => {
     setStatusLoading(id);
     try {
-      await dispatch(approveSchedule({ 
-        id, 
-        status, 
-        rejectionReason: status === 'REJECTED' ? declineReason : undefined 
+      await dispatch(approveSchedule({
+        id,
+        status,
+        rejectionReason: status === 'REJECTED' ? declineReason : undefined
       })).unwrap();
       toast.success(`Schedule ${status.toLowerCase()} successfully`);
       setIsRejectModalOpen(false);
@@ -152,7 +152,7 @@ const CompanyInterviewManager: React.FC = () => {
           <div className="bubble-secondary" />
         </div>
         <div className="hero-texture" />
-        
+
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-8">
           <div className="space-y-4">
             <div className="hero-badge">
@@ -163,7 +163,7 @@ const CompanyInterviewManager: React.FC = () => {
               Interview <span>Scheduler</span>
             </h1>
             <p className="hero-description text-blue-100/80">
-              Manage your recruitment rounds with precision. Review candidate lists, 
+              Manage your recruitment rounds with precision. Review candidate lists,
               coordinate with the placement office, and track selection progress in real-time.
             </p>
             <div className="flex items-center gap-4 pt-2">
@@ -201,10 +201,10 @@ const CompanyInterviewManager: React.FC = () => {
         ].map((stat, idx) => (
           <div key={idx} className={cn("premium-stat-card", `stat-glow-${stat.color}`)}>
             <div className="flex items-center justify-between mb-4">
-              <div className={cn("stat-icon-box", 
-                stat.color === 'indigo' ? "bg-primary/10 text-primary" : 
-                stat.color === 'amber' ? "bg-amber-500/10 text-amber-600" : 
-                "bg-emerald-500/10 text-emerald-600"
+              <div className={cn("stat-icon-box",
+                stat.color === 'indigo' ? "bg-primary/10 text-primary" :
+                  stat.color === 'amber' ? "bg-amber-500/10 text-amber-600" :
+                    "bg-emerald-500/10 text-emerald-600"
               )}>
                 <stat.icon size={24} strokeWidth={2.5} />
               </div>
@@ -233,8 +233,8 @@ const CompanyInterviewManager: React.FC = () => {
                 key={type}
                 onClick={() => setFilterType(type as any)}
                 className={`px-6 py-2.5 rounded-lg text-[10px] font-black uppercase tracking-[0.15em] transition-all whitespace-nowrap ${filterType === type
-                    ? 'bg-primary text-white shadow-lg shadow-primary/20'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                  ? 'bg-primary text-white shadow-lg shadow-primary/20'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   }`}
               >
                 {type}
@@ -258,7 +258,7 @@ const CompanyInterviewManager: React.FC = () => {
         <div className="grid grid-cols-1 gap-6">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-32 saas-card bg-transparent border-dashed border-2">
-               <div className="relative mb-6">
+              <div className="relative mb-6">
                 <div className="w-16 h-16 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-8 h-8 border-4 border-primary/10 border-b-primary rounded-full animate-spin [animation-duration:1s]" />
@@ -268,8 +268,8 @@ const CompanyInterviewManager: React.FC = () => {
             </div>
           ) : filteredSchedules.length > 0 ? (
             filteredSchedules.map((schedule) => (
-              <div 
-                key={schedule.id} 
+              <div
+                key={schedule.id}
                 className={cn(
                   "group saas-card p-0 overflow-hidden border border-border/50 hover:border-primary/30 transition-all duration-500",
                   schedule.companyApprovalStatus === 'PENDING' && "border-amber-500/20 bg-amber-500/[0.01]"
@@ -343,14 +343,14 @@ const CompanyInterviewManager: React.FC = () => {
                   <div className="lg:w-[240px] p-6 md:p-8 bg-muted/20 flex items-center justify-center border-t lg:border-t-0 lg:border-l border-border/50">
                     {schedule.companyApprovalStatus === 'PENDING' ? (
                       <div className="flex flex-col gap-3 w-full">
-                        <Button 
+                        <Button
                           onClick={() => handleUpdateStatus(schedule.id, 'APPROVED')}
                           disabled={statusLoading === schedule.id}
                           className="w-full rounded-xl font-black text-[10px] uppercase tracking-[0.2em] h-11 bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
                         >
                           {statusLoading === schedule.id ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Confirm Round'}
                         </Button>
-                        <Button 
+                        <Button
                           variant="ghost"
                           onClick={() => { setSelectedSchedule(schedule); setIsRejectModalOpen(true); }}
                           className="w-full text-destructive hover:bg-destructive/10 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] h-11"
@@ -362,8 +362,8 @@ const CompanyInterviewManager: React.FC = () => {
                       <div className="text-center space-y-2 w-full">
                         <div className={cn(
                           "w-full py-2.5 px-4 rounded-xl font-black text-[10px] uppercase tracking-[0.25em] border flex items-center justify-center gap-2",
-                          schedule.companyApprovalStatus === 'APPROVED' 
-                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" 
+                          schedule.companyApprovalStatus === 'APPROVED'
+                            ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20"
                             : "bg-rose-500/10 text-rose-600 border-rose-500/20"
                         )}>
                           {schedule.companyApprovalStatus === 'APPROVED' ? <CheckCircle size={12} /> : <XCircle size={12} />}
@@ -518,15 +518,15 @@ const CompanyInterviewManager: React.FC = () => {
           <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar scroll-smooth p-1">
             {msgLoading === activeSchedule?.id ? (
               <div className="py-20 flex flex-col items-center gap-4">
-                 <Loader2 className="w-8 h-8 text-primary animate-spin opacity-20" />
-                 <p className="text-[10px] font-black text-muted-foreground tracking-widest uppercase">Loading Conversation...</p>
+                <Loader2 className="w-8 h-8 text-primary animate-spin opacity-20" />
+                <p className="text-[10px] font-black text-muted-foreground tracking-widest uppercase">Loading Conversation...</p>
               </div>
             ) : activeSchedule?.messages && activeSchedule.messages.length > 0 ? (
               [...activeSchedule.messages].reverse().map((msg: any) => (
                 <div key={msg.id} className={cn(
                   "p-5 rounded-2xl border transition-all",
-                  msg.isAdmin 
-                    ? "bg-primary/[0.03] border-primary/10 mr-8" 
+                  msg.isAdmin
+                    ? "bg-primary/[0.03] border-primary/10 mr-8"
                     : "bg-muted/40 border-border/50 ml-8"
                 )}>
                   <div className="flex items-center justify-between mb-3">
@@ -541,7 +541,7 @@ const CompanyInterviewManager: React.FC = () => {
                         "text-[10px] font-black uppercase tracking-widest",
                         msg.isAdmin ? "text-primary" : "text-emerald-600"
                       )}>
-                        {msg.isAdmin ? (activeSchedule?.adminName || 'Placement Admin') : 'Your Team'}
+                        {msg.isAdmin ? (activeSchedule?.adminName || 'Placement Admin') : 'TPO'}
                       </span>
                     </div>
                     <span className="text-[9px] font-bold text-muted-foreground/50">
@@ -559,8 +559,8 @@ const CompanyInterviewManager: React.FC = () => {
                   <MessageSquare size={24} className="text-muted-foreground/30" />
                 </div>
                 <div className="space-y-1">
-                    <p className="text-xs font-black text-foreground uppercase tracking-tight">No Messages Yet</p>
-                    <p className="text-[10px] text-muted-foreground font-medium">Start a coordination thread with the placement office.</p>
+                  <p className="text-xs font-black text-foreground uppercase tracking-tight">No Messages Yet</p>
+                  <p className="text-[10px] text-muted-foreground font-medium">Start a coordination thread with the placement office.</p>
                 </div>
               </div>
             )}
