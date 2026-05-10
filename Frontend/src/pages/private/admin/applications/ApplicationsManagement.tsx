@@ -149,15 +149,13 @@ const ApplicationsManagement: React.FC = () => {
                       <SelectItem 
                         key={s.id} 
                         value={s.id.toString()} 
-                        className="rounded-xl mb-1 last:mb-0 focus:bg-indigo-500/5 focus:text-indigo-600 transition-colors py-2"
+                        className="rounded-xl mb-1 last:mb-0 focus:bg-indigo-500/5 focus:text-indigo-600 transition-colors py-2.5"
                       >
-                        <div className="flex flex-col min-w-0 py-0.5">
-                          <span className="font-black text-xs tracking-tight text-foreground">{s.title}</span>
-                          <div className="flex items-center gap-2 mt-1">
-                            <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest px-1.5 py-0.5 bg-indigo-500/5 rounded-md border border-indigo-500/10">
-                              {s.company?.name}
-                            </span>
-                          </div>
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          <span className="font-black text-xs tracking-tight text-foreground truncate">{s.title}</span>
+                          <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest px-1.5 py-0.5 bg-indigo-500/5 rounded-md border border-indigo-500/10 shrink-0">
+                            {s.company?.name}
+                          </span>
                         </div>
                       </SelectItem>
                     ))}
