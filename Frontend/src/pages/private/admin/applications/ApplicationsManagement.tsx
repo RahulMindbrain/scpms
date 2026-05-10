@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Building2, Briefcase, Users, UserCheck, ListChecks, PieChart, CheckCircle2 } from 'lucide-react';
+import { Search, Building2, Briefcase, Users, UserCheck, ListChecks, PieChart, CheckCircle2, Download, Calendar } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchScheduleApplications, fetchSchedules } from '@/redux/thunks/interviewThunk';
 import { fetchCompanies } from '@/redux/thunks/companyThunk';
@@ -13,6 +13,8 @@ import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 const ApplicationsManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -59,6 +61,37 @@ const ApplicationsManagement: React.FC = () => {
     selected: filteredApplications.filter((app: any) => app.status === 'SELECTED').length,
   };
 
+  const handleExportCSV = () => {
+    if (filteredApplications.length === 0) {
+      toast.error("No data available to export");
+      return;
+    }
+    
+    const headers = ["Student Name", "Email", "Target Role", "Department", "Status"];
+    const csvRows = filteredApplications.map((app: any) => [
+      app.name || 'Anonymous Student',
+      app.email || 'N/A',
+      app.jobTitle || 'N/A',
+      app.department?.name || 'N/A',
+      app.status
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...csvRows.map((row: string[]) => row.map((value: string) => `"${value ?? ''}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `applications_${activeSchedule?.title?.replace(/\s+/g, '_') || 'list'}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    toast.success("Applications list exported successfully");
+  };
+
   const getStatusStyle = (status: string) => {
     switch (status) {
       case 'APPLIED': return 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20';
@@ -73,45 +106,83 @@ const ApplicationsManagement: React.FC = () => {
   return (
     <AdminPageLayout>
       <PageHeader
-        title="Recruitment Tracking"
-        description={activeSchedule ? `Monitoring ${activeSchedule.title} for ${activeSchedule.company?.name || 'Corporate Partner'}` : "Monitor student application stages and track candidate progress across drives."}
-        badge="Talent Pipeline"
+        title="Applications"
         icon={UserCheck}
         variant="indigo"
       >
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-          {schedules.length > 0 && (
-            <div className="w-full sm:w-[200px]">
-              <Select
-                value={scheduleId?.toString()}
-                onValueChange={(val) => navigate(`/admin/applications/${val}`)}
-              >
-                <SelectTrigger className="h-10 rounded-xl bg-background/50 border-border text-xs font-black uppercase tracking-widest px-4">
-                  <SelectValue placeholder="Select Drive" />
-                </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  {schedules.map((s) => (
-                    <SelectItem key={s.id} value={s.id.toString()}>
-                      {s.title}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          )}
-          <div className="relative w-full sm:w-[280px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Search by student or role..."
-              className="pl-9 bg-background/50 border-border rounded-xl h-10 text-sm focus-visible:ring-primary/20"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
+        <div className="flex items-center gap-3">
+          <Button 
+            variant="outline" 
+            className="h-10 rounded-xl border-border bg-background/50 hover:bg-primary/5 hover:text-primary hover:border-primary/20 transition-all gap-2 text-[10px] font-black uppercase tracking-widest px-4"
+            onClick={handleExportCSV}
+          >
+            <Download size={14} />
+            <span className="hidden lg:inline">Export CSV</span>
+          </Button>
         </div>
       </PageHeader>
 
       <div className="space-y-6">
+        {/* Selection & Global Filters Section */}
+        <div className="saas-card p-6 bg-background/50 border-border/50">
+          <div className="flex flex-wrap items-end gap-6">
+            {schedules.length > 0 && (
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 flex items-center gap-2">
+                  <Calendar size={12} className="text-indigo-500" />
+                  Recruitment Drive
+                </label>
+                <Select
+                  value={scheduleId?.toString()}
+                  onValueChange={(val) => navigate(`/admin/applications/${val}`)}
+                >
+                  <SelectTrigger className="w-full sm:w-[320px] h-12 rounded-xl bg-background border-border/60 text-xs font-bold px-4 focus:ring-indigo-500/20 transition-all shadow-sm hover:border-indigo-500/30 group">
+                    <div className="flex items-center gap-3 truncate">
+                      <div className="size-8 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-600 border border-indigo-500/20 shrink-0 group-hover:bg-indigo-500 group-hover:text-white transition-colors">
+                        <Briefcase size={14} />
+                      </div>
+                      <SelectValue placeholder="Choose an active drive..." />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl border-border shadow-2xl p-1 max-h-[400px]">
+                    {schedules.map((s) => (
+                      <SelectItem 
+                        key={s.id} 
+                        value={s.id.toString()} 
+                        className="rounded-xl mb-1 last:mb-0 focus:bg-indigo-500/5 focus:text-indigo-600 transition-colors py-2"
+                      >
+                        <div className="flex flex-col min-w-0 py-0.5">
+                          <span className="font-black text-xs tracking-tight text-foreground">{s.title}</span>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest px-1.5 py-0.5 bg-indigo-500/5 rounded-md border border-indigo-500/10">
+                              {s.company?.name}
+                            </span>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div className="space-y-2 flex-1 min-w-[300px]">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1 flex items-center gap-2">
+                <Search size={12} className="text-primary" />
+                Search Candidates
+              </label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/50" />
+                <Input
+                  placeholder="Filter by name, role, or department..."
+                  className="pl-10 bg-background border-border rounded-xl h-11 text-sm focus-visible:ring-primary/20 shadow-sm"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
         {loading && (
           <div className="py-32 flex justify-center">
             <Loader text="Retrieving application records..." />

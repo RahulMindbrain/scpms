@@ -41,11 +41,16 @@ export function SiteHeader() {
   const location = useLocation()
 
   const getTitle = () => {
-    if (routeTitles[location.pathname]) return routeTitles[location.pathname]
-    const path = location.pathname.split("/").filter(Boolean).pop()
-    if (!path) return "Dashboard"
-    return path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ")
-  }
+    // Check exact matches first
+    if (routeTitles[location.pathname]) return routeTitles[location.pathname];
+    
+    // Handle parameterized /admin/applications/:id routes
+    if (location.pathname.startsWith('/admin/applications/')) return "Applications";
+
+    const path = location.pathname.split("/").filter(Boolean).pop();
+    if (!path) return "Dashboard";
+    return path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ");
+  };
 
   return (
     <header className="
