@@ -230,9 +230,17 @@ const InterviewSchedulerPage: React.FC = () => {
                     <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                       <div className="space-y-2 min-w-0 flex-1">
                         <h3 className="text-xl font-bold text-foreground tracking-tight leading-tight group-hover:text-primary transition-colors truncate">{drive.title}</h3>
-                        <div className="inline-flex items-center gap-2 text-primary font-black text-[10px] bg-primary/5 border border-primary/10 px-3 py-1.5 rounded-xl uppercase tracking-widest max-w-full">
-                          <Building2 className="shrink-0" size={13} />
-                          <span className="truncate">{drive.company?.name || "Corporate Partner"}</span>
+                        <div className="flex flex-wrap gap-2">
+                          <div className="inline-flex items-center gap-2 text-primary font-black text-[10px] bg-primary/5 border border-primary/10 px-3 py-1.5 rounded-xl uppercase tracking-widest max-w-full">
+                            <Building2 className="shrink-0" size={13} />
+                            <span className="truncate">{drive.company?.name || "Corporate Partner"}</span>
+                          </div>
+                          {drive.adminName && (
+                            <div className="inline-flex items-center gap-2 text-indigo-600 font-black text-[10px] bg-indigo-500/5 border border-indigo-500/10 px-3 py-1.5 rounded-xl uppercase tracking-widest max-w-full">
+                              <Sparkles className="shrink-0" size={13} />
+                              <span className="truncate">{drive.adminName}</span>
+                            </div>
+                          )}
                         </div>
                       </div>
                       <Badge className={cn(
@@ -419,8 +427,8 @@ const InterviewSchedulerPage: React.FC = () => {
       <Modal
         isOpen={isMessagesOpen}
         onClose={() => setIsMessagesOpen(false)}
-        title="Internal Communication"
-        subtitle={`Notes for ${activeSchedule?.title || "selected schedule"}`}
+        title="Round Discussion"
+        subtitle={`Coordination between ${activeSchedule?.adminName || 'Placement Office'} and ${activeSchedule?.company?.name || 'Corporate Partner'}`}
       >
         <div className="flex flex-col gap-8 py-4">
           <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 scrollbar-hide">
@@ -430,11 +438,35 @@ const InterviewSchedulerPage: React.FC = () => {
               </div>
             ) : activeSchedule?.messages && activeSchedule.messages.length > 0 ? (
               [...activeSchedule.messages].reverse().map((msg: any) => (
-                <div key={msg.id} className="bg-muted/30 border border-border rounded-2xl p-5 space-y-2 group hover:border-primary/20 transition-all">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-black text-primary uppercase tracking-widest">
-                      {msg.senderName || (msg.isAdmin ? 'Placement Admin' : 'Corporate Partner')}
-                    </p>
+                <div key={msg.id} className={cn(
+                  "p-5 rounded-2xl border transition-all space-y-2",
+                  msg.isAdmin 
+                    ? "bg-primary/[0.03] border-primary/10 mr-8" 
+                    : "bg-emerald-500/[0.03] border-emerald-500/10 ml-8"
+                )}>
+                  <div className="flex items-center justify-between mb-1">
+                    <div className="flex items-center gap-2.5">
+                      <div className={cn(
+                        "w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black shadow-sm",
+                        msg.isAdmin ? "bg-primary text-white" : "bg-emerald-500 text-white"
+                      )}>
+                        {msg.isAdmin ? 'A' : 'C'}
+                      </div>
+                      <span className={cn(
+                        "text-[10px] font-black uppercase tracking-widest",
+                        msg.isAdmin ? "text-primary" : "text-emerald-600"
+                      )}>
+                        {msg.isAdmin 
+                          ? (msg.senderName || activeSchedule?.adminName || 'Placement Admin')
+                          : (msg.senderName || activeSchedule?.company?.name || 'Corporate Partner')
+                        }
+                      </span>
+                    </div>
+                    {msg.createdAt && (
+                      <span className="text-[9px] font-bold text-muted-foreground/50">
+                        {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    )}
                   </div>
                   <p className="text-sm text-foreground font-medium leading-relaxed">{msg.message}</p>
                 </div>

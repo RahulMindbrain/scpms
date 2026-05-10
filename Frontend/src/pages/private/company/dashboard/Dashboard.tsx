@@ -11,6 +11,7 @@ import { toast } from "sonner"
 
 import Loader from "@/components/Loader"
 import CountdownTimer from "@/components/CountdownTimer"
+import CompanyApprovalPending from "@/components/status/CompanyApprovalPending"
 import { Calendar, Clock, MapPin, Sparkles } from "lucide-react"
 import { useSocket } from "@/socket/SocketProvider"
 import { SOCKET_EVENTS } from "@/socket/socket.events"
@@ -104,8 +105,11 @@ export default function Dashboard() {
   }
 
   if (error) {
+    if (error.includes("Account not approved")) {
+      return <CompanyApprovalPending />
+    }
     return (
-      <div className="flex flex-1 items-center justify-center p-4 text-destructive">
+      <div className="flex flex-1 items-center justify-center p-4 text-destructive font-bold">
         Error: {error}
       </div>
     )

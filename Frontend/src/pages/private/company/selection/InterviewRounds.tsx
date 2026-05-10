@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   Calendar, Clock, MapPin, Info, Search, Loader2,
-  MessageSquare, CheckCircle, XCircle, Users
+  MessageSquare, CheckCircle, XCircle, Users,
+  Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -292,6 +293,10 @@ const CompanyInterviewManager: React.FC = () => {
                         <Badge variant="outline" className="bg-primary/5 text-primary border-primary/10 text-[9px] font-black uppercase tracking-wider px-2 py-0.5">
                           {schedule.jobTitle}
                         </Badge>
+                        <div className="inline-flex items-center gap-2 text-indigo-600 font-black text-[9px] bg-indigo-500/5 border border-indigo-500/10 px-2 py-1 rounded-lg uppercase tracking-widest">
+                          <Sparkles className="shrink-0" size={11} />
+                          <span>{schedule.adminName || 'Placement Office'}</span>
+                        </div>
                         <span className="text-[10px] font-bold text-muted-foreground/40 tracking-widest uppercase">
                           REF #{String(schedule.id).padStart(4, '0')}
                         </span>
@@ -532,8 +537,11 @@ const CompanyInterviewManager: React.FC = () => {
                       )}>
                         {msg.isAdmin ? 'A' : 'Y'}
                       </div>
-                      <span className="text-[10px] font-black text-foreground uppercase tracking-widest">
-                        {msg.isAdmin ? 'Placement Admin' : 'Your Team'}
+                      <span className={cn(
+                        "text-[10px] font-black uppercase tracking-widest",
+                        msg.isAdmin ? "text-primary" : "text-emerald-600"
+                      )}>
+                        {msg.isAdmin ? (activeSchedule?.adminName || 'Placement Admin') : 'Your Team'}
                       </span>
                     </div>
                     <span className="text-[9px] font-bold text-muted-foreground/50">
