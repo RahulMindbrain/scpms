@@ -15,10 +15,19 @@ interface CloudinarySignatureResponse {
  * @param folder The folder in Cloudinary to upload to.
  * @returns The secure URL of the uploaded file.
  */
-export const uploadFileToCloudinary = async (file: File, folder: string = "scpms"): Promise<string> => {
+export const uploadFileToCloudinary = async (
+  file: File, 
+  folder: string = "scpms", 
+  flags?: string,
+  resourceType: string = "auto"
+): Promise<string> => {
   try {
     // 1. Get signature from backend
-    const { timestamp, signature, cloudName, apiKey } = await postAPI<CloudinarySignatureResponse>("/cloudinary/signature", { folder });
+    const { timestamp, signature, cloudName, apiKey } = await postAPI<CloudinarySignatureResponse>("/cloudinary/signature", { 
+      folder,
+      flags,
+      resource_type: resourceType 
+    });
 
     // 2. Prepare Form Data for Cloudinary
     const formData = new FormData();
@@ -29,10 +38,9 @@ export const uploadFileToCloudinary = async (file: File, folder: string = "scpms
     formData.append("folder", folder);
 
     // 3. Upload to Cloudinary
+    // We stick to the standard 'auto' resource type and basic upload path
     const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`;
     
-    // We use a fresh axios instance to avoid our backend interceptors (like auth headers) 
-    // being sent to Cloudinary, which might cause issues or expose tokens.
     const response = await axios.post(cloudinaryUrl, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });

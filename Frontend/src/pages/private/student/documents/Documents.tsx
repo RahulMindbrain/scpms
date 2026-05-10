@@ -99,41 +99,39 @@ const Documents = () => {
   };
 
   // ✅ UNIVERSAL DOWNLOAD FUNCTION
-  const downloadFile = async (url: string, name = '') => {
+  const downloadFile = (url: string, name = '') => {
     if (!url) {
       toast.error("Invalid file URL");
       return;
     }
 
-    const isPdf = name.toLowerCase().endsWith('.pdf') || url.toLowerCase().includes('.pdf');
-    let finalUrl = url;
+    const normalizedUrl = url.toLowerCase().includes('cloudinary.com') && !url.toLowerCase().endsWith('.pdf') && !url.toLowerCase().includes('/f_pdf/') 
+      ? url + '.pdf' 
+      : url;
 
-    // If it's a PDF on Cloudinary, ensure it has the .pdf extension if missing
-    if (isPdf && !finalUrl.toLowerCase().endsWith('.pdf')) {
-      finalUrl = finalUrl + '.pdf';
+    const cleanName = (name || 'document').replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    
+    let downloadUrl = normalizedUrl;
+    if (normalizedUrl.includes('cloudinary.com') && normalizedUrl.includes('/upload/')) {
+       // Using f_pdf, fl_attachment, and dn_ (Download Name) while stripping the extension
+       // is the industry-standard way to force reliable Cloudinary PDF downloads.
+       downloadUrl = normalizedUrl
+         .replace('/upload/', `/upload/f_pdf,fl_attachment,dn_${cleanName}/`)
+         .replace(/\.pdf$/i, '');
     }
 
-    try {
-      const response = await fetch(finalUrl);
-      const blob = await response.blob();
-      const blobUrl = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = name || 'document.pdf';
-      document.body.appendChild(link);
-      link.click();
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.setAttribute('download', `${cleanName}.pdf`);
+    link.setAttribute('target', '_blank');
+    link.setAttribute('rel', 'noopener noreferrer');
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(() => {
       document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
-      toast.success("Download started");
-    } catch (error) {
-      console.error("Download failed:", error);
-      // Fallback to direct link if fetch fails (CORS issue)
-      const link = document.createElement('a');
-      link.href = finalUrl.replace('/upload/', '/upload/fl_attachment/');
-      link.target = '_blank';
-      link.download = name || 'document';
-      link.click();
-    }
+    }, 500);
+    
+    toast.success("Download started");
   };
 
   // ✅ Helper to get thumbnail

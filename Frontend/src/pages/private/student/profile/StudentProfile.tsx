@@ -4,7 +4,7 @@ import {
   Briefcase, FileText, Building2,
   CheckCircle, Globe, MapPin,
   Award, Layers, Cpu, Rocket,
-  Clock, ShieldAlert
+  Clock, ShieldAlert, Download
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
@@ -245,6 +245,42 @@ const StudentProfile = () => {
     setPreviewName(name);
     setPreviewUrl(normalizedUrl);
     setIsPdfPreview(normalizedUrl.toLowerCase().includes('.pdf') || normalizedUrl.toLowerCase().includes('/f_pdf/'));
+  };
+
+  const handleDownload = (url: string | null, name: string = 'document') => {
+    if (!url) {
+      toast.error("No document URL available for download");
+      return;
+    }
+    
+    const normalizedUrl = normalizePreviewUrl(url);
+    const cleanName = name.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+    
+    // THE "MAGIC" CLOUDINARY DOWNLOAD URL:
+    // 1. Use 'f_pdf' to ensure the content type is application/pdf.
+    // 2. Use 'fl_attachment' to force the download header.
+    // 3. Use 'dn_' (Download Name) to explicitly set the filename on the server side.
+    // 4. STRIP the .pdf extension from the public ID to avoid double-extension errors (ERR_INVALID_RESPONSE).
+    let downloadUrl = normalizedUrl;
+    if (normalizedUrl.includes('cloudinary.com') && normalizedUrl.includes('/upload/')) {
+       downloadUrl = normalizedUrl
+         .replace('/upload/', `/upload/f_pdf,fl_attachment,dn_${cleanName}/`)
+         .replace(/\.pdf$/i, ''); // Strip the extension from the public ID
+    }
+
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.setAttribute('download', `${cleanName}.pdf`);
+    link.setAttribute('target', '_blank');
+    link.setAttribute('rel', 'noopener noreferrer');
+    document.body.appendChild(link);
+    link.click();
+    
+    setTimeout(() => {
+      document.body.removeChild(link);
+    }, 500);
+    
+    toast.success("Download started");
   };
 
   const handleAddProject = (project: any) => {
@@ -754,17 +790,35 @@ const StudentProfile = () => {
                         <FileText className="h-5 w-5 text-indigo-400" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-sm font-bold truncate">{profile.name}_Resume.pdf</p>
-                        <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{profile.resumeUrl ? 'PDF Document • Ready' : 'No document uploaded'}</p>
+                        <p className="text-sm font-bold truncate">
+                          {profile.resumeUrl ? `Resume - ${profile.name}.pdf` : 'No document uploaded'}
+                        </p>
+                        <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{profile.resumeUrl ? 'Verified PDF • Cloud Hosted' : 'Action required'}</p>
                       </div>
                     </div>
-                    <Button
-                      onClick={() => profile.resumeUrl && openFile(profile.resumeUrl, `${profile.name}_Resume`)}
-                      disabled={!profile.resumeUrl}
-                      className="bg-white text-slate-900 hover:bg-slate-100 rounded-xl px-4 h-9 text-xs font-bold shadow-lg shadow-white/5 transition-transform active:scale-95 shrink-0"
-                    >
-                      View
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={() => {
+                          const fileName = profile.resumeUrl ? `Resume_${profile.name.replace(/\s+/g, '_')}.pdf` : 'Resume.pdf';
+                          profile.resumeUrl && openFile(profile.resumeUrl, fileName);
+                        }}
+                        disabled={!profile.resumeUrl}
+                        className="bg-white text-slate-900 hover:bg-slate-100 rounded-xl px-4 h-9 text-xs font-bold shadow-lg shadow-white/5 transition-transform active:scale-95 shrink-0"
+                      >
+                        View
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          const fileName = profile.resumeUrl ? `Resume_${profile.name.replace(/\s+/g, '_')}.pdf` : 'Resume.pdf';
+                          profile.resumeUrl && handleDownload(profile.resumeUrl, fileName);
+                        }}
+                        disabled={!profile.resumeUrl}
+                        variant="outline"
+                        className="bg-white/10 hover:bg-white/20 border-white/20 text-white rounded-xl px-4 h-9 text-xs font-bold transition-all shrink-0"
+                      >
+                        <Download className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -922,9 +976,18 @@ const StudentProfile = () => {
                   </div>
                   {previewName}
                 </DialogTitle>
-                <Button variant="outline" size="sm" className="rounded-xl border-slate-200 dark:border-slate-800" onClick={() => window.open(previewUrl!, '_blank')}>
-                  <ExternalLink className="h-4 w-4 mr-2" /> Open Full View
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button variant="outline" size="sm" className="rounded-xl border-slate-200 dark:border-slate-800" onClick={() => window.open(previewUrl!, '_blank')}>
+                    <ExternalLink className="h-4 w-4 mr-2" /> Open Full View
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20"
+                    onClick={() => handleDownload(previewUrl, previewName)}
+                  >
+                    <Download className="h-4 w-4 mr-2" /> Download
+                  </Button>
+                </div>
               </div>
             </DialogHeader>
             <div className="flex-1 bg-slate-100 overflow-hidden relative">
@@ -953,8 +1016,8 @@ const StudentProfile = () => {
                           Open PDF
                         </Button>
                         <Button
-                          onClick={() => window.open(previewUrl!.replace('/upload/', '/upload/fl_attachment/'), '_blank')}
-                          className="rounded-xl"
+                          onClick={() => handleDownload(previewUrl, previewName)}
+                          className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
                         >
                           Download PDF
                         </Button>

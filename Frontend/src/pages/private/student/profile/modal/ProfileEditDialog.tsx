@@ -423,10 +423,11 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
                     if (!file) return;
                     setIsUploading(true);
                     try {
-                      const url = await upload(file, "resumes");
+                      // Pass 'attachment' flag to force direct download for this file
+                      const url = await upload(file, "resumes", "attachment");
                       if (url) {
                         updateField("resumeUrl", url);
-                        toast.success("Resume uploaded");
+                        toast.success("Resume uploaded successfully");
                       }
                     } catch (error) {
                       toast.error("Upload failed");
