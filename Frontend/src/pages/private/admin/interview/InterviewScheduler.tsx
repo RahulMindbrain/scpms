@@ -5,9 +5,11 @@ import {
   Search, MessageSquare, Send, Trash2,
   Calendar,
   Sparkles,
-  FileText
+  FileText,
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -29,6 +31,7 @@ import { PageHeader } from '@/components/PageHeader';
 
 const InterviewSchedulerPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const { schedules, loading } = useSelector((state: RootState) => state.interview);
   const { companies } = useSelector((state: RootState) => state.company);
   const { user } = useSelector((state: RootState) => state.auth);
@@ -282,6 +285,9 @@ const InterviewSchedulerPage: React.FC = () => {
                   {/* Actions Column */}
                   <div className="bg-muted/10 p-6 lg:w-48 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-border shrink-0">
                     <div className="flex items-center gap-2">
+                      <Button variant="outline" size="icon" className="size-10 rounded-xl border-border text-muted-foreground hover:text-indigo-600 hover:bg-indigo-500/10 hover:border-indigo-500/20 transition-all" onClick={(e) => { e.stopPropagation(); navigate(`/admin/applications/${drive.id}`); }}>
+                        <Users size={16} />
+                      </Button>
                       <Button variant="outline" size="icon" className="size-10 rounded-xl border-border text-muted-foreground hover:text-primary hover:bg-primary/5 hover:border-primary/20 transition-all" onClick={(e) => handleOpenEdit(e, drive)}>
                         <Edit3 size={16} />
                       </Button>

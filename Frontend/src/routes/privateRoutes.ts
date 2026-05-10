@@ -71,7 +71,7 @@ export const PrivateRoutes: RouteOptions<any>[] = [
 
     },
     {
-        path: "/admin/applications",
+        path: "/admin/applications/:id?",
         component: ApplicationsManagement,
     },
     {
