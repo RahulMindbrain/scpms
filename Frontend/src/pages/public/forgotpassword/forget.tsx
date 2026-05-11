@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import type { AppDispatch } from '@/redux/store/store';
 
 type FlowStep = 'EMAIL' | 'OTP' | 'RESET';
-
+const OTP_TIME = 5 * 60
 const ForgotPassword: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -19,7 +19,7 @@ const ForgotPassword: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [timer, setTimer] = useState(30);
+  const [timer, setTimer] = useState(OTP_TIME);
   const [canResend, setCanResend] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -35,6 +35,12 @@ const ForgotPassword: React.FC = () => {
     }
     return () => clearInterval(interval);
   }, [step, timer]);
+  useEffect(() => {
+  if (step === 'OTP') {
+    setTimer(OTP_TIME);
+    setCanResend(false);
+  }
+}, [step]);
 
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,7 +51,7 @@ const ForgotPassword: React.FC = () => {
       await dispatch(forgotPassword(email)).unwrap();
       toast.success("OTP sent successfully to your email", { id: "otp-toast" });
       setStep('OTP');
-      setTimer(30);
+   setTimer(OTP_TIME);
       setCanResend(false);
     } catch (error: any) {
       toast.error(error || "Failed to send OTP", { id: "otp-toast" });
@@ -76,13 +82,13 @@ const ForgotPassword: React.FC = () => {
     try {
       await dispatch(forgotPassword(email)).unwrap();
       toast.success("OTP resent successfully", { id: "otp-toast" });
-      setTimer(30);
+   setTimer(OTP_TIME);
       setCanResend(false);
     } catch (error: any) {
       toast.error(error || "Failed to resend OTP", { id: "otp-toast" });
       // If OTP was already sent, we should still start the timer to prevent immediate spamming
       if (error === "OTP already sent. Please wait.") {
-        setTimer(30);
+   setTimer(OTP_TIME);
         setCanResend(false);
       }
     } finally {
@@ -210,7 +216,7 @@ const ForgotPassword: React.FC = () => {
                           strokeWidth="2.5"
                           fill="transparent"
                           strokeDasharray={2 * Math.PI * 10}
-                          strokeDashoffset={2 * Math.PI * 10 * (1 - timer / 30)}
+                          strokeDashoffset={2 * Math.PI * 10 * (1 - timer / OTP_TIME)}
                           strokeLinecap="round"
                           className="text-blue-500 transition-all duration-1000 ease-linear"
                         />
@@ -227,7 +233,7 @@ const ForgotPassword: React.FC = () => {
                 type="button"
                 onClick={() => {
                   setStep('EMAIL');
-                  setTimer(30);
+                 setTimer(OTP_TIME);
                   setCanResend(false);
                 }}
                 className="text-slate-400 text-xs font-medium hover:text-slate-600 transition-colors flex items-center justify-center gap-1"
