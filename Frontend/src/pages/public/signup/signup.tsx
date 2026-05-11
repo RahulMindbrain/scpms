@@ -323,7 +323,7 @@ const SignUp: React.FC = () => {
 
                       <div className="space-y-2">
                         <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
-                          University ID
+                          University 
                         </label>
 
                         <div className="relative group">
@@ -336,14 +336,14 @@ const SignUp: React.FC = () => {
                             name="universityId"
                             value={form.universityId}
                             onChange={handleChange}
-                            placeholder="University ID"
+                            placeholder="University "
                             className={inputClasses(false)}
                           />
                         </div>
                       </div>
                       <div className="space-y-2">
     <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
-      Department ID
+      Department 
     </label>
 
     <div className="relative group">
@@ -356,7 +356,7 @@ const SignUp: React.FC = () => {
         name="departmentId"
         value={form.departmentId}
         onChange={handleChange}
-        placeholder="Department ID"
+        placeholder="Department "
         className={inputClasses(false)}
       />
     </div>
