@@ -353,3 +353,35 @@ export const getApplicationByStudentAndJobUniversity = async (
     },
   });
 };
+
+export const getJobUniversityDisplayDetails = async (id: number) => {
+  return prisma.jobUniversity.findUnique({
+    where: {
+      id,
+    },
+
+    include: {
+      university: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+
+      job: {
+        select: {
+          id: true,
+          title: true,
+          location: true,
+
+          company: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
+    },
+  });
+};

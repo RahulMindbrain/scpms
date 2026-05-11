@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
+
 import { sendBulkMailByCompanyService } from "../services/bulkmail.service";
+
 import { sendSuccess, sendError } from "../utils/response";
 
 export const sendBulkMailController = async (req: Request, res: Response) => {
@@ -10,25 +12,29 @@ export const sendBulkMailController = async (req: Request, res: Response) => {
       return sendError(res, 403, "Only admin can send bulk mail");
     }
 
-    const { companyId, jobIds, subject, message } = req.body;
+    const { companyId, jobUniversityIds, subject, message } = req.body;
 
     if (!companyId || !Number.isFinite(Number(companyId))) {
       return sendError(res, 400, "Valid companyId is required");
     }
 
-    if (!Array.isArray(jobIds) || jobIds.length === 0) {
-      return sendError(res, 400, "jobIds must be a non-empty array");
+    if (!Array.isArray(jobUniversityIds) || !jobUniversityIds.length) {
+      return sendError(res, 400, "jobUniversityIds must be a non-empty array");
     }
 
-    const parsedJobIds = jobIds.map(Number);
-    if (parsedJobIds.some((id) => !Number.isFinite(id))) {
-      return sendError(res, 400, "Invalid jobIds provided");
+    const parsedIds = jobUniversityIds.map(Number);
+
+    if (parsedIds.some((id) => !Number.isFinite(id))) {
+      return sendError(res, 400, "Invalid jobUniversityIds provided");
     }
 
     const result = await sendBulkMailByCompanyService({
       companyId: Number(companyId),
-      jobIds: parsedJobIds,
+
+      jobUniversityIds: parsedIds,
+
       subject,
+
       message,
     });
 
