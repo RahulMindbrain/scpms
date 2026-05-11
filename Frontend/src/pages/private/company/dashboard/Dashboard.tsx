@@ -12,7 +12,7 @@ import { toast } from "sonner"
 import Loader from "@/components/Loader"
 import CountdownTimer from "@/components/CountdownTimer"
 import CompanyApprovalPending from "@/components/status/CompanyApprovalPending"
-import { Calendar, Clock, MapPin, Sparkles } from "lucide-react"
+import { Building2, Calendar, Clock, MapPin, Sparkles } from "lucide-react"
 import { useSocket } from "@/socket/SocketProvider"
 import { SOCKET_EVENTS } from "@/socket/socket.events"
 import { DashboardUpcomingEventsDialog } from "@/components/dashboard/DashboardUpcomingEventsDialog"
@@ -147,6 +147,7 @@ const upcomingEvents = useSelector(
             <p className="hero-description text-base opacity-90 max-w-lg mb-0">
               Monitor your job drives, track applicant progress, and discover top talent effortlessly.
             </p>
+
           </div>
 
           {nextEvent && (
@@ -237,6 +238,113 @@ const upcomingEvents = useSelector(
              </div>
           </div>
         </div>
+                    {/* ── Upcoming Events Section ── */}
+<div className="saas-card overflow-hidden">
+  <div className="flex items-center justify-between mb-6">
+    <div>
+      <h3 className="text-lg font-black text-foreground tracking-tight flex items-center gap-2">
+        <Calendar className="size-5 text-primary" />
+        Upcoming Events
+      </h3>
+      <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest mt-1">
+        Next scheduled drives & interviews
+      </p>
+    </div>
+
+    <button
+      onClick={() => setShowAllEvents(true)}
+      className="text-[10px] font-black uppercase tracking-widest text-primary bg-primary/10 px-3 py-1.5 rounded-lg hover:bg-primary hover:text-white transition-all"
+    >
+      View All
+    </button>
+  </div>
+
+  {/* Countdown + List Grid */}
+  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    
+    {/* LEFT: Countdown Card */}
+    <div className="saas-card bg-gradient-to-br from-indigo-500 to-purple-600 text-white">
+      {nextEvent ? (
+        <>
+          <div className="flex items-center gap-2 mb-3">
+            <Clock className="size-4" />
+            <span className="text-[10px] font-black uppercase tracking-widest">
+              Next Event Countdown
+            </span>
+          </div>
+
+          <h4 className="text-lg font-black mb-2 truncate">
+            {nextEvent.title}
+          </h4>
+
+          <p className="text-white/80 text-xs font-medium mb-4 flex items-center gap-2">
+            <MapPin className="size-3" />
+            {nextEvent.company?.name || "Company Drive"}
+          </p>
+
+          {/* Countdown Timer */}
+          <div className="bg-white/10 rounded-2xl p-4">
+            <CountdownTimer targetDate={nextEvent.startTime} />
+          </div>
+        </>
+      ) : (
+        <div className="flex flex-col items-center justify-center h-full py-10 text-center">
+          <Calendar className="size-8 mb-3 opacity-60" />
+          <p className="font-bold">No Upcoming Event</p>
+          <p className="text-xs text-white/70">Schedule will appear here</p>
+        </div>
+      )}
+    </div>
+
+    {/* RIGHT: Event List */}
+    <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+      {upcomingEvents.length > 0 ? (
+        upcomingEvents.slice(0, 5).map((event: any) => (
+          <div
+            key={event.id}
+            className="flex items-center gap-4 p-4 rounded-2xl bg-muted/30 hover:bg-muted/50 transition-all border border-transparent hover:border-primary/20"
+          >
+            {/* Date */}
+            <div className="text-center min-w-[50px]">
+              <p className="text-[10px] font-bold text-muted-foreground uppercase">
+                {new Date(event.startTime).toLocaleDateString([], {
+                  month: "short",
+                })}
+              </p>
+              <p className="text-lg font-black">
+                {new Date(event.startTime).getDate()}
+              </p>
+            </div>
+
+            {/* Info */}
+            <div className="flex-1 min-w-0">
+              <p className="font-bold text-sm truncate">{event.title}</p>
+              <p className="text-[11px] text-muted-foreground flex items-center gap-1">
+                <Building2 className="size-3" />
+                {event.company?.name || "Company"}
+              </p>
+            </div>
+
+            {/* Time */}
+            <div className="text-right">
+              <p className="text-[11px] font-bold text-primary">
+                {new Date(event.startTime).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+            </div>
+          </div>
+        ))
+      ) : (
+        <div className="flex flex-col items-center justify-center py-10 text-center opacity-60">
+          <Calendar className="size-6 mb-2" />
+          <p className="text-sm font-bold">No Events Scheduled</p>
+        </div>
+      )}
+    </div>
+  </div>
+</div>
       </div>
 
       <DashboardUpcomingEventsDialog open={showAllEvents} onOpenChange={setShowAllEvents} />
