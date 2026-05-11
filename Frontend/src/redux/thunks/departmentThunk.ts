@@ -3,7 +3,7 @@ import { deleteAPI, getAPI, postAPI, putAPI } from "../../apis/api";
 
 export const fetchDepartments = createAsyncThunk(
   "department/fetchAll",
-  async (_, { rejectWithValue }) => {
+  async (universityId: string | number | undefined, { rejectWithValue }) => {
     try {
       const response = await getAPI<any>("/dept/?limit=1000");
       return response.data.data;

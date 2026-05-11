@@ -55,8 +55,8 @@ const SignUp: React.FC = () => {
     passingYear: "",
 
   });
-const { universities } = useSelector((state: RootState) => state.superAdmin);
-const { departments } = useSelector((state: RootState) => state.department);
+const { universities, loading: univLoading } = useSelector((state: RootState) => state.superAdmin);
+const { departments, loading: deptLoading } = useSelector((state: RootState) => state.department);
 useEffect(() => {
   dispatch(fetchUniversities());
 }, [dispatch]);
@@ -344,8 +344,11 @@ useEffect(() => {
                               onChange={handleChange}
                               required
                               className={inputClasses(false)}
+                              disabled={univLoading}
                             >
-                              <option value="">Select University</option>
+                              <option value="">
+                                {univLoading ? "Loading Universities..." : "Select University"}
+                              </option>
                               {universities?.map((u: any) => (
                                 <option key={u.id} value={u.id}>
                                   {u.name}
@@ -359,21 +362,23 @@ useEffect(() => {
                           <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Department</label>
                           <div className="relative group">
                             <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
-                            <select
-                              name="departmentId"
-                              value={form.departmentId}
-                              onChange={handleChange}
-                              required
-                              className={inputClasses(false)}
-                              disabled={!form.universityId}
-                            >
-                              <option value="">Select Department</option>
-                              {departments?.map((d: any) => (
-                                <option key={d.id} value={d.id}>
-                                  {d.name}
+                              <select
+                                name="departmentId"
+                                value={form.departmentId}
+                                onChange={handleChange}
+                                required
+                                className={inputClasses(false)}
+                                disabled={!form.universityId || deptLoading}
+                              >
+                                <option value="">
+                                  {deptLoading ? "Loading Departments..." : "Select Department"}
                                 </option>
-                              ))}
-                            </select>
+                                {departments?.map((d: any) => (
+                                  <option key={d.id} value={d.id}>
+                                    {d.name}
+                                  </option>
+                                ))}
+                              </select>
                           </div>
                         </div>
 
@@ -445,9 +450,10 @@ useEffect(() => {
   );
 };
 
-const RoleCard = ({ icon: Icon, title, active, onClick }: any) => (
+const RoleCard = ({ icon: Icon, title, desc, active, onClick }: any) => (
   <button
     onClick={onClick}
+    type="button"
     className={`p-6 rounded-2xl border-2 transition-all text-left flex flex-col gap-4 relative overflow-hidden ${active
       ? "border-blue-600 bg-blue-50/50 dark:bg-blue-500/10 shadow-xl shadow-blue-500/10"
       : "border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/40 hover:border-blue-300 dark:hover:border-white/20 shadow-md hover:shadow-xl"
@@ -459,7 +465,7 @@ const RoleCard = ({ icon: Icon, title, active, onClick }: any) => (
     </div>
     <div className="space-y-1">
       <h3 className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-tight">{title}</h3>
-      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">Click to select this role</p>
+      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{desc || "Click to select this role"}</p>
     </div>
     {active && (
       <div className="absolute top-4 right-4 bg-blue-600 rounded-full p-1 shadow-lg">
