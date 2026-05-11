@@ -16,7 +16,8 @@ import {
 
 import type { AppDispatch } from "@/redux/store/store"
 import type { RootState } from "@/redux/reducers/rootReducer"
-import { fetchUpcomingEvents, fetchUnreadCount } from "@/redux/thunks/notificationThunks"
+import { fetchUnreadCount } from "@/redux/thunks/notificationThunks"
+import { fetchUpcomingEvents } from "@/redux/thunks/upcomingEventThunks"
 import { useSocket } from "@/socket/SocketProvider"
 import { SOCKET_EVENTS } from "@/socket/socket.events"
 import { toast } from "sonner";
@@ -25,15 +26,24 @@ export default function StudentDashboard() {
   const dispatch = useDispatch<AppDispatch>()
   const { socket } = useSocket()
 
-  const { upcomingEvents = [], unreadCount = 0 } = useSelector(
-    (state: RootState) => state.notification || {}
-  )
+const { unreadCount = 0 } = useSelector(
+  (state: RootState) => state.notification || {}
+)
+
+const upcomingEvents = useSelector(
+  (state: RootState) => state.upcomingEvents?.data?.items || []
+)
 
 
  // ✅ ADDED: get user
   const { user } = useSelector((state: RootState) => state.auth)
 
   const nextEvent = upcomingEvents.length > 0 ? upcomingEvents[0] : null
+useEffect(() => {
+  dispatch(fetchUpcomingEvents({ page: 1, limit: 10 }))
+  dispatch(fetchUnreadCount())
+}, [dispatch])
+
 
   // 🔍 DIAGNOSTIC: Log state changes
   useEffect(() => {
@@ -65,7 +75,7 @@ useEffect(() => {
 
   const handleUpdate = () => {
     console.log("🔄 Socket Event Received: Refreshing Dashboard Data...");
-    dispatch(fetchUpcomingEvents());
+   
     dispatch(fetchUnreadCount());
   };
 
@@ -228,27 +238,51 @@ useEffect(() => {
                 </div>
               ) : (
                 upcomingEvents.map((event) => (
-                  <div
-                    key={event.id}
-                    className="bg-card border border-border rounded-2xl p-5 flex items-center gap-5 transition-all hover:border-primary/50 group shadow-sm"
-                  >
-                    <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
-                      <Briefcase className="h-6 w-6" />
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">{event.title}</h4>
-                      <p className="text-sm text-muted-foreground font-medium">{event.company}</p>
-                    </div>
-                    <div className="text-right hidden sm:block">
-                      <p className="text-sm font-bold text-foreground">
-                        {new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                      </p>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">
-                        {new Date(event.startTime).toLocaleDateString([], { day: 'numeric', month: 'short' })}
-                      </p>
-                    </div>
-                    <ChevronRight className="h-5 w-5 text-muted-foreground/40 group-hover:text-primary transition-all group-hover:translate-x-1" />
-                  </div>
+                 <div
+  key={event.id}
+  className="bg-card border border-border rounded-2xl p-5 flex items-center gap-5 transition-all hover:border-primary/50 group shadow-sm"
+>
+  {/* Icon */}
+  <div className="h-14 w-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+    <Briefcase className="h-6 w-6" />
+  </div>
+
+  {/* Content */}
+  <div className="flex-1 min-w-0">
+    <h4 className="text-base font-bold text-foreground truncate">
+      {event.title}
+    </h4>
+
+    <p className="text-sm text-muted-foreground truncate">
+      {event.company?.name || "Placement Event"}
+    </p>
+
+    {event.description && (
+      <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
+        {event.description}
+      </p>
+    )}
+  </div>
+
+  {/* Time */}
+  <div className="text-right hidden sm:block shrink-0">
+    <p className="text-sm font-bold text-foreground">
+      {new Date(event.startTime).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })}
+    </p>
+
+    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">
+      {new Date(event.startTime).toLocaleDateString([], {
+        day: "numeric",
+        month: "short",
+      })}
+    </p>
+  </div>
+
+  <ChevronRight className="h-5 w-5 text-muted-foreground/40 group-hover:text-primary transition-all group-hover:translate-x-1 shrink-0" />
+</div>
                 ))
               )}
             </div>

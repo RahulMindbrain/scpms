@@ -6,7 +6,7 @@ import { SectionCards } from "@/components/section-cards"
 import type { RootState } from "@/redux/reducers/rootReducer"
 import type { AppDispatch } from "@/redux/store/store"
 import { fetchCompanyJobs, fetchJobApplications } from "@/redux/thunks/companyThunk"
-import { fetchUpcomingEvents } from "@/redux/thunks/notificationThunks"
+import { fetchUpcomingEvents } from "@/redux/thunks/upcomingEventThunks"
 import { toast } from "sonner"
 
 import Loader from "@/components/Loader"
@@ -19,20 +19,28 @@ import { SOCKET_EVENTS } from "@/socket/socket.events"
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>()
   const { jobs, applications, loading, error } = useSelector((state: RootState) => state.company)
-  const { upcomingEvents = [] } = useSelector((state: RootState) => state.notification || {})
+const upcomingEvents = useSelector(
+  (state: RootState) => state.upcomingEvents?.data?.items ?? []
+)
 
   const nextEvent = upcomingEvents.length > 0 ? upcomingEvents[0] : null
   const { socket } = useSocket()
 
-  const handleUpdate = () => {
-    console.log("🔄 Company Dashboard: Refreshing data...");
-    toast.success("Dashboard Synchronized", {
-      description: "Latest applications and job status have been updated."
-    });
-    dispatch(fetchCompanyJobs({ page: 1, limit: 100 }))
-    dispatch(fetchJobApplications({ page: 1 }))
-    dispatch(fetchUpcomingEvents())
-  }
+ const handleUpdate = () => {
+  console.log("🔄 Company Dashboard: Refreshing data...");
+
+  toast.success("Dashboard Synchronized", {
+    description: "Latest applications and job status have been updated."
+  });
+
+  dispatch(fetchCompanyJobs({ page: 1, limit: 100 }));
+  dispatch(fetchJobApplications({ page: 1 }));
+
+  dispatch(fetchUpcomingEvents({
+    page: 1,
+    limit: 10,
+  }));
+};
 
   useEffect(() => {
     if (!socket) return
@@ -106,7 +114,7 @@ export default function Dashboard() {
 
   if (error) {
     if (error.includes("Account not approved")) {
-      return <CompanyApprovalPending />
+     return <CompanyApprovalPending isOpen={true} />
     }
     return (
       <div className="flex flex-1 items-center justify-center p-4 text-destructive font-bold">
@@ -157,11 +165,11 @@ export default function Dashboard() {
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
                   <div className="flex-1 min-w-0">
-                    <p className="text-white font-bold text-xl truncate">{nextEvent.title}</p>
+                    <p className="text-white font-bold text-xl truncate">{nextEvent?.title}</p>
                     <div className="flex flex-wrap items-center gap-4 mt-3">
                        <div className="flex items-center gap-1.5 text-white/70 text-xs font-medium">
                           <Clock size={14} className="text-blue-400" />
-                          {new Date(nextEvent.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {new Date(nextEvent?.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                        </div>
                        <div className="flex items-center gap-1.5 text-white/70 text-xs font-medium">
                           <MapPin size={14} className="text-blue-400" />

@@ -10,7 +10,7 @@ import applicationReducer from "@/redux/slices/applicationSlices"
 import interviewReducer from "@/redux/slices/interviewSlice";
 import notificationReducer from "@/redux/slices/notificationSlice";
 import skillReducer from "@/redux/slices/skillSlice";
-
+import upcomingEventReducer from "@/redux/slices/upcomingEventSlice"
 const rootReducer = combineReducers({
     auth: authReducer,
     student: studentReducer,
@@ -22,6 +22,7 @@ const rootReducer = combineReducers({
     application:applicationReducer,
     notification: notificationReducer,
     skill: skillReducer,
+    upcomingEvents: upcomingEventReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

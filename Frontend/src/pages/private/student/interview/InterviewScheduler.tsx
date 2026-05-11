@@ -15,17 +15,25 @@ import { useDispatch, useSelector } from 'react-redux';
 import CountdownTimer from '@/components/CountdownTimer';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { fetchUpcomingEvents } from '@/redux/thunks/notificationThunks';
+import { fetchUpcomingEvents } from '@/redux/thunks/upcomingEventThunks';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import Loader from '@/components/Loader';
 
 const InterviewSchedule: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { upcomingEvents = [], loading } = useSelector((state: RootState) => state.notification || {});
+  const upcomingEvents = useSelector(
+    (state: RootState) => state.upcomingEvents?.data?.items ?? []
+  );
+  const loading = useSelector(
+    (state: RootState) => state.upcomingEvents?.loading ?? false
+  );
 
   useEffect(() => {
-    dispatch(fetchUpcomingEvents());
+    dispatch(fetchUpcomingEvents({
+      page: 1,
+      limit: 10,
+    }));
   }, [dispatch]);
 
   // Helper to get accent color based on index or company name
@@ -47,7 +55,7 @@ const InterviewSchedule: React.FC = () => {
   return (
     <div className="flex-1 flex flex-col bg-background min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
       <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-10 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
-        
+
         {/* Adaptive Hero Banner */}
         <div className="student-hero-banner group">
           <div className="student-hero-mesh">
@@ -57,11 +65,11 @@ const InterviewSchedule: React.FC = () => {
 
           <div className="student-hero-texture"></div>
           <div className="student-hero-overlay"></div>
-          
+
           <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div className="max-w-2xl">
               <div className="student-hero-badge">
-                <Sparkles /> 
+                <Sparkles />
                 <span>Interview Hub</span>
               </div>
               <h1 className="student-hero-title">
@@ -86,8 +94,8 @@ const InterviewSchedule: React.FC = () => {
               <div>
                 <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Active Invitations</h2>
                 <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 font-medium">
-                  {upcomingEvents.length > 0 
-                    ? `You have ${upcomingEvents.length} interviews scheduled.` 
+                  {upcomingEvents.length > 0
+                    ? `You have ${upcomingEvents.length} interviews scheduled.`
                     : "No interviews scheduled at the moment."}
                 </p>
               </div>
@@ -99,11 +107,11 @@ const InterviewSchedule: React.FC = () => {
             <div className="space-y-6">
               {upcomingEvents.length > 0 ? (
                 upcomingEvents.map((item, idx) => (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
-                    key={item.id} 
+                    key={item.id}
                     className={cn(
                       "group relative bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl border border-slate-200/60 dark:border-white/[0.08] rounded-[2.5rem] p-8 md:p-10 transition-all duration-500 hover:shadow-2xl hover:border-indigo-500/30 hover:translate-y-[-4px]",
                     )}
@@ -112,9 +120,9 @@ const InterviewSchedule: React.FC = () => {
                       <div className="flex gap-6">
                         <div className={cn(
                           "w-16 h-16 md:w-20 md:h-20 rounded-[1.5rem] bg-gradient-to-br flex items-center justify-center text-white font-black text-2xl md:text-3xl shadow-xl transition-transform group-hover:scale-110 duration-500",
-                          getAccentColor(item.company || 'C', idx)
+                          getAccentColor(item.company?.name || 'C', idx)
                         )}>
-                          {(item.company || item.title || 'C').charAt(0).toUpperCase()}
+                          (item.company?.name || item.title || 'C').charAt(0).toUpperCase()
                         </div>
                         <div className="space-y-1">
                           <div className="flex flex-wrap items-center gap-3 mb-1">
@@ -122,13 +130,13 @@ const InterviewSchedule: React.FC = () => {
                             <span className={cn(
                               "text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-[0.1em] border shadow-sm",
                               item.venue?.toLowerCase().includes('http') || item.venue?.toLowerCase().includes('meet') || item.venue?.toLowerCase().includes('zoom')
-                                ? 'bg-blue-500/10 text-blue-600 border-blue-500/20 shadow-blue-500/5' 
+                                ? 'bg-blue-500/10 text-blue-600 border-blue-500/20 shadow-blue-500/5'
                                 : 'bg-amber-500/10 text-amber-600 border-amber-500/20 shadow-amber-500/5'
                             )}>
                               {item.venue?.toLowerCase().includes('http') || item.venue?.toLowerCase().includes('meet') || item.venue?.toLowerCase().includes('zoom') ? 'Online' : 'Offline'}
                             </span>
                           </div>
-                          <p className="text-indigo-600 dark:text-indigo-400 font-black text-sm uppercase tracking-wider">{item.company}</p>
+                          <p className="text-indigo-600 dark:text-indigo-400 font-black text-sm uppercase tracking-wider">{item.company?.name}</p>
                           <p className="text-slate-500 dark:text-slate-400 text-xs font-bold flex items-center gap-1.5 uppercase tracking-tighter">
                             <UserCheck size={14} className="text-indigo-500" />
                             Interview Round
@@ -150,12 +158,12 @@ const InterviewSchedule: React.FC = () => {
                           </div>
                           <CountdownTimer targetDate={item.startTime} />
                         </div>
-                        
+
                         {item.venue?.toLowerCase().includes('http') || item.venue?.toLowerCase().includes('meet') || item.venue?.toLowerCase().includes('zoom') ? (
-                          <a 
-                            href={item.venue.startsWith('http') ? item.venue : `https://${item.venue}`} 
-                            target="_blank" 
-                            rel="noreferrer" 
+                          <a
+                            href={item.venue.startsWith('http') ? item.venue : `https://${item.venue}`}
+                            target="_blank"
+                            rel="noreferrer"
                             className="w-full sm:w-auto flex items-center justify-center gap-2 text-xs font-black uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 px-8 py-4 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 active:scale-95"
                           >
                             Launch Meeting <ExternalLink size={16} />
@@ -215,7 +223,7 @@ const InterviewSchedule: React.FC = () => {
                     <div key={i} className="flex gap-5 relative group/item">
                       <div className={cn("w-1.5 rounded-full shrink-0 h-14", i === 0 ? "bg-emerald-500" : i === 1 ? "bg-blue-500" : "bg-indigo-500")} />
                       <div className="min-w-0">
-                        <p className="text-sm font-black text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{act.company}</p>
+                        <p className="text-sm font-black text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{act.company?.name}</p>
                         <p className="text-xs text-slate-500 dark:text-slate-400 font-bold mt-1">{act.title}</p>
                         <p className="text-[10px] text-slate-400 dark:text-slate-600 mt-2 uppercase font-black tracking-widest">
                           {new Date(act.startTime).toLocaleDateString()} • {new Date(act.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
