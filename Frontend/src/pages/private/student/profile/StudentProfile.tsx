@@ -793,7 +793,7 @@ const StudentProfile = () => {
                         <p className="text-sm font-bold truncate">
                           {profile.resumeUrl ? `Resume - ${profile.name}.pdf` : 'No document uploaded'}
                         </p>
-                        <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{profile.resumeUrl ? 'Verified PDF • Cloud Hosted' : 'Action required'}</p>
+                        <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{profile.resumeUrl ? 'Verified PDF' : 'Action required'}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -807,7 +807,7 @@ const StudentProfile = () => {
                       >
                         View
                       </Button>
-                      <Button
+                      {/* <Button
                         onClick={() => {
                           const fileName = profile.resumeUrl ? `Resume_${profile.name.replace(/\s+/g, '_')}.pdf` : 'Resume.pdf';
                           profile.resumeUrl && handleDownload(profile.resumeUrl, fileName);
@@ -817,7 +817,7 @@ const StudentProfile = () => {
                         className="bg-white/10 hover:bg-white/20 border-white/20 text-white rounded-xl px-4 h-9 text-xs font-bold transition-all shrink-0"
                       >
                         <Download className="h-3.5 w-3.5" />
-                      </Button>
+                      </Button> */}
                     </div>
                   </div>
                 </CardContent>
@@ -980,13 +980,13 @@ const StudentProfile = () => {
                   <Button variant="outline" size="sm" className="rounded-xl border-slate-200 dark:border-slate-800" onClick={() => window.open(previewUrl!, '_blank')}>
                     <ExternalLink className="h-4 w-4 mr-2" /> Open Full View
                   </Button>
-                  <Button 
+                  {/* <Button 
                     size="sm" 
                     className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20"
                     onClick={() => handleDownload(previewUrl, previewName)}
                   >
                     <Download className="h-4 w-4 mr-2" /> Download
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </DialogHeader>
@@ -1015,12 +1015,12 @@ const StudentProfile = () => {
                         >
                           Open PDF
                         </Button>
-                        <Button
+                        {/* <Button
                           onClick={() => handleDownload(previewUrl, previewName)}
                           className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
                         >
                           Download PDF
-                        </Button>
+                        </Button> */}
                       </div>
                     </div>
                   </div>
