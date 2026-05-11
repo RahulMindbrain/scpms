@@ -1,8 +1,8 @@
 import { NotificationType } from "@prisma/client";
-import {
-  //getJobBasicDetails,
-  getJobDisplayDetails,
-} from "../repository/job.repository";
+// import {
+//   //getJobBasicDetails,
+//   getJobDisplayDetails,
+// } from "../repository/job.repository";
 import {
   createManyNotifications,
   createNotification,
@@ -16,6 +16,7 @@ import {
 } from "../repository/notification.repository";
 import {
   getEligibleUnplacedStudents,
+  getEligibleUnplacedStudentsForJobs,
   getStudentByUserId,
   //getUnplacedStudents,
 } from "../repository/student.repository";
@@ -28,6 +29,7 @@ import {
   getUpcomingSchedulesForStudent,
 } from "../repository/schedule.repository";
 import { getCompanyByUserId } from "../repository/company.repository";
+import { getJobUniversityDisplayDetails } from "../repository/job.university.repository";
 
 export const createNotificationService = async (data: any) => {
   return createNotification(data);
@@ -41,54 +43,110 @@ export const markAsReadService = async (id: number) => {
   return markAsRead(id);
 };
 
-export const notifyEligibleStudentsForJob = async (
-  jobId: number,
+export const notifyEligibleStudentsForJobUniversity = async (
+  jobUniversityId: number,
+
   customSubject?: string,
+
   customMessage?: string,
 ) => {
-  const students = await getEligibleUnplacedStudents(jobId);
+  const studentGroups = await getEligibleUnplacedStudentsForJobs([
+    jobUniversityId,
+  ]);
 
-  if (!students.length) return 0;
+  if (!studentGroups.length) {
+    return 0;
+  }
+
+  const group = studentGroups[0];
+
+  if (!group) {
+    return 0;
+  }
+
+  const students = group.students;
+
+  if (!students.length) {
+    return 0;
+  }
+
+  const jobUniversity = await getJobUniversityDisplayDetails(jobUniversityId);
+
+  if (!jobUniversity) {
+    throw new Error("JobUniversity not found");
+  }
 
   const emails = students.map((s) => s.user.email);
-  const userIds = students.map((s) => s.userId);
 
-  const job = await getJobDisplayDetails(jobId);
+  const userIds = students.map((s) => s.user.id);
 
   const subject =
-    customSubject || `New Job Opportunity: ${job?.title || "Apply Now"}`;
+    customSubject || `New Opportunity: ${jobUniversity.job.title}`;
 
   const message =
     customMessage ||
     `
-      <p>A new job has been posted on the portal.</p>
-      <p><strong>Role:</strong> ${job?.title || "N/A"}</p>
-      <p><strong>Company:</strong> ${job?.company?.name || "N/A"}</p>
-      <p><strong>Location:</strong> ${job?.location || "N/A"}</p>
-      <p>Login to your dashboard and apply now.</p>
-    `;
+        <p>
+          A new opportunity has been approved for your university.
+        </p>
 
-  emitToUsers(userIds, SOCKET_EVENTS.NEW_JOB, {
-    jobId,
-    title: job?.title,
-    company: job?.company?.name,
-    location: job?.location,
-  });
+        <p>
+          <strong>Role:</strong>
+          ${jobUniversity.job.title}
+        </p>
+
+        <p>
+          <strong>Company:</strong>
+          ${jobUniversity.job.company.name}
+        </p>
+
+        <p>
+          <strong>Location:</strong>
+          ${jobUniversity.job.location}
+        </p>
+
+        <p>
+          Login and apply now.
+        </p>
+      `;
+
+  emitToUsers(
+    userIds,
+
+    SOCKET_EVENTS.NEW_JOB,
+
+    {
+      jobUniversityId,
+
+      title: jobUniversity.job.title,
+
+      company: jobUniversity.job.company.name,
+
+      location: jobUniversity.job.location,
+    },
+  );
 
   await sendEmailService({
     recipients: emails,
+
     subject,
+
     html: message,
   });
 
   await createManyNotifications(
     userIds.map((userId) => ({
       userId,
-      title: "New Job Posted",
-      message: `New job: ${job?.title || "Apply Now"} at ${job?.company?.name || ""}`,
+
+      title: "New Job Opportunity",
+
+      message: `${jobUniversity.job.title} at ${jobUniversity.job.company.name}`,
+
       type: NotificationType.JOB_POSTED,
-      entityId: jobId,
-      entityType: "JOB",
+
+      entityId: jobUniversityId,
+
+      entityType: "JOB_UNIVERSITY",
     })),
   );
 
@@ -180,7 +238,13 @@ export const getUpcomingEventsService = async (
       const company = await getCompanyByUserId(userId);
       if (!company) throw new Error("Company not found");
 
-      return getUpcomingSchedulesForCompany(company.id, skip, limit, page);
+      return getUpcomingSchedulesForCompany(
+        company.id,
+        undefined,
+        skip,
+        limit,
+        page,
+      );
     }
 
     case "ADMIN": {

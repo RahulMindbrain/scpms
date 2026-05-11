@@ -103,6 +103,9 @@ export const createStudentService = async (
       cert.certificateUrl = normalizeUrl(cert.certificateUrl);
     }
   });
+  if (!data.departmentId) {
+    throw new Error("Department is required");
+  }
 
   const dept = await getDepartmentById(data.departmentId);
 

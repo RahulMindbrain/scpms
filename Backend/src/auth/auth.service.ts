@@ -138,8 +138,12 @@ export const forgotPasswordService = async (email: string) => {
 
 export const resendOtpService = async (email: string) => {
   email = normalizeEmails(email);
+
   const user = await getUserOtpState(email);
-  if (!user) throw new Error("User not found");
+
+  if (!user) {
+    throw new Error("User not found");
+  }
 
   const now = new Date();
 
@@ -152,12 +156,14 @@ export const resendOtpService = async (email: string) => {
   }
 
   const { otp, hashedOtp } = await generateOtp();
-  console.log(otp);
 
   const updated = await storeOtpByUserId(user.id, hashedOtp, OTP_EXPIRY);
 
+  await sendOtpEmail(user.email, otp);
+
   return {
     message: "OTP resent",
+
     otpExpiry: updated.otpExpiry,
   };
 };

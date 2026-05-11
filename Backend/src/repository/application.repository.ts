@@ -39,32 +39,42 @@ export const getApplications = async (
   limit: number,
 ) => {
   try {
-    console.log(user);
     let where: any = {};
 
     if (user.role === "STUDENT") {
       where.studentId = user.studentId;
     } else if (user.role === "COMPANY") {
-      where.job = {
-        companyId: user.companyId,
+      where.jobUniversity = {
+        job: {
+          companyId: user.companyId,
+        },
       };
     } else if (user.role === "ADMIN") {
     }
-    console.log("WHERE:", where);
-
     if (filters.studentId) {
       where.studentId = filters.studentId;
     }
 
     if (filters.companyId) {
-      where.job = {
-        ...(where.job || {}),
-        companyId: filters.companyId,
+      where.jobUniversity = {
+        ...(where.jobUniversity || {}),
+
+        job: {
+          companyId: filters.companyId,
+        },
       };
     }
 
     if (filters.jobId) {
-      where.jobId = filters.jobId;
+      where.jobUniversity = {
+        ...(where.jobUniversity || {}),
+
+        jobId: filters.jobId,
+      };
+    }
+
+    if (filters.jobUniversityId) {
+      where.jobUniversityId = filters.jobUniversityId;
     }
 
     if (filters.applicationId) {
@@ -80,29 +90,81 @@ export const getApplications = async (
     const [applications, totalCount, statusCounts] = await Promise.all([
       prisma.application.findMany({
         where,
+
         skip,
+
         take: limit,
-        orderBy: { createdAt: "desc" },
+
+        orderBy: {
+          createdAt: "desc",
+        },
 
         select: {
           id: true,
+
           status: true,
+
+          currentRound: true,
+
           createdAt: true,
+
           updatedAt: true,
 
-          job: {
+          jobUniversity: {
             select: {
               id: true,
-              title: true,
-              location: true,
+
+              universityId: true,
+
               status: true,
-              companyId: true,
+
+              salary: true,
+
+              openings: true,
+
+              minCgpa: true,
+
+              maxBacklogs: true,
+
+              university: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+
+              job: {
+                select: {
+                  id: true,
+
+                  title: true,
+
+                  location: true,
+
+                  status: true,
+
+                  companyId: true,
+
+                  company: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
             },
           },
 
           student: {
             select: {
               id: true,
+
+              cgpa: true,
+
+              activeBacklogs: true,
+
+              isPlaced: true,
 
               user: {
                 select: {
@@ -118,36 +180,44 @@ export const getApplications = async (
                   name: true,
                 },
               },
-
-              cgpa: true,
-              activeBacklogs: true,
-              isPlaced: true,
             },
           },
         },
       }),
 
-      prisma.application.count({ where }),
+      prisma.application.count({
+        where,
+      }),
 
       prisma.application.groupBy({
         by: ["status"],
-        _count: { status: true },
+
+        _count: {
+          status: true,
+        },
+
         where,
       }),
     ]);
 
     return {
       applications,
+
       statusCounts,
+
       pagination: {
         totalCount,
+
         totalPages: Math.ceil(totalCount / limit),
+
         currentPage: page,
+
         limit,
       },
     };
   } catch (error) {
     console.error("Repository Error:", error);
+
     throw error;
   }
 };
@@ -211,8 +281,9 @@ export const deleteApplication = async (id: number) => {
 export const getTotalPlacedStudents = async () => {
   return prisma.application.groupBy({
     by: ["studentId"],
+
     where: {
-      status: "SELECTED",
+      status: "OFFER_ACCEPTED",
     },
   });
 };
@@ -226,7 +297,9 @@ export const getApplicationById = async (id: number) => {
 export const acceptApplication = async (id: number) => {
   return prisma.application.update({
     where: { id },
+
     data: {
+      status: "OFFER_ACCEPTED",
       isAccepted: true,
       acceptedAt: new Date(),
     },
@@ -236,8 +309,10 @@ export const acceptApplication = async (id: number) => {
 export const withdrawApplication = async (id: number) => {
   return prisma.application.update({
     where: { id },
+
     data: {
-      status: "WITHDRAWN",
+      status: "OFFER_REJECTED",
+      rejectedAt: new Date(),
     },
   });
 };
@@ -285,9 +360,7 @@ export const getApplicationsBySchedule = async (
 
   const where = {
     jobUniversity: {
-      job: {
-        interviewScheduleId: scheduleId,
-      },
+      interviewScheduleId: scheduleId,
     },
   };
 
@@ -472,27 +545,47 @@ export const getScheduleJobsDetails = async (scheduleId: number) => {
         },
       },
 
-      jobs: {
+      jobUniversities: {
         select: {
           id: true,
 
-          title: true,
+          universityId: true,
 
           status: true,
 
-          jobUniversities: {
+          salary: true,
+
+          openings: true,
+
+          minCgpa: true,
+
+          maxBacklogs: true,
+
+          approvedAt: true,
+
+          job: {
             select: {
               id: true,
 
-              universityId: true,
+              title: true,
 
-              status: true,
+              location: true,
 
-              _count: {
-                select: {
-                  applications: true,
-                },
-              },
+              createdAt: true,
+            },
+          },
+
+          university: {
+            select: {
+              id: true,
+
+              name: true,
+            },
+          },
+
+          _count: {
+            select: {
+              applications: true,
             },
           },
         },

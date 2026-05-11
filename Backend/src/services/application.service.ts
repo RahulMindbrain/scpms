@@ -1,4 +1,9 @@
-import { ApplicationStatus, NotificationType } from "@prisma/client";
+import {
+  ApplicationStatus,
+  InterviewRound,
+  NotificationType,
+  Prisma,
+} from "@prisma/client";
 
 import prisma from "../config/db";
 
@@ -27,6 +32,10 @@ import { SOCKET_EVENTS } from "../socket.event";
 
 import { createNotification } from "../repository/notification.repository";
 import { sendMail } from "../utils/mails/transporter.mail";
+import {
+  allowedRoundTransitions,
+  allowedStatusTransitions,
+} from "../constants/workflow.constants";
 
 export const createApplicationService = async (
   userId: number,
@@ -218,7 +227,7 @@ export const updateApplicationService = async ({
 
   status: ApplicationStatus;
 
-  currentRound?: any;
+  currentRound?: InterviewRound;
 
   reason?: string;
 
@@ -232,7 +241,7 @@ export const updateApplicationService = async ({
     throw new Error("Application not found");
   }
 
-  if (existing.status === "REJECTED" && status !== "REJECTED") {
+  if (existing.status === "REJECTED") {
     throw new Error("Rejected applications cannot be updated");
   }
 
@@ -243,37 +252,74 @@ export const updateApplicationService = async ({
     throw new Error("Offer already finalized");
   }
 
-  const application = await prisma.$transaction(async (tx) => {
-    const updatedApplication = await updateApplicationStatus(
-      tx,
-      applicationId,
-      {
+  const allowedStatuses =
+    allowedStatusTransitions[existing.status as ApplicationStatus];
+
+  if (!allowedStatuses.includes(status)) {
+    throw new Error(
+      `Invalid status transition from ${existing.status} to ${status}`,
+    );
+  }
+
+  if (status !== "SHORTLISTED" && currentRound) {
+    throw new Error("Rounds can only be updated for shortlisted applications");
+  }
+
+  if (existing.currentRound && currentRound) {
+    const allowedRounds =
+      allowedRoundTransitions[existing.currentRound as InterviewRound];
+
+    if (!allowedRounds.includes(currentRound)) {
+      throw new Error(
+        `Invalid round transition from ${existing.currentRound} to ${currentRound}`,
+      );
+    }
+  }
+
+  const finalStatuses: ApplicationStatus[] = [
+    "SELECTED",
+    "REJECTED",
+    "OFFER_ACCEPTED",
+    "OFFER_REJECTED",
+  ];
+
+  if (finalStatuses.includes(status)) {
+    currentRound = undefined;
+  }
+
+  const application = await prisma.$transaction(
+    async (tx: Prisma.TransactionClient) => {
+      const updatedApplication = await updateApplicationStatus(
+        tx,
+        applicationId,
+        {
+          status,
+
+          currentRound,
+
+          ...(reason && {
+            reason,
+          }),
+        },
+      );
+
+      await createApplicationHistory(tx, {
+        applicationId,
+
         status,
 
-        currentRound,
+        round: currentRound ?? null,
 
-        ...(reason && {
-          reason,
-        }),
-      },
-    );
+        reason: reason ?? null,
 
-    await createApplicationHistory(tx, {
-      applicationId,
+        remarks: remarks ?? null,
 
-      status,
+        createdBy: updatedBy ?? null,
+      });
 
-      round: currentRound ?? null,
-
-      reason: reason ?? null,
-
-      remarks: remarks ?? null,
-
-      createdBy: updatedBy ?? null,
-    });
-
-    return updatedApplication;
-  });
+      return updatedApplication;
+    },
+  );
 
   emitToUser(
     application.student.userId,
@@ -298,22 +344,59 @@ export const updateApplicationService = async ({
 
     let message = `Your application for ${application.jobUniversity.job.title} has been updated`;
 
-    if (status === "SHORTLISTED") {
-      title = "Application Shortlisted";
+    if (status === "SHORTLISTED" && currentRound) {
+      title = `${currentRound} Round Update`;
 
-      message = `You have been shortlisted for ${currentRound ?? "next round"} in ${application.jobUniversity.job.title}`;
+      message = `You have progressed to the ${currentRound} round for ${application.jobUniversity.job.title}`;
     }
 
     if (status === "REJECTED") {
       title = "Application Rejected";
 
-      message = `Your application was rejected${currentRound ? ` in ${currentRound}` : ""} for ${application.jobUniversity.job.title}`;
+      message = `Your application was rejected${
+        existing.currentRound ? ` in ${existing.currentRound}` : ""
+      } for ${application.jobUniversity.job.title}`;
     }
 
     if (status === "SELECTED") {
       title = "Application Selected";
 
       message = `Congratulations! You have been selected for ${application.jobUniversity.job.title}`;
+    }
+
+    if (status === "OFFER_ACCEPTED") {
+      title = "Offer Accepted";
+
+      message = `You have accepted the offer for ${application.jobUniversity.job.title}`;
+    }
+
+    if (status === "OFFER_REJECTED") {
+      title = "Offer Rejected";
+
+      message = `You have rejected the offer for ${application.jobUniversity.job.title}`;
+    }
+
+    let notificationType: NotificationType =
+      NotificationType.APPLICATION_SELECTED;
+
+    if (status === "SHORTLISTED") {
+      notificationType = NotificationType.APPLICATION_SHORTLISTED;
+    }
+
+    if (status === "REJECTED") {
+      notificationType = NotificationType.APPLICATION_REJECTED;
+    }
+
+    if (status === "SELECTED") {
+      notificationType = NotificationType.APPLICATION_SELECTED;
+    }
+
+    if (status === "OFFER_ACCEPTED") {
+      notificationType = NotificationType.OFFER_ACCEPTED;
+    }
+
+    if (status === "OFFER_REJECTED") {
+      notificationType = NotificationType.OFFER_REJECTED;
     }
 
     await createNotification({
@@ -323,10 +406,7 @@ export const updateApplicationService = async ({
 
       message,
 
-      type:
-        status === "REJECTED"
-          ? NotificationType.APPLICATION_REJECTED
-          : NotificationType.APPLICATION_SELECTED,
+      type: notificationType,
     });
 
     await sendMail({
@@ -335,14 +415,14 @@ export const updateApplicationService = async ({
       subject: title,
 
       html: `
-          <h2>${title}</h2>
+        <h2>${title}</h2>
 
-          <p>${message}</p>
+        <p>${message}</p>
 
-          ${reason ? `<p><strong>Reason:</strong> ${reason}</p>` : ""}
+        ${reason ? `<p><strong>Reason:</strong> ${reason}</p>` : ""}
 
-          ${remarks ? `<p><strong>Remarks:</strong> ${remarks}</p>` : ""}
-        `,
+        ${remarks ? `<p><strong>Remarks:</strong> ${remarks}</p>` : ""}
+      `,
     });
   } catch (err) {
     console.error("Notification failed", err);

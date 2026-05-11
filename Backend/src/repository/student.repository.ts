@@ -314,22 +314,77 @@ export const getStudentDetails = async (userId: number) => {
       },
 
       applications: {
+        orderBy: {
+          createdAt: "desc",
+        },
+
         select: {
           id: true,
+
           status: true,
+
+          currentRound: true,
+
+          reason: true,
+
+          isAccepted: true,
+
+          acceptedAt: true,
+
           createdAt: true,
 
-          job: {
+          updatedAt: true,
+
+          statusHistory: {
+            orderBy: {
+              createdAt: "asc",
+            },
+
             select: {
               id: true,
-              title: true,
-              location: true,
-              salary: true,
 
-              company: {
+              status: true,
+
+              round: true,
+
+              reason: true,
+
+              remarks: true,
+
+              createdAt: true,
+            },
+          },
+
+          jobUniversity: {
+            select: {
+              id: true,
+
+              status: true,
+
+              universityId: true,
+
+              minCgpa: true,
+
+              university: {
                 select: {
                   id: true,
                   name: true,
+                },
+              },
+
+              job: {
+                select: {
+                  id: true,
+                  title: true,
+                  location: true,
+                  salary: true,
+
+                  company: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
                 },
               },
             },
@@ -413,7 +468,7 @@ export const getDeptWiseStats = async (universityId: number) => {
 
       applications: {
         where: {
-          status: "SELECTED",
+          status: "OFFER_ACCEPTED",
 
           jobUniversity: {
             universityId,
@@ -439,7 +494,7 @@ export const getTotalPlacedStudentsRepo = async (universityId: number) => {
     by: ["studentId"],
 
     where: {
-      status: "SELECTED",
+      status: "OFFER_ACCEPTED",
 
       jobUniversity: {
         universityId,
@@ -453,7 +508,7 @@ export const getTotalPlacedStudentsRepo = async (universityId: number) => {
 export const getSalaryDataRepo = async (universityId: number) => {
   return prisma.application.findMany({
     where: {
-      status: "SELECTED",
+      status: "OFFER_ACCEPTED",
 
       jobUniversity: {
         universityId,
@@ -535,49 +590,60 @@ export const getSalaryDataRepo = async (universityId: number) => {
 //   });
 // };
 
-export const getEligibleUnplacedStudents = async (jobId: number) => {
-  const job = await prisma.job.findUnique({
-    where: { id: jobId },
-    select: {
-      minCgpa: true,
-      maxCgpa: true,
-      maxBacklogs: true,
-      eligibleDepartments: {
-        select: { id: true },
+export const getEligibleUnplacedStudents = async (jobUniversityId: number) => {
+  const jobUniversity = await prisma.jobUniversity.findUnique({
+    where: {
+      id: jobUniversityId,
+    },
+
+    include: {
+      university: true,
+
+      job: {
+        select: {
+          eligibleDepartments: {
+            select: {
+              id: true,
+            },
+          },
+        },
       },
     },
   });
 
-  if (!job) throw new Error("Job not found");
+  if (!jobUniversity) {
+    throw new Error("Job university not found");
+  }
 
-  const deptIds = job.eligibleDepartments.map((d) => d.id);
+  if (jobUniversity.status !== "APPROVED") {
+    throw new Error("Job not approved");
+  }
+
+  const deptIds = jobUniversity.job.eligibleDepartments.map((d) => d.id);
 
   return prisma.student.findMany({
     where: {
       isPlaced: false,
 
+      universityId: jobUniversity.universityId,
+
       departmentId: {
         in: deptIds,
       },
 
-      ...(job.minCgpa !== null && {
+      ...(jobUniversity.minCgpa !== null && {
         cgpa: {
-          gte: job.minCgpa,
+          gte: jobUniversity.minCgpa,
         },
       }),
 
-      ...(job.maxCgpa !== null && {
-        cgpa: {
-          lte: job.maxCgpa,
-        },
-      }),
-
-      ...(job.maxBacklogs !== null && {
+      ...(jobUniversity.maxBacklogs !== null && {
         activeBacklogs: {
-          lte: job.maxBacklogs,
+          lte: jobUniversity.maxBacklogs,
         },
       }),
     },
+
     include: {
       user: true,
     },
@@ -594,54 +660,218 @@ export const markStudentPlaced = async (studentId: number) => {
   });
 };
 
-export const getEligibleUnplacedStudentsForJobs = async (jobIds: number[]) => {
-  if (!jobIds.length) return [];
+// export const getEligibleUnplacedStudentsForJobs = async (
+//   jobUniversityIds: number[],
+// ) => {
+//   if (!jobUniversityIds.length) {
+//     return [];
+//   }
 
-  const jobs = await prisma.job.findMany({
-    where: {
-      id: { in: jobIds },
-      status: "APPROVED",
-    },
-    select: {
-      id: true,
-      eligibleDepartments: {
-        select: { id: true },
-      },
-    },
-  });
+//   const jobUniversities = await prisma.jobUniversity.findMany({
+//     where: {
+//       id: {
+//         in: jobUniversityIds,
+//       },
 
-  if (!jobs.length) {
-    throw new Error("No valid jobs found");
-  }
+//       status: "APPROVED",
+//     },
 
-  const departmentIds = [
-    ...new Set(jobs.flatMap((job) => job.eligibleDepartments.map((d) => d.id))),
-  ];
+//     select: {
+//       id: true,
 
-  if (!departmentIds.length) {
+//       universityId: true,
+
+//       minCgpa: true,
+
+//       maxBacklogs: true,
+
+//       job: {
+//         select: {
+//           eligibleDepartments: {
+//             select: {
+//               id: true,
+//             },
+//           },
+//         },
+//       },
+//     },
+//   });
+
+//   if (!jobUniversities.length) {
+//     throw new Error("No approved job universities found");
+//   }
+
+//   const eligibleStudentsMap = new Map<number, any>();
+
+//   for (const jobUniversity of jobUniversities) {
+//     const departmentIds = jobUniversity.job.eligibleDepartments.map(
+//       (d) => d.id,
+//     );
+
+//     if (!departmentIds.length) {
+//       continue;
+//     }
+
+//     const students = await prisma.student.findMany({
+//       where: {
+//         isPlaced: false,
+
+//         universityId: jobUniversity.universityId,
+
+//         departmentId: {
+//           in: departmentIds,
+//         },
+
+//         ...(jobUniversity.minCgpa !== null && {
+//           cgpa: {
+//             gte: jobUniversity.minCgpa,
+//           },
+//         }),
+
+//         ...(jobUniversity.maxBacklogs !== null && {
+//           activeBacklogs: {
+//             lte: jobUniversity.maxBacklogs,
+//           },
+//         }),
+//       },
+
+//       select: {
+//         id: true,
+
+//         universityId: true,
+
+//         departmentId: true,
+
+//         cgpa: true,
+
+//         activeBacklogs: true,
+
+//         user: {
+//           select: {
+//             id: true,
+//             firstname: true,
+//             lastname: true,
+//             email: true,
+//           },
+//         },
+//       },
+//     });
+
+//     for (const student of students) {
+//       eligibleStudentsMap.set(student.id, student);
+//     }
+//   }
+
+//   return Array.from(eligibleStudentsMap.values());
+// };
+
+export const getEligibleUnplacedStudentsForJobs = async (
+  jobUniversityIds: number[],
+) => {
+  if (!jobUniversityIds.length) {
     return [];
   }
 
-  return prisma.student.findMany({
+  const jobUniversities = await prisma.jobUniversity.findMany({
     where: {
-      isPlaced: false,
-      departmentId: {
-        in: departmentIds,
+      id: {
+        in: jobUniversityIds,
       },
+
+      status: "APPROVED",
     },
+
     select: {
       id: true,
-      departmentId: true,
-      user: {
+
+      universityId: true,
+
+      minCgpa: true,
+
+      maxBacklogs: true,
+
+      job: {
         select: {
-          id: true,
-          firstname: true,
-          lastname: true,
-          email: true,
+          eligibleDepartments: {
+            select: {
+              id: true,
+            },
+          },
         },
       },
     },
   });
+
+  if (!jobUniversities.length) {
+    throw new Error("No approved job universities found");
+  }
+
+  const results = [];
+
+  for (const jobUniversity of jobUniversities) {
+    const departmentIds = jobUniversity.job.eligibleDepartments.map(
+      (d) => d.id,
+    );
+
+    if (!departmentIds.length) {
+      continue;
+    }
+
+    const students = await prisma.student.findMany({
+      where: {
+        isPlaced: false,
+
+        universityId: jobUniversity.universityId,
+
+        departmentId: {
+          in: departmentIds,
+        },
+
+        ...(jobUniversity.minCgpa !== null && {
+          cgpa: {
+            gte: jobUniversity.minCgpa,
+          },
+        }),
+
+        ...(jobUniversity.maxBacklogs !== null && {
+          activeBacklogs: {
+            lte: jobUniversity.maxBacklogs,
+          },
+        }),
+      },
+
+      select: {
+        id: true,
+
+        universityId: true,
+
+        departmentId: true,
+
+        cgpa: true,
+
+        activeBacklogs: true,
+
+        user: {
+          select: {
+            id: true,
+            firstname: true,
+            lastname: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    results.push({
+      jobUniversityId: jobUniversity.id,
+
+      universityId: jobUniversity.universityId,
+
+      students,
+    });
+  }
+
+  return results;
 };
 
 export const getAppliedStudentsForJobs = async (jobIds: number[]) => {

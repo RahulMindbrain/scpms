@@ -1,57 +1,100 @@
-import { sendSuccess, sendError } from "../utils/response";
 import { sendMail } from "../utils/mails/transporter.mail";
+
 import { getEligibleUnplacedStudentsForJobs } from "../repository/student.repository";
-import { getActiveJobsByCompanyId } from "../repository/job.repository";
+
+import prisma from "../config/db";
 
 export const sendBulkMailByCompanyService = async ({
   companyId,
-  jobIds,
+  jobUniversityIds,
   subject,
   message,
 }: {
   companyId: number;
-  jobIds: number[];
+
+  jobUniversityIds: number[];
+
   subject?: string;
+
   message?: string;
 }) => {
-  const jobs = await getActiveJobsByCompanyId(companyId);
+  const jobUniversities = await prisma.jobUniversity.findMany({
+    where: {
+      id: {
+        in: jobUniversityIds,
+      },
 
-  const selectedJobs = jobs.filter((j) => jobIds.includes(j.id));
+      status: "APPROVED",
 
-  if (!selectedJobs.length) {
-    throw new Error("No valid jobs selected");
+      job: {
+        companyId,
+      },
+    },
+
+    include: {
+      job: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+    },
+  });
+
+  if (!jobUniversities.length) {
+    throw new Error("No valid job universities selected");
   }
 
-  const validJobIds = selectedJobs.map((j) => j.id);
+  const validJobUniversityIds = jobUniversities.map((ju) => ju.id);
 
-  const students = await getEligibleUnplacedStudentsForJobs(validJobIds);
+  const studentGroups = await getEligibleUnplacedStudentsForJobs(
+    validJobUniversityIds,
+  );
 
-  if (!students.length) {
-    return { sent: 0 };
+  if (!studentGroups.length) {
+    return {
+      sent: 0,
+    };
   }
 
-  const emails = students.map((s) => s.user.email);
+  const emails = [
+    ...new Set(
+      studentGroups.flatMap((group) =>
+        group.students.map((student) => student.user.email),
+      ),
+    ),
+  ];
 
-  const jobTitles = selectedJobs.map((j) => j.title).join(", ");
+  const jobTitles = jobUniversities.map((ju) => ju.job.title).join(", ");
 
-  const finalSubject = subject || `New Opportunities Available`;
+  const finalSubject = subject || "New Opportunities Available";
 
   const finalMessage =
     message ||
     `
       <p>New job opportunities are available.</p>
-      <p><strong>Roles:</strong> ${jobTitles}</p>
-      <p>Please login and apply.</p>
+
+      <p>
+        <strong>Roles:</strong>
+        ${jobTitles}
+      </p>
+
+      <p>
+        Please login and apply.
+      </p>
     `;
 
   await sendMail({
     to: emails,
+
     subject: finalSubject,
+
     html: finalMessage,
   });
 
   return {
-    sent: students.length,
+    sent: emails.length,
+
     jobs: jobTitles,
   };
 };

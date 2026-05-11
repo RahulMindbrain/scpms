@@ -1,3 +1,4 @@
+import { Prisma } from "@prisma/client";
 import prisma from "../config/db";
 
 export const createJob = async (data: any) => {
@@ -146,6 +147,58 @@ export const getJobById = async (id: number) => {
       company: true,
       eligibleDepartments: true,
       skills: true,
+    },
+  });
+};
+
+// export const getJobsByIds = async (jobIds: number[]) => {
+//   return prisma.job.findMany({
+//     where: {
+//       id: {
+//         in: jobIds,
+//       },
+
+//       isDeleted: false,
+//     },
+
+//     include: {
+//       company: true,
+
+//       eligibleDepartments: true,
+
+//       skills: true,
+
+//       universities: {
+//         include: {
+//           university: true,
+//         },
+//       },
+//     },
+//   });
+// };
+
+export const getJobsByIds = async (jobIds: number[]) => {
+  return prisma.job.findMany({
+    where: {
+      id: {
+        in: jobIds,
+      },
+
+      isDeleted: false,
+    },
+
+    include: {
+      company: true,
+
+      eligibleDepartments: true,
+
+      skills: true,
+
+      universities: {
+        include: {
+          university: true,
+        },
+      },
     },
   });
 };

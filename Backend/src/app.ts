@@ -64,6 +64,6 @@ app.use("/superadmin", saRouter);
 app.use("/job-universities", jobUniversityRouter);
 app.use("/university", universityRoutes);
 
-app.use(attachQueryLogger);
+// app.use(attachQueryLogger);
 
 export default app;

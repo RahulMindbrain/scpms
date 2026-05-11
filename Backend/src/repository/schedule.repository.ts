@@ -1,5 +1,9 @@
-import { ScheduleStatus } from "@prisma/client";
 import prisma from "../config/db";
+import {
+  CompanyApprovalStatus,
+  JobStatus,
+  ScheduleStatus,
+} from "@prisma/client";
 
 const baseScheduleInclude = {
   company: {
@@ -9,12 +13,74 @@ const baseScheduleInclude = {
       userId: true,
     },
   },
-  jobs: {
+
+  university: {
     select: {
       id: true,
-      title: true,
+      name: true,
+    },
+  },
+
+  jobUniversities: {
+    where: {
+      status: JobStatus.APPROVED,
+    },
+
+    select: {
+      id: true,
+
+      universityId: true,
+
       status: true,
-      companyId: true,
+
+      salary: true,
+
+      openings: true,
+
+      minCgpa: true,
+
+      maxBacklogs: true,
+
+      sentAt: true,
+
+      approvedAt: true,
+
+      university: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+
+      job: {
+        select: {
+          id: true,
+
+          title: true,
+
+          status: true,
+
+          companyId: true,
+
+          location: true,
+
+          createdAt: true,
+
+          eligibleDepartments: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+
+          skills: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
     },
   },
 };
@@ -33,26 +99,87 @@ export const createInterviewSchedule = async (data: {
   });
 };
 
+const jobUniversityScheduleSelect = {
+  id: true,
+
+  universityId: true,
+
+  status: true,
+
+  salary: true,
+
+  openings: true,
+
+  minCgpa: true,
+
+  maxBacklogs: true,
+
+  sentAt: true,
+
+  approvedAt: true,
+
+  university: {
+    select: {
+      id: true,
+      name: true,
+    },
+  },
+
+  job: {
+    select: {
+      id: true,
+      title: true,
+      description: true,
+      location: true,
+      status: true,
+      createdAt: true,
+
+      eligibleDepartments: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+
+      skills: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+    },
+  },
+};
+
 export const attachJobsToSchedule = async (
   scheduleId: number,
-  jobIds: number[],
+  jobUniversityIds: number[],
 ) => {
-  return prisma.job.updateMany({
+  return prisma.jobUniversity.updateMany({
     where: {
-      id: { in: jobIds },
+      id: {
+        in: jobUniversityIds,
+      },
+
       interviewScheduleId: null,
+
+      status: JobStatus.APPROVED,
     },
+
     data: {
       interviewScheduleId: scheduleId,
     },
   });
 };
 
-export const detachJobsFromSchedule = async (jobIds: number[]) => {
-  return prisma.job.updateMany({
+export const detachJobsFromSchedule = async (jobUniversityIds: number[]) => {
+  return prisma.jobUniversity.updateMany({
     where: {
-      id: { in: jobIds },
+      id: {
+        in: jobUniversityIds,
+      },
     },
+
     data: {
       interviewScheduleId: null,
     },
@@ -61,16 +188,71 @@ export const detachJobsFromSchedule = async (jobIds: number[]) => {
 
 export const getScheduleById = async (id: number) => {
   return prisma.interviewSchedule.findUnique({
-    where: { id },
+    where: {
+      id,
+    },
+
     include: {
       company: true,
+
       admin: {
         include: {
           user: true,
         },
       },
-      jobs: {
-        select: { id: true },
+
+      university: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
+
+      jobUniversities: {
+        where: {
+          status: JobStatus.APPROVED,
+        },
+
+        select: {
+          id: true,
+
+          universityId: true,
+
+          status: true,
+
+          salary: true,
+
+          openings: true,
+
+          minCgpa: true,
+
+          maxBacklogs: true,
+
+          sentAt: true,
+
+          approvedAt: true,
+
+          job: {
+            select: {
+              id: true,
+
+              title: true,
+
+              location: true,
+
+              status: true,
+
+              companyId: true,
+            },
+          },
+
+          university: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
       },
     },
   });
@@ -90,9 +272,15 @@ export const getAllSchedules = async (companyId: number) => {
 
 export const getSchedulesByCompany = async (companyId: number) => {
   return prisma.interviewSchedule.findMany({
-    where: { companyId },
+    where: {
+      companyId,
+    },
+
     include: baseScheduleInclude,
-    orderBy: { startTime: "asc" },
+
+    orderBy: {
+      startTime: "asc",
+    },
   });
 };
 
@@ -104,20 +292,41 @@ export const getUpcomingSchedules = async () => {
       endTime: {
         gte: now,
       },
+
+      jobUniversities: {
+        some: {
+          status: JobStatus.APPROVED,
+        },
+      },
     },
+
     include: baseScheduleInclude,
-    orderBy: { startTime: "asc" },
+
+    orderBy: {
+      startTime: "asc",
+    },
   });
 };
-
 export const getOngoingSchedules = async () => {
   const now = new Date();
 
   return prisma.interviewSchedule.findMany({
     where: {
-      startTime: { lte: now },
-      endTime: { gte: now },
+      startTime: {
+        lte: now,
+      },
+
+      endTime: {
+        gte: now,
+      },
+
+      jobUniversities: {
+        some: {
+          status: JobStatus.APPROVED,
+        },
+      },
     },
+
     include: baseScheduleInclude,
   });
 };
@@ -176,29 +385,39 @@ export const createScheduleWithJobs = async (
     venue?: string;
     createdBy: number;
   },
-  jobIds: number[],
+
+  jobUniversityIds: number[],
 ) => {
   return prisma.$transaction(async (tx) => {
     const schedule = await tx.interviewSchedule.create({
       data: scheduleData,
     });
 
-    const updated = await tx.job.updateMany({
+    const updated = await tx.jobUniversity.updateMany({
       where: {
-        id: { in: jobIds },
+        id: {
+          in: jobUniversityIds,
+        },
+
         interviewScheduleId: null,
+
+        status: JobStatus.APPROVED,
       },
+
       data: {
         interviewScheduleId: schedule.id,
       },
     });
 
-    if (updated.count !== jobIds.length) {
-      throw new Error("Some jobs were already scheduled");
+    if (updated.count !== jobUniversityIds.length) {
+      throw new Error("Some job universities were already scheduled");
     }
 
     return tx.interviewSchedule.findUnique({
-      where: { id: schedule.id },
+      where: {
+        id: schedule.id,
+      },
+
       include: baseScheduleInclude,
     });
   });
@@ -222,11 +441,55 @@ export const getScheduleWithParticipants = async (scheduleId: number) => {
   });
 };
 
+// export const getScheduleWithJobsAndApplications = async (
+//   scheduleId: number,
+// ) => {
+//   return prisma.interviewSchedule.findUnique({
+//     where: { id: scheduleId },
+//     include: {
+//       company: {
+//         select: {
+//           id: true,
+//           name: true,
+//           userId: true,
+//         },
+//       },
+//       jobs: {
+//         select: {
+//           id: true,
+//           title: true,
+//           applications: {
+//             select: {
+//               id: true,
+//               student: {
+//                 select: {
+//                   id: true,
+//                   user: {
+//                     select: {
+//                       id: true,
+//                       firstname: true,
+//                       lastname: true,
+//                       email: true,
+//                     },
+//                   },
+//                 },
+//               },
+//             },
+//           },
+//         },
+//       },
+//     },
+//   });
+// };
+
 export const getScheduleWithJobsAndApplications = async (
   scheduleId: number,
 ) => {
   return prisma.interviewSchedule.findUnique({
-    where: { id: scheduleId },
+    where: {
+      id: scheduleId,
+    },
+
     include: {
       company: {
         select: {
@@ -235,16 +498,108 @@ export const getScheduleWithJobsAndApplications = async (
           userId: true,
         },
       },
-      jobs: {
+
+      university: {
         select: {
           id: true,
-          title: true,
+          name: true,
+        },
+      },
+
+      admin: {
+        include: {
+          user: true,
+        },
+      },
+      jobUniversities: {
+        where: {
+          status: JobStatus.APPROVED,
+        },
+
+        select: {
+          id: true,
+
+          universityId: true,
+
+          status: true,
+
+          salary: true,
+
+          openings: true,
+
+          minCgpa: true,
+
+          maxBacklogs: true,
+
+          sentAt: true,
+
+          approvedAt: true,
+
+          job: {
+            select: {
+              id: true,
+
+              title: true,
+
+              location: true,
+
+              status: true,
+
+              companyId: true,
+
+              eligibleDepartments: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+
+              skills: {
+                select: {
+                  id: true,
+                  name: true,
+                },
+              },
+            },
+          },
+
+          university: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+
           applications: {
             select: {
               id: true,
+
+              status: true,
+
+              currentRound: true,
+
+              reason: true,
+
+              createdAt: true,
+
+              acceptedAt: true,
+
+              rejectedAt: true,
+
               student: {
                 select: {
                   id: true,
+
+                  universityId: true,
+
+                  departmentId: true,
+
+                  cgpa: true,
+
+                  activeBacklogs: true,
+
+                  isPlaced: true,
+
                   user: {
                     select: {
                       id: true,
@@ -253,6 +608,40 @@ export const getScheduleWithJobsAndApplications = async (
                       email: true,
                     },
                   },
+
+                  department: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+
+                  university: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                },
+              },
+
+              histories: {
+                orderBy: {
+                  createdAt: "asc",
+                },
+
+                select: {
+                  id: true,
+
+                  status: true,
+
+                  round: true,
+
+                  reason: true,
+
+                  remarks: true,
+
+                  createdAt: true,
                 },
               },
             },
@@ -266,14 +655,17 @@ export const getScheduleWithJobsAndApplications = async (
 export const updateScheduleApprovalStatus = async (
   scheduleId: number,
   data: {
-    companyApprovalStatus: "APPROVED" | "REJECTED";
+    companyApprovalStatus: CompanyApprovalStatus;
     approvedAt?: Date;
     rejectedAt?: Date;
     rejectionReason?: string | null;
   },
 ) => {
   return prisma.interviewSchedule.update({
-    where: { id: scheduleId },
+    where: {
+      id: scheduleId,
+    },
+
     data,
   });
 };
@@ -282,10 +674,50 @@ export const getSchedulesByCompanyIdRepo = async (companyId: number) => {
   return prisma.interviewSchedule.findMany({
     where: {
       companyId,
-      //companyApprovalStatus: "APPROVED",
     },
+
     include: {
-      jobs: true,
+      jobUniversities: {
+        where: {
+          status: JobStatus.APPROVED,
+        },
+
+        select: {
+          id: true,
+
+          universityId: true,
+
+          status: true,
+
+          salary: true,
+
+          openings: true,
+
+          minCgpa: true,
+
+          maxBacklogs: true,
+
+          job: {
+            select: {
+              id: true,
+
+              title: true,
+
+              status: true,
+
+              location: true,
+            },
+          },
+
+          university: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
+
       company: {
         select: {
           id: true,
@@ -293,7 +725,10 @@ export const getSchedulesByCompanyIdRepo = async (companyId: number) => {
         },
       },
     },
-    orderBy: { startTime: "asc" },
+
+    orderBy: {
+      startTime: "asc",
+    },
   });
 };
 
@@ -348,8 +783,10 @@ export const getUpcomingSchedulesForStudent = async (
       gte: now,
     },
 
-    jobs: {
+    jobUniversities: {
       some: {
+        status: JobStatus.APPROVED,
+
         applications: {
           some: {
             studentId,
@@ -372,8 +809,17 @@ export const getUpcomingSchedulesForStudent = async (
           },
         },
 
-        jobs: {
+        university: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+
+        jobUniversities: {
           where: {
+            status: JobStatus.APPROVED,
+
             applications: {
               some: {
                 studentId,
@@ -383,27 +829,52 @@ export const getUpcomingSchedulesForStudent = async (
 
           select: {
             id: true,
-            title: true,
-            description: true,
-            salary: true,
-            location: true,
-            status: true,
-            minCgpa: true,
-            maxCgpa: true,
-            maxBacklogs: true,
-            createdAt: true,
 
-            skills: {
+            universityId: true,
+
+            status: true,
+
+            salary: true,
+
+            openings: true,
+
+            minCgpa: true,
+
+            maxBacklogs: true,
+
+            sentAt: true,
+
+            approvedAt: true,
+
+            university: {
               select: {
                 id: true,
                 name: true,
               },
             },
 
-            eligibleDepartments: {
+            job: {
               select: {
                 id: true,
-                name: true,
+                title: true,
+                description: true,
+                location: true,
+                status: true,
+                createdAt: true,
+
+                eligibleDepartments: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+
+                skills: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
               },
             },
 
@@ -411,11 +882,22 @@ export const getUpcomingSchedulesForStudent = async (
               where: {
                 studentId,
               },
+
               select: {
                 id: true,
+
                 status: true,
+
+                currentRound: true,
+
                 isAccepted: true,
+
                 acceptedAt: true,
+
+                rejectedAt: true,
+
+                reason: true,
+
                 createdAt: true,
               },
             },
@@ -428,6 +910,7 @@ export const getUpcomingSchedulesForStudent = async (
       },
 
       skip,
+
       take,
     }),
 
@@ -438,10 +921,14 @@ export const getUpcomingSchedulesForStudent = async (
 
   return {
     items,
+
     pagination: {
       page,
+
       limit: take,
+
       total,
+
       totalPages: Math.ceil(total / take),
     },
   };
@@ -449,6 +936,7 @@ export const getUpcomingSchedulesForStudent = async (
 
 export const getUpcomingSchedulesForCompany = async (
   companyId: number,
+  universityId: number | undefined,
   skip: number,
   take: number,
   page: number,
@@ -457,14 +945,30 @@ export const getUpcomingSchedulesForCompany = async (
 
   const where = {
     companyId,
+
+    ...(universityId && {
+      universityId,
+    }),
+
     startTime: {
       gte: now,
+    },
+
+    jobUniversities: {
+      some: {
+        status: JobStatus.APPROVED,
+
+        ...(universityId && {
+          universityId,
+        }),
+      },
     },
   };
 
   const [items, total] = await prisma.$transaction([
     prisma.interviewSchedule.findMany({
       where,
+
       include: {
         company: {
           select: {
@@ -474,30 +978,88 @@ export const getUpcomingSchedulesForCompany = async (
           },
         },
 
-        jobs: {
+        university: {
           select: {
             id: true,
-            title: true,
-            description: true,
-            salary: true,
-            location: true,
-            status: true,
-            minCgpa: true,
-            maxCgpa: true,
-            maxBacklogs: true,
-            createdAt: true,
+            name: true,
+          },
+        },
 
-            skills: {
+        jobUniversities: {
+          where: {
+            status: JobStatus.APPROVED,
+
+            ...(universityId && {
+              universityId,
+            }),
+          },
+
+          select: {
+            id: true,
+
+            universityId: true,
+
+            status: true,
+
+            salary: true,
+
+            openings: true,
+
+            minCgpa: true,
+
+            maxBacklogs: true,
+
+            sentAt: true,
+
+            approvedAt: true,
+
+            university: {
               select: {
                 id: true,
                 name: true,
               },
             },
 
-            eligibleDepartments: {
+            job: {
               select: {
                 id: true,
-                name: true,
+                title: true,
+                description: true,
+                location: true,
+                status: true,
+                createdAt: true,
+
+                eligibleDepartments: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+
+                skills: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+
+            applications: {
+              select: {
+                id: true,
+
+                status: true,
+
+                currentRound: true,
+
+                isAccepted: true,
+
+                acceptedAt: true,
+
+                rejectedAt: true,
+
+                createdAt: true,
               },
             },
           },
@@ -509,6 +1071,7 @@ export const getUpcomingSchedulesForCompany = async (
       },
 
       skip,
+
       take,
     }),
 
@@ -519,10 +1082,14 @@ export const getUpcomingSchedulesForCompany = async (
 
   return {
     items,
+
     pagination: {
       page,
+
       limit: take,
+
       total,
+
       totalPages: Math.ceil(total / take),
     },
   };
@@ -540,8 +1107,10 @@ export const getUpcomingSchedulesForAdmin = async (
     where: {
       userId,
     },
+
     select: {
       id: true,
+      universityId: true,
     },
   });
 
@@ -550,15 +1119,25 @@ export const getUpcomingSchedulesForAdmin = async (
   }
 
   const where = {
-    createdBy: admin.id,
+    universityId: admin.universityId,
+
     startTime: {
       gte: now,
+    },
+
+    jobUniversities: {
+      some: {
+        universityId: admin.universityId,
+
+        status: JobStatus.APPROVED,
+      },
     },
   };
 
   const [items, total] = await prisma.$transaction([
     prisma.interviewSchedule.findMany({
       where,
+
       include: {
         company: {
           select: {
@@ -568,30 +1147,86 @@ export const getUpcomingSchedulesForAdmin = async (
           },
         },
 
-        jobs: {
+        university: {
           select: {
             id: true,
-            title: true,
-            description: true,
-            salary: true,
-            location: true,
-            status: true,
-            minCgpa: true,
-            maxCgpa: true,
-            maxBacklogs: true,
-            createdAt: true,
+            name: true,
+          },
+        },
 
-            skills: {
+        jobUniversities: {
+          where: {
+            universityId: admin.universityId,
+
+            status: JobStatus.APPROVED,
+          },
+
+          select: {
+            id: true,
+
+            universityId: true,
+
+            status: true,
+
+            salary: true,
+
+            openings: true,
+
+            minCgpa: true,
+
+            maxBacklogs: true,
+
+            sentAt: true,
+
+            approvedAt: true,
+
+            university: {
               select: {
                 id: true,
                 name: true,
               },
             },
 
-            eligibleDepartments: {
+            job: {
               select: {
                 id: true,
-                name: true,
+                title: true,
+                description: true,
+                location: true,
+                status: true,
+                createdAt: true,
+
+                eligibleDepartments: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+
+                skills: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+
+            applications: {
+              select: {
+                id: true,
+
+                status: true,
+
+                currentRound: true,
+
+                isAccepted: true,
+
+                acceptedAt: true,
+
+                rejectedAt: true,
+
+                createdAt: true,
               },
             },
           },
@@ -603,6 +1238,7 @@ export const getUpcomingSchedulesForAdmin = async (
       },
 
       skip,
+
       take,
     }),
 
@@ -613,10 +1249,14 @@ export const getUpcomingSchedulesForAdmin = async (
 
   return {
     items,
+
     pagination: {
       page,
+
       limit: take,
+
       total,
+
       totalPages: Math.ceil(total / take),
     },
   };

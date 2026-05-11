@@ -526,7 +526,7 @@ export const getDashboardStatsService = async (userId: number) => {
 
       const isPlaced = student.applications?.some(
         (app) =>
-          app.status === "SELECTED" &&
+          app.status === "OFFER_ACCEPTED" &&
           app.jobUniversity?.universityId === universityId,
       );
 

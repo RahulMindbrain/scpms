@@ -16,7 +16,7 @@ import {
   updateCompanyRequestsService,
   getCompanyRequestsService,
 } from "../services/admin.service";
-import { notifyEligibleStudentsForJob } from "../services/notification.service";
+// import { notifyEligibleStudentsForJob } from "../services/notification.service";
 import { runInBackground } from "../utils/Background.task";
 import {
   getUniversitiesByIds,
