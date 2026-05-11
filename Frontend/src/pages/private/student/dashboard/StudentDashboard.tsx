@@ -1,4 +1,4 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -22,8 +22,10 @@ import { useSocket } from "@/socket/SocketProvider"
 import { SOCKET_EVENTS } from "@/socket/socket.events"
 import { toast } from "sonner"
 import CountdownTimer from "@/components/CountdownTimer"
+import { DashboardUpcomingEventsDialog } from "@/components/dashboard/DashboardUpcomingEventsDialog"
 
 export default function StudentDashboard() {
+  const [showAllEvents, setShowAllEvents] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
   const { socket } = useSocket()
 
@@ -224,9 +226,13 @@ useEffect(() => {
           <div className="lg:col-span-8 space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-2xl font-bold text-foreground tracking-tight">Upcoming Schedule</h3>
-              <Link to="/student/calendar" className="text-sm font-semibold text-primary hover:opacity-80 transition-opacity">
-                View All
-              </Link>
+              <button
+                type="button"
+                onClick={() => setShowAllEvents(true)}
+                className="text-sm font-semibold text-primary hover:opacity-80 transition-opacity"
+              >
+                View all
+              </button>
             </div>
 
             <div className="space-y-4">
@@ -336,6 +342,8 @@ useEffect(() => {
 
         </section>
       </div>
+
+      <DashboardUpcomingEventsDialog open={showAllEvents} onOpenChange={setShowAllEvents} />
     </div>
 
   )

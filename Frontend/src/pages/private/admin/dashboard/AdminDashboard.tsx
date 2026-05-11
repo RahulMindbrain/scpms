@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react"
+import { DashboardUpcomingEventsDialog } from "@/components/dashboard/DashboardUpcomingEventsDialog"
 import { useNavigate } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
@@ -330,6 +331,7 @@ const QuickActions = () => {
 }
 
 export default function AdminDashboard() {
+  const [showAllUpcoming, setShowAllUpcoming] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
   const { data: dashboardData, loading: dashLoading, error } = useSelector((state: RootState) => state.dashboard)
   const { schedules, loading: schedLoading } = useSelector((state: RootState) => state.interview)
@@ -471,10 +473,23 @@ export default function AdminDashboard() {
 
           <div className="xl:col-span-4 flex flex-col gap-8">
             <QuickActions />
-            <NextInterviewCountdown schedules={schedules} />
+            <div className="space-y-3">
+              <div className="flex items-center justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowAllUpcoming(true)}
+                  className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline"
+                >
+                  View all upcoming
+                </button>
+              </div>
+              <NextInterviewCountdown schedules={schedules} />
+            </div>
           </div>
         </div>
       </div>
+
+      <DashboardUpcomingEventsDialog open={showAllUpcoming} onOpenChange={setShowAllUpcoming} />
     </AdminPageLayout>
   )
 }

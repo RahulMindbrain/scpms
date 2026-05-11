@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 import { DeptStatsTable } from "@/components/dept-stats-table"
@@ -15,8 +15,10 @@ import CompanyApprovalPending from "@/components/status/CompanyApprovalPending"
 import { Calendar, Clock, MapPin, Sparkles } from "lucide-react"
 import { useSocket } from "@/socket/SocketProvider"
 import { SOCKET_EVENTS } from "@/socket/socket.events"
+import { DashboardUpcomingEventsDialog } from "@/components/dashboard/DashboardUpcomingEventsDialog"
 
 export default function Dashboard() {
+  const [showAllEvents, setShowAllEvents] = useState(false)
   const dispatch = useDispatch<AppDispatch>()
   const { jobs, applications, loading, error } = useSelector((state: RootState) => state.company)
 const upcomingEvents = useSelector(
@@ -149,16 +151,23 @@ const upcomingEvents = useSelector(
 
           {nextEvent && (
             <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2.5rem] p-6 lg:p-8 shadow-2xl animate-in zoom-in-95 duration-700">
-              <div className="flex items-center gap-3 mb-6">
+              <div className="flex items-center gap-3 mb-6 flex-wrap">
                 <div className="p-3 bg-white/10 rounded-2xl">
                   <Calendar className="w-5 h-5 text-white" />
                 </div>
-                <div>
+                <div className="min-w-0 flex-1">
                   <h3 className="text-white font-black text-lg leading-tight">Next Event</h3>
                   <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mt-0.5">Upcoming Schedule</p>
                 </div>
-                <div className="ml-auto">
-                   <CountdownTimer targetDate={nextEvent.startTime} />
+                <div className="flex items-center gap-3 ml-auto flex-wrap justify-end">
+                  <CountdownTimer targetDate={nextEvent.startTime} />
+                  <button
+                    type="button"
+                    onClick={() => setShowAllEvents(true)}
+                    className="text-[10px] font-black uppercase tracking-widest text-white/90 hover:text-white border border-white/25 rounded-full px-3 py-1.5 bg-white/10 hover:bg-white/15 transition-colors"
+                  >
+                    View all
+                  </button>
                 </div>
               </div>
 
@@ -167,14 +176,17 @@ const upcomingEvents = useSelector(
                   <div className="flex-1 min-w-0">
                     <p className="text-white font-bold text-xl truncate">{nextEvent?.title}</p>
                     <div className="flex flex-wrap items-center gap-4 mt-3">
-                       <div className="flex items-center gap-1.5 text-white/70 text-xs font-medium">
-                          <Clock size={14} className="text-blue-400" />
-                          {new Date(nextEvent?.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                       </div>
-                       <div className="flex items-center gap-1.5 text-white/70 text-xs font-medium">
-                          <MapPin size={14} className="text-blue-400" />
-                          Virtual / On-campus
-                       </div>
+                      <div className="flex items-center gap-1.5 text-white/70 text-xs font-medium">
+                        <Clock size={14} className="text-blue-400" />
+                        {new Date(nextEvent?.startTime).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </div>
+                      <div className="flex items-center gap-1.5 text-white/70 text-xs font-medium">
+                        <MapPin size={14} className="text-blue-400" />
+                        Virtual / On-campus
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -227,6 +239,7 @@ const upcomingEvents = useSelector(
         </div>
       </div>
 
+      <DashboardUpcomingEventsDialog open={showAllEvents} onOpenChange={setShowAllEvents} />
     </div>
   )
 }
