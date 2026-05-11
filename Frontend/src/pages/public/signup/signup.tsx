@@ -12,6 +12,8 @@ import {
   Eye,
   FileText,
   Building2,
+  CalendarClock,
+  Calendar,
 } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -38,20 +40,20 @@ const SignUp: React.FC = () => {
 
   const { isAuthenticated, userType } = useSelector((state: RootState) => state.auth);
 
-const [form, setForm] = useState({
-  fullName: "",
-  email: "",
-  password: "",
-  confirmPassword: "",
-  companyName: "",
-  description: "",
+  const [form, setForm] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    companyName: "",
+    description: "",
 
-  departmentId: "",
-  universityId: "",
-  year: "",
-  passingYear: "",
+    departmentId: "",
+    universityId: "",
+    year: "",
+    passingYear: "",
 
-});
+  });
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -75,75 +77,75 @@ const [form, setForm] = useState({
     setStep(2);
   };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
 
-  if (!form.fullName.trim()) return toast.error("Full name is required");
-  if (!form.email.trim()) return toast.error("Email address is required");
-  if (form.password !== form.confirmPassword)
-    return toast.error("Passwords do not match");
+    if (!form.fullName.trim()) return toast.error("Full name is required");
+    if (!form.email.trim()) return toast.error("Email address is required");
+    if (form.password !== form.confirmPassword)
+      return toast.error("Passwords do not match");
 
-  if (!passwordRegex.test(form.password)) {
-    return toast.error("Password must contain uppercase and lowercase letters");
-  }
+    if (!passwordRegex.test(form.password)) {
+      return toast.error("Password must contain uppercase and lowercase letters");
+    }
 
-  const names = form.fullName.trim().split(/\s+/);
-  if (names.length < 2)
-    return toast.error("Please enter first and last name");
+    const names = form.fullName.trim().split(/\s+/);
+    if (names.length < 2)
+      return toast.error("Please enter first and last name");
 
-  const firstname = names[0];
-  const lastname = names.slice(1).join(" ");
+    const firstname = names[0];
+    const lastname = names.slice(1).join(" ");
 
-  const payload: any = {
-    firstname,
-    lastname,
-    email: form.email.toLowerCase(),
-    password: form.password,
-    role: activeRole,
+    const payload: any = {
+      firstname,
+      lastname,
+      email: form.email.toLowerCase(),
+      password: form.password,
+      role: activeRole,
 
-    ...(activeRole === "COMPANY" && {
-      company: {
-        name: form.companyName,
-        description: form.description,
-      },
-    }),
+      ...(activeRole === "COMPANY" && {
+        company: {
+          name: form.companyName,
+          description: form.description,
+        },
+      }),
 
-    ...(activeRole === "STUDENT" && {
-      student: {
-        departmentId: form.departmentId ? Number(form.departmentId) : null,
-        universityId: form.universityId ? Number(form.universityId) : null,
-        year: form.year ? Number(form.year) : null,
-        passingYear: form.passingYear ? Number(form.passingYear) : null,
-       
-      },
-    }),
+      ...(activeRole === "STUDENT" && {
+        student: {
+          departmentId: form.departmentId ? Number(form.departmentId) : null,
+          universityId: form.universityId ? Number(form.universityId) : null,
+          year: form.year ? Number(form.year) : null,
+          passingYear: form.passingYear ? Number(form.passingYear) : null,
+
+        },
+      }),
+    };
+
+    setIsSubmitting(true);
+
+    try {
+      await dispatch(registerUser(payload)).unwrap();
+      toast.success("Account created successfully!");
+      setTimeout(() => navigate("/login"), 1500);
+    } catch (err: any) {
+      console.log(err);
+      toast.error(err?.message || "Registration failed.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
-  setIsSubmitting(true);
-
-  try {
-    await dispatch(registerUser(payload)).unwrap();
-    toast.success("Account created successfully!");
-    setTimeout(() => navigate("/login"), 1500);
-  } catch (err: any) {
-    console.log(err);
-    toast.error(err?.message || "Registration failed.");
-  } finally {
-    setIsSubmitting(false);
-  }
-};
   return (
     <div className="min-h-screen w-full flex bg-white dark:bg-[#02040a] font-sans selection:bg-blue-500/30">
-      
+
       {/* Left Column: Branding & Image */}
       <div className="hidden lg:flex lg:w-[45%] xl:w-[40%] relative overflow-hidden flex-col justify-between p-12 xl:p-16">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src={campBG} 
-            alt="Campus Lifestyle" 
+          <img
+            src={campBG}
+            alt="Campus Lifestyle"
             className="w-full h-full object-cover grayscale-[10%] brightness-[0.35]"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-slate-950/90 via-slate-950/60 to-blue-950/80"></div>
@@ -199,7 +201,7 @@ const handleSubmit = async (e: React.FormEvent) => {
         <div className="w-full max-w-lg space-y-10">
           <AnimatePresence mode="wait">
             {step === 1 ? (
-              <motion.div 
+              <motion.div
                 key="step1"
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -240,15 +242,15 @@ const handleSubmit = async (e: React.FormEvent) => {
                 </div>
               </motion.div>
             ) : (
-              <motion.div 
+              <motion.div
                 key="step2"
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="space-y-10"
               >
                 <div className="flex flex-col gap-6">
-                  <button 
-                    onClick={() => setStep(1)} 
+                  <button
+                    onClick={() => setStep(1)}
                     className="group flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-700 w-fit transition-colors"
                   >
                     <ChevronLeft size={16} /> Back to roles
@@ -317,45 +319,100 @@ const handleSubmit = async (e: React.FormEvent) => {
                           {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
                       </div>
-                      <input
-      name="departmentId"
-      value={form.departmentId}
-      onChange={handleChange}
-      placeholder="Department ID"
-      className={inputClasses(false)}
-    />
 
-    <input
-      name="universityId"
-      value={form.universityId}
-      onChange={handleChange}
-      placeholder="University ID"
-      className={inputClasses(false)}
-    />
 
-    <input
-      name="year"
-      value={form.year}
-      onChange={handleChange}
-      placeholder="Year (e.g. 4)"
-      className={inputClasses(false)}
-    />
+                      <div className="space-y-2">
+                        <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
+                          University ID
+                        </label>
 
-    <input
-      name="passingYear"
-      value={form.passingYear}
-      onChange={handleChange}
-      placeholder="Passing Year (e.g. 2026)"
-      className={inputClasses(false)}
-    />
+                        <div className="relative group">
+                          <GraduationCap
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+                            size={18}
+                          />
+
+                          <input
+                            name="universityId"
+                            value={form.universityId}
+                            onChange={handleChange}
+                            placeholder="University ID"
+                            className={inputClasses(false)}
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+    <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
+      Department ID
+    </label>
+
+    <div className="relative group">
+      <Building2
+        className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+        size={18}
+      />
+
+      <input
+        name="departmentId"
+        value={form.departmentId}
+        onChange={handleChange}
+        placeholder="Department ID"
+        className={inputClasses(false)}
+      />
+    </div>
+  </div>
+                      <div className="space-y-2">
+                        <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
+                          Year
+                        </label>
+
+                        <div className="relative group">
+                          <CalendarClock
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+                            size={18}
+                          />
+
+                          <input
+                            name="year"
+                            value={form.year}
+                            onChange={handleChange}
+                            placeholder="Year (e.g. 4)"
+                            className={inputClasses(false)}
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
+                          Passing Year
+                        </label>
+
+                        <div className="relative group">
+                          <Calendar
+                            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+                            size={18}
+                          />
+
+                          <input
+                            name="passingYear"
+                            value={form.passingYear}
+                            onChange={handleChange}
+                            placeholder="2026"
+                            className={inputClasses(false)}
+                          />
+                        </div>
+                      </div>
+
+
+
+
 
 
                     </div>
                   </div>
 
-                  <button 
-                    type="submit" 
-                    disabled={isSubmitting} 
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-xl shadow-blue-500/20 active:scale-[0.98] mt-4"
                   >
                     {isSubmitting ? "Creating Account..." : "Complete Registration"}
@@ -372,17 +429,15 @@ const handleSubmit = async (e: React.FormEvent) => {
 };
 
 const RoleCard = ({ icon: Icon, title, active, onClick }: any) => (
-  <button 
-    onClick={onClick} 
-    className={`p-6 rounded-2xl border-2 transition-all text-left flex flex-col gap-4 relative overflow-hidden ${
-      active 
-        ? "border-blue-600 bg-blue-50/50 dark:bg-blue-500/10 shadow-xl shadow-blue-500/10" 
-        : "border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/40 hover:border-blue-300 dark:hover:border-white/20 shadow-md hover:shadow-xl"
-    }`}
+  <button
+    onClick={onClick}
+    className={`p-6 rounded-2xl border-2 transition-all text-left flex flex-col gap-4 relative overflow-hidden ${active
+      ? "border-blue-600 bg-blue-50/50 dark:bg-blue-500/10 shadow-xl shadow-blue-500/10"
+      : "border-slate-200 dark:border-white/5 bg-white dark:bg-slate-900/40 hover:border-blue-300 dark:hover:border-white/20 shadow-md hover:shadow-xl"
+      }`}
   >
-    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-      active ? "bg-blue-600 text-white shadow-lg" : "bg-slate-100 dark:bg-white/5 text-slate-500"
-    }`}>
+    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${active ? "bg-blue-600 text-white shadow-lg" : "bg-slate-100 dark:bg-white/5 text-slate-500"
+      }`}>
       <Icon size={20} />
     </div>
     <div className="space-y-1">
