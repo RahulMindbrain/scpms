@@ -38,14 +38,20 @@ const SignUp: React.FC = () => {
 
   const { isAuthenticated, userType } = useSelector((state: RootState) => state.auth);
 
-  const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    companyName: "",
-    description: "",
-  });
+const [form, setForm] = useState({
+  fullName: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+  companyName: "",
+  description: "",
+
+  departmentId: "",
+  universityId: "",
+  year: "",
+  passingYear: "",
+
+});
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -69,54 +75,65 @@ const SignUp: React.FC = () => {
     setStep(2);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!form.fullName.trim()) return toast.error("Full name is required");
-    if (!form.email.trim()) return toast.error("Email address is required");
-    if (form.password !== form.confirmPassword) return toast.error("Passwords do not match");
-    if (!passwordRegex.test(form.password)) {
-      return toast.error("Password must contain uppercase and lowercase letters");
-    }
+  const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z]).{6,}$/;
 
-    if (activeRole === "COMPANY") {
-      if (!form.companyName.trim()) return toast.error("Company name is required");
-      if (!form.description.trim()) return toast.error("Company description is required");
-    }
+  if (!form.fullName.trim()) return toast.error("Full name is required");
+  if (!form.email.trim()) return toast.error("Email address is required");
+  if (form.password !== form.confirmPassword)
+    return toast.error("Passwords do not match");
 
-    const names = form.fullName.trim().split(/\s+/);
-    if (names.length < 2) return toast.error("Please enter first and last name");
+  if (!passwordRegex.test(form.password)) {
+    return toast.error("Password must contain uppercase and lowercase letters");
+  }
 
-    const firstname = names[0];
-    const lastname = names.slice(1).join(" ");
+  const names = form.fullName.trim().split(/\s+/);
+  if (names.length < 2)
+    return toast.error("Please enter first and last name");
 
-    const payload = {
-      firstname,
-      lastname,
-      email: form.email.toLowerCase(),
-      password: form.password,
-      role: activeRole,
-      ...(activeRole === "COMPANY" && {
-        company: {
-          name: form.companyName,
-          description: form.description,
-        },
-      }),
-    };
+  const firstname = names[0];
+  const lastname = names.slice(1).join(" ");
 
-    setIsSubmitting(true);
-    try {
-      await dispatch(registerUser(payload)).unwrap();
-      toast.success("Account created successfully!");
-      setTimeout(() => navigate("/login"), 1500);
-    } catch (err: any) {
-      toast.error(err?.message || "Registration failed.");
-    } finally {
-      setIsSubmitting(false);
-    }
+  const payload: any = {
+    firstname,
+    lastname,
+    email: form.email.toLowerCase(),
+    password: form.password,
+    role: activeRole,
+
+    ...(activeRole === "COMPANY" && {
+      company: {
+        name: form.companyName,
+        description: form.description,
+      },
+    }),
+
+    ...(activeRole === "STUDENT" && {
+      student: {
+        departmentId: form.departmentId ? Number(form.departmentId) : null,
+        universityId: form.universityId ? Number(form.universityId) : null,
+        year: form.year ? Number(form.year) : null,
+        passingYear: form.passingYear ? Number(form.passingYear) : null,
+       
+      },
+    }),
   };
 
+  setIsSubmitting(true);
+
+  try {
+    await dispatch(registerUser(payload)).unwrap();
+    toast.success("Account created successfully!");
+    setTimeout(() => navigate("/login"), 1500);
+  } catch (err: any) {
+    console.log(err);
+    toast.error(err?.message || "Registration failed.");
+  } finally {
+    setIsSubmitting(false);
+  }
+};
   return (
     <div className="min-h-screen w-full flex bg-white dark:bg-[#02040a] font-sans selection:bg-blue-500/30">
       
@@ -300,6 +317,39 @@ const SignUp: React.FC = () => {
                           {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
                       </div>
+                      <input
+      name="departmentId"
+      value={form.departmentId}
+      onChange={handleChange}
+      placeholder="Department ID"
+      className={inputClasses(false)}
+    />
+
+    <input
+      name="universityId"
+      value={form.universityId}
+      onChange={handleChange}
+      placeholder="University ID"
+      className={inputClasses(false)}
+    />
+
+    <input
+      name="year"
+      value={form.year}
+      onChange={handleChange}
+      placeholder="Year (e.g. 4)"
+      className={inputClasses(false)}
+    />
+
+    <input
+      name="passingYear"
+      value={form.passingYear}
+      onChange={handleChange}
+      placeholder="Passing Year (e.g. 2026)"
+      className={inputClasses(false)}
+    />
+
+
                     </div>
                   </div>
 
