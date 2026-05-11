@@ -5,8 +5,8 @@ export const fetchDepartments = createAsyncThunk(
   "department/fetchAll",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await getAPI<any>("/dept/");
-      return response;
+      const response = await getAPI<any>("/dept/?limit=1000");
+      return response.data.data;
     } catch (error: any) {
       return rejectWithValue(error.message || "Failed to fetch departments");
     }

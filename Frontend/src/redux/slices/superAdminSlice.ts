@@ -49,7 +49,7 @@ const superAdminSlice = createSlice({
       })
       .addCase(fetchUniversities.fulfilled, (state, action) => {
         state.loading = false;
-        state.universities = action.payload.data;
+        state.universities = action.payload;
       })
 
       .addCase(fetchUniversities.rejected, (state, action) => {

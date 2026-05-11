@@ -23,7 +23,8 @@ import { registerUser } from "../../../redux/thunks/registerThunk";
 import { toast } from "sonner";
 import { ModeToggle } from "@/components/mode-toggle";
 import { motion, AnimatePresence } from "framer-motion";
-
+import { fetchDepartments } from "../../../redux/thunks/departmentThunk";
+import { fetchUniversities } from "../../../redux/thunks/superadmin/universityThunks";
 // Import Assets
 import campBG from "@/assets/camp.jpg";
 
@@ -54,7 +55,11 @@ const SignUp: React.FC = () => {
     passingYear: "",
 
   });
-
+const { universities } = useSelector((state: RootState) => state.superAdmin);
+const { departments } = useSelector((state: RootState) => state.department);
+useEffect(() => {
+  dispatch(fetchUniversities());
+}, [dispatch]);
   useEffect(() => {
     if (isAuthenticated) {
       const role = userType?.toLowerCase();
@@ -64,7 +69,7 @@ const SignUp: React.FC = () => {
     }
   }, [isAuthenticated, userType, navigate]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     if (name === "fullName" && value !== "" && !/^[a-zA-Z\s]*$/.test(value)) {
       return;
@@ -136,6 +141,12 @@ const SignUp: React.FC = () => {
       setIsSubmitting(false);
     }
   };
+
+useEffect(() => {
+  if (form.universityId) {
+    dispatch(fetchDepartments(form.universityId));
+  }
+}, [form.universityId, dispatch]);
   return (
     <div className="min-h-screen w-full flex bg-white dark:bg-[#02040a] font-sans selection:bg-blue-500/30">
 
@@ -321,86 +332,92 @@ const SignUp: React.FC = () => {
                       </div>
 
 
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
-                          University 
-                        </label>
-
-                        <div className="relative group">
-                          <GraduationCap
-                            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
-                            size={18}
-                          />
-
-                          <input
-                            name="universityId"
-                            value={form.universityId}
-                            onChange={handleChange}
-                            placeholder="University "
-                            className={inputClasses(false)}
-                          />
+                    {activeRole === "STUDENT" && (
+                      <>
+                        <div className="space-y-2">
+                          <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">University</label>
+                          <div className="relative group">
+                            <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
+                            <select
+                              name="universityId"
+                              value={form.universityId}
+                              onChange={handleChange}
+                              required
+                              className={inputClasses(false)}
+                            >
+                              <option value="">Select University</option>
+                              {universities?.map((u: any) => (
+                                <option key={u.id} value={u.id}>
+                                  {u.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
                         </div>
-                      </div>
-                      <div className="space-y-2">
-    <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
-      Department 
-    </label>
 
-    <div className="relative group">
-      <Building2
-        className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
-        size={18}
-      />
-
-      <input
-        name="departmentId"
-        value={form.departmentId}
-        onChange={handleChange}
-        placeholder="Department "
-        className={inputClasses(false)}
-      />
-    </div>
-  </div>
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
-                          Year
-                        </label>
-
-                        <div className="relative group">
-                          <CalendarClock
-                            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
-                            size={18}
-                          />
-
-                          <input
-                            name="year"
-                            value={form.year}
-                            onChange={handleChange}
-                            placeholder="Year (e.g. 4)"
-                            className={inputClasses(false)}
-                          />
+                        <div className="space-y-2">
+                          <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Department</label>
+                          <div className="relative group">
+                            <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
+                            <select
+                              name="departmentId"
+                              value={form.departmentId}
+                              onChange={handleChange}
+                              required
+                              className={inputClasses(false)}
+                              disabled={!form.universityId}
+                            >
+                              <option value="">Select Department</option>
+                              {departments?.map((d: any) => (
+                                <option key={d.id} value={d.id}>
+                                  {d.name}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
                         </div>
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
-                          Passing Year
-                        </label>
 
-                        <div className="relative group">
-                          <Calendar
-                            className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
-                            size={18}
-                          />
-
-                          <input
-                            name="passingYear"
-                            value={form.passingYear}
-                            onChange={handleChange}
-                            placeholder="2026"
-                            className={inputClasses(false)}
-                          />
+                        <div className="space-y-2">
+                          <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
+                            Current Year
+                          </label>
+                          <div className="relative group">
+                            <CalendarClock
+                              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+                              size={18}
+                            />
+                            <input
+                              name="year"
+                              value={form.year}
+                              onChange={handleChange}
+                              required
+                              placeholder="Year (e.g. 4)"
+                              className={inputClasses(false)}
+                            />
+                          </div>
                         </div>
-                      </div>
+
+                        <div className="space-y-2">
+                          <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
+                            Passing Year
+                          </label>
+                          <div className="relative group">
+                            <Calendar
+                              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+                              size={18}
+                            />
+                            <input
+                              name="passingYear"
+                              value={form.passingYear}
+                              onChange={handleChange}
+                              required
+                              placeholder="2026"
+                              className={inputClasses(false)}
+                            />
+                          </div>
+                        </div>
+                      </>
+                    )}
 
 
 
