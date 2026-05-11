@@ -23,6 +23,11 @@ const ForgotPassword: React.FC = () => {
   const [canResend, setCanResend] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+const formatTime = (sec: number) => {
+    const minutes = Math.floor(sec / 60);
+    const seconds = sec % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     let interval: any;
@@ -223,7 +228,7 @@ const ForgotPassword: React.FC = () => {
                       </svg>
                     </div>
                     <span className="text-sm font-medium">
-                      Didn't receive code? Retry in <span className="text-blue-600 font-bold tabular-nums">{timer}s</span>
+                      Didn't receive code? Retry in <span className="text-blue-600 font-bold tabular-nums">{formatTime(timer)}</span>
                     </span>
                   </>
                 )}

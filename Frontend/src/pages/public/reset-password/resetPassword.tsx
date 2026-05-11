@@ -14,7 +14,7 @@ const ResetPassword: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,9}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[!@#$%^&*(),.?":{}|<>]).{6,16}$/;
 
     if (!passwordRegex.test(newPassword)) {
       return toast.error("Password must contain at least one uppercase, one lowercase letter, and one special character");
