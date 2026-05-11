@@ -20,7 +20,8 @@ import { fetchUnreadCount } from "@/redux/thunks/notificationThunks"
 import { fetchUpcomingEvents } from "@/redux/thunks/upcomingEventThunks"
 import { useSocket } from "@/socket/SocketProvider"
 import { SOCKET_EVENTS } from "@/socket/socket.events"
-import { toast } from "sonner";
+import { toast } from "sonner"
+import CountdownTimer from "@/components/CountdownTimer"
 
 export default function StudentDashboard() {
   const dispatch = useDispatch<AppDispatch>()
@@ -179,13 +180,16 @@ useEffect(() => {
               key={idx}
               className="bg-card rounded-[1.5rem] p-7 shadow-sm border border-border transition-all hover:shadow-md group"
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-2 flex-wrap">
                 <div className={`p-3 rounded-xl ${stat.bg} dark:bg-primary/10 transition-transform group-hover:scale-110`}>
                   <stat.icon className={`h-6 w-6 ${stat.iconColor} dark:text-primary`} />
                 </div>
                 {stat.isNext && nextEvent && (
-                  <div className="text-[10px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                    Next Up
+                  <div className="flex items-center gap-2 flex-wrap justify-end">
+                    <div className="text-[10px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full uppercase tracking-wider shrink-0">
+                      Next Up
+                    </div>
+                    <CountdownTimer targetDate={nextEvent.startTime} />
                   </div>
                 )}
               </div>
