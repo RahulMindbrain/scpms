@@ -400,29 +400,33 @@ const CompanyManagement: React.FC = () => {
             <Loader text="Retrieving job directives..." />
           ) : companyJobs.length > 0 ? (
             <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
-              {companyJobs.map((job: any) => (
-                <div key={job.id} className="p-5 bg-muted/10 rounded-2xl border border-border hover:border-primary/30 transition-all">
+              {companyJobs.map((row: any) => {
+                const posting = row.job ?? row;
+                const rowKey = row.id ?? posting?.id;
+                return (
+                <div key={rowKey} className="p-5 bg-muted/10 rounded-2xl border border-border hover:border-primary/30 transition-all">
                   <div className="flex justify-between items-start mb-4">
                     <div>
-                      <h4 className="font-bold text-foreground text-base tracking-tight">{job.title}</h4>
-                      <p className="text-xs text-muted-foreground font-medium mt-1">ID: #{job.id} • {job.location || 'Remote'}</p>
+                      <h4 className="font-bold text-foreground text-base tracking-tight">{posting.title ?? '—'}</h4>
+                      <p className="text-xs text-muted-foreground font-medium mt-1">Job #{posting.id ?? '—'} • {posting.location || 'Remote'}</p>
                     </div>
                     <Badge variant="outline" className="text-[10px] font-black tracking-widest bg-muted/50">
-                      {job.status}
+                      {row.status}
                     </Badge>
                   </div>
                   <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
                     <div>
                       <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Compensation</p>
-                      <p className="text-sm font-bold text-emerald-500">₹{job.salary} LPA</p>
+                      <p className="text-sm font-bold text-emerald-500">₹{row.salary} LPA</p>
                     </div>
                     <div>
                       <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Eligibility</p>
-                      <p className="text-sm font-bold text-foreground">{job.minCgpa} CGPA</p>
+                      <p className="text-sm font-bold text-foreground">{row.minCgpa} CGPA</p>
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-20 bg-muted/20 rounded-3xl border border-dashed border-border">

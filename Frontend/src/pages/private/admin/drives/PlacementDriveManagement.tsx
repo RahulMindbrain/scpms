@@ -107,31 +107,49 @@ const PlacementDriveManagement: React.FC = () => {
   const processedDrives = useMemo(() => {
     const now = new Date();
 
-    const enrichedJobs = reduxJobs.map((job: Job) => {
-      const scheduleDate = job.createdAt ? new Date(job.createdAt) : null;
+    const enrichedJobs = reduxJobs.map((row: Job & Record<string, unknown>) => {
+      const j = (row as { job?: Job }).job;
+      const title = j?.title ?? row.title;
+      const company = j?.company ?? row.company;
+      const scheduleDate = (row as { sentAt?: string }).sentAt
+        ? new Date((row as { sentAt: string }).sentAt)
+        : row.createdAt
+          ? new Date(row.createdAt)
+          : null;
 
+      const rowStatus = (row as { status?: string }).status;
       let status: 'active' | 'completed' | 'upcoming' = 'active';
-      if (job.status === 'CLOSED' || job.status === 'REJECTED') {
+      if (rowStatus === 'CLOSED' || rowStatus === 'REJECTED') {
         status = 'completed';
       } else if (scheduleDate && scheduleDate.getTime() - now.getTime() > 14 * 24 * 60 * 60 * 1000) {
         status = 'upcoming';
       }
 
-      const salaryValue = job.salary || job.salaryRange;
+      const salaryValue = row.salary || row.salaryRange;
       const formattedSalary = salaryValue
         ? `${Number(salaryValue).toLocaleString('en-IN')}`
         : 'N/A';
 
+      const depts = j?.eligibleDepartments ?? row.eligibleDepartments;
+
       return {
-        ...job,
+        ...row,
+        title,
+        company,
+        eligibleDepartments: depts,
+        createdAt: (row as { sentAt?: string }).sentAt ?? row.createdAt,
+        salary: row.salary,
         status,
         formattedSalary,
-        formattedDate: job.createdAt ? new Date(job.createdAt).toLocaleDateString('en-IN', {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric'
-        }) : 'TBD',
-        departments: job.eligibleDepartments?.map((d: Department) => d.name) || []
+        formattedDate: scheduleDate
+          ? scheduleDate.toLocaleDateString('en-IN', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            })
+          : 'TBD',
+        departments:
+          Array.isArray(depts) ? depts.map((d: Department) => d.name).filter(Boolean) : [],
       };
     });
 

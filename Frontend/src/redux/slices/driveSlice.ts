@@ -37,9 +37,19 @@ const driveSlice = createSlice({
             })
             .addCase(fetchJobs.fulfilled, (state, action) => {
                 state.loading = false;
-                // Based on backend structure: { success: true, data: { data: [], meta: {} } }
-                state.jobs = action.payload?.data?.data || [];
-                state.meta = action.payload?.data?.meta || null;
+                const p = action.payload as {
+                    data?: unknown;
+                    meta?: DriveState["meta"];
+                } | null;
+                // GET /job-universities returns { data, meta }; GET /admin/get-jobs used sendSuccess { data: { data, meta } }
+                const rows = Array.isArray(p?.data)
+                    ? p!.data
+                    : (p as { data?: { data?: unknown[] } })?.data?.data;
+                state.jobs = Array.isArray(rows) ? rows : [];
+                state.meta =
+                    p?.meta ??
+                    (p as { data?: { meta?: DriveState["meta"] } })?.data?.meta ??
+                    null;
             })
             .addCase(fetchJobs.rejected, (state, action) => {
                 state.loading = false;

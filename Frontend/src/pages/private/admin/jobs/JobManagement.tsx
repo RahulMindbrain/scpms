@@ -76,10 +76,21 @@ const AdminJobManagement: React.FC = () => {
     setPage(1);
   }, [activeTab]);
 
-  const handleStatusUpdate = async (jobIds: number[], status: string) => {
+  const handleStatusUpdate = async (jobUniversityIds: number[], status: string) => {
     const toastId = toast.loading(`Processing ${status.toLowerCase()}...`);
     try {
-      await dispatch(updateJobStatus({ jobIds, status })).unwrap();
+      let reason: string | undefined;
+      if (status === "REJECTED") {
+        reason =
+          window.prompt("Rejection reason (required):")?.trim() || undefined;
+        if (!reason) {
+          toast.error("Rejection reason is required", { id: toastId });
+          return;
+        }
+      }
+      await dispatch(
+        updateJobStatus({ jobIds: jobUniversityIds, status, reason }),
+      ).unwrap();
       toast.success(`Job(s) ${status.toLowerCase()} successfully`, { id: toastId });
       dispatch(fetchJobs({ status: activeTab, page, limit: PAGE_LIMIT }));
     } catch (error: any) {
@@ -97,21 +108,30 @@ const AdminJobManagement: React.FC = () => {
       return 0;
     };
 
-    let result = (Array.isArray(jobs) ? jobs : []).filter(job =>
-      job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.company?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    let result = (Array.isArray(jobs) ? jobs : []).filter((row) => {
+      const title = row.job?.title ?? "";
+      const uniName = row.university?.name ?? "";
+      return (
+        title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        uniName.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    });
 
     if (filterDepartment !== 'all') {
-      result = result.filter(job =>
-        (Array.isArray(job.eligibleDepartments) ? job.eligibleDepartments : []).some(
-          (dept: any) => dept?.name?.toLowerCase() === filterDepartment.toLowerCase()
-        )
+      result = result.filter((row) =>
+        (Array.isArray(row.job?.eligibleDepartments) ? row.job.eligibleDepartments : []).some(
+          (dept: { name?: string }) =>
+            dept?.name?.toLowerCase() === filterDepartment.toLowerCase(),
+        ),
       );
     }
 
     if (filterLocation !== 'all') {
-      result = result.filter(job => job.location?.toLowerCase().includes(filterLocation.toLowerCase()));
+      result = result.filter((row) =>
+        (row.job?.location ?? "")
+          .toLowerCase()
+          .includes(filterLocation.toLowerCase()),
+      );
     }
 
     result = [...result].sort((a, b) => {
@@ -129,15 +149,19 @@ const AdminJobManagement: React.FC = () => {
   }, [jobs, searchTerm, sortBy, filterDepartment, filterLocation]);
 
   const locations = useMemo(() => {
-    const locs = new Set((Array.isArray(jobs) ? jobs : []).map(j => j.location).filter(Boolean));
+    const locs = new Set(
+      (Array.isArray(jobs) ? jobs : [])
+        .map((j) => j.job?.location)
+        .filter(Boolean),
+    );
     return Array.from(locs);
   }, [jobs]);
 
   const departments = useMemo(() => {
-    const allDepartments = (Array.isArray(jobs) ? jobs : []).flatMap(j =>
-      Array.isArray(j.eligibleDepartments) ? j.eligibleDepartments : []
+    const allDepartments = (Array.isArray(jobs) ? jobs : []).flatMap((j) =>
+      Array.isArray(j.job?.eligibleDepartments) ? j.job.eligibleDepartments : [],
     );
-    const names = allDepartments.map((dept: any) => dept?.name).filter(Boolean);
+    const names = allDepartments.map((dept: { name?: string }) => dept?.name).filter(Boolean);
     return Array.from(new Set(names));
   }, [jobs]);
 
@@ -232,10 +256,10 @@ const AdminJobManagement: React.FC = () => {
           </div>
         ) : filteredAndSortedJobs.length > 0 ? (
           <AnimatePresence mode="popLayout">
-            {filteredAndSortedJobs.map((job) => (
+            {filteredAndSortedJobs.map((row) => (
               <motion.div
                 layout
-                key={job.id}
+                key={row.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
@@ -244,17 +268,17 @@ const AdminJobManagement: React.FC = () => {
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 bg-muted/50 rounded-2xl flex items-center justify-center border border-border group-hover:border-primary/30 transition-all duration-300 shadow-sm overflow-hidden">
-                      {job.company?.logo ? (
-                        <img src={job.company.logo} alt={job.company.name} className="w-10 h-10 object-contain" />
+                      {row.job?.company?.logo ? (
+                        <img src={row.job.company.logo} alt={row.job.company.name} className="w-10 h-10 object-contain" />
                       ) : (
                         <Building2 className="w-7 h-7 text-muted-foreground group-hover:text-primary transition-colors" />
                       )}
                     </div>
                     <div className="overflow-hidden">
                       <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors truncate tracking-tight pr-4">
-                        {job.title}
+                        {row.job?.title ?? '—'}
                       </h3>
-                      <p className="text-sm text-muted-foreground font-medium truncate">{job.company?.name}</p>
+                      <p className="text-sm text-muted-foreground font-medium truncate">{row.university?.name}</p>
                     </div>
                   </div>
                   <DropdownMenu>
@@ -274,20 +298,20 @@ const AdminJobManagement: React.FC = () => {
                 <div className="flex flex-wrap items-center gap-3 mb-6">
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted/50 border border-border text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                     <MapPin className="size-3 text-muted-foreground" />
-                    {job.location || 'Remote'}
+                    {row.job?.location || 'Remote'}
                   </div>
                   <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-600 uppercase tracking-widest">
                     <IndianRupee className="size-3" />
-                    {job.salary} LPA
+                    {row.salary} LPA
                   </div>
                 </div>
 
                 <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 min-h-[40px] mb-6">
-                  {job.description || "No specific job description provided for this listing."}
+                  {row.description || "No specific job description provided for this listing."}
                 </p>
 
                 <div className="flex flex-wrap gap-2 mb-6 mt-auto">
-                  {(Array.isArray(job.eligibleDepartments) ? job.eligibleDepartments : []).slice(0, 2).map((dept: any) => (
+                  {(Array.isArray(row.job?.eligibleDepartments) ? row.job.eligibleDepartments : []).slice(0, 2).map((dept: { id: number; name?: string }) => (
                     <Badge
                       key={dept.id}
                       variant="outline"
@@ -296,9 +320,9 @@ const AdminJobManagement: React.FC = () => {
                       {dept.name}
                     </Badge>
                   ))}
-                  {job.eligibleDepartments?.length > 2 && (
+                  {(row.job?.eligibleDepartments?.length ?? 0) > 2 && (
                     <Badge variant="outline" className="bg-muted/30 border-border font-black text-[9px] uppercase tracking-widest">
-                      +{job.eligibleDepartments.length - 2}
+                      +{(row.job?.eligibleDepartments?.length ?? 0) - 2}
                     </Badge>
                   )}
                 </div>
@@ -308,14 +332,14 @@ const AdminJobManagement: React.FC = () => {
                     <div className="flex items-center gap-3">
                       <Button
                         className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-10 font-black uppercase tracking-widest text-[10px] shadow-lg shadow-emerald-500/10 active:scale-95 transition-all"
-                        onClick={() => handleStatusUpdate([job.id], 'APPROVED')}
+                        onClick={() => handleStatusUpdate([row.id], 'APPROVED')}
                       >
                         <CheckCircle className="size-3.5 mr-1.5" /> Approve
                       </Button>
                       <Button
                         variant="outline"
                         className="flex-1 border-rose-500/20 text-rose-600 hover:bg-rose-500/10 rounded-xl h-10 font-black uppercase tracking-widest text-[10px] active:scale-95 transition-all"
-                        onClick={() => handleStatusUpdate([job.id], 'REJECTED')}
+                        onClick={() => handleStatusUpdate([row.id], 'REJECTED')}
                       >
                         <XCircle className="size-3.5 mr-1.5" /> Reject
                       </Button>
