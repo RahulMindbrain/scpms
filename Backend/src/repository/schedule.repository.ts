@@ -58,8 +58,6 @@ const baseScheduleInclude = {
 
           title: true,
 
-          status: true,
-
           companyId: true,
 
           location: true,
