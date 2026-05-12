@@ -129,7 +129,7 @@ export const deleteSuperAdminController = async (
 
 export const getAdminsController = async (req: Request, res: Response) => {
   try {
-    console.log("GET ADMINS CONTROLLER HIT");
+    // console.log("GET ADMINS CONTROLLER HIT");
     const { status } = req.query;
 
     const data = await getAdminsService(
