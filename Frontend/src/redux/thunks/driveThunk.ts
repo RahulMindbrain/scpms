@@ -11,7 +11,7 @@ const errMessage = (error: unknown, fallback: string) => {
 export const fetchJobs = createAsyncThunk(
   "drive/fetchJobs",
   async (
-    params: { status?: string; page?: number; limit?: number },
+    params: { status?: string; page?: number; limit?: number; companyId?: number },
     { rejectWithValue },
   ) => {
     try {

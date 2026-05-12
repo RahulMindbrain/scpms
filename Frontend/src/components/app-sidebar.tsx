@@ -50,7 +50,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: "/admin/drives",
             icon: <Briefcase />,
           },
-          { title: "Manage Jobs", url: "/admin/jobs", icon: <ListChecks /> },
+          { title: "Job Moderation", url: "/admin/jobs", icon: <ListChecks /> },
+          // { title: "University Jobs", url: "/admin/university-jobs", icon: <Briefcase /> },
           {
             title: "Applications",
             url: "/admin/applications",

@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   Building2,
@@ -38,6 +39,7 @@ interface Company {
 }
 
 const CompanyManagement: React.FC = () => {
+  const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const { companies: reduxCompanies, loading, error } = useSelector((state: RootState) => state.company);
 
@@ -119,9 +121,7 @@ const CompanyManagement: React.FC = () => {
   };
 
   const handleViewJobs = (companyId: number) => {
-    setSelectedCompanyId(companyId);
-    setIsJobsModalOpen(true);
-    dispatch(fetchJobsByCompanyId({ id: companyId, params: { page: 1, limit: 10, status: 'APPROVED' } }));
+    navigate(`/admin/jobs?companyId=${companyId}`);
   };
 
   if (loading && reduxCompanies.length === 0) {
@@ -368,75 +368,6 @@ const CompanyManagement: React.FC = () => {
         </form>
       </Modal>
 
-      {/* Jobs Modal */}
-      <Modal
-        isOpen={isJobsModalOpen}
-        onClose={() => setIsJobsModalOpen(false)}
-        title="Directives Registry"
-        subtitle="Internal log of job opportunities and campaign status"
-      >
-        <div className="space-y-6 pt-4">
-          <div className="flex bg-muted/30 p-1 rounded-xl w-fit">
-            {['PENDING', 'APPROVED', 'REJECTED'].map((status) => (
-              <button
-                key={status}
-                onClick={() => {
-                  setJobsStatusFilter(status);
-                  if (selectedCompanyId) {
-                    dispatch(fetchJobsByCompanyId({ id: selectedCompanyId, params: { page: 1, limit: 10, status } }));
-                  }
-                }}
-                className={`px-4 py-2 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all ${jobsStatusFilter === status
-                  ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
-                  }`}
-              >
-                {status}
-              </button>
-            ))}
-          </div>
-
-          {loading ? (
-            <Loader text="Retrieving job directives..." />
-          ) : companyJobs.length > 0 ? (
-            <div className="space-y-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
-              {companyJobs.map((row: any) => {
-                const posting = row.job ?? row;
-                const rowKey = row.id ?? posting?.id;
-                return (
-                <div key={rowKey} className="p-5 bg-muted/10 rounded-2xl border border-border hover:border-primary/30 transition-all">
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h4 className="font-bold text-foreground text-base tracking-tight">{posting.title ?? '—'}</h4>
-                      <p className="text-xs text-muted-foreground font-medium mt-1">Job #{posting.id ?? '—'} • {posting.location || 'Remote'}</p>
-                    </div>
-                    <Badge variant="outline" className="text-[10px] font-black tracking-widest bg-muted/50">
-                      {row.status}
-                    </Badge>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/50">
-                    <div>
-                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Compensation</p>
-                      <p className="text-sm font-bold text-emerald-500">₹{row.salary} LPA</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Eligibility</p>
-                      <p className="text-sm font-bold text-foreground">{row.minCgpa} CGPA</p>
-                    </div>
-                  </div>
-                </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-20 bg-muted/20 rounded-3xl border border-dashed border-border">
-              <LayoutGrid className="size-12 text-muted-foreground/20 mx-auto mb-4" />
-              <p className="font-bold text-foreground">No directives found</p>
-              <p className="text-xs text-muted-foreground mt-1">No jobs match the current status filter.</p>
-            </div>
-          )}
-        </div>
-      </Modal>
     </AdminPageLayout>
   );
 };

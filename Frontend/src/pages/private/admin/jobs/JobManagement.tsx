@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   Briefcase,
   Building2,
@@ -14,10 +15,12 @@ import {
   MoreVertical,
   ChevronLeft,
   ChevronRight,
-  CheckCircle2
+  CheckCircle2,
+  ListChecks
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobs, updateJobStatus } from '@/redux/thunks/driveThunk';
+import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -60,6 +63,7 @@ const STATUS_STYLES = {
 const AdminJobManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { jobs, meta, loading } = useSelector((state: RootState) => state.drive);
+  const { companies: reduxCompanies } = useSelector((state: RootState) => state.company);
   const [activeTab, setActiveTab] = useState<'PENDING' | 'APPROVED' | 'REJECTED'>('PENDING');
   const [page, setPage] = useState(1);
   const PAGE_LIMIT = 10;
@@ -67,10 +71,21 @@ const AdminJobManagement: React.FC = () => {
   const [sortBy, setSortBy] = useState<string>('newest');
   const [filterDepartment, setFilterDepartment] = useState<string>('all');
   const [filterLocation, setFilterLocation] = useState<string>('all');
+  const [searchParams] = useSearchParams();
+  const initialCompany = searchParams.get('companyId') || 'all';
+  const [filterCompany, setFilterCompany] = useState<string>(initialCompany);
 
   useEffect(() => {
-    dispatch(fetchJobs({ status: activeTab, page, limit: PAGE_LIMIT }));
-  }, [dispatch, activeTab, page]);
+    dispatch(fetchCompanies({ limit: 100 })); // Fetch companies for filter
+  }, [dispatch]);
+
+  useEffect(() => {
+    const params: any = { status: activeTab, page, limit: PAGE_LIMIT };
+    if (filterCompany !== 'all') {
+      params.companyId = Number(filterCompany);
+    }
+    dispatch(fetchJobs(params));
+  }, [dispatch, activeTab, page, filterCompany]);
 
   useEffect(() => {
     setPage(1);
@@ -120,8 +135,9 @@ const AdminJobManagement: React.FC = () => {
     if (filterDepartment !== 'all') {
       result = result.filter((row) =>
         (Array.isArray(row.job?.eligibleDepartments) ? row.job.eligibleDepartments : []).some(
-          (dept: { name?: string }) =>
-            dept?.name?.toLowerCase() === filterDepartment.toLowerCase(),
+          (dept: { id: number; name?: string }) =>
+            (dept?.name?.toLowerCase() === filterDepartment.toLowerCase()) || 
+            (dept?.id?.toString() === filterDepartment)
         ),
       );
     }
@@ -135,8 +151,8 @@ const AdminJobManagement: React.FC = () => {
     }
 
     result = [...result].sort((a, b) => {
-      if (sortBy === 'newest') return b.id - a.id;
-      if (sortBy === 'oldest') return a.id - b.id;
+      if (sortBy === 'newest') return new Date(b.sentAt || b.id).getTime() - new Date(a.sentAt || a.id).getTime();
+      if (sortBy === 'oldest') return new Date(a.sentAt || a.id).getTime() - new Date(b.sentAt || b.id).getTime();
       if (sortBy === 'salary-high') {
         const salaryA = getSalaryValue(a.salary);
         const salaryB = getSalaryValue(b.salary);
@@ -161,7 +177,7 @@ const AdminJobManagement: React.FC = () => {
     const allDepartments = (Array.isArray(jobs) ? jobs : []).flatMap((j) =>
       Array.isArray(j.job?.eligibleDepartments) ? j.job.eligibleDepartments : [],
     );
-    const names = allDepartments.map((dept: { name?: string }) => dept?.name).filter(Boolean);
+    const names = allDepartments.map((dept: { id: number; name?: string }) => dept?.name || `Dept #${dept.id}`).filter(Boolean);
     return Array.from(new Set(names));
   }, [jobs]);
 
@@ -171,7 +187,7 @@ const AdminJobManagement: React.FC = () => {
         title="Job Moderation"
         description="Review and manage job listings submitted by corporate partners."
         badge="Recruitment Ops"
-        icon={Briefcase}
+        icon={ListChecks}
         variant="sky"
       >
         <div className="relative w-full sm:w-[280px]">
@@ -245,6 +261,19 @@ const AdminJobManagement: React.FC = () => {
               ))}
             </SelectContent>
           </Select>
+
+          <Select value={filterCompany} onValueChange={setFilterCompany}>
+            <SelectTrigger className="w-[160px] h-10 rounded-xl bg-background/50 border-border text-xs font-bold uppercase tracking-widest">
+              <Building2 className="size-3.5 mr-2 text-muted-foreground" />
+              <SelectValue placeholder="Company" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              <SelectItem value="all">All Companies</SelectItem>
+              {reduxCompanies.map((company: any) => (
+                <SelectItem key={company.id} value={company.id.toString()}>{company.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -295,37 +324,56 @@ const AdminJobManagement: React.FC = () => {
                   </DropdownMenu>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 mb-6">
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted/50 border border-border text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                    <MapPin className="size-3 text-muted-foreground" />
-                    {row.job?.location || 'Remote'}
+                  <div className="flex flex-wrap items-center gap-3 mb-6">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted/50 border border-border text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                      <MapPin className="size-3 text-muted-foreground" />
+                      {row.job?.location || 'Remote'}
+                    </div>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-600 uppercase tracking-widest">
+                      <IndianRupee className="size-3" />
+                      {row.salary > 100000 ? (row.salary / 100000).toFixed(1) : row.salary} LPA
+                    </div>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[10px] font-black text-blue-600 uppercase tracking-widest">
+                      <Clock className="size-3" />
+                      Sent {new Date(row.sentAt).toLocaleDateString()}
+                    </div>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[10px] font-black text-amber-600 uppercase tracking-widest">
+                      <Briefcase className="size-3" />
+                      {row.openings} Openings
+                    </div>
                   </div>
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-600 uppercase tracking-widest">
-                    <IndianRupee className="size-3" />
-                    {row.salary} LPA
+
+                  <div className="grid grid-cols-2 gap-3 mb-6">
+                    <div className="p-3 bg-muted/20 rounded-xl border border-border/50">
+                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Min. CGPA</p>
+                      <p className="text-xs font-bold text-foreground">{row.minCgpa}</p>
+                    </div>
+                    <div className="p-3 bg-muted/20 rounded-xl border border-border/50">
+                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Max Backlogs</p>
+                      <p className="text-xs font-bold text-foreground">{row.maxBacklogs}</p>
+                    </div>
                   </div>
-                </div>
 
                 <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 min-h-[40px] mb-6">
                   {row.description || "No specific job description provided for this listing."}
                 </p>
 
-                <div className="flex flex-wrap gap-2 mb-6 mt-auto">
-                  {(Array.isArray(row.job?.eligibleDepartments) ? row.job.eligibleDepartments : []).slice(0, 2).map((dept: { id: number; name?: string }) => (
-                    <Badge
-                      key={dept.id}
-                      variant="outline"
-                      className="bg-muted/30 border-border font-black text-[9px] uppercase tracking-widest"
-                    >
-                      {dept.name}
-                    </Badge>
-                  ))}
-                  {(row.job?.eligibleDepartments?.length ?? 0) > 2 && (
-                    <Badge variant="outline" className="bg-muted/30 border-border font-black text-[9px] uppercase tracking-widest">
-                      +{(row.job?.eligibleDepartments?.length ?? 0) - 2}
-                    </Badge>
-                  )}
-                </div>
+                  <div className="flex flex-wrap gap-2 mb-6 mt-auto">
+                    {(Array.isArray(row.job?.eligibleDepartments) ? row.job.eligibleDepartments : []).slice(0, 3).map((dept: { id: number; name?: string }) => (
+                      <Badge
+                        key={dept.id}
+                        variant="outline"
+                        className="bg-muted/30 border-border font-black text-[9px] uppercase tracking-widest"
+                      >
+                        {dept.name || `Dept #${dept.id}`}
+                      </Badge>
+                    ))}
+                    {(row.job?.eligibleDepartments?.length ?? 0) > 3 && (
+                      <Badge variant="outline" className="bg-muted/30 border-border font-black text-[9px] uppercase tracking-widest">
+                        +{(row.job?.eligibleDepartments?.length ?? 0) - 3}
+                      </Badge>
+                    )}
+                  </div>
 
                 <div className="pt-5 border-t border-border mt-auto">
                   {activeTab === 'PENDING' ? (
@@ -372,6 +420,7 @@ const AdminJobManagement: React.FC = () => {
                 setSearchTerm('');
                 setFilterDepartment('all');
                 setFilterLocation('all');
+                setFilterCompany('all');
               }}
               className="rounded-xl px-8 border-border font-bold text-xs uppercase tracking-widest h-11"
             >

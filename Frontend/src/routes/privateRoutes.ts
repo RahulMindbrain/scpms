@@ -20,6 +20,7 @@ import InterviewSchedulerPage from "@/pages/private/admin/interview/InterviewSch
 import BulkEmail from "@/pages/private/admin/email/BulkEmail";
 import DocumentManagement from "@/pages/private/admin/documents/DocumentManagement";
 import AdminJobManagement from "@/pages/private/admin/jobs/JobManagement";
+import UniversityJobs from "@/pages/private/admin/jobs/UniversityJobs";
 import DepartmentManagement from "@/pages/private/admin/department/DepartmentManagement";
 import SkillManagement from "@/pages/private/admin/skills/SkillManagement";
 import SuperAdminDashboard from "@/pages/private/superadmin/dashboard/SuperAdminDashboard";
@@ -96,6 +97,10 @@ export const PrivateRoutes: RouteOptions<any>[] = [
     {
         path: "/admin/jobs",
         component: AdminJobManagement,
+    },
+    {
+        path: "/admin/university-jobs",
+        component: UniversityJobs,
     },
     {
         path: "/admin/departments",
