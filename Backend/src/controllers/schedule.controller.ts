@@ -14,6 +14,7 @@ import {
 } from "../services/schedule.service";
 
 import { sendSuccess, sendError } from "../utils/response";
+import { getAdminByUserId } from "../repository/admin.repository";
 
 export const createScheduleController = async (req: Request, res: Response) => {
   try {
@@ -37,10 +38,16 @@ export const createScheduleController = async (req: Request, res: Response) => {
       return sendError(res, 400, "jobUniversityIds must be a non-empty array");
     }
 
+    const admin = await getAdminByUserId(user.id);
+
+    if (!admin) {
+      return sendError(res, 404, "Admin not found");
+    }
+
     const schedule = await createInterviewScheduleService({
       ...req.body,
 
-      createdBy: user.id,
+      createdBy: admin.id,
     });
 
     return sendSuccess(res, 201, "Schedule created", schedule);
