@@ -238,8 +238,6 @@ export const getScheduleById = async (id: number) => {
 
               location: true,
 
-              status: true,
-
               companyId: true,
             },
           },
