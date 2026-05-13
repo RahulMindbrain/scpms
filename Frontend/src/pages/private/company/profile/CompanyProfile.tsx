@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
-import { Briefcase, Building2, Globe, Mail, MapPin, Pencil, Save, X } from "lucide-react"
+import { Briefcase, Building2, Mail, MapPin, Pencil, Save, Users, X } from "lucide-react"
 import { useDispatch, useSelector } from "react-redux"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import {
   fetchCompanyProfile,
   updateCompanyProfile,
-  createCompanyProfile,
+  fetchCompanyJobs,
+  fetchJobApplications,
 } from "@/redux/thunks/companyThunk"
 import { Button } from "@/components/ui/button"
 import type { AppDispatch } from "@/redux/store/store"
@@ -21,6 +22,7 @@ interface ProfileFormData {
 const CompanyProfile = () => {
   const dispatch = useDispatch<AppDispatch>()
   const { profile, jobs, applications, loading } = useSelector((state: RootState) => state.company)
+  const { user } = useSelector((state: RootState) => state.auth)
 
   const {
     register,
@@ -29,47 +31,37 @@ const CompanyProfile = () => {
     formState: { errors },
   } = useForm<ProfileFormData>()
   const [isEditing, setIsEditing] = useState(false)
-  const [isCreating, setIsCreating] = useState(false)
 
   useEffect(() => {
     dispatch(fetchCompanyProfile())
       .unwrap()
       .then((data) => {
-        const prof = data?.data
+        const prof = data?.data || data
         if (prof) {
           setValue("name", prof.name || "")
           setValue("description", prof.description || "")
-        } else {
-          setIsCreating(true)
         }
       })
-      .catch(() => {
-        setIsCreating(true)
-      })
+    
+    // Fetch stats dynamically
+    dispatch(fetchCompanyJobs({ page: 1, limit: 100 }))
+    dispatch(fetchJobApplications({ page: 1 }))
   }, [dispatch, setValue])
 
   useEffect(() => {
     if (profile) {
-      setValue("name", profile.name || "")
-      setValue("description", profile.description || "")
-      setIsCreating(false)
+      const prof = profile.data || profile
+      setValue("name", prof.name || "")
+      setValue("description", prof.description || "")
     }
   }, [profile, setValue])
 
   const onSubmit = async (data: ProfileFormData) => {
     try {
-      if (isCreating) {
-        await dispatch(createCompanyProfile(data)).unwrap()
-        toast.success("Profile created successfully!")
-        setIsCreating(false)
-        setIsEditing(false)
-        dispatch(fetchCompanyProfile())
-      } else {
-        await dispatch(updateCompanyProfile(data)).unwrap()
-        toast.success("Profile updated successfully!")
-        setIsEditing(false)
-        dispatch(fetchCompanyProfile())
-      }
+      await dispatch(updateCompanyProfile(data)).unwrap()
+      toast.success("Profile updated successfully!")
+      setIsEditing(false)
+      dispatch(fetchCompanyProfile())
     } catch (error: any) {
       toast.error(error?.message || "Failed to save profile")
     }
@@ -103,11 +95,11 @@ const CompanyProfile = () => {
               Official Profile
             </div>
             <h1 className="hero-title text-3xl md:text-5xl lg:text-6xl font-black">
-              {profile?.name || "Your Company"}
+              {(profile?.data?.name || profile?.name) || "Your Company"}
             </h1>
             <p className="hero-description text-blue-50/80 max-w-2xl">
-              {profile?.description
-                ? (profile.description.length > 150 ? profile.description.substring(0, 150) + "..." : profile.description)
+              {(profile?.data?.description || profile?.description)
+                ? ((profile?.data?.description || profile?.description).length > 150 ? (profile?.data?.description || profile?.description).substring(0, 150) + "..." : (profile?.data?.description || profile?.description))
                 : "Complete your company profile to start posting jobs and attracting top talent from across the globe."}
             </p>
           </div>
@@ -119,7 +111,7 @@ const CompanyProfile = () => {
               <span className="text-3xl font-black text-white">{jobs?.length || 0}</span>
             </div>
             <div className="bg-white/10 backdrop-blur-md rounded-2xl p-5 border border-white/10 flex flex-col items-center min-w-[120px] transition-transform hover:scale-105 duration-300">
-              <Globe size={20} className="text-blue-200 mb-2" />
+              <Users size={20} className="text-blue-200 mb-2" />
               <span className="text-white/60 text-[10px] font-bold uppercase tracking-widest">Applicants</span>
               <span className="text-3xl font-black text-white">{applications?.length || 0}</span>
             </div>
@@ -133,17 +125,31 @@ const CompanyProfile = () => {
           <div className="saas-card overflow-hidden">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Profile Strength</h3>
-              <span className="text-xs font-bold text-primary">{(profile?.name && profile?.description) ? "100%" : profile?.name ? "50%" : "0%"}</span>
+              <span className="text-xs font-bold text-primary">
+                {(() => {
+                  const prof = profile?.data || profile;
+                  const fields = ['name', 'description'];
+                  const filled = fields.filter(f => prof?.[f]).length;
+                  return Math.round((filled / fields.length) * 100) + "%";
+                })()}
+              </span>
             </div>
             <div className="h-2 w-full bg-muted rounded-full overflow-hidden mb-4">
               <div
                 className="h-full bg-primary transition-all duration-1000 ease-out"
-                style={{ width: (profile?.name && profile?.description) ? "100%" : profile?.name ? "50%" : "0%" }}
+                style={{
+                  width: (() => {
+                    const prof = profile?.data || profile;
+                    const fields = ['name', 'description'];
+                    const filled = fields.filter(f => prof?.[f]).length;
+                    return (filled / fields.length) * 100 + "%";
+                  })()
+                }}
               ></div>
             </div>
             <p className="text-[10px] text-muted-foreground font-medium leading-relaxed">
-              {(profile?.name && profile?.description)
-                ? "Your profile is complete! You're ready to attract top talent."
+              {(profile?.data?.name || profile?.name) && (profile?.data?.description || profile?.description)
+                ? "Your profile is looking great! Complete all fields to maximize visibility."
                 : "Complete your profile details to increase your visibility to candidates."}
             </p>
           </div>
@@ -161,7 +167,9 @@ const CompanyProfile = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase">Support Email</p>
-                  <p className="text-sm font-semibold truncate">{profile?.user?.email || "N/A"}</p>
+                  <p className="text-sm font-semibold truncate">
+                    {(profile?.data?.user?.email || profile?.user?.email) || user?.email || "N/A"}
+                  </p>
                 </div>
               </div>
 
@@ -171,7 +179,9 @@ const CompanyProfile = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase">Administrator</p>
-                  <p className="text-sm font-semibold truncate">{profile?.user?.firstname || "N/A"}</p>
+                  <p className="text-sm font-semibold truncate">
+                    {(profile?.data?.user?.firstname || profile?.user?.firstname) || user?.firstname || "N/A"}
+                  </p>
                 </div>
               </div>
 
@@ -182,7 +192,7 @@ const CompanyProfile = () => {
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] font-bold text-muted-foreground uppercase">Member Since</p>
                   <p className="text-sm font-semibold truncate">
-                    {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "N/A"}
+                    {(profile?.data?.createdAt || profile?.createdAt) ? new Date(profile?.data?.createdAt || profile?.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) : "N/A"}
                   </p>
                 </div>
               </div>
@@ -204,7 +214,7 @@ const CompanyProfile = () => {
                 </div>
               </div>
 
-              {!isEditing && !isCreating && (
+              {!isEditing && (
                 <Button
                   onClick={() => setIsEditing(true)}
                   variant="outline"
@@ -226,7 +236,7 @@ const CompanyProfile = () => {
                     <input
                       id="name"
                       className="saas-input saas-input-with-icon h-12"
-                      disabled={!isEditing && !isCreating}
+                      disabled={!isEditing}
                       placeholder="e.g. Acme Corporation"
                       {...register("name", { required: "Company name is required" })}
                     />
@@ -244,7 +254,7 @@ const CompanyProfile = () => {
                     id="description"
                     rows={8}
                     className="saas-input py-4 resize-none min-h-[200px]"
-                    disabled={!isEditing && !isCreating}
+                    disabled={!isEditing}
                     placeholder="Tell prospective candidates about your company culture, mission, and what makes you unique..."
                     {...register("description", {
                       required: "Description is required",
@@ -258,27 +268,26 @@ const CompanyProfile = () => {
                 </div>
               </div>
 
-              {(isEditing || isCreating) && (
+              {isEditing && (
                 <footer className="p-6 border-t border-border/50 bg-muted/10 flex justify-end gap-3">
-                  {!isCreating && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className="rounded-xl font-bold px-6 border-border hover:bg-muted"
-                      onClick={() => {
-                        setIsEditing(false)
-                        setValue("name", profile?.name || "")
-                        setValue("description", profile?.description || "")
-                      }}
-                    >
-                      Cancel
-                    </Button>
-                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="rounded-xl font-bold px-6 border-border hover:bg-muted"
+                    onClick={() => {
+                      setIsEditing(false)
+                      const prof = profile?.data || profile
+                      setValue("name", prof?.name || "")
+                      setValue("description", prof?.description || "")
+                    }}
+                  >
+                    Cancel
+                  </Button>
                   <Button type="submit" disabled={loading} className="rounded-xl font-bold px-8 min-w-[160px] gap-2 shadow-lg shadow-primary/20">
                     {loading ? <Loader size="sm" /> : (
                       <>
                         <Save size={18} />
-                        {isCreating ? "Create Profile" : "Save Changes"}
+                        Save Changes
                       </>
                     )}
                   </Button>

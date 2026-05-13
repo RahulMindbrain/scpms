@@ -209,7 +209,7 @@ const AdminJobManagement: React.FC = () => {
       </PageHeader>
 
       {/* Tabs & Filters Bar */}
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-6 pb-6 border-b border-border">
+      <div className="flex flex-col lg:flex-row items-center justify-between gap-4 md:gap-6 pb-6 border-b border-border">
         <div className="flex bg-muted/30 p-1 rounded-2xl border border-border w-full lg:w-auto overflow-x-auto scrollbar-hide">
           {(['PENDING', 'APPROVED', 'REJECTED'] as const).map((tab) => {
             const config = STATUS_STYLES[tab];
@@ -218,7 +218,7 @@ const AdminJobManagement: React.FC = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex items-center gap-2 px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${isActive
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 md:px-6 py-2 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${isActive
                   ? `bg-${config.color}-500/10 text-${config.color}-600 border border-${config.color}-500/20 shadow-sm`
                   : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   }`}
@@ -230,9 +230,9 @@ const AdminJobManagement: React.FC = () => {
           })}
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 md:gap-3 w-full lg:w-auto">
           <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-[160px] h-10 rounded-xl bg-background/50 border-border text-xs font-bold uppercase tracking-widest">
+            <SelectTrigger className="w-full sm:w-[150px] h-10 rounded-xl bg-background/50 border-border text-[10px] font-bold uppercase tracking-widest">
               <ArrowUpDown className="size-3.5 mr-2 text-muted-foreground" />
               <SelectValue placeholder="Sort" />
             </SelectTrigger>
@@ -244,9 +244,9 @@ const AdminJobManagement: React.FC = () => {
           </Select>
 
           <Select value={filterDepartment} onValueChange={setFilterDepartment}>
-            <SelectTrigger className="w-[160px] h-10 rounded-xl bg-background/50 border-border text-xs font-bold uppercase tracking-widest">
+            <SelectTrigger className="w-full sm:w-[150px] h-10 rounded-xl bg-background/50 border-border text-[10px] font-bold uppercase tracking-widest">
               <Filter className="size-3.5 mr-2 text-muted-foreground" />
-              <SelectValue placeholder="Department" />
+              <SelectValue placeholder="Dept" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="all">All Depts</SelectItem>
@@ -257,9 +257,9 @@ const AdminJobManagement: React.FC = () => {
           </Select>
 
           <Select value={filterLocation} onValueChange={setFilterLocation}>
-            <SelectTrigger className="w-[160px] h-10 rounded-xl bg-background/50 border-border text-xs font-bold uppercase tracking-widest">
+            <SelectTrigger className="w-full sm:w-[150px] h-10 rounded-xl bg-background/50 border-border text-[10px] font-bold uppercase tracking-widest">
               <MapPin className="size-3.5 mr-2 text-muted-foreground" />
-              <SelectValue placeholder="Location" />
+              <SelectValue placeholder="Loc" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
               <SelectItem value="all">All Locations</SelectItem>
@@ -270,12 +270,12 @@ const AdminJobManagement: React.FC = () => {
           </Select>
 
           <Select value={filterCompany} onValueChange={setFilterCompany}>
-            <SelectTrigger className="w-[160px] h-10 rounded-xl bg-background/50 border-border text-xs font-bold uppercase tracking-widest">
+            <SelectTrigger className="w-full sm:w-[150px] h-10 rounded-xl bg-background/50 border-border text-[10px] font-bold uppercase tracking-widest">
               <Building2 className="size-3.5 mr-2 text-muted-foreground" />
-              <SelectValue placeholder="Company" />
+              <SelectValue placeholder="Brand" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
-              <SelectItem value="all">All Companies</SelectItem>
+              <SelectItem value="all">All Brands</SelectItem>
               {reduxCompanies.map((company: any) => (
                 <SelectItem key={company.id} value={company.id.toString()}>{company.name}</SelectItem>
               ))}
@@ -331,22 +331,22 @@ const AdminJobManagement: React.FC = () => {
                   </DropdownMenu>
                 </div>
 
-                  <div className="flex flex-wrap items-center gap-3 mb-6">
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-muted/50 border border-border text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                      <MapPin className="size-3 text-muted-foreground" />
-                      {row.job?.location || 'Remote'}
+                  <div className="grid grid-cols-2 gap-2 mb-6">
+                    <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-muted/50 border border-border text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                      <MapPin className="size-3 text-muted-foreground shrink-0" />
+                      <span className="truncate">{row.job?.location || 'Remote'}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black text-emerald-600 uppercase tracking-widest">
-                      <IndianRupee className="size-3" />
-                      {row.salary > 100000 ? (row.salary / 100000).toFixed(1) : row.salary} LPA
+                    <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black text-emerald-600 uppercase tracking-widest">
+                      <IndianRupee className="size-3 shrink-0" />
+                      <span className="truncate">{row.salary > 100000 ? (row.salary / 100000).toFixed(1) : row.salary} LPA</span>
                     </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[10px] font-black text-blue-600 uppercase tracking-widest">
-                      <Clock className="size-3" />
-                      Sent {new Date(row.sentAt).toLocaleDateString()}
+                    <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[9px] font-black text-blue-600 uppercase tracking-widest">
+                      <Clock className="size-3 shrink-0" />
+                      <span className="truncate">{new Date(row.sentAt).toLocaleDateString()}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[10px] font-black text-amber-600 uppercase tracking-widest">
-                      <Briefcase className="size-3" />
-                      {row.openings} Openings
+                    <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[9px] font-black text-amber-600 uppercase tracking-widest">
+                      <Briefcase className="size-3 shrink-0" />
+                      <span className="truncate">{row.openings} Positions</span>
                     </div>
                   </div>
 

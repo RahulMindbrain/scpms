@@ -83,7 +83,7 @@ const Applicants: React.FC = () => {
               <Target size={12} className="animate-pulse text-white" />
               Talent Review
             </div>
-            <h1 className="hero-title">
+            <h1 className="hero-title text-3xl sm:text-4xl lg:text-5xl">
               Drive <br />
               <span>Applicants</span>
             </h1>
@@ -98,8 +98,8 @@ const Applicants: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-8">
         
         {/* Filters Bar */}
-        <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-4">
-          <div className="md:col-span-2 lg:col-span-3 relative group">
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 md:gap-4">
+          <div className="col-span-2 md:col-span-2 lg:col-span-3 relative group">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors" size={18} />
             <input 
               type="text" 
@@ -110,7 +110,7 @@ const Applicants: React.FC = () => {
             />
           </div>
 
-          <div className="md:col-span-1 lg:col-span-1.5">
+          <div className="col-span-1 md:col-span-1 lg:col-span-1.5">
             <div className="relative">
               <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground z-10 pointer-events-none" size={16} />
               <select
@@ -126,7 +126,7 @@ const Applicants: React.FC = () => {
             </div>
           </div>
 
-          <div className="md:col-span-1 lg:col-span-1.5">
+          <div className="col-span-1 md:col-span-1 lg:col-span-1.5">
             <div className="relative">
               <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground z-10 pointer-events-none" size={16} />
               <select
@@ -145,7 +145,7 @@ const Applicants: React.FC = () => {
         </div>
 
         {/* Applicants Table */}
-        <div className="saas-card p-0 overflow-hidden border-none shadow-2xl shadow-primary/5">
+        <div className="hidden md:block saas-card p-0 overflow-hidden border-none shadow-2xl shadow-primary/5">
           <div className="overflow-x-auto">
             <table className="saas-table border-collapse">
               <thead>
@@ -268,6 +268,77 @@ const Applicants: React.FC = () => {
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Mobile View */}
+        <div className="grid grid-cols-1 gap-4 md:hidden pb-12">
+          {loading ? (
+            <div className="py-20 flex justify-center">
+              <Loader text="Analyzing profiles..." />
+            </div>
+          ) : filteredApplicants.length === 0 ? (
+            <div className="py-20 text-center saas-card border-dashed bg-muted/10">
+              <p className="text-sm font-medium text-muted-foreground">No matches found for search.</p>
+            </div>
+          ) : (
+            filteredApplicants.map((app: any) => (
+              <div key={app.id} className="saas-card p-6 space-y-5">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-11 h-11 bg-primary/10 rounded-2xl flex items-center justify-center text-primary border border-primary/5">
+                      <User size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <h3 className="font-black text-foreground text-sm tracking-tight truncate">
+                        {app.student?.user?.firstname} {app.student?.user?.lastname}
+                      </h3>
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest truncate">
+                        {app.student?.department?.name}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="px-2 py-0.5 bg-violet-500/10 text-violet-600 rounded text-[9px] font-black uppercase tracking-widest border border-violet-500/10 shrink-0">
+                    {app.student?.cgpa} CGPA
+                  </div>
+                </div>
+
+                <div className="py-4 border-y border-border/50 flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-foreground font-bold">
+                    <div className="p-1.5 bg-emerald-500/10 text-emerald-600 rounded-lg">
+                      <Briefcase size={12} />
+                    </div>
+                    <span className="text-[11px] truncate max-w-[150px]">{app.job?.title}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between gap-3">
+                  <div className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                    Lifecycle
+                  </div>
+                  <Select
+                    value={app.status}
+                    onValueChange={(value) => handleStatusUpdate(app.id, value, app.status)}
+                  >
+                    <SelectTrigger className={`
+                      flex-1 h-10 rounded-xl text-[9px] font-black uppercase tracking-widest border-2 transition-all
+                      ${app.status === 'SELECTED' ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-600' :
+                        app.status === 'REJECTED' ? 'border-rose-500/50 bg-rose-500/5 text-rose-600' :
+                        app.status === 'SHORTLISTED' ? 'border-violet-500/50 bg-violet-500/5 text-violet-600' :
+                        'border-primary/50 bg-primary/5 text-primary'}
+                    `}>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-2xl border-border shadow-2xl">
+                      <SelectItem value="APPLIED" disabled={isBackward(app.status, 'APPLIED')}>Applied</SelectItem>
+                      <SelectItem value="SHORTLISTED" disabled={isBackward(app.status, 'SHORTLISTED')}>Shortlisted</SelectItem>
+                      <SelectItem value="SELECTED" disabled={isBackward(app.status, 'SELECTED')}>Selected</SelectItem>
+                      <SelectItem value="REJECTED" disabled={isBackward(app.status, 'REJECTED')}>Rejected</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
       </div>

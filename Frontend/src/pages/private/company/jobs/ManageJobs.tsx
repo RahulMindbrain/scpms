@@ -83,7 +83,7 @@ const ManageJobs: React.FC = () => {
                 <Sparkles size={12} className="animate-pulse" />
                 Management Console
               </div>
-              <h1 className="hero-title">
+              <h1 className="hero-title text-3xl sm:text-4xl lg:text-5xl">
                 Manage Your <br />
                 <span>Job Drives</span>
               </h1>
@@ -135,7 +135,7 @@ const ManageJobs: React.FC = () => {
         </div>
 
         {/* Jobs Grid/List */}
-        <div className="saas-card overflow-hidden border-none p-0 shadow-2xl shadow-primary/5">
+        <div className="hidden md:block saas-card overflow-hidden border-none p-0 shadow-2xl shadow-primary/5">
           <div className="overflow-x-auto">
             <table className="saas-table border-collapse">
               <thead>
@@ -281,6 +281,92 @@ const ManageJobs: React.FC = () => {
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Mobile View */}
+        <div className="grid grid-cols-1 gap-4 md:hidden">
+          {loading ? (
+            <div className="py-20 flex justify-center">
+              <Loader text="Loading drives..." />
+            </div>
+          ) : filteredJobs?.length === 0 ? (
+            <div className="py-20 text-center saas-card border-dashed bg-muted/10">
+              <p className="text-sm font-medium text-muted-foreground">No drives found matching your search.</p>
+            </div>
+          ) : (
+            filteredJobs?.map((job: any) => (
+              <div key={job.id} className="saas-card p-6 space-y-5">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="space-y-1">
+                    <h3 className="font-bold text-foreground text-base leading-tight">{job.title}</h3>
+                    <div className="flex items-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                      <MapPin size={10} className="text-primary/60" />
+                      {job.location}
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="flex items-center gap-1.5 font-medium text-muted-foreground">
+                      <Calendar size={12} className="text-muted-foreground/50" />
+                      <span className="text-[10px]">
+                        {job.createdAt ? new Date(job.createdAt).toLocaleDateString() : 'N/A'}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 py-4 border-y border-border/50">
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Departments</p>
+                    <div className="flex flex-wrap gap-1">
+                      {job.eligibleDepartments?.slice(0, 2).map((dept: any) => (
+                        <Badge key={dept.id} variant="secondary" className="bg-primary/5 text-primary border-none text-[8px] font-bold px-1.5 py-0">
+                          {dept.name}
+                        </Badge>
+                      ))}
+                      {job.eligibleDepartments?.length > 2 && <span className="text-[8px] text-muted-foreground font-bold">+{job.eligibleDepartments.length - 2}</span>}
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Key Skills</p>
+                    <div className="flex flex-wrap gap-1">
+                      {job.skills?.slice(0, 2).map((skill: any) => (
+                        <Badge key={skill.id} variant="outline" className="text-[8px] font-bold px-1.5 py-0 border-muted-foreground/20 text-muted-foreground">
+                          {skill.name}
+                        </Badge>
+                      ))}
+                      {job.skills?.length > 2 && <span className="text-[8px] text-muted-foreground font-bold">+{job.skills.length - 2}</span>}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <div className="text-[10px] font-black text-primary uppercase tracking-widest">
+                    ID: {String(job.id).slice(-4).toUpperCase()}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      to={`/company/send-job-to-university?jobId=${job.id}`}
+                      className="h-9 px-4 flex items-center justify-center rounded-xl bg-blue-500/10 text-blue-600 text-[10px] font-black uppercase tracking-widest hover:bg-blue-500 hover:text-white transition-all"
+                    >
+                      Send
+                    </Link>
+                    <Link
+                      to={`/company/post-job?jobId=${job.id}`}
+                      className="size-9 flex items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all"
+                    >
+                      <Edit3 size={14} />
+                    </Link>
+                    <button
+                      onClick={() => handleDeleteJob(job.id)}
+                      className="size-9 flex items-center justify-center rounded-xl bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white transition-all"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
 
         {/* Pagination */}

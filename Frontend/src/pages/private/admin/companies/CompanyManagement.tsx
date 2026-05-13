@@ -160,23 +160,25 @@ const CompanyManagement: React.FC = () => {
         icon={Building2}
         variant="indigo"
       >
-        <div className="relative w-full lg:w-[280px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search partners..."
-            className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
-          />
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+          <div className="relative w-full sm:w-[240px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search partners..."
+              className="w-full pl-9 pr-4 py-2 bg-background border border-border rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all"
+            />
+          </div>
+          <Button onClick={() => setIsAddModalOpen(true)} className="w-full sm:w-auto h-10 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/20 whitespace-nowrap">
+            Onboard Partner
+          </Button>
         </div>
-        <Button onClick={() => setIsAddModalOpen(true)} className="h-10 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl shadow-lg shadow-primary/20">
-          Onboard Partner
-        </Button>
       </PageHeader>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
         {[
           { label: "Total Partners", value: companies.length, icon: Building2, color: "indigo" },
           { label: "Verified Brands", value: companies.filter(c => c.approval === 'Approved').length, icon: CheckCircle2, color: "emerald" },
@@ -189,20 +191,20 @@ const CompanyManagement: React.FC = () => {
                 <stat.icon className="size-5" />
               </div>
             </div>
-            <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{stat.label}</p>
-            <h2 className="text-3xl font-black text-foreground mt-1 tracking-tight">{stat.value}</h2>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider line-clamp-1">{stat.label}</p>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-foreground mt-1 tracking-tight">{stat.value}</h2>
           </div>
         ))}
       </div>
 
       {/* Filters */}
-      <div className="flex items-center justify-between border-b border-border pb-6">
-        <div className="flex bg-muted/30 p-1 rounded-2xl border border-border">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-border pb-6">
+        <div className="flex bg-muted/30 p-1 rounded-2xl border border-border w-full sm:w-auto overflow-x-auto scrollbar-hide">
           {['All', 'Active', 'Inactive'].map((opt) => (
             <button
               key={opt}
               onClick={() => setFilter(opt)}
-              className={`px-6 py-2 rounded-xl text-xs font-bold transition-all duration-300 ${filter === opt
+              className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-xl text-[10px] sm:text-xs font-bold transition-all duration-300 whitespace-nowrap ${filter === opt
                 ? 'bg-primary text-white shadow-lg shadow-primary/20'
                 : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                 }`}
@@ -211,8 +213,8 @@ const CompanyManagement: React.FC = () => {
             </button>
           ))}
         </div>
-        <div className="hidden md:flex items-center gap-2 text-muted-foreground text-xs font-bold uppercase tracking-widest">
-          <LayoutGrid className="w-4 h-4" />
+        <div className="flex items-center gap-2 text-muted-foreground text-[10px] font-bold uppercase tracking-widest">
+          <LayoutGrid className="w-3.5 h-3.5" />
           <span>{filteredCompanies.length} entities found</span>
         </div>
       </div>

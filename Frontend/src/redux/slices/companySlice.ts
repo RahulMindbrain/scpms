@@ -77,13 +77,13 @@ const companySlice = createSlice({
 
       // ✅ Profile
       .addCase(fetchCompanyProfile.fulfilled, (state, action) => {
-        state.profile = action.payload;
+        state.profile = action.payload.data || action.payload;
       })
       .addCase(createCompanyProfile.fulfilled, (state, action) => {
-        state.profile = action.payload;
+        state.profile = action.payload.data || action.payload;
       })
       .addCase(updateCompanyProfile.fulfilled, (state, action) => {
-        state.profile = action.payload;
+        state.profile = action.payload.data || action.payload;
       })
 
       // ✅ Jobs

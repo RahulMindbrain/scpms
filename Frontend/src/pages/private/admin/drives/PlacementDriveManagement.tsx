@@ -195,8 +195,8 @@ const PlacementDriveManagement: React.FC = () => {
         icon={Trophy}
         variant="amber"
       >
-        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-          <div className="relative w-full lg:w-[240px]">
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full lg:w-auto">
+          <div className="relative w-full sm:w-[240px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Search companies..."
@@ -254,16 +254,16 @@ const PlacementDriveManagement: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
         {[
           { label: 'Total Drives', value: reduxJobs.length, icon: Trophy, color: 'primary' },
-          { label: 'Active Companies', value: processedDrives.length, icon: Building2, color: 'emerald' },
-          { label: 'Scheduled Interviews', value: reduxJobs.filter((job: Job) => !!job.interviewScheduleId).length, icon: Calendar, color: 'indigo' }
+          { label: 'Active Brands', value: processedDrives.length, icon: Building2, color: 'emerald' },
+          { label: 'Interviews', value: reduxJobs.filter((job: Job) => !!job.interviewScheduleId).length, icon: Calendar, color: 'indigo' }
         ].map((stat, i) => (
-          <div key={i} className="saas-card flex items-center gap-5">
-            <div className={`size-12 rounded-2xl bg-${stat.color}-500/10 flex items-center justify-center border border-${stat.color}-500/20`}>
-              <stat.icon className={`size-6 text-${stat.color}-600`} />
+          <div key={i} className="saas-card flex items-center gap-4 p-4 md:p-6">
+            <div className={`size-10 md:size-12 rounded-xl md:rounded-2xl bg-${stat.color}-500/10 flex items-center justify-center border border-${stat.color}-500/20 shrink-0`}>
+              <stat.icon className={`size-5 md:size-6 text-${stat.color}-600`} />
             </div>
             <div>
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-1">{stat.label}</p>
-              <p className="text-2xl font-black text-foreground">{stat.value}</p>
+              <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5 md:mb-1">{stat.label}</p>
+              <p className="text-xl md:text-2xl font-black text-foreground">{stat.value}</p>
             </div>
           </div>
         ))}
@@ -285,42 +285,42 @@ const PlacementDriveManagement: React.FC = () => {
                   <button
                     onClick={() => toggleCompany(group.company.id)}
                     className={cn(
-                      "w-full flex flex-col md:flex-row md:items-center gap-6 p-6 rounded-[2rem] text-left transition-all duration-300",
+                      "w-full flex items-center gap-4 md:gap-6 p-4 md:p-6 rounded-3xl md:rounded-[2rem] text-left transition-all duration-300",
                       "bg-card border border-border hover:border-primary/20 shadow-sm group",
                       !isExpanded && "opacity-80 grayscale-[0.2]"
                     )}
                   >
-                    <div className="size-16 bg-muted/50 rounded-2xl flex items-center justify-center border border-border group-hover:border-primary/30 transition-all shadow-sm shrink-0">
-                      <Building2 className="size-8 text-muted-foreground group-hover:text-primary transition-colors" />
+                    <div className="size-12 md:size-16 bg-muted/50 rounded-xl md:rounded-2xl flex items-center justify-center border border-border group-hover:border-primary/30 transition-all shadow-sm shrink-0">
+                      <Building2 className="size-6 md:size-8 text-muted-foreground group-hover:text-primary transition-colors" />
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-3 mb-1">
-                        <h2 className="text-xl font-bold text-foreground tracking-tight group-hover:text-primary transition-colors">
+                      <div className="flex flex-wrap items-center gap-2 md:gap-3 mb-1">
+                        <h2 className="text-base md:text-xl font-bold text-foreground tracking-tight group-hover:text-primary transition-colors truncate">
                           {group.company.name}
                         </h2>
-                        <Badge variant="outline" className="bg-primary/5 border-primary/20 text-primary font-black text-[9px] uppercase tracking-widest px-2.5 py-0.5">
-                          {group.jobs.length} {group.jobs.length === 1 ? 'Opening' : 'Openings'}
+                        <Badge variant="outline" className="bg-primary/5 border-primary/20 text-primary font-black text-[8px] md:text-[9px] uppercase tracking-widest px-2 py-0.5">
+                          {group.jobs.length} {group.jobs.length === 1 ? 'Job' : 'Jobs'}
                         </Badge>
                       </div>
-                      <div className="flex items-center gap-3 text-muted-foreground">
-                        <div className="flex items-center gap-1.5 text-xs font-medium">
-                          <MapPin className="size-3.5" />
+                      <div className="flex items-center gap-2 md:gap-3 text-muted-foreground overflow-hidden">
+                        <div className="flex items-center gap-1 text-[10px] md:text-xs font-medium shrink-0">
+                          <MapPin className="size-3 md:size-3.5" />
                           {group.company.location || 'PAN India'}
                         </div>
-                        <div className="size-1 bg-border rounded-full" />
-                        <p className="text-xs font-medium truncate max-w-md text-muted-foreground/70">
+                        <div className="hidden sm:block size-1 bg-border rounded-full shrink-0" />
+                        <p className="hidden sm:block text-[10px] md:text-xs font-medium truncate text-muted-foreground/70">
                           {group.company.description || "Corporate recruitment partner."}
                         </p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 ml-auto">
+                    <div className="flex items-center shrink-0">
                       <div className={cn(
-                        "size-10 rounded-xl flex items-center justify-center border transition-all",
+                        "size-8 md:size-10 rounded-lg md:rounded-xl flex items-center justify-center border transition-all",
                         isExpanded ? "bg-primary/10 border-primary/20 text-primary" : "bg-muted/50 border-border text-muted-foreground"
                       )}>
-                        <ChevronDown className={cn("size-5 transition-transform duration-500", !isExpanded && "-rotate-90")} />
+                        <ChevronDown className={cn("size-4 md:size-5 transition-transform duration-500", !isExpanded && "-rotate-90")} />
                       </div>
                     </div>
                   </button>
@@ -334,7 +334,7 @@ const PlacementDriveManagement: React.FC = () => {
                         exit={{ height: 0, opacity: 0 }}
                         className="overflow-hidden"
                       >
-                        <div className="grid grid-cols-1 gap-4 pl-4 border-l-2 border-border ml-8 py-2">
+                        <div className="grid grid-cols-1 gap-4 pl-3 md:pl-4 border-l-2 border-border ml-4 md:ml-8 py-2">
                           {group.jobs.map((job) => {
                             const config = statusConfig[job.status];
                             return (
@@ -343,69 +343,69 @@ const PlacementDriveManagement: React.FC = () => {
                                 layout
                                 initial={{ opacity: 0, x: -10 }}
                                 animate={{ opacity: 1, x: 0 }}
-                                className="saas-card relative group/job p-6"
+                                className="saas-card relative group/job p-4 md:p-6"
                               >
-                                <div className="flex flex-col xl:flex-row gap-8">
+                                <div className="flex flex-col xl:flex-row gap-6 md:gap-8">
                                   <div className="flex-1 min-w-0">
-                                    <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-                                      <div className="space-y-1.5">
-                                        <h3 className="text-lg font-bold text-foreground group-hover/job:text-primary transition-colors tracking-tight">
+                                    <div className="flex flex-wrap items-center justify-between gap-3 md:gap-4 mb-4">
+                                      <div className="space-y-1">
+                                        <h3 className="text-base md:text-lg font-bold text-foreground group-hover/job:text-primary transition-colors tracking-tight">
                                           {job.title}
                                         </h3>
-                                        <div className={cn("inline-flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border shadow-sm", config.bg, config.color)}>
-                                          <div className={cn("size-1.5 rounded-full animate-pulse", config.dot)} />
+                                        <div className={cn("inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-widest border shadow-sm", config.bg, config.color)}>
+                                          <div className={cn("size-1 rounded-full animate-pulse", config.dot)} />
                                           {config.label}
                                         </div>
                                       </div>
 
-                                      <div className="flex flex-wrap gap-2">
+                                      <div className="flex flex-wrap gap-1.5 md:gap-2">
                                         {(job.departments?.length ? job.departments : ['All Depts']).slice(0, 2).map((dept: string) => (
-                                          <Badge key={dept} variant="outline" className="bg-muted/30 border-border text-[9px] font-black uppercase tracking-widest px-2.5">
+                                          <Badge key={dept} variant="outline" className="bg-muted/30 border-border text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2 md:px-2.5">
                                             {dept}
                                           </Badge>
                                         ))}
                                       </div>
                                     </div>
 
-                                    <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-6 font-medium">
+                                    <p className="text-[11px] md:text-xs text-muted-foreground leading-relaxed line-clamp-2 mb-4 md:mb-6 font-medium">
                                       {job.description || "No description provided."}
                                     </p>
 
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                                       <div className="space-y-1">
-                                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                                          <IndianRupee className="size-3 text-emerald-500" /> Package
+                                        <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">
+                                          <IndianRupee className="size-2.5 md:size-3 text-emerald-500" /> Package
                                         </p>
-                                        <p className="text-sm font-bold text-foreground">{job.formattedSalary} LPA</p>
+                                        <p className="text-xs md:text-sm font-bold text-foreground">{job.formattedSalary} LPA</p>
                                       </div>
                                       <div className="space-y-1">
-                                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                                          <Target className="size-3 text-indigo-500" /> Eligibility
+                                        <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">
+                                          <Target className="size-2.5 md:size-3 text-indigo-500" /> Eligibility
                                         </p>
-                                        <p className="text-sm font-bold text-foreground">{job.minCgpa ?? 'No'} CGPA</p>
+                                        <p className="text-xs md:text-sm font-bold text-foreground">{job.minCgpa ?? 'No'} CGPA</p>
                                       </div>
                                       <div className="space-y-1">
-                                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                                          <Users className="size-3 text-violet-500" /> Applicants
+                                        <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">
+                                          <Users className="size-2.5 md:size-3 text-violet-500" /> Applicants
                                         </p>
-                                        <p className="text-sm font-bold text-foreground">{job._count?.applications || 0} Applied</p>
+                                        <p className="text-xs md:text-sm font-bold text-foreground">{job._count?.applications || 0} Applied</p>
                                       </div>
                                       <div className="space-y-1">
-                                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                                          <Calendar className="size-3 text-amber-500" /> Posted
+                                        <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">
+                                          <Calendar className="size-2.5 md:size-3 text-amber-500" /> Posted
                                         </p>
-                                        <p className="text-sm font-bold text-foreground">{job.formattedDate}</p>
+                                        <p className="text-xs md:text-sm font-bold text-foreground">{job.formattedDate}</p>
                                       </div>
                                     </div>
                                   </div>
 
-                                  <div className="flex xl:flex-col items-stretch xl:justify-center gap-4 xl:pl-8 xl:border-l border-border min-w-[160px]">
+                                  <div className="flex xl:flex-col items-stretch xl:justify-center gap-3 md:gap-4 xl:pl-8 xl:border-l border-border min-w-full md:min-w-[160px]">
                                     <Button
                                       onClick={() => { setSelectedJob(job); setIsDetailsOpen(true); }}
-                                      className="flex-1 bg-slate-900 hover:bg-primary text-white rounded-xl h-10 font-black uppercase tracking-widest text-[10px] shadow-lg active:scale-95 transition-all"
+                                      className="flex-1 bg-slate-900 hover:bg-primary text-white rounded-xl h-9 md:h-10 font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-lg active:scale-95 transition-all"
                                     >
                                       Review Drive
-                                      <ChevronRight className="size-3.5 ml-1.5" />
+                                      <ChevronRight className="size-3 md:size-3.5 ml-1.5" />
                                     </Button>
                                   </div>
                                 </div>
