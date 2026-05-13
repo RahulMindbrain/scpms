@@ -58,21 +58,142 @@ export const checkUserProfile = async (userId: number, role: string) => {
   if (role === "STUDENT") {
     return prisma.student.findUnique({
       where: { userId },
-      select: { id: true },
+      select: {
+        id: true,
+        userId: true,
+
+        cgpa: true,
+        year: true,
+        passingYear: true,
+
+        resumeUrl: true,
+        activeBacklogs: true,
+
+        linkedinUrl: true,
+        githubUrl: true,
+        portfolioUrl: true,
+
+        isPlaced: true,
+        placedAt: true,
+
+        createdAt: true,
+
+        university: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            city: true,
+            state: true,
+            country: true,
+            status: true,
+          },
+        },
+
+        department: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+
+        skills: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+
+        experiences: {
+          select: {
+            id: true,
+            companyName: true,
+            role: true,
+            description: true,
+            startDate: true,
+            endDate: true,
+          },
+        },
+
+        certificates: {
+          select: {
+            id: true,
+            title: true,
+            issuer: true,
+            certificateUrl: true,
+            issuedDate: true,
+          },
+        },
+
+        projects: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            techStack: true,
+            githubUrl: true,
+            liveUrl: true,
+          },
+        },
+      },
     });
   }
 
   if (role === "COMPANY") {
     return prisma.company.findUnique({
       where: { userId },
-      select: { id: true },
+      select: {
+        id: true,
+        userId: true,
+
+        name: true,
+        description: true,
+
+        createdAt: true,
+
+        universities: {
+          select: {
+            id: true,
+            status: true,
+            approvedAt: true,
+            rejectedAt: true,
+            reason: true,
+
+            university: {
+              select: {
+                id: true,
+                name: true,
+                code: true,
+                city: true,
+                state: true,
+                country: true,
+              },
+            },
+          },
+        },
+      },
     });
   }
 
   if (role === "ADMIN") {
     return prisma.admin.findUnique({
       where: { userId },
-      select: { id: true },
+      select: {
+        id: true,
+        userId: true,
+
+        university: {
+          select: {
+            id: true,
+            name: true,
+            code: true,
+            city: true,
+            state: true,
+            country: true,
+            status: true,
+          },
+        },
+      },
     });
   }
 

@@ -1,5 +1,6 @@
 import { Role } from "@prisma/client";
 import {
+  checkUserProfile,
   createUser,
   findUserByEmail,
   getUserById,
@@ -106,7 +107,12 @@ export const getUserService = async (userId: number) => {
     throw new Error("User not found");
   }
 
-  return user;
+  const profile = (await checkUserProfile(user.id, user.role)) || undefined;
+
+  return {
+    ...user,
+    profile,
+  };
 };
 
 export const updateUserService = async (
