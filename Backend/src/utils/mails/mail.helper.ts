@@ -17,13 +17,14 @@ type DirectionResult = {
 };
 
 type ScheduleWithParticipants = {
-  createdBy: number;
   admin: {
+    userId: number;
     user: {
       email: string;
       firstname: string;
     };
   };
+
   company: {
     userId: number;
     user: {
@@ -37,7 +38,7 @@ export const resolveParticipants = (
   schedule: ScheduleWithParticipants,
 ): Participants => {
   return {
-    adminId: schedule.createdBy,
+    adminId: schedule.admin.userId,
     adminEmail: schedule.admin.user.email,
     adminName: schedule.admin.user.firstname,
 

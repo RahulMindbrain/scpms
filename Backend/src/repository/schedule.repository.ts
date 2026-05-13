@@ -429,8 +429,15 @@ export const getScheduleWithParticipants = async (scheduleId: number) => {
         },
       },
       admin: {
-        include: {
-          user: true,
+        select: {
+          userId: true,
+
+          user: {
+            select: {
+              email: true,
+              firstname: true,
+            },
+          },
         },
       },
     },
