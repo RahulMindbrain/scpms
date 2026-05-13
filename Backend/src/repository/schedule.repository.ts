@@ -706,8 +706,6 @@ export const getSchedulesByCompanyIdRepo = async (companyId: number) => {
 
               title: true,
 
-              status: true,
-
               location: true,
             },
           },
