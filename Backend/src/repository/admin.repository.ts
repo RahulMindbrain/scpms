@@ -74,7 +74,7 @@ export const createAdminWithUniversity = async (
 export const getAdminByUserId = async (userId: number) => {
   return prisma.admin.findUnique({
     where: { userId },
-    select: { id: true },
+    select: { id: true, universityId: true },
   });
 };
 

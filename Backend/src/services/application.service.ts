@@ -36,6 +36,7 @@ import {
   allowedRoundTransitions,
   allowedStatusTransitions,
 } from "../constants/workflow.constants";
+import { getAdminByUserId } from "../repository/admin.repository";
 
 export const createApplicationService = async (
   userId: number,
@@ -205,6 +206,16 @@ export const getApplicationsService = async (
       }
 
       enrichedUser.studentId = student.id;
+    }
+
+    if (user.role === "ADMIN") {
+      const admin = await getAdminByUserId(user.id);
+
+      if (!admin) {
+        throw new Error("Admin not found");
+      }
+
+      enrichedUser.universityId = admin.universityId;
     }
 
     return await getApplications(enrichedUser, filters, page, limit);

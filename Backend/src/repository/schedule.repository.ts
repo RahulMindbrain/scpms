@@ -858,9 +858,7 @@ export const getUpcomingSchedulesForStudent = async (
               select: {
                 id: true,
                 title: true,
-                description: true,
                 location: true,
-                status: true,
                 createdAt: true,
 
                 eligibleDepartments: {
@@ -894,8 +892,6 @@ export const getUpcomingSchedulesForStudent = async (
                 isAccepted: true,
 
                 acceptedAt: true,
-
-                rejectedAt: true,
 
                 reason: true,
 

@@ -327,6 +327,8 @@ export const getJobUniversityById = async (id: number) => {
     where: { id },
 
     include: {
+      university: true,
+
       job: {
         include: {
           company: {
@@ -334,10 +336,12 @@ export const getJobUniversityById = async (id: number) => {
               user: true,
             },
           },
+
+          eligibleDepartments: true,
+
+          skills: true,
         },
       },
-
-      departments: true,
     },
   });
 };

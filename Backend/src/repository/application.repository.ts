@@ -141,8 +141,6 @@ export const getApplications = async (
 
                   location: true,
 
-                  status: true,
-
                   companyId: true,
 
                   company: {
