@@ -88,9 +88,9 @@ export const fetchJobs = createAsyncThunk(
 
 export const applyJob = createAsyncThunk(
     "student/applyJob",
-    async (jobId: number, { rejectWithValue }) => {
+    async (jobUniversityId: number, { rejectWithValue }) => {
         try {
-            const response = await postAPI<any>("/student/apply-job", { jobId });
+            const response = await postAPI<any>("/student/apply-job", { jobUniversityId });
             return response;
         } catch (error: any) {
             return rejectWithValue(error?.message || "Failed to apply for job");

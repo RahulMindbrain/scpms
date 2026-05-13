@@ -18,7 +18,7 @@ import Loader from '@/components/Loader';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from "@/components/ui/card";
-
+import {StudentPageLayout} from '@/components/layout/StudentPageLayout';
 type Status = 'APPLIED' | 'SHORTLISTED' | 'TECHNICAL_ROUND' | 'HR_ROUND' | 'SELECTED' | 'REJECTED';
 
 const STATUS_CONFIG: Record<Status, { label: string; color: string; bgColor: string; icon: any; shadow: string; accent: string }> = {
@@ -131,16 +131,16 @@ const ApplicationCard = ({
     >
       <div className="p-5 md:p-6">
         <div className="flex flex-col md:flex-row items-center gap-4">
-          <CompanyIcon name={app.job?.company?.name || "C"} size="sm" />
+          <CompanyIcon name={app.jobUniversity?.job?.company?.name || "C"} size="sm" />
           
           <div className="flex-1 min-w-0 text-center md:text-left">
             <h3 className="text-lg font-black text-slate-900 dark:text-white truncate tracking-tight">
-              {app.job?.title || "Unknown Role"}
+              {app.jobUniversity?.job?.title || "Unknown Role"}
             </h3>
             <div className="flex items-center justify-center md:justify-start gap-3 mt-1">
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
                 <Building2 size={12} className="text-blue-500" />
-                {app.job?.company?.name}
+                {app.jobUniversity?.job?.company?.name}
               </span>
               <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-white/20" />
               <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center gap-1">
@@ -285,7 +285,7 @@ const ApplicationCard = ({
                         <h4 className="text-[9px] font-black uppercase tracking-widest">Current Status</h4>
                       </div>
                       <p className="text-[11px] text-blue-800/80 dark:text-blue-100/60 leading-relaxed font-medium">
-                        Your application is under review by the {app.job?.company?.name} hiring team.
+                        Your application is under review by the {app.jobUniversity?.job?.company?.name} hiring team.
                       </p>
                     </div>
                   )}
@@ -329,7 +329,6 @@ const StatCard = ({ title, value, icon: Icon, color, subValue }: { title: string
   );
 };
 
-/* ─── Main Component ─── */
 const ApplicationStatus = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -354,8 +353,8 @@ const ApplicationStatus = () => {
   const filteredApplications = useMemo(() => {
     return applications.filter((app: any) => {
       const matchesSearch =
-        app.job?.company?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        app.job?.title?.toLowerCase().includes(searchQuery.toLowerCase());
+        app.jobUniversity?.job?.company?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        app.jobUniversity?.job?.title?.toLowerCase().includes(searchQuery.toLowerCase());
 
       if (!matchesSearch) return false;
 
@@ -377,8 +376,6 @@ const ApplicationStatus = () => {
 
     return { total, active, shortlisted, selected };
   }, [applications]);
-
-
 
   const handleApplicationAction = async (id: number, action: "ACCEPT" | "REJECT") => {
     const loadingText = action === "ACCEPT" ? "Accepting offer..." : "Rejecting offer...";
@@ -402,8 +399,8 @@ const ApplicationStatus = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background min-h-screen">
-      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
+    <StudentPageLayout>
+      <div className="space-y-8 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
         
         {/* Adaptive Hero Banner */}
         <div className="student-hero-banner group">
@@ -430,7 +427,7 @@ const ApplicationStatus = () => {
             </div>
             <Button
               onClick={() => navigate('/student/jobs')}
-              className="bg-white text-slate-900 hover:bg-slate-100 font-black rounded-2xl shadow-2xl px-10 h-16 text-sm transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-3 group whitespace-nowrap"
+              className="bg-white text-slate-900 hover:bg-slate-100 font-black rounded-2xl shadow-2xl px-8 md:px-10 h-14 md:h-16 text-xs md:text-sm transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-3 group whitespace-nowrap"
             >
               Job Explorer <ArrowRight size={20} className="text-blue-600 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -438,15 +435,15 @@ const ApplicationStatus = () => {
         </div>
 
         {/* ─── Streamlined Stats ─── */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           <StatCard
-            title="Total Applications"
+            title="Total Apps"
             value={stats.total}
             icon={Briefcase}
             color="blue"
           />
           <StatCard
-            title="Active Pipeline"
+            title="Active"
             value={stats.active}
             icon={Activity}
             color="blue"
@@ -458,7 +455,7 @@ const ApplicationStatus = () => {
             color="purple"
           />
           <StatCard
-            title="Selections"
+            title="Selected"
             value={stats.selected}
             icon={ShieldCheck}
             color="emerald"
@@ -466,14 +463,14 @@ const ApplicationStatus = () => {
         </div>
 
         {/* ─── Refined Controls ─── */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white/50 dark:bg-[#161b22]/40 p-6 rounded-[2rem] border border-slate-200/60 dark:border-white/[0.08] backdrop-blur-xl shadow-sm">
-          <div className="flex items-center gap-2 p-1.5 bg-slate-200/50 dark:bg-black/40 rounded-2xl border border-slate-200/50 dark:border-white/[0.05] w-full lg:w-auto overflow-x-auto no-scrollbar">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-white/50 dark:bg-[#161b22]/40 p-4 md:p-6 rounded-[2rem] border border-slate-200/60 dark:border-white/[0.08] backdrop-blur-xl shadow-sm">
+          <div className="flex items-center gap-1.5 md:gap-2 p-1 md:p-1.5 bg-slate-200/50 dark:bg-black/40 rounded-2xl border border-slate-200/50 dark:border-white/[0.05] w-full lg:w-auto overflow-x-auto no-scrollbar">
             {["All", "Active", "Shortlisted", "Selected", "Rejected"].map((filter) => (
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
                 className={cn(
-                  "px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
+                  "px-4 md:px-6 py-2.5 md:py-3 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap",
                   activeFilter === filter
                     ? "bg-white dark:bg-[#1e1f26] text-blue-600 dark:text-blue-400 shadow-md border border-slate-200 dark:border-white/10 scale-[1.02]"
                     : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
@@ -488,7 +485,7 @@ const ApplicationStatus = () => {
             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
             <Input
               placeholder="Filter by company or role..."
-              className="pl-14 h-14 bg-white dark:bg-black/20 border-slate-200/60 dark:border-white/[0.1] rounded-2xl text-sm font-bold focus-visible:ring-blue-500/30 transition-all"
+              className="pl-14 h-12 md:h-14 bg-white dark:bg-black/20 border-slate-200/60 dark:border-white/[0.1] rounded-2xl text-sm font-bold focus-visible:ring-blue-500/30 transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -500,12 +497,12 @@ const ApplicationStatus = () => {
           <div className="flex items-center justify-between px-4">
             <div className="flex items-center gap-3">
               <div className="h-2 w-2 rounded-full bg-blue-600 animate-pulse" />
-              <h2 className="text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Live Pipeline Status</h2>
+              <h2 className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">Live Pipeline Status</h2>
             </div>
-            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-3 py-1 rounded-full">{filteredApplications.length} Entries Identified</span>
+            <span className="text-[9px] md:text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-3 py-1 rounded-full">{filteredApplications.length} Entries</span>
           </div>
 
-          <div className="grid grid-cols-1 gap-6">
+          <div className="grid grid-cols-1 gap-4 md:gap-6">
             <AnimatePresence mode="popLayout">
               {filteredApplications.length > 0 ? (
                 filteredApplications.map((app: any) => (
@@ -522,12 +519,12 @@ const ApplicationStatus = () => {
                 <motion.div 
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="py-32 flex flex-col items-center text-center bg-white/30 dark:bg-white/[0.02] rounded-[3rem] border-2 border-dashed border-slate-200/60 dark:border-white/10"
+                  className="py-20 md:py-32 flex flex-col items-center text-center bg-white/30 dark:bg-white/[0.02] rounded-[2.5rem] md:rounded-[3rem] border-2 border-dashed border-slate-200/60 dark:border-white/10 px-4"
                 >
-                  <div className="w-20 h-20 rounded-3xl bg-slate-100 dark:bg-white/5 flex items-center justify-center mb-6 text-slate-300 dark:text-slate-700">
-                    <Search size={40} />
-                  </div>
-                  <h3 className="text-2xl font-black text-slate-900 dark:text-white">No Matching Records</h3>
+                 <div className="w-16 h-16 md:w-20 md:h-20 rounded-[1.5rem] md:rounded-3xl bg-slate-100 dark:bg-white/5 flex items-center justify-center mb-6 text-slate-300 dark:text-slate-700">
+  <Search className="w-8 h-8 md:w-10 md:h-10" />
+</div>
+                  <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white">No Matching Records</h3>
                   <p className="text-slate-500 dark:text-slate-400 text-sm mt-3 font-medium max-w-xs leading-relaxed">
                     We couldn't find any applications matching your current criteria. Try adjusting your filters.
                   </p>
@@ -538,26 +535,26 @@ const ApplicationStatus = () => {
         </div>
 
         {/* ─── Premium Footer Banner ─── */}
-        <div className="group relative overflow-hidden rounded-[2.5rem] bg-white/40 dark:bg-[#161b22]/40 border border-slate-200/60 dark:border-white/[0.08] p-8 flex flex-col md:flex-row items-center gap-8 backdrop-blur-xl shadow-sm">
-          <div className="w-16 h-16 rounded-2xl bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 shadow-inner">
-            <Rocket size={32} className="group-hover:translate-y-[-4px] group-hover:translate-x-[4px] transition-transform duration-500" />
-          </div>
+        <div className="group relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] bg-white/40 dark:bg-[#161b22]/40 border border-slate-200/60 dark:border-white/[0.08] p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-8 backdrop-blur-xl shadow-sm">
+          <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 shadow-inner">
+  <Rocket className="w-7 h-7 md:w-8 md:h-8 group-hover:translate-y-[-4px] group-hover:translate-x-[4px] transition-transform duration-500" />
+</div>
           <div className="flex-1 text-center md:text-left">
-            <h4 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-wider">Operational Velocity</h4>
-            <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-1">
+            <h4 className="text-base md:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wider">Operational Velocity</h4>
+            <p className="text-xs md:text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium mt-1">
               Data shows that candidates who respond within 24 hours increase their final interview success rate by <span className="text-blue-600 dark:text-blue-400 font-black">65%</span>. Keep your profile sharp.
             </p>
           </div>
           <Button
             variant="outline"
             onClick={() => navigate('/student/profile')}
-            className="rounded-2xl px-8 h-14 font-black text-xs uppercase tracking-widest border-slate-200 dark:border-white/10 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-500/20 transition-all shadow-sm"
+            className="w-full md:w-auto rounded-2xl px-8 h-12 md:h-14 font-black text-[10px] md:text-xs uppercase tracking-widest border-slate-200 dark:border-white/10 hover:bg-blue-600 hover:text-white dark:hover:bg-blue-500/20 transition-all shadow-sm"
           >
             Enhance Profile
           </Button>
         </div>
       </div>
-    </div>
+    </StudentPageLayout>
   );
 };
 

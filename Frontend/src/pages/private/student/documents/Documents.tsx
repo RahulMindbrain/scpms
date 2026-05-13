@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
 import Loader from '@/components/Loader';
+import { StudentPageLayout } from '@/components/layout/StudentPageLayout';
 
 const Documents = () => {
   const [activeTab, setActiveTab] = useState('All');
@@ -154,8 +155,8 @@ const Documents = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col bg-background min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
-      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
+    <StudentPageLayout>
+      <div className="space-y-8 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
 
         {/* Adaptive Hero Banner */}
         <div className="student-hero-banner group">
@@ -170,7 +171,7 @@ const Documents = () => {
           <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div className="max-w-2xl">
               <div className="student-hero-badge">
-                <Sparkles /> 
+                <Sparkles size={14} /> 
                 <span>Document Vault</span>
               </div>
               <h1 className="student-hero-title">
@@ -181,13 +182,13 @@ const Documents = () => {
               </p>
             </div>
             
-            <div className="flex flex-col sm:flex-row items-center gap-4">
-              <div className="relative group">
+            <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+              <div className="relative group w-full sm:w-auto">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 dark:text-white/40 dark:group-focus-within:text-white transition-colors" size={18} />
                 <input
                   type="text"
                   placeholder="Search files..."
-                  className="pl-12 pr-6 h-14 bg-slate-100 dark:bg-white/10 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-400 dark:placeholder:text-white/30 text-slate-900 dark:text-white w-full sm:w-64"
+                  className="pl-12 pr-6 h-12 md:h-14 bg-slate-100 dark:bg-white/10 backdrop-blur-xl border border-slate-200 dark:border-white/10 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all placeholder:text-slate-400 dark:placeholder:text-white/30 text-slate-900 dark:text-white w-full sm:w-64"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -196,7 +197,7 @@ const Documents = () => {
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="flex items-center justify-center gap-3 px-8 h-14 bg-white text-[#0f172a] rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all w-full sm:w-auto active:scale-95"
+                className="flex items-center justify-center gap-3 px-8 h-12 md:h-14 bg-white text-[#0f172a] rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-105 transition-all w-full sm:w-auto active:scale-95"
               >
                 {isUploading ? <Loader size="sm" /> : <Upload size={18} />}
                 {isUploading ? "Syncing..." : "Upload File"}
@@ -206,13 +207,13 @@ const Documents = () => {
         </div>
 
         {/* Filters aligned with Premium Style */}
-        <div className="flex items-center gap-2 bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl p-1.5 rounded-2xl border border-slate-200/60 dark:border-white/[0.08] w-fit shadow-sm">
+        <div className="flex items-center gap-1.5 md:gap-2 bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl p-1 md:p-1.5 rounded-2xl border border-slate-200/60 dark:border-white/[0.08] w-fit shadow-sm overflow-x-auto no-scrollbar max-w-full">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveTab(cat)}
               className={cn(
-                "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300",
+                "px-4 md:px-6 py-2.5 md:py-3 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 whitespace-nowrap",
                 activeTab === cat
                   ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-xl border border-slate-200/50 dark:border-white/10 scale-105"
                   : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
@@ -224,11 +225,11 @@ const Documents = () => {
         </div>
 
         {/* Grid aligned with Premium Style */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {filteredDocs.length > 0 ? (
             filteredDocs.map((doc) => (
-              <div key={doc.id} className="group relative bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl p-6 rounded-[2.5rem] border border-slate-200/60 dark:border-white/[0.08] transition-all duration-500 hover:shadow-2xl hover:translate-y-[-4px] hover:border-indigo-500/30">
-                <div className="relative h-48 mb-6 rounded-[1.5rem] overflow-hidden bg-slate-100 dark:bg-black/20 border border-slate-200/50 dark:border-white/5 flex items-center justify-center shadow-inner">
+              <div key={doc.id} className="group relative bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl p-5 md:p-6 rounded-[2.5rem] border border-slate-200/60 dark:border-white/[0.08] transition-all duration-500 hover:shadow-2xl hover:translate-y-[-4px] hover:border-indigo-500/30">
+                <div className="relative h-40 md:h-48 mb-5 md:mb-6 rounded-[1.5rem] overflow-hidden bg-slate-100 dark:bg-black/20 border border-slate-200/50 dark:border-white/5 flex items-center justify-center shadow-inner">
                   {getThumbnail(doc) ? (
                     <img
                       src={getThumbnail(doc)}
@@ -241,23 +242,23 @@ const Documents = () => {
                     />
                   ) : (
                     <div className="p-8 text-indigo-500/40 group-hover:scale-110 transition-transform duration-500">
-                      <FileText size={64} strokeWidth={1} />
+                      <FileText size={56} md:size={64} strokeWidth={1} />
                     </div>
                   )}
                   {/* Hover Overlay */}
                   <div className="absolute inset-0 bg-indigo-900/40 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-center justify-center gap-4">
                     <button
                       onClick={() => downloadFile(doc.url, doc.name)}
-                      className="p-4 bg-white text-indigo-600 rounded-2xl shadow-2xl hover:scale-110 active:scale-95 transition-all"
+                      className="p-3 md:p-4 bg-white text-indigo-600 rounded-2xl shadow-2xl hover:scale-110 active:scale-95 transition-all"
                     >
                       <Download size={20} />
                     </button>
                   </div>
                 </div>
  
-                <div className="px-2 space-y-4">
+                <div className="px-1 md:px-2 space-y-4">
                   <div className="flex justify-between items-start gap-4">
-                    <h3 className="font-black text-lg text-slate-900 dark:text-white truncate tracking-tight" title={doc.name}>
+                    <h3 className="font-black text-base md:text-lg text-slate-900 dark:text-white truncate tracking-tight" title={doc.name}>
                       {doc.name}
                     </h3>
                     <div className="p-2 rounded-xl bg-slate-100 dark:bg-white/5 shadow-inner">
@@ -267,35 +268,35 @@ const Documents = () => {
                   
                   <div className="flex items-center justify-between">
                     <div className="space-y-1">
-                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-black uppercase tracking-[0.2em]">{doc.size} • {doc.date}</p>
+                      <p className="text-[9px] md:text-[10px] text-slate-500 dark:text-slate-400 font-black uppercase tracking-[0.2em]">{doc.size} • {doc.date}</p>
                       <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                        <span className="text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest">{doc.status}</span>
+                        <span className="text-emerald-600 dark:text-emerald-400 text-[9px] md:text-[10px] font-black uppercase tracking-widest">{doc.status}</span>
                       </div>
                     </div>
                     
                     <button
                       onClick={() => deleteDocument(doc.id)}
-                      className="p-3 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100"
+                      className="p-2 md:p-3 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100"
                     >
-                      <Trash2 size={18} />
+                      <Trash2 size={16} md:size={18} />
                     </button>
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <div className="col-span-full py-32 text-center bg-white/40 dark:bg-white/[0.02] border-2 border-dashed border-slate-200/60 dark:border-white/10 rounded-[3rem] shadow-sm">
-              <div className="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-[2.5rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mx-auto mb-6">
-                <FileClock size={48} />
+            <div className="col-span-full py-24 md:py-32 text-center bg-white/40 dark:bg-white/[0.02] border-2 border-dashed border-slate-200/60 dark:border-white/10 rounded-[2.5rem] md:rounded-[3rem] shadow-sm px-4">
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-slate-100 dark:bg-white/5 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mx-auto mb-6">
+                <FileClock size={40} md:size={48} />
               </div>
-              <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Vault is Empty</h3>
-              <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm font-medium">Start by uploading your academic credentials.</p>
+              <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Vault is Empty</h3>
+              <p className="text-slate-500 dark:text-slate-400 mt-2 text-xs md:text-sm font-medium">Start by uploading your academic credentials.</p>
             </div>
           )}
         </div>
       </div>
-    </div>
+    </StudentPageLayout>
   );
 };
 

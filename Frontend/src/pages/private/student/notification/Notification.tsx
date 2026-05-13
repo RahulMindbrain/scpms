@@ -36,6 +36,8 @@ type NotificationItem = {
   createdAt: string;
 };
 
+import { StudentPageLayout } from '@/components/layout/StudentPageLayout';
+
 const Notification = () => {
   const dispatch = useDispatch<AppDispatch>();
   const [activeFilter, setActiveFilter] = useState<NotificationFilter>('all');
@@ -111,7 +113,7 @@ const Notification = () => {
       case 'APPLICATION_REJECTED':
       case 'OFFER_REJECTED':
         return { label: 'Update', icon: Info, color: 'text-rose-600 dark:text-rose-400', bg: 'bg-rose-500/10', border: 'border-rose-500/20' };
-      default: return { label: 'System', icon: Bell, color: 'text-slate-600 dark:text-slate-400', bg: 'bg-slate-500/10', border: 'border-slate-500/20' };
+      default: return { label: 'System', icon: Bell, color: 'text-sidebar-foreground/70 dark:text-slate-400', bg: 'bg-slate-500/10', border: 'border-slate-500/20' };
     }
   };
 
@@ -135,8 +137,8 @@ const Notification = () => {
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-background min-h-screen selection:bg-indigo-500/30 selection:text-indigo-200">
-      <div className="max-w-[1600px] mx-auto w-full p-4 md:p-8 space-y-8 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
+    <StudentPageLayout>
+      <div className="space-y-8 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
         
         {/* Adaptive Hero Banner */}
         <div className="student-hero-banner group">
@@ -162,19 +164,18 @@ const Notification = () => {
                   : "Track all your recruitment milestones, interview calls, and placement activities in real-time."}
               </p>
             </div>
-            
           </div>
         </div>
 
         {/* ─── Controls & Filters ─── */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl p-6 rounded-[2rem] border border-slate-200/60 dark:border-white/[0.08] shadow-sm">
-          <div className="flex items-center gap-2 bg-slate-100 dark:bg-white/5 p-1.5 rounded-2xl border border-slate-200 dark:border-white/[0.05]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl p-4 md:p-6 rounded-[2rem] border border-slate-200/60 dark:border-white/[0.08] shadow-sm">
+          <div className="flex items-center gap-1.5 md:gap-2 bg-slate-100 dark:bg-white/5 p-1 md:p-1.5 rounded-2xl border border-slate-200 dark:border-white/[0.05] overflow-x-auto no-scrollbar w-full sm:w-fit">
             {filterTabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveFilter(tab.key)}
                 className={cn(
-                  "px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 flex items-center gap-2",
+                  "px-4 md:px-6 py-2.5 md:py-3 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 flex items-center gap-2 whitespace-nowrap",
                   activeFilter === tab.key
                     ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-xl border border-slate-200/50 dark:border-white/10 scale-105"
                     : "text-sidebar-foreground/70 hover:text-slate-900 dark:hover:text-white"
@@ -182,7 +183,7 @@ const Notification = () => {
               >
                 {tab.label}
                 <span className={cn(
-                  "px-2 py-0.5 rounded-lg text-[9px] font-black transition-colors shadow-inner",
+                  "px-1.5 md:px-2 py-0.5 rounded-lg text-[8px] md:text-[9px] font-black transition-colors shadow-inner",
                   activeFilter === tab.key ? "bg-indigo-500/10" : "bg-slate-200 dark:bg-white/5"
                 )}>{tab.count}</span>
               </button>
@@ -193,7 +194,7 @@ const Notification = () => {
             variant="outline"
             onClick={handleMarkAllRead}
             disabled={unreadCount === 0 || loading}
-            className="rounded-2xl border-none bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-black text-[10px] uppercase tracking-widest px-8 h-12 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-all shadow-inner"
+            className="w-full sm:w-auto rounded-2xl border-none bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-black text-[9px] md:text-[10px] uppercase tracking-widest px-6 md:px-8 h-12 hover:bg-indigo-600 hover:text-white dark:hover:bg-indigo-600 dark:hover:text-white transition-all shadow-inner"
           >
             Mark all as read <CheckCircle2 className="ml-2 w-4 h-4" />
           </Button>
@@ -216,67 +217,67 @@ const Notification = () => {
                     exit={{ opacity: 0, scale: 0.95 }}
                     onClick={() => !notification.read && handleMarkAsRead(notification.id)}
                     className={cn(
-                      "group relative cursor-pointer rounded-[2.5rem] border p-8 transition-all duration-500 overflow-hidden",
+                      "group relative cursor-pointer rounded-[2rem] md:rounded-[2.5rem] border p-6 md:p-8 transition-all duration-500 overflow-hidden",
                       !notification.read
                         ? "bg-indigo-500/[0.08] dark:bg-indigo-500/10 border-indigo-500/30 shadow-2xl shadow-indigo-500/10"
                         : "bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl border-slate-200/60 dark:border-white/[0.08] hover:border-indigo-500/30 hover:shadow-2xl"
                     )}
                   >
-                    <div className="flex items-start gap-8">
+                    <div className="flex flex-col md:flex-row items-start gap-4 md:gap-8">
                       <div className={cn(
-                        "mt-1 flex h-16 w-16 shrink-0 items-center justify-center rounded-[1.5rem] border shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-3",
+                        "flex h-12 w-12 md:h-16 md:w-16 shrink-0 items-center justify-center rounded-[1rem] md:rounded-[1.5rem] border shadow-2xl transition-all duration-500 group-hover:scale-110 group-hover:rotate-3",
                         !notification.read
                           ? cn(config.bg, config.color, config.border)
                           : "bg-slate-100 dark:bg-white/5 text-slate-400 border-slate-200/50 dark:border-white/10 shadow-inner"
                       )}>
-                        <TagIcon size={28} strokeWidth={2.5} />
+                        <TagIcon size={20} md:size={28} className="md:w-7 md:h-7" strokeWidth={2.5} />
                       </div>
 
                       <div className="min-w-0 flex-1 space-y-3">
-                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 md:gap-4">
                           <div className="space-y-1">
                             <div className="flex items-center gap-3">
                               <span className={cn(
-                                "px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border",
+                                "px-2.5 py-1 rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-widest border",
                                 config.bg, config.color, config.border
                               )}>
                                 {config.label}
                               </span>
                               {!notification.read && (
                                 <div className="flex items-center gap-1.5">
-                                  <div className="h-2 w-2 rounded-full bg-indigo-500 animate-pulse" />
-                                  <span className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">New</span>
+                                  <div className="h-1.5 w-1.5 md:h-2 md:w-2 rounded-full bg-indigo-500 animate-pulse" />
+                                  <span className="text-[8px] md:text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">New</span>
                                 </div>
                               )}
                             </div>
                             <h3 className={cn(
-                              "text-lg font-black tracking-tight transition-colors",
+                              "text-base md:text-lg font-black tracking-tight transition-colors",
                               notification.read ? "text-slate-600 dark:text-slate-400" : "text-slate-900 dark:text-white"
                             )}>
                               {notification.title}
                             </h3>
                           </div>
                           
-                          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-white/5 text-[10px] font-black text-slate-500 uppercase tracking-widest shrink-0 h-fit">
+                          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-white/5 text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-widest shrink-0 h-fit w-fit">
                             <Clock size={12} className="text-indigo-500" />
                             {formatTime(notification.createdAt)}
                           </div>
                         </div>
 
                         <p className={cn(
-                          "text-sm leading-relaxed font-medium",
+                          "text-xs md:text-sm leading-relaxed font-medium",
                           notification.read ? "text-slate-500 dark:text-slate-500" : "text-slate-700 dark:text-slate-300"
                         )}>
                           {notification.message}
                         </p>
 
-                        <div className="pt-2 flex flex-wrap items-center gap-6">
+                        <div className="pt-2 flex flex-wrap items-center gap-4 md:gap-6">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handleViewDetails(notification);
                             }}
-                            className="flex items-center gap-1.5 text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:translate-x-1 transition-transform"
+                            className="flex items-center gap-1.5 text-[10px] md:text-[11px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest hover:translate-x-1 transition-transform"
                           >
                             Details <ArrowUpRight size={14} />
                           </button>
@@ -287,7 +288,7 @@ const Notification = () => {
                                 e.stopPropagation();
                                 handleMarkAsRead(notification.id);
                               }}
-                              className="text-[11px] font-black text-slate-500 hover:text-indigo-600 uppercase tracking-widest transition-colors"
+                              className="text-[10px] md:text-[11px] font-black text-slate-500 hover:text-indigo-600 uppercase tracking-widest transition-colors"
                             >
                               Mark as read
                             </button>
@@ -298,7 +299,7 @@ const Notification = () => {
                               e.stopPropagation();
                               handleDelete(notification.id);
                             }}
-                            className="flex items-center gap-1.5 text-[11px] font-black text-rose-500 hover:text-rose-700 uppercase tracking-widest transition-colors opacity-0 group-hover:opacity-100"
+                            className="flex items-center gap-1.5 text-[10px] md:text-[11px] font-black text-rose-500 hover:text-rose-700 uppercase tracking-widest transition-colors md:opacity-0 md:group-hover:opacity-100"
                           >
                             <Trash2 size={14} /> Remove
                           </button>
@@ -313,13 +314,13 @@ const Notification = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="py-32 flex flex-col items-center text-center bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10 shadow-sm"
+              className="py-20 md:py-32 flex flex-col items-center text-center bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl rounded-[2.5rem] md:rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10 shadow-sm px-4"
             >
-              <div className="w-24 h-24 bg-slate-100 dark:bg-white/5 rounded-[2.5rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 border-2 border-slate-200 dark:border-white/5 shadow-inner">
-                <Bell size={48} strokeWidth={1.5} />
+              <div className="w-20 h-20 md:w-24 md:h-24 bg-slate-100 dark:bg-white/5 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 border-2 border-slate-200 dark:border-white/5 shadow-inner">
+                <Bell size={40} md:size={48} strokeWidth={1.5} />
               </div>
-              <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase text-lg">All caught up!</h3>
-              <p className="text-slate-500 dark:text-slate-400 text-sm max-w-xs mt-2 font-medium opacity-80">
+              <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase">All caught up!</h3>
+              <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 max-w-xs mt-2 font-medium opacity-80">
                 {activeFilter === 'all'
                   ? "You don't have any notifications at the moment. Check back later for updates."
                   : `No ${activeFilter} notifications found in your history.`}
@@ -333,7 +334,7 @@ const Notification = () => {
             <Button
               onClick={() => dispatch(fetchNotifications({ page: pagination.page + 1, limit: pagination.limit }))}
               disabled={loading}
-              className="rounded-2xl border-none bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-black text-[10px] uppercase tracking-widest px-12 h-14 hover:bg-indigo-600 hover:text-white transition-all shadow-inner active:scale-95"
+              className="w-full sm:w-auto rounded-2xl border-none bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white font-black text-[10px] uppercase tracking-widest px-12 h-14 hover:bg-indigo-600 hover:text-white transition-all shadow-inner active:scale-95"
             >
               {loading ? <Loader size="sm" /> : 'Load older notifications'}
             </Button>
@@ -355,30 +356,30 @@ const Notification = () => {
                 initial={{ y: 20, opacity: 0, scale: 0.95 }}
                 animate={{ y: 0, opacity: 1, scale: 1 }}
                 exit={{ y: 20, opacity: 0, scale: 0.95 }}
-                className="relative w-full max-w-lg rounded-[2.5rem] bg-white dark:bg-[#1e1f26] p-10 shadow-2xl border border-slate-200 dark:border-white/10"
+                className="relative w-full max-w-lg rounded-[2.5rem] bg-white dark:bg-[#1e1f26] p-6 md:p-10 shadow-2xl border border-slate-200 dark:border-white/10"
               >
-                <div className="mb-8 flex items-start justify-between gap-6">
+                <div className="mb-6 md:mb-8 flex items-start justify-between gap-4 md:gap-6">
                   <div className="space-y-2">
                     <div className={cn(
-                      "px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border w-fit shadow-sm",
+                      "px-3 py-1 rounded-full text-[8px] md:text-[9px] font-black uppercase tracking-widest border w-fit shadow-sm",
                       getTagConfig(selectedNotification.type).bg,
                       getTagConfig(selectedNotification.type).color,
                       getTagConfig(selectedNotification.type).border
                     )}>
                       {getTagConfig(selectedNotification.type).label}
                     </div>
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">{selectedNotification.title}</h3>
-                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{formatTime(selectedNotification.createdAt)}</p>
+                    <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">{selectedNotification.title}</h3>
+                    <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{formatTime(selectedNotification.createdAt)}</p>
                   </div>
                   <button
                     onClick={() => setSelectedNotification(null)}
-                    className="rounded-2xl p-3 bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-rose-500 transition-colors shadow-inner"
+                    className="rounded-2xl p-2 md:p-3 bg-slate-100 dark:bg-white/5 text-slate-400 hover:text-rose-500 transition-colors shadow-inner"
                   >
                     <X size={20} />
                   </button>
                 </div>
 
-                <div className="rounded-[1.5rem] bg-slate-50 dark:bg-white/[0.03] p-8 text-base leading-relaxed text-slate-700 dark:text-slate-200 font-medium border border-slate-100 dark:border-white/5 shadow-inner">
+                <div className="rounded-[1.5rem] bg-slate-50 dark:bg-white/[0.03] p-6 md:p-8 text-sm md:text-base leading-relaxed text-slate-700 dark:text-slate-200 font-medium border border-slate-100 dark:border-white/5 shadow-inner">
                   {selectedNotification.message}
                 </div>
 
@@ -395,7 +396,7 @@ const Notification = () => {
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </StudentPageLayout>
   );
 };
 
