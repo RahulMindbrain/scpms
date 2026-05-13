@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Modal } from '@/components/ui/modal';
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -79,7 +80,8 @@ const InterviewSchedulerPage: React.FC = () => {
     title: '',
     startTime: '',
     endTime: '',
-    venue: ''
+    venue: '',
+    message: ''
   });
   const [isSubmittingSchedule, setIsSubmittingSchedule] = useState(false);
   const [isWizardOpen, setIsWizardOpen] = useState(false);
@@ -132,7 +134,8 @@ const InterviewSchedulerPage: React.FC = () => {
       title: `${job.job?.title || 'Drive'} @ ${job.university?.name || job.job?.company?.name || 'Campus'}`,
       startTime: '',
       endTime: '',
-      venue: ''
+      venue: '',
+      message: ''
     });
     setIsFinalizeModalOpen(true);
   };
@@ -155,7 +158,12 @@ const InterviewSchedulerPage: React.FC = () => {
         venue: finalizeData.venue
       };
 
-      await dispatch(createSchedule(payload)).unwrap();
+      const res = await dispatch(createSchedule(payload)).unwrap();
+      
+      if (finalizeData.message.trim() && res?.data?.id) {
+        await dispatch(sendScheduleMessage({ id: res.data.id, message: finalizeData.message.trim() })).unwrap();
+      }
+
       toast.success("Interview scheduled successfully!");
       setIsFinalizeModalOpen(false);
       setIsJobsModalOpen(false);
@@ -767,6 +775,16 @@ const InterviewSchedulerPage: React.FC = () => {
               onChange={(e) => setFinalizeData({...finalizeData, venue: e.target.value})}
               placeholder="e.g. Main Auditorium or G-Meet Link"
               className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium text-slate-700"
+            />
+          </div>
+
+          <div className="space-y-3">
+            <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Custom Instructions</label>
+            <Textarea 
+              placeholder="Add any specific details or requirements for the candidates..."
+              value={finalizeData.message}
+              onChange={(e) => setFinalizeData({...finalizeData, message: e.target.value})}
+              className="min-h-[120px] rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium resize-none focus:ring-[#1A6CFF]/10 p-5 text-slate-700"
             />
           </div>
 
