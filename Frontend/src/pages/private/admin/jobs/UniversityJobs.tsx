@@ -122,7 +122,7 @@ const UniversityJobs: React.FC = () => {
         variant="blue"
       />
 
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card/50 backdrop-blur-md p-6 rounded-3xl border border-border shadow-sm">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-card/50 backdrop-blur-md p-6 rounded-3xl border border-border shadow-sm">
         <div className="relative flex-1 max-w-md group">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
           <Input
@@ -228,7 +228,7 @@ const UniversityJobs: React.FC = () => {
       {filteredAndSortedJobs.length === 0 && !loading && (
         <div className="text-center py-20 bg-card/30 rounded-[3rem] border border-dashed border-border mt-8">
           <Briefcase className="size-16 text-muted-foreground/20 mx-auto mb-4" />
-          <h3 className="text-xl font-bold text-foreground">No approved jobs found</h3>
+          <h3 className="text-xl font-bold text-foreground truncate px-4">No approved jobs found</h3>
           <p className="text-muted-foreground text-sm mt-2">Try adjusting your filters or search terms.</p>
         </div>
       )}

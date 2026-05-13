@@ -160,7 +160,7 @@ const CompanyManagement: React.FC = () => {
         icon={Building2}
         variant="indigo"
       >
-        <div className="relative w-full sm:w-[280px]">
+        <div className="relative w-full lg:w-[280px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
             type="text"
@@ -176,7 +176,7 @@ const CompanyManagement: React.FC = () => {
       </PageHeader>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {[
           { label: "Total Partners", value: companies.length, icon: Building2, color: "indigo" },
           { label: "Verified Brands", value: companies.filter(c => c.approval === 'Approved').length, icon: CheckCircle2, color: "emerald" },

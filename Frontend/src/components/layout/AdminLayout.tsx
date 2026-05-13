@@ -19,7 +19,7 @@ const AdminLayout: React.FC = () => {
         <AppSidebar variant="inset" />
         <SidebarInset className="bg-background">
           <SiteHeader />
-          <main className="relative flex flex-1 flex-col bg-background min-h-0 overflow-y-auto @container/main">
+          <main className="relative flex flex-1 flex-col bg-background min-h-0 overflow-y-auto overflow-x-hidden @container/main">
             <Outlet />
           </main>
         </SidebarInset>

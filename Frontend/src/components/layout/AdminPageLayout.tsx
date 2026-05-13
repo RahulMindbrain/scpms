@@ -8,7 +8,7 @@ interface AdminPageLayoutProps {
 export function AdminPageLayout({ children, className = "" }: AdminPageLayoutProps) {
   return (
     <div className={`flex-1 flex flex-col bg-background min-h-0 ${className}`}>
-      <div className="max-w-[1600px] w-full mx-auto p-4 md:p-8 lg:p-10 space-y-8 animate-in fade-in duration-700">
+      <div className="max-w-[1600px] w-full mx-auto p-4 sm:p-6 lg:p-10 space-y-8 animate-in fade-in duration-700">
         {children}
       </div>
     </div>

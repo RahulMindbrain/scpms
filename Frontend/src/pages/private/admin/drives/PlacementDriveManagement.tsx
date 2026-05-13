@@ -195,8 +195,8 @@ const PlacementDriveManagement: React.FC = () => {
         icon={Trophy}
         variant="amber"
       >
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
-          <div className="relative w-full sm:w-[240px]">
+        <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+          <div className="relative w-full lg:w-[240px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Search companies..."
@@ -210,7 +210,7 @@ const PlacementDriveManagement: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="w-full sm:w-auto flex items-center justify-between gap-3 h-10 rounded-xl border-border bg-background/50 text-xs font-black uppercase tracking-widest px-4"
+              className="w-full lg:w-auto flex items-center justify-between gap-3 h-10 rounded-xl border-border bg-background/50 text-xs font-black uppercase tracking-widest px-4"
             >
               <div className="flex items-center gap-2">
                 <Filter className="size-3.5 text-primary" />

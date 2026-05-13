@@ -73,7 +73,7 @@ export function PageHeader({
       </div>
       <div className="hero-texture"></div>
 
-      <div className="relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div className="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div className="space-y-4">
           {badge && (
             <div className="hero-badge">
@@ -81,17 +81,17 @@ export function PageHeader({
               <span>{badge}</span>
             </div>
           )}
-          <h1 className="text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-            {Icon && <Icon className={`h-8 w-8 ${colors.titleSpan}`} />}
-            {title}
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+            {Icon && <Icon className={`h-8 w-8 ${colors.titleSpan} shrink-0`} />}
+            <span className="truncate">{title}</span>
           </h1>
           {description && (
-            <p className="max-w-2xl text-sm md:text-base text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+            <p className="max-w-2xl text-xs sm:text-sm md:text-base text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
               {description}
             </p>
           )}
         </div>
-        {children && <div className="flex items-center gap-3">{children}</div>}
+        {children && <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">{children}</div>}
       </div>
     </section>
   );

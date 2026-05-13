@@ -293,14 +293,24 @@ const InterviewSchedulerPage: React.FC = () => {
         icon={Calendar}
         variant="indigo"
       >
-        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+        <Button 
+          onClick={() => setIsWizardOpen(true)}
+          className="h-11 px-8 rounded-2xl bg-[#1A6CFF] hover:bg-[#0055FF] text-white font-black uppercase tracking-[0.15em] text-[10px] shadow-lg shadow-[#1A6CFF]/20 active:scale-95 transition-all flex items-center gap-2.5"
+        >
+          <Plus size={18} />
+          Schedule Drive
+        </Button>
+      </PageHeader>
+
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 bg-card/50 backdrop-blur-md p-6 rounded-[2rem] border border-border shadow-sm mb-10">
+        <div className="flex flex-wrap items-center gap-4">
           {isSuperAdmin && (
-            <div className="flex bg-muted/50 p-1 rounded-xl border border-border mr-2">
+            <div className="flex bg-muted/50 p-1.5 rounded-2xl border border-border">
               <button
                 onClick={() => setSchedulerType('companies')}
                 className={cn(
-                  "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                  schedulerType === 'companies' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
+                  "px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
+                  schedulerType === 'companies' ? "bg-background shadow-lg text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Companies
@@ -308,8 +318,8 @@ const InterviewSchedulerPage: React.FC = () => {
               <button
                 onClick={() => setSchedulerType('universities')}
                 className={cn(
-                  "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-                  schedulerType === 'universities' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
+                  "px-6 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all",
+                  schedulerType === 'universities' ? "bg-background shadow-lg text-primary" : "text-muted-foreground hover:text-foreground"
                 )}
               >
                 Universities
@@ -318,11 +328,11 @@ const InterviewSchedulerPage: React.FC = () => {
           )}
 
           <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
-            <SelectTrigger className="w-full sm:w-[180px] h-10 rounded-xl bg-background/50 border-border text-xs font-black uppercase tracking-widest px-4">
+            <SelectTrigger className="w-full lg:w-[220px] h-12 rounded-2xl bg-background border-border text-xs font-black uppercase tracking-widest px-5 shadow-sm">
               <SelectValue placeholder="Filter By" />
             </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="all">All Companies</SelectItem>
+            <SelectContent className="rounded-2xl border-border shadow-2xl">
+              <SelectItem value="all">All Registered Entities</SelectItem>
               {companies.map((company) => (
                 <SelectItem key={company.id} value={company.id.toString()}>
                   {company.name}
@@ -330,26 +340,18 @@ const InterviewSchedulerPage: React.FC = () => {
               ))}
             </SelectContent>
           </Select>
-
-          <div className="relative w-full sm:w-[220px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Search..."
-              className="pl-9 bg-background/50 border-border rounded-xl h-10 text-sm focus-visible:ring-primary/20"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-
-          <Button 
-            onClick={() => setIsWizardOpen(true)}
-            className="h-11 px-8 rounded-2xl bg-[#1A6CFF] hover:bg-[#0055FF] text-white font-black uppercase tracking-[0.15em] text-[10px] shadow-lg shadow-[#1A6CFF]/20 active:scale-95 transition-all flex items-center gap-2.5"
-          >
-            <Plus size={18} />
-            Schedule Drive
-          </Button>
         </div>
-      </PageHeader>
+
+        <div className="relative w-full lg:w-[320px] group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+          <Input
+            placeholder="Search active timelines..."
+            className="pl-11 pr-5 h-12 bg-background border-border rounded-2xl text-sm font-medium focus-visible:ring-primary/20 shadow-sm"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+      </div>
 
       <div className="space-y-12">
         {/* Existing Schedules List */}
@@ -547,7 +549,7 @@ const InterviewSchedulerPage: React.FC = () => {
         }}
         title="Interview Scheduler"
         subtitle="Configure and launch new recruitment interview drives"
-        maxWidth="sm:max-w-5xl"
+        maxWidth="max-w-5xl"
       >
         <div className="space-y-8 py-4">
           {/* Top Bar: Role-based Selection */}
