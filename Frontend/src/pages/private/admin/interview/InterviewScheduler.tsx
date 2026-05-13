@@ -495,7 +495,7 @@ const InterviewSchedulerPage: React.FC = () => {
                       exit={{ height: 0, opacity: 0 }}
                       className="border-t border-border bg-muted/5"
                     >
-                      <div className="p-8 sm:p-10 space-y-8">
+                      <div className="p-5 md:p-6 space-y-8">
                         <div className="flex items-center gap-3">
                           <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
                             <Sparkles size={18} />
@@ -528,7 +528,7 @@ const InterviewSchedulerPage: React.FC = () => {
           })
         ) : (
           <div className="py-32 text-center saas-card border-dashed bg-muted/10">
-            <div className="size-20 bg-muted/30 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6">
+            <div className="size-20 bg-muted/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <Calendar className="size-10 text-muted-foreground/30" />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">No schedules found</h3>
@@ -548,264 +548,269 @@ const InterviewSchedulerPage: React.FC = () => {
     </div>
 
       {/* Consolidated Schedule Wizard Modal */}
-      <Modal
-        isOpen={isWizardOpen}
-        onClose={() => {
-          setIsWizardOpen(false);
-          setWizardCompanyId('');
-          setWizardUniversityId('');
-        }}
-        title="Interview Scheduler"
-        subtitle="Configure and launch new recruitment interview drives"
-        maxWidth="max-w-5xl"
-      >
-        <div className="space-y-8 py-4">
-          {/* Top Bar: Role-based Selection */}
-          <div className="flex flex-col md:flex-row items-end gap-4 bg-muted/30 p-6 rounded-[2rem] border border-border">
-            {isSuperAdmin && (
-              <div className="flex-1 space-y-2">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Target University</label>
-                <Select value={wizardUniversityId} onValueChange={handleWizardUniversityChange}>
-                  <SelectTrigger className="h-12 rounded-2xl bg-background border-border font-bold text-xs uppercase tracking-widest px-4">
-                    <SelectValue placeholder="Select University" />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-2xl">
-                    <SelectItem value="all">All Universities</SelectItem>
-                    {schedulerUniversities.map((uni) => (
-                      <SelectItem key={uni.id} value={uni.id.toString()}>{uni.name}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
+      {/* Consolidated Schedule Wizard Modal */}
+<Modal
+  isOpen={isWizardOpen}
+  onClose={() => {
+    setIsWizardOpen(false);
+    setWizardCompanyId('');
+    setWizardUniversityId('');
+  }}
+  title="Interview Scheduler"
+  subtitle="Configure and launch new recruitment interview drives"
+>
+  <div className="space-y-8 py-2">
+    {/* Step 1: Selection Header */}
+    <div className="relative overflow-hidden flex flex-col md:flex-row items-end gap-4 bg-slate-50 p-6 rounded-[2rem] border border-slate-200/60 shadow-sm">
+      <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
+        <Building2 size={80} />
+      </div>
+      
+      {isSuperAdmin && (
+        <div className="flex-1 space-y-2.5 z-10 w-full">
+          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+            <div className="size-1.5 rounded-full bg-primary" /> Target University
+          </label>
+          <Select value={wizardUniversityId} onValueChange={handleWizardUniversityChange}>
+            <SelectTrigger className="h-12 rounded-2xl bg-white border-slate-200 shadow-sm font-semibold text-xs uppercase tracking-tighter px-4 focus:ring-primary/10">
+              <SelectValue placeholder="Select University" />
+            </SelectTrigger>
+            <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
+              <SelectItem value="all">All Universities</SelectItem>
+              {schedulerUniversities.map((uni) => (
+                <SelectItem key={uni.id} value={uni.id.toString()}>{uni.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
 
-            <div className="flex-1 space-y-2">
-              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Select Company</label>
-              <Select value={wizardCompanyId} onValueChange={handleWizardCompanyChange}>
-                <SelectTrigger className="h-12 rounded-2xl bg-background border-border font-bold text-xs uppercase tracking-widest px-4">
-                  <SelectValue placeholder="Select Company" />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl">
-                  {companies.map((c) => (
-                    <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+      <div className="flex-1 space-y-2.5 z-10 w-full">
+        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+          <div className="size-1.5 rounded-full bg-primary" /> Select Company
+        </label>
+        <Select value={wizardCompanyId} onValueChange={handleWizardCompanyChange}>
+          <SelectTrigger className="h-12 rounded-2xl bg-white border-slate-200 shadow-sm font-semibold text-xs uppercase tracking-tighter px-4 focus:ring-primary/10">
+            <SelectValue placeholder="Select Company" />
+          </SelectTrigger>
+          <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
+            {companies.map((c) => (
+              <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+
+    <AnimatePresence mode="wait">
+      {!wizardCompanyId ? (
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="py-24 text-center border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50/50"
+        >
+          <div className="bg-white size-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm border border-slate-100">
+            <Building2 className="size-10 text-slate-300" />
+          </div>
+          <h3 className="text-xl font-bold text-slate-800">Awaiting Selection</h3>
+          <p className="text-slate-500 text-sm mt-2 max-w-[240px] mx-auto">Choose a partner company to view available job slots.</p>
+        </motion.div>
+      ) : schedulerLoading ? (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
+          <div className="h-32 rounded-2xl bg-slate-100 animate-pulse" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[1, 2, 3, 4].map(i => (
+              <div key={i} className="h-48 rounded-[2rem] bg-slate-100 animate-pulse" />
+            ))}
+          </div>
+        </motion.div>
+      ) : schedulerJobs.length > 0 ? (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="space-y-8"
+        >
+          {/* Summary Card */}
+          <div className="bg-gradient-to-br from-primary/[0.03] to-primary/[0.08] border border-primary/10 rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-1.5 text-center md:text-left">
+              <h4 className="text-xl font-extrabold text-slate-900 tracking-tight">
+                {companies.find(c => c.id.toString() === wizardCompanyId)?.name} 
+                <span className="text-primary ml-2">({schedulerJobs.length} Positions)</span>
+              </h4>
+              <p className="text-xs text-slate-500 font-bold uppercase tracking-wider">Ready for scheduling</p>
+            </div>
+            <div className="flex gap-3">
+              <div className="bg-white rounded-2xl py-3 px-5 border border-slate-200 shadow-sm text-center min-w-[90px]">
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-tighter mb-0.5">Approved</p>
+                <p className="text-lg font-black text-emerald-600 leading-none">{schedulerJobs.filter(j => j.status === 'APPROVED').length}</p>
+              </div>
             </div>
           </div>
 
-          <AnimatePresence mode="wait">
-            {!wizardCompanyId ? (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="py-20 text-center border-2 border-dashed border-border rounded-[3rem] bg-muted/5"
+          {/* Jobs Grid */}
+          <div className="grid
+  grid-cols-1
+  xl:grid-cols-2
+  gap-5
+  max-h-[45vh]
+  overflow-y-auto
+  pr-3
+  custom-scrollbar">
+            {schedulerJobs.map((ju: any) => (
+              <motion.div
+                key={ju.id}
+                whileHover={{ y: -4 }}
+                className="group relative bg-white border border-slate-200 hover:border-primary/40 p-6 rounded-3xl transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-primary/5"
               >
-                <Building2 className="size-16 text-muted-foreground/20 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-foreground">Awaiting Selection</h3>
-                <p className="text-muted-foreground text-sm mt-2">Please select a company to begin scheduling interviews.</p>
-              </motion.div>
-            ) : schedulerLoading ? (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="space-y-6"
-              >
-                <div className="h-32 rounded-[2.5rem] bg-muted animate-pulse" />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {[1, 2, 3, 4].map(i => (
-                    <div key={i} className="h-48 rounded-[2rem] bg-muted animate-pulse" />
+                <div className="flex justify-between items-start mb-5">
+                  <div className="min-w-0 flex-1">
+                    <div className="size-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-lg shadow-lg group-hover:bg-primary transition-colors">
+                      {ju.job?.title?.[0] || 'J'}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h5 className="font-bold text-slate-900 text-[15px] leading-tight">{ju.job?.title}</h5>
+                      <span className="text-[9px] font-black text-primary/60 uppercase tracking-widest">{ju.university?.name || "Global"}</span>
+                    </div>
+                  </div>
+                  <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100 text-[8px] font-black uppercase px-2 py-1">
+                    {ju.status}
+                  </Badge>
+                </div>
+
+                <div className="flex flex-wrap gap-1.5 mb-5">
+                  {(ju.job?.eligibleDepartments || []).slice(0, 3).map((dept: any) => (
+                    <Badge key={dept.id} variant="secondary" className="bg-slate-100 text-slate-600 border-transparent text-[8px] font-bold uppercase px-2">
+                      {dept.name || `Dept #${dept.id}`}
+                    </Badge>
                   ))}
                 </div>
-              </motion.div>
-            ) : schedulerJobs.length > 0 ? (
-              <motion.div 
-                initial={{ opacity: 0, scale: 0.98 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="space-y-8"
-              >
-                {/* Summary Card */}
-                <div className="bg-primary/5 border border-primary/20 rounded-[2.5rem] p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-                  <div className="space-y-2 text-center md:text-left">
-                    <h4 className="text-xl font-bold text-foreground tracking-tight">
-                      {companies.find(c => c.id.toString() === wizardCompanyId)?.name} has <span className="text-primary">{schedulerJobs.length} jobs</span> available
-                    </h4>
-                    <p className="text-sm text-muted-foreground font-medium">Ready for interview scheduling across eligible departments.</p>
+
+                <div className="grid grid-cols-2 gap-3 py-4 border-y border-slate-100 mb-6 bg-slate-50/50 rounded-2xl px-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">CTC Package</p>
+                    <p className="text-sm font-black text-emerald-600">₹{(ju.salary / 100000).toFixed(1)} LPA</p>
                   </div>
-                  <div className="flex gap-4">
-                    <div className="bg-background rounded-2xl p-4 border border-border shadow-sm text-center min-w-[100px]">
-                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Total</p>
-                      <p className="text-xl font-black text-primary">{schedulerJobs.length}</p>
-                    </div>
-                    <div className="bg-background rounded-2xl p-4 border border-border shadow-sm text-center min-w-[100px]">
-                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Active</p>
-                      <p className="text-xl font-black text-emerald-600">{schedulerJobs.filter(j => j.status === 'APPROVED').length}</p>
-                    </div>
+                  <div className="text-right">
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Slots</p>
+                    <p className="text-sm font-black text-slate-900">{ju.openings} Open</p>
                   </div>
                 </div>
 
-                {/* Jobs Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[45vh] overflow-y-auto pr-2 custom-scrollbar">
-                  {schedulerJobs.map((ju: any) => (
-                    <motion.div
-                      key={ju.id}
-                      layout
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className="saas-card bg-background hover:bg-muted/5 hover:border-primary/30 p-6 flex flex-col group transition-all duration-500"
-                    >
-                      <div className="flex justify-between items-start mb-6">
-                        <div className="flex items-center gap-4">
-                          <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-bold text-lg group-hover:scale-110 transition-transform shadow-inner">
-                            {ju.job?.title?.[0] || 'J'}
-                          </div>
-                          <div>
-                            <h5 className="font-bold text-foreground text-base tracking-tight">{ju.job?.title}</h5>
-                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{ju.university?.name || "Global"}</p>
-                          </div>
-                        </div>
-                        <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[9px] font-black uppercase tracking-widest">
-                          {ju.status}
-                        </Badge>
-                      </div>
-
-                      <div className="flex flex-wrap gap-2 mb-6">
-                        {(ju.job?.eligibleDepartments || []).map((dept: any) => (
-                          <Badge key={dept.id} variant="outline" className="bg-muted/30 border-border text-[8px] font-black uppercase tracking-widest px-2 py-0.5">
-                            {dept.name || `Dept #${dept.id}`}
-                          </Badge>
-                        ))}
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-4 py-4 border-y border-border/50 mb-6 bg-muted/5 rounded-2xl px-4">
-                        <div className="space-y-1 text-center md:text-left">
-                          <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">LPA Package</p>
-                          <p className="text-xs font-bold text-emerald-600">₹ {(ju.salary / 100000).toFixed(1)} LPA</p>
-                        </div>
-                        <div className="space-y-1 text-center md:text-right">
-                          <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Openings</p>
-                          <p className="text-xs font-bold text-foreground">{ju.openings} Seats</p>
-                        </div>
-                      </div>
-
-                      <Button 
-                        onClick={() => handleScheduleClick(ju)}
-                        className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl h-11 font-black uppercase tracking-widest text-[9px] shadow-lg shadow-primary/10 group-hover:shadow-none transition-all flex items-center justify-center gap-2"
-                      >
-                        <Calendar size={14} />
-                        Launch Interview
-                      </Button>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="py-24 text-center bg-muted/10 rounded-[3rem] border border-dashed border-border"
-              >
-                <div className="size-20 bg-muted/30 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6">
-                  <Briefcase className="size-10 text-muted-foreground/30" />
-                </div>
-                <h3 className="text-xl font-bold text-foreground mb-1">No Active Jobs</h3>
-                <p className="text-muted-foreground text-sm max-w-xs mx-auto mb-8">
-                  We couldn't find any approved job openings for this company that are ready for scheduling.
-                </p>
                 <Button 
-                  variant="outline" 
-                  className="rounded-xl px-8 border-border font-bold text-xs uppercase tracking-widest h-11"
-                  onClick={() => setWizardCompanyId('')}
+                  onClick={() => handleScheduleClick(ju)}
+                  className="w-full bg-slate-900 hover:bg-primary text-white rounded-xl h-11 font-bold uppercase tracking-widest text-[9px] transition-all flex items-center justify-center gap-2"
                 >
-                  Change Company
+                  <Calendar size={14} className="opacity-70" />
+                  Launch Drive
                 </Button>
               </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </Modal>
+            ))}
+          </div>
+        </motion.div>
+      ) : (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-24 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+            <Briefcase className="size-12 text-slate-300 mx-auto mb-4" />
+            <h3 className="text-lg font-bold text-slate-800">No Approved Openings</h3>
+            <p className="text-slate-500 text-sm mb-8">This company has no pending job approvals.</p>
+            <Button variant="outline" className="rounded-xl border-slate-200 font-bold text-xs" onClick={() => setWizardCompanyId('')}>
+                Refresh List
+            </Button>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  </div>
+</Modal>
 
-      {/* Jobs Selection Modal - DEPRECATED in favor of Wizard, but kept for legacy fallback if needed */}
-      {/* (Removed as it's now integrated) */}
 
       {/* Finalize Schedule Modal */}
-      <Modal
-        isOpen={isFinalizeModalOpen}
-        onClose={() => setIsFinalizeModalOpen(false)}
-        title="Drive Logistics"
-        subtitle="Finalize the interview schedule details"
+      {/* Finalize Schedule Modal */}
+<Modal
+  isOpen={isFinalizeModalOpen}
+  onClose={() => setIsFinalizeModalOpen(false)}
+  title="Drive Logistics"
+  subtitle="Finalize the interview schedule details"
+>
+  <div className="space-y-6 py-4">
+    {/* Visual Progress Indicator - Optional Decoration */}
+    <div className="flex items-center gap-4 mb-2">
+       <div className="h-1 flex-1 bg-primary rounded-full" />
+       <div className="h-1 flex-1 bg-primary rounded-full" />
+       <div className="h-1 flex-1 bg-primary rounded-full opacity-30" />
+    </div>
+
+    <div className="space-y-3">
+      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Drive Identifier</label>
+      <Input 
+        value={finalizeData.title}
+        onChange={(e) => setFinalizeData({...finalizeData, title: e.target.value})}
+        placeholder="e.g. 2024 Product Engineering Drive"
+        className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold focus:ring-primary/20 text-slate-800 placeholder:font-medium"
+      />
+    </div>
+
+   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="space-y-3">
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Date & Time</label>
+        <Input 
+          type="datetime-local"
+          value={finalizeData.startTime}
+          onChange={(e) => setFinalizeData({...finalizeData, startTime: e.target.value})}
+          className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold text-slate-800"
+        />
+      </div>
+      <div className="space-y-3">
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Expected End</label>
+        <Input 
+          type="datetime-local"
+          value={finalizeData.endTime}
+          onChange={(e) => setFinalizeData({...finalizeData, endTime: e.target.value})}
+          className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold text-slate-800"
+        />
+      </div>
+    </div>
+
+    <div className="space-y-3">
+      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Venue / Virtual Link</label>
+      <div className="relative">
+        <Input 
+            value={finalizeData.venue}
+            onChange={(e) => setFinalizeData({...finalizeData, venue: e.target.value})}
+            placeholder="Room 402 or Zoom/Meet URL"
+            className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold pl-12 text-slate-800"
+        />
+        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400" />
+      </div>
+    </div>
+
+    <div className="space-y-3">
+      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Candidate Briefing</label>
+      <Textarea 
+        placeholder="Detailed instructions for students..."
+        value={finalizeData.message}
+        onChange={(e) => setFinalizeData({...finalizeData, message: e.target.value})}
+        className="min-h-[100px] rounded-2xl bg-slate-50 border-slate-200 font-medium p-5 text-slate-700 focus:ring-primary/10"
+      />
+    </div>
+
+    <div className="pt-6 grid grid-cols-1 gap-3">
+      <Button 
+        onClick={handleFinalSubmit}
+        disabled={isSubmittingSchedule}
+        className="h-14 bg-primary hover:bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl shadow-primary/20 transition-all active:scale-95"
       >
-        <div className="space-y-6 py-4">
-          <div className="space-y-3">
-            <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Drive Title</label>
-            <Input 
-              value={finalizeData.title}
-              onChange={(e) => setFinalizeData({...finalizeData, title: e.target.value})}
-              placeholder="e.g. Campus Recruitment 2024"
-              className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium focus:ring-[#1A6CFF]/10 text-slate-700"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-6">
-            <div className="space-y-3">
-              <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Start Time</label>
-              <Input 
-                type="datetime-local"
-                value={finalizeData.startTime}
-                onChange={(e) => setFinalizeData({...finalizeData, startTime: e.target.value})}
-                className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium text-slate-700"
-              />
-            </div>
-            <div className="space-y-3">
-              <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">End Time</label>
-              <Input 
-                type="datetime-local"
-                value={finalizeData.endTime}
-                onChange={(e) => setFinalizeData({...finalizeData, endTime: e.target.value})}
-                className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium text-slate-700"
-              />
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Venue / Link</label>
-            <Input 
-              value={finalizeData.venue}
-              onChange={(e) => setFinalizeData({...finalizeData, venue: e.target.value})}
-              placeholder="e.g. Main Auditorium or G-Meet Link"
-              className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium text-slate-700"
-            />
-          </div>
-
-          <div className="space-y-3">
-            <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Custom Instructions</label>
-            <Textarea 
-              placeholder="Add any specific details or requirements for the candidates..."
-              value={finalizeData.message}
-              onChange={(e) => setFinalizeData({...finalizeData, message: e.target.value})}
-              className="min-h-[120px] rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium resize-none focus:ring-[#1A6CFF]/10 p-5 text-slate-700"
-            />
-          </div>
-
-          <div className="pt-6 space-y-4">
-            <Button 
-              onClick={handleFinalSubmit}
-              disabled={isSubmittingSchedule}
-              className="w-full h-14 bg-[#1A6CFF] hover:bg-[#0055FF] text-white rounded-2xl font-black uppercase tracking-[0.15em] text-[11px] shadow-[0_12px_24px_rgba(26,108,255,0.3)] hover:shadow-[0_15px_30px_rgba(26,108,255,0.4)] active:scale-[0.98] transition-all duration-300"
-            >
-              {isSubmittingSchedule ? <Loader size="sm" /> : "Confirm & Schedule"}
-            </Button>
-            <Button 
-              variant="ghost"
-              onClick={() => setIsFinalizeModalOpen(false)}
-              className="w-full h-10 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 hover:text-foreground hover:bg-transparent transition-all"
-            >
-              Back to jobs
-            </Button>
-          </div>
-        </div>
-      </Modal>
+        {isSubmittingSchedule ? <Loader size="sm" /> : "Confirm & Launch Drive"}
+      </Button>
+      <Button 
+        variant="ghost"
+        onClick={() => setIsFinalizeModalOpen(false)}
+        className="h-10 text-[10px] font-black uppercase text-slate-400 hover:text-slate-900 transition-colors"
+      >
+        Back to Jobs
+      </Button>
+    </div>
+  </div>
+</Modal>
 
       <EditScheduleModal
         schedule={selectedSchedule}
@@ -814,62 +819,68 @@ const InterviewSchedulerPage: React.FC = () => {
         mode={mode}
       />
 
-      <Modal
-        isOpen={isMessagesOpen}
-        onClose={() => setIsMessagesOpen(false)}
-        title="Internal Communication"
-        subtitle={`Notes for ${activeSchedule?.title || "selected schedule"}`}
-      >
-        <div className="flex flex-col gap-8 py-4">
-          <div className="space-y-4 max-h-[350px] overflow-y-auto pr-2 scrollbar-hide">
-            {msgLoading === activeSchedule?.id ? (
-              <div className="py-16">
-                <Loader size="sm" text="Syncing communications..." />
-              </div>
-            ) : activeSchedule?.messages && activeSchedule.messages.length > 0 ? (
-              [...activeSchedule.messages].reverse().map((msg: any) => (
-                <div key={msg.id} className="bg-muted/30 border border-border rounded-2xl p-5 space-y-2 group hover:border-primary/20 transition-all">
-                  <div className="flex items-center justify-between">
-                    <p className="text-[10px] font-black text-primary uppercase tracking-widest">
-                      {msg.senderName || (msg.isAdmin ? 'Placement Admin' : 'Corporate Partner')}
-                    </p>
-                  </div>
-                  <p className="text-sm text-foreground font-medium leading-relaxed">{msg.message}</p>
-                </div>
-              ))
-            ) : (
-              <div className="flex flex-col items-center justify-center py-16 text-center space-y-4 bg-muted/10 rounded-3xl border border-dashed border-border">
-                <MessageSquare className="size-10 text-muted-foreground/30" />
-                <p className="text-muted-foreground text-xs font-black uppercase tracking-widest">Zero historical notes recorded.</p>
-              </div>
-            )}
-          </div>
-
-          <div className="space-y-4 pt-6 border-t border-border">
-            <div className="flex items-center gap-2 text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-              <Sparkles className="size-3.5 text-primary" /> Post Communication Note
-            </div>
-            <textarea
-              rows={4}
-              placeholder="Record a formal note or internal update for this drive..."
-              value={messageText}
-              onChange={(e) => setMessageText(e.target.value)}
-              className="w-full px-5 py-4 bg-muted/30 border border-border rounded-2xl text-sm font-medium text-foreground placeholder:text-muted-foreground/50 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary/30 resize-none transition-all"
-            />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!messageText.trim() || sendingMsg}
-              className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/10 active:scale-95 transition-all"
-            >
-              {sendingMsg ? (
-                <span className="flex items-center gap-2"><Loader size="sm" /> Sending...</span>
-              ) : (
-                <span className="flex items-center gap-2"><Send className="size-3.5" /> Dispatch Note</span>
-              )}
-            </Button>
-          </div>
+     <Modal
+  isOpen={isMessagesOpen}
+  onClose={() => setIsMessagesOpen(false)}
+  title="Drive Communications"
+  subtitle={`History for ${activeSchedule?.title || "Drive"}`}
+>
+  <div className="flex flex-col gap-6 py-4">
+    <div className="space-y-6 max-h-[380px] overflow-y-auto pr-3 custom-scrollbar">
+      {msgLoading === activeSchedule?.id ? (
+        <div className="py-20 text-center">
+          <Loader size="sm" text="Syncing logs..." />
         </div>
-      </Modal>
+      ) : activeSchedule?.messages && activeSchedule.messages.length > 0 ? (
+        [...activeSchedule.messages].reverse().map((msg: any) => (
+          <div key={msg.id} className="relative group">
+            <div className={`flex flex-col ${msg.isAdmin ? 'items-start' : 'items-end'}`}>
+               <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">
+                 {msg.senderName || (msg.isAdmin ? 'System Admin' : 'Partner')} • Just now
+               </span>
+               <div className={`p-4 rounded-2xl text-sm font-medium leading-relaxed max-w-[85%] shadow-sm border 
+                 ${msg.isAdmin ? 'bg-white border-slate-200 text-slate-800' : 'bg-primary text-white border-primary'}`}>
+                 {msg.message}
+               </div>
+            </div>
+          </div>
+        ))
+      ) : (
+        <div className="flex flex-col items-center justify-center py-20 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
+          <div className="size-14 bg-white rounded-2xl flex items-center justify-center shadow-sm mb-4">
+             <MessageSquare className="size-6 text-slate-300" />
+          </div>
+          <p className="text-slate-500 text-xs font-bold uppercase tracking-widest">No internal notes yet.</p>
+        </div>
+      )}
+    </div>
+
+    <div className="pt-6 border-t border-slate-100">
+      <div className="bg-slate-50 p-2 rounded-[1.8rem] border border-slate-200 shadow-inner">
+        <textarea
+          rows={3}
+          placeholder="Type a formal update..."
+          value={messageText}
+          onChange={(e) => setMessageText(e.target.value)}
+          className="w-full px-4 py-3 bg-transparent text-sm font-medium text-slate-800 placeholder:text-slate-400 outline-none resize-none"
+        />
+    <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4 p-2">
+            <div className="flex gap-2">
+                <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[9px] font-bold text-slate-400 uppercase">Internal Visibility</span>
+            </div>
+            <Button
+                onClick={handleSendMessage}
+                disabled={!messageText.trim() || sendingMsg}
+                className="bg-slate-900 hover:bg-primary text-white rounded-2xl px-6 h-10 font-bold text-[10px] uppercase tracking-widest transition-all"
+            >
+                {sendingMsg ? <Loader size="sm" /> : <><Send className="size-3 mr-2" /> Dispatch</>}
+            </Button>
+        </div>
+      </div>
+    </div>
+  </div>
+</Modal>
     </AdminPageLayout>
   );
 };
