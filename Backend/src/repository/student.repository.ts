@@ -29,6 +29,9 @@ export const createStudent = async (userId: number, data: any) => {
       passingYear: data.passingYear,
 
       ...(data.cgpa !== undefined && { cgpa: data.cgpa }),
+      ...(data.activeBacklogs !== undefined && {
+        activeBacklogs: data.activeBacklogs,
+      }),
       ...(data.resumeUrl && { resumeUrl: data.resumeUrl }),
 
       ...(data.linkedinUrl && { linkedinUrl: data.linkedinUrl }),

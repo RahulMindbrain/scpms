@@ -12,6 +12,8 @@ export const createStudentSchema = z
 
     cgpa: z.number().min(0).max(10).optional().optional(),
 
+    activeBacklogs: z.number().int().min(0).optional(),
+
     resumeUrl: z.string().url().optional(),
 
     skillIds: z.array(z.number().int().positive()).optional(),
@@ -65,6 +67,7 @@ export const updateStudentSchema = z
     year: z.number().int().min(1).max(4).optional(),
     passingYear: z.number().int().min(2000).max(2100).optional(),
     cgpa: z.number().min(0).max(10).optional(),
+    activeBacklogs: z.number().int().min(0).optional(),
 
     resumeUrl: z.string().url().optional(),
 
