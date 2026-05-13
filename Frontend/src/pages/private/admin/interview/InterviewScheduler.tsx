@@ -4,7 +4,8 @@ import {
   MapPin, Briefcase, ChevronDown, ChevronUp, 
   Search, MessageSquare, Send, Trash2,
   Calendar,
-  Sparkles
+  Sparkles,
+  IndianRupee
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -57,6 +58,8 @@ const InterviewSchedulerPage: React.FC = () => {
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCompanyId, setSelectedCompanyId] = useState<string>('');
+  const [wizardCompanyId, setWizardCompanyId] = useState<string>('');
+  const [wizardUniversityId, setWizardUniversityId] = useState<string>('');
   
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<any>(null);
@@ -79,6 +82,7 @@ const InterviewSchedulerPage: React.FC = () => {
     venue: ''
   });
   const [isSubmittingSchedule, setIsSubmittingSchedule] = useState(false);
+  const [isWizardOpen, setIsWizardOpen] = useState(false);
 
   useEffect(() => {
     dispatch(fetchCompanies({ page: 1, limit: 100 }));
@@ -98,14 +102,28 @@ const InterviewSchedulerPage: React.FC = () => {
     }
   }, [selectedCompanyId, companies, dispatch]);
 
+  const handleWizardCompanyChange = (id: string) => {
+    setWizardCompanyId(id);
+    if (id && id !== 'all') {
+      dispatch(fetchCompanyJobsForSchedule(Number(id)));
+    }
+  };
+
+  const handleWizardUniversityChange = (id: string) => {
+    setWizardUniversityId(id);
+    // Optionally fetch companies for this university if the API supports it
+  };
+
   const handleEntityClick = (entity: any) => {
     setSelectedEntity(entity);
     if (schedulerType === 'companies') {
-      dispatch(fetchCompanyJobsForSchedule(entity.id));
+      handleWizardCompanyChange(entity.id.toString());
     } else {
+      setWizardUniversityId(entity.id.toString());
       dispatch(fetchUniversityJobsForSchedule({ universityId: entity.id }));
     }
-    setIsJobsModalOpen(true);
+    // We'll keep the modal open but switch view if needed, 
+    // or just use the new consolidated UI
   };
 
   const handleScheduleClick = (job: any) => {
@@ -141,6 +159,7 @@ const InterviewSchedulerPage: React.FC = () => {
       toast.success("Interview scheduled successfully!");
       setIsFinalizeModalOpen(false);
       setIsJobsModalOpen(false);
+      setIsWizardOpen(false);
       // Refresh schedules if needed
       if (selectedCompanyId) {
         dispatch(fetchSchedules(Number(selectedCompanyId)));
@@ -321,58 +340,18 @@ const InterviewSchedulerPage: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
+
+          <Button 
+            onClick={() => setIsWizardOpen(true)}
+            className="h-11 px-8 rounded-2xl bg-[#1A6CFF] hover:bg-[#0055FF] text-white font-black uppercase tracking-[0.15em] text-[10px] shadow-lg shadow-[#1A6CFF]/20 active:scale-95 transition-all flex items-center gap-2.5"
+          >
+            <Plus size={18} />
+            Schedule Drive
+          </Button>
         </div>
       </PageHeader>
 
       <div className="space-y-12">
-        {/* Entity Selection Flow */}
-        <section className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3">
-              <span className="size-2 rounded-full bg-primary animate-pulse" />
-              Schedule New Drive
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {schedulerLoading ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="h-48 rounded-[2rem] bg-muted/20 animate-pulse border border-dashed border-border" />
-              ))
-            ) : (
-              (schedulerType === 'companies' ? schedulerCompanies : schedulerUniversities).map((item) => (
-                <motion.div
-                  key={item.id}
-                  whileHover={{ y: -5, scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => handleEntityClick(item)}
-                  className="group relative cursor-pointer"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="saas-card p-8 h-full flex flex-col items-center justify-center text-center gap-4 border-2 border-transparent group-hover:border-primary/20 transition-all bg-background/50 backdrop-blur-xl">
-                    <div className="size-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition-transform">
-                      {schedulerType === 'companies' ? <Building2 size={32} /> : <Sparkles size={32} />}
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">{item.name}</h4>
-                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                        {schedulerType === 'companies' ? item.user?.email : `${item.city}, ${item.state}`}
-                      </p>
-                    </div>
-                    <div className="pt-4 mt-auto">
-                      <span className="px-4 py-1.5 rounded-xl bg-muted text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover:bg-primary group-hover:text-white transition-all">
-                        Fetch Jobs
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              ))
-            )}
-          </div>
-        </section>
-
-        <Separator className="opacity-50" />
-
         {/* Existing Schedules List */}
         <section className="space-y-6">
           <div className="flex items-center justify-between">
@@ -457,31 +436,42 @@ const InterviewSchedulerPage: React.FC = () => {
                   </div>
 
                   {/* Actions Column */}
-                  <div className="bg-muted/10 p-6 lg:w-48 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-border shrink-0">
-                    <div className="flex items-center gap-2">
-                      <Button variant="outline" size="icon" className="size-10 rounded-xl border-border text-muted-foreground hover:text-primary hover:bg-primary/5 hover:border-primary/20 transition-all" onClick={(e) => handleOpenEdit(e, drive)}>
-                        <Edit3 size={16} />
-                      </Button>
-                      <Button variant="outline" size="icon" className="size-10 rounded-xl border-border text-muted-foreground hover:text-amber-600 hover:bg-amber-500/10 hover:border-amber-500/20 transition-all" onClick={(e) => handleOpenMessages(e, drive)}>
-                        <MessageSquare size={16} />
-                      </Button>
+                  <div className="bg-muted/10 p-6 lg:w-56 flex flex-row lg:flex-col items-center justify-between lg:justify-center gap-4 border-t lg:border-t-0 lg:border-l border-border shrink-0">
+                    <div className="flex flex-col gap-3 w-full">
                       <Button 
-                        variant="outline" 
-                        size="icon" 
-                        className="size-10 rounded-xl border-border text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 hover:border-rose-500/20 transition-all" 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          const toastId = toast.loading("Removing schedule...");
-                          dispatch(deleteSchedule(drive.id))
-                            .unwrap()
-                            .then(() => toast.success("Schedule deleted", { id: toastId }))
-                            .catch((err) => toast.error(err || "Delete failed", { id: toastId }));
-                        }}
+                        className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl h-11 font-black uppercase tracking-widest text-[9px] shadow-lg shadow-primary/10 transition-all flex items-center justify-center gap-2" 
+                        onClick={(e) => handleOpenEdit(e, drive)}
                       >
-                        <Trash2 size={16} />
+                        <Edit3 size={14} />
+                        Edit Schedule
                       </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="outline" 
+                          className="flex-1 h-10 rounded-xl border-border text-muted-foreground hover:text-amber-600 hover:bg-amber-500/10 hover:border-amber-500/20 transition-all flex items-center justify-center gap-2 text-[8px] font-black uppercase tracking-widest" 
+                          onClick={(e) => handleOpenMessages(e, drive)}
+                        >
+                          <MessageSquare size={14} />
+                          Notes
+                        </Button>
+                        <Button 
+                          variant="outline" 
+                          size="icon"
+                          className="size-10 shrink-0 rounded-xl border-border text-muted-foreground hover:text-rose-600 hover:bg-rose-500/10 hover:border-rose-500/20 transition-all" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            const toastId = toast.loading("Removing schedule...");
+                            dispatch(deleteSchedule(drive.id))
+                              .unwrap()
+                              .then(() => toast.success("Schedule deleted", { id: toastId }))
+                              .catch((err) => toast.error(err || "Delete failed", { id: toastId }));
+                          }}
+                        >
+                          <Trash2 size={16} />
+                        </Button>
+                      </div>
                     </div>
-                    <div className="size-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground">
+                    <div className="size-10 rounded-xl bg-muted flex items-center justify-center text-muted-foreground cursor-pointer hover:bg-muted/50 transition-colors" onClick={(e) => { e.stopPropagation(); toggleExpand(drive.id); }}>
                       {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                     </div>
                   </div>
@@ -547,91 +537,187 @@ const InterviewSchedulerPage: React.FC = () => {
       </section>
     </div>
 
-      {/* Jobs Selection Modal */}
+      {/* Consolidated Schedule Wizard Modal */}
       <Modal
-        isOpen={isJobsModalOpen}
-        onClose={() => setIsJobsModalOpen(false)}
-        title={`Available Jobs`}
-        subtitle={`Recruitment opportunities for ${selectedEntity?.name}`}
-        maxWidth="sm:max-w-4xl"
+        isOpen={isWizardOpen}
+        onClose={() => {
+          setIsWizardOpen(false);
+          setWizardCompanyId('');
+          setWizardUniversityId('');
+        }}
+        title="Interview Scheduler"
+        subtitle="Configure and launch new recruitment interview drives"
+        maxWidth="sm:max-w-5xl"
       >
-        <div className="space-y-6 py-4">
-          {isSuperAdmin && schedulerType === 'companies' && schedulerUniversitiesForFilter.length > 0 && (
-            <div className="flex items-center gap-3 mb-4">
-              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Filter by University:</label>
-              <Select value={jobUniversityFilter} onValueChange={setJobUniversityFilter}>
-                <SelectTrigger className="w-[200px] h-8 rounded-lg text-[10px] font-bold uppercase tracking-widest px-3">
-                  <SelectValue placeholder="All Universities" />
+        <div className="space-y-8 py-4">
+          {/* Top Bar: Role-based Selection */}
+          <div className="flex flex-col md:flex-row items-end gap-4 bg-muted/30 p-6 rounded-[2rem] border border-border">
+            {isSuperAdmin && (
+              <div className="flex-1 space-y-2">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Target University</label>
+                <Select value={wizardUniversityId} onValueChange={handleWizardUniversityChange}>
+                  <SelectTrigger className="h-12 rounded-2xl bg-background border-border font-bold text-xs uppercase tracking-widest px-4">
+                    <SelectValue placeholder="Select University" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl">
+                    <SelectItem value="all">All Universities</SelectItem>
+                    {schedulerUniversities.map((uni) => (
+                      <SelectItem key={uni.id} value={uni.id.toString()}>{uni.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <div className="flex-1 space-y-2">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Select Company</label>
+              <Select value={wizardCompanyId} onValueChange={handleWizardCompanyChange}>
+                <SelectTrigger className="h-12 rounded-2xl bg-background border-border font-bold text-xs uppercase tracking-widest px-4">
+                  <SelectValue placeholder="Select Company" />
                 </SelectTrigger>
-                <SelectContent className="rounded-xl">
-                  <SelectItem value="all">All Universities</SelectItem>
-                  {schedulerUniversitiesForFilter.map((uni) => (
-                    <SelectItem key={uni.id} value={uni.id.toString()}>
-                      {uni.name}
-                    </SelectItem>
+                <SelectContent className="rounded-2xl">
+                  {companies.map((c) => (
+                    <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
-          )}
+          </div>
 
-          {schedulerLoading ? (
-            <div className="py-20 flex justify-center">
-              <Loader text="Loading opportunities..." />
-            </div>
-          ) : filteredSchedulerJobs.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-              {filteredSchedulerJobs.map((ju: any) => (
-                <div key={ju.id} className="saas-card bg-muted/10 p-6 space-y-4 hover:border-primary/30 transition-all group">
-                  <div className="flex justify-between items-start">
-                    <div className="space-y-1">
-                      <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">{ju.job?.title}</h4>
-                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                        <Building2 size={10} /> {ju.job?.company?.name || selectedEntity?.name}
-                      </p>
-                      <p className="text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-1.5">
-                        <Sparkles size={10} /> {ju.university?.name || selectedEntity?.name}
-                      </p>
-                    </div>
-                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/10 text-[8px] font-black px-2 py-0.5">
-                      {ju.status}
-                    </Badge>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4 py-3 border-y border-border/50">
-                    <div className="space-y-0.5">
-                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.15em]">Package</p>
-                      <p className="text-xs font-bold text-emerald-600">₹ {(ju.salary / 100000).toFixed(1)} LPA</p>
-                    </div>
-                    <div className="space-y-0.5 text-right">
-                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.15em]">Openings</p>
-                      <p className="text-xs font-bold text-foreground">{ju.openings} Seats</p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <p className="text-[10px] text-muted-foreground line-clamp-2 italic font-medium leading-relaxed">
-                      {ju.description || "No specific drive description provided."}
-                    </p>
-                  </div>
-
-                  <Button 
-                    onClick={() => handleScheduleClick(ju)}
-                    className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl h-10 font-black uppercase tracking-widest text-[9px] shadow-lg shadow-primary/5 group-hover:shadow-primary/20 transition-all"
-                  >
-                    Schedule Interview
-                  </Button>
+          <AnimatePresence mode="wait">
+            {!wizardCompanyId ? (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="py-20 text-center border-2 border-dashed border-border rounded-[3rem] bg-muted/5"
+              >
+                <Building2 className="size-16 text-muted-foreground/20 mx-auto mb-4" />
+                <h3 className="text-xl font-bold text-foreground">Awaiting Selection</h3>
+                <p className="text-muted-foreground text-sm mt-2">Please select a company to begin scheduling interviews.</p>
+              </motion.div>
+            ) : schedulerLoading ? (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="space-y-6"
+              >
+                <div className="h-32 rounded-[2.5rem] bg-muted animate-pulse" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {[1, 2, 3, 4].map(i => (
+                    <div key={i} className="h-48 rounded-[2rem] bg-muted animate-pulse" />
+                  ))}
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-20 bg-muted/10 rounded-[2rem] border border-dashed border-border">
-              <Briefcase className="size-12 text-muted-foreground/20 mx-auto mb-4" />
-              <p className="text-muted-foreground text-xs font-black uppercase tracking-widest">No active job listings found.</p>
-            </div>
-          )}
+              </motion.div>
+            ) : schedulerJobs.length > 0 ? (
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="space-y-8"
+              >
+                {/* Summary Card */}
+                <div className="bg-primary/5 border border-primary/20 rounded-[2.5rem] p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="space-y-2 text-center md:text-left">
+                    <h4 className="text-xl font-bold text-foreground tracking-tight">
+                      {companies.find(c => c.id.toString() === wizardCompanyId)?.name} has <span className="text-primary">{schedulerJobs.length} jobs</span> available
+                    </h4>
+                    <p className="text-sm text-muted-foreground font-medium">Ready for interview scheduling across eligible departments.</p>
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="bg-background rounded-2xl p-4 border border-border shadow-sm text-center min-w-[100px]">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Total</p>
+                      <p className="text-xl font-black text-primary">{schedulerJobs.length}</p>
+                    </div>
+                    <div className="bg-background rounded-2xl p-4 border border-border shadow-sm text-center min-w-[100px]">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-1">Active</p>
+                      <p className="text-xl font-black text-emerald-600">{schedulerJobs.filter(j => j.status === 'APPROVED').length}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Jobs Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[45vh] overflow-y-auto pr-2 custom-scrollbar">
+                  {schedulerJobs.map((ju: any) => (
+                    <motion.div
+                      key={ju.id}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="saas-card bg-background hover:bg-muted/5 hover:border-primary/30 p-6 flex flex-col group transition-all duration-500"
+                    >
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="flex items-center gap-4">
+                          <div className="size-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-bold text-lg group-hover:scale-110 transition-transform shadow-inner">
+                            {ju.job?.title?.[0] || 'J'}
+                          </div>
+                          <div>
+                            <h5 className="font-bold text-foreground text-base tracking-tight">{ju.job?.title}</h5>
+                            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">{ju.university?.name || "Global"}</p>
+                          </div>
+                        </div>
+                        <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/20 text-[9px] font-black uppercase tracking-widest">
+                          {ju.status}
+                        </Badge>
+                      </div>
+
+                      <div className="flex flex-wrap gap-2 mb-6">
+                        {(ju.job?.eligibleDepartments || []).map((dept: any) => (
+                          <Badge key={dept.id} variant="outline" className="bg-muted/30 border-border text-[8px] font-black uppercase tracking-widest px-2 py-0.5">
+                            {dept.name || `Dept #${dept.id}`}
+                          </Badge>
+                        ))}
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-4 py-4 border-y border-border/50 mb-6 bg-muted/5 rounded-2xl px-4">
+                        <div className="space-y-1 text-center md:text-left">
+                          <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">LPA Package</p>
+                          <p className="text-xs font-bold text-emerald-600">₹ {(ju.salary / 100000).toFixed(1)} LPA</p>
+                        </div>
+                        <div className="space-y-1 text-center md:text-right">
+                          <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Openings</p>
+                          <p className="text-xs font-bold text-foreground">{ju.openings} Seats</p>
+                        </div>
+                      </div>
+
+                      <Button 
+                        onClick={() => handleScheduleClick(ju)}
+                        className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl h-11 font-black uppercase tracking-widest text-[9px] shadow-lg shadow-primary/10 group-hover:shadow-none transition-all flex items-center justify-center gap-2"
+                      >
+                        <Calendar size={14} />
+                        Launch Interview
+                      </Button>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="py-24 text-center bg-muted/10 rounded-[3rem] border border-dashed border-border"
+              >
+                <div className="size-20 bg-muted/30 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6">
+                  <Briefcase className="size-10 text-muted-foreground/30" />
+                </div>
+                <h3 className="text-xl font-bold text-foreground mb-1">No Active Jobs</h3>
+                <p className="text-muted-foreground text-sm max-w-xs mx-auto mb-8">
+                  We couldn't find any approved job openings for this company that are ready for scheduling.
+                </p>
+                <Button 
+                  variant="outline" 
+                  className="rounded-xl px-8 border-border font-bold text-xs uppercase tracking-widest h-11"
+                  onClick={() => setWizardCompanyId('')}
+                >
+                  Change Company
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </Modal>
+
+      {/* Jobs Selection Modal - DEPRECATED in favor of Wizard, but kept for legacy fallback if needed */}
+      {/* (Removed as it's now integrated) */}
 
       {/* Finalize Schedule Modal */}
       <Modal
@@ -641,59 +727,59 @@ const InterviewSchedulerPage: React.FC = () => {
         subtitle="Finalize the interview schedule details"
       >
         <div className="space-y-6 py-4">
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Drive Title</label>
+          <div className="space-y-3">
+            <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Drive Title</label>
             <Input 
               value={finalizeData.title}
               onChange={(e) => setFinalizeData({...finalizeData, title: e.target.value})}
               placeholder="e.g. Campus Recruitment 2024"
-              className="h-12 rounded-xl bg-muted/30 border-border font-medium focus:ring-primary/20"
+              className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium focus:ring-[#1A6CFF]/10 text-slate-700"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Start Time</label>
+          <div className="grid grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Start Time</label>
               <Input 
                 type="datetime-local"
                 value={finalizeData.startTime}
                 onChange={(e) => setFinalizeData({...finalizeData, startTime: e.target.value})}
-                className="h-12 rounded-xl bg-muted/30 border-border font-medium"
+                className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium text-slate-700"
               />
             </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">End Time</label>
+            <div className="space-y-3">
+              <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">End Time</label>
               <Input 
                 type="datetime-local"
                 value={finalizeData.endTime}
                 onChange={(e) => setFinalizeData({...finalizeData, endTime: e.target.value})}
-                className="h-12 rounded-xl bg-muted/30 border-border font-medium"
+                className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium text-slate-700"
               />
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Venue / Link</label>
+          <div className="space-y-3">
+            <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Venue / Link</label>
             <Input 
               value={finalizeData.venue}
               onChange={(e) => setFinalizeData({...finalizeData, venue: e.target.value})}
               placeholder="e.g. Main Auditorium or G-Meet Link"
-              className="h-12 rounded-xl bg-muted/30 border-border font-medium"
+              className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium text-slate-700"
             />
           </div>
 
-          <div className="pt-4 space-y-3">
+          <div className="pt-6 space-y-4">
             <Button 
               onClick={handleFinalSubmit}
               disabled={isSubmittingSchedule}
-              className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 transition-all"
+              className="w-full h-14 bg-[#1A6CFF] hover:bg-[#0055FF] text-white rounded-2xl font-black uppercase tracking-[0.15em] text-[11px] shadow-[0_12px_24px_rgba(26,108,255,0.3)] hover:shadow-[0_15px_30px_rgba(26,108,255,0.4)] active:scale-[0.98] transition-all duration-300"
             >
               {isSubmittingSchedule ? <Loader size="sm" /> : "Confirm & Schedule"}
             </Button>
             <Button 
               variant="ghost"
               onClick={() => setIsFinalizeModalOpen(false)}
-              className="w-full h-10 rounded-xl text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+              className="w-full h-10 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/40 hover:text-foreground hover:bg-transparent transition-all"
             >
               Back to jobs
             </Button>
