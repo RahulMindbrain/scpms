@@ -12,9 +12,10 @@ import {
 } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { useDispatch, useSelector } from "react-redux"
-import { fetchCompanyJobs } from "@/redux/thunks/companyThunk"
+import { fetchCompanyJobs, deleteCompanyJob } from "@/redux/thunks/companyThunk"
 import type { RootState } from "@/redux/reducers/rootReducer"
 import type { AppDispatch } from "@/redux/store/store"
+import { toast } from "sonner"
 import {
   Pagination,
   PaginationContent,
@@ -41,6 +42,17 @@ const ManageJobs: React.FC = () => {
     dispatch(fetchCompanyJobs({ page }))
   }, [dispatch, page])
 
+  const handleDeleteJob = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this job drive?")) {
+      try {
+        await dispatch(deleteCompanyJob(id)).unwrap()
+        toast.success("Job drive deleted successfully")
+      } catch (error: any) {
+        toast.error(error || "Failed to delete job drive")
+      }
+    }
+  }
+
   const formatSalary = (salary: number) => {
     if (salary >= 100000) {
       return `${(salary / 100000).toFixed(2)} LPA`
@@ -50,8 +62,8 @@ const ManageJobs: React.FC = () => {
 
   const filteredJobs = jobs?.filter(
     (job: any) =>
-      job.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      job.location.toLowerCase().includes(searchTerm.toLowerCase())
+      job.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      job.location?.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   return (
@@ -116,12 +128,9 @@ const ManageJobs: React.FC = () => {
             <div className="flex items-center gap-3 rounded-2xl border border-border bg-card px-6 py-2.5 shadow-sm">
               <div className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
               <span className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
-                {jobs?.length || 0} Total Postings
+                {meta?.total || jobs?.length || 0} Total Postings
               </span>
             </div>
-            {/* <button className="p-3 bg-card border border-border rounded-2xl hover:bg-muted transition-colors shadow-sm">
-              <Filter size={18} className="text-muted-foreground" />
-            </button> */}
           </div>
         </div>
 
@@ -131,12 +140,11 @@ const ManageJobs: React.FC = () => {
             <table className="saas-table border-collapse">
               <thead>
                 <tr className="border-b border-border/50 bg-muted/5">
-                  <th className="px-8 py-5">Position Details</th>
-                  <th className="px-6 py-5">Compensation</th>
-                  <th className="px-6 py-5">Location</th>
-                  <th className="px-6 py-5">Date Posted</th>
-                  <th className="px-6 py-5">Status</th>
-                  <th className="px-8 py-5 text-right">Actions</th>
+                  <th className="px-8 py-4">Job Role</th>
+                  <th className="px-6 py-4">Target Departments</th>
+                  <th className="px-6 py-4">Core Skills</th>
+                  <th className="px-6 py-4">Posted On</th>
+                  <th className="px-8 py-4 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/30">
@@ -177,35 +185,58 @@ const ManageJobs: React.FC = () => {
                       key={job.id}
                       className="group transition-colors hover:bg-muted/5"
                     >
-                      <td className="px-8 py-6">
+                      <td className="px-8 py-4">
                         <div className="flex flex-col gap-1">
-                          <span className="text-sm font-black text-foreground transition-colors group-hover:text-primary">
+                          <span className="text-sm font-bold text-foreground transition-colors group-hover:text-primary">
                             {job.title}
                           </span>
-                          <span className="flex items-center gap-1.5 text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
-                            <Plus size={10} className="text-primary" /> ID:{" "}
-                            {String(job.id).slice(-8).toUpperCase()}
-                          </span>
+                          <div className="flex items-center gap-3 text-[10px] font-bold tracking-widest text-muted-foreground uppercase">
+                            <span className="flex items-center gap-1">
+                              <MapPin size={10} className="text-primary/60" /> {job.location}
+                            </span>
+                            <span className="h-1 w-1 rounded-full bg-border" />
+                            <span>ID: {String(job.id).slice(-4).toUpperCase()}</span>
+                          </div>
                         </div>
                       </td>
-                      <td className="px-6 py-6">
-                        <div className="flex items-center gap-2 font-bold text-foreground">
-                          <IndianRupee size={14} className="text-primary" />
-                          <span className="text-sm">
-                            {formatSalary(job.salary)}
-                          </span>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1.5 max-w-[180px]">
+                          {job.eligibleDepartments?.slice(0, 2).map((dept: any) => (
+                            <Badge key={dept.id} variant="secondary" className="bg-primary/5 text-primary border-primary/10 text-[9px] font-bold px-2 py-0.5 whitespace-nowrap">
+                              {dept.name}
+                            </Badge>
+                          ))}
+                          {job.eligibleDepartments?.length > 2 && (
+                            <span className="text-[9px] font-bold text-muted-foreground self-center ml-1">
+                              +{job.eligibleDepartments.length - 2} more
+                            </span>
+                          )}
+                          {!job.eligibleDepartments?.length && (
+                            <span className="text-[10px] text-muted-foreground italic font-medium">All Depts</span>
+                          )}
                         </div>
                       </td>
-                      <td className="px-6 py-6">
-                        <div className="flex items-center gap-2 font-semibold text-muted-foreground">
-                          <MapPin size={14} />
-                          <span className="text-xs">{job.location}</span>
+                      <td className="px-6 py-4">
+                        <div className="flex flex-wrap gap-1.5 max-w-[180px]">
+                          {job.skills?.slice(0, 3).map((skill: any) => (
+                            <Badge key={skill.id} variant="outline" className="text-[9px] font-bold px-2 py-0.5 border-muted-foreground/20 text-muted-foreground whitespace-nowrap">
+                              {skill.name}
+                            </Badge>
+                          ))}
+                          {job.skills?.length > 3 && (
+                            <span className="text-[9px] font-bold text-muted-foreground self-center ml-1">
+                              +{job.skills.length - 3} more
+                            </span>
+                          )}
+                          {!job.skills?.length && (
+                            <span className="text-[10px] text-muted-foreground italic font-medium">General</span>
+                          )}
                         </div>
                       </td>
-                      <td className="px-6 py-6">
-                        <div className="flex items-center gap-2 font-semibold text-muted-foreground">
-                          <Calendar size={14} />
-                          <span className="text-xs">
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-2 font-medium text-muted-foreground">
+                          <Calendar size={14} className="text-muted-foreground/50" />
+                          <span className="text-[11px]">
                             {job.createdAt
                               ? new Date(job.createdAt).toLocaleDateString(
                                 "en-US",
@@ -219,40 +250,28 @@ const ManageJobs: React.FC = () => {
                           </span>
                         </div>
                       </td>
-                      <td className="px-6 py-6">
-                        <Badge
-                          className={`rounded-full border px-3 py-1 text-[10px] font-black tracking-widest uppercase shadow-sm ${job.status === "APPROVED" || job.status === "Active"
-                              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-600"
-                              : job.status === "REJECTED" ||
-                                job.status === "Closed"
-                                ? "border-rose-500/20 bg-rose-500/10 text-rose-600"
-                                : "border-primary/20 bg-primary/10 text-primary"
-                            } `}
-                        >
-                          {job.status}
-                        </Badge>
-                      </td>
-                      <td className="px-8 py-6">
-                        <div className="flex items-center justify-end gap-3">
+                      <td className="px-8 py-4">
+                        <div className="flex items-center justify-end gap-2">
                           <Link
                             to={`/company/send-job-to-university?jobId=${job.id}`}
-                            className="flex items-center gap-2 rounded-xl bg-blue-500/10 px-4 py-2 text-[10px] font-black tracking-widest text-blue-600 uppercase shadow-sm transition-all hover:bg-blue-500 hover:text-white"
+                            className="flex items-center gap-2 rounded-lg bg-blue-500/5 px-3 py-1.5 text-[9px] font-bold tracking-wider text-blue-600 uppercase transition-all hover:bg-blue-500 hover:text-white"
                             title="Send Job to University"
                           >
                             Send
                           </Link>
                           <Link
                             to={`/company/post-job?jobId=${job.id}`}
-                            className="flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-2 text-[10px] font-black tracking-widest text-emerald-600 uppercase shadow-sm transition-all hover:bg-emerald-500 hover:text-white"
+                            className="flex items-center gap-2 rounded-lg bg-emerald-500/5 px-3 py-1.5 text-[9px] font-bold tracking-wider text-emerald-600 uppercase transition-all hover:bg-emerald-500 hover:text-white"
                             title="Modify Drive"
                           >
-                            <Edit3 size={14} /> Modify
+                            <Edit3 size={12} /> Edit
                           </Link>
                           <button
-                            className="rounded-xl p-2.5 text-muted-foreground transition-all hover:bg-rose-500/10 hover:text-rose-500"
+                            onClick={() => handleDeleteJob(job.id)}
+                            className="rounded-lg p-2 text-muted-foreground/40 transition-all hover:bg-rose-500/10 hover:text-rose-500"
                             title="Delete Drive"
                           >
-                            <Trash2 size={18} />
+                            <Trash2 size={16} />
                           </button>
                         </div>
                       </td>
