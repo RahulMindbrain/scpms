@@ -21,6 +21,7 @@ import { Modal } from '@/components/ui/modal';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobs } from '@/redux/thunks/driveThunk';
+import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import { cn } from '@/lib/utils';
@@ -82,9 +83,11 @@ const PlacementDriveManagement: React.FC = () => {
   const filterRef = useRef<HTMLDivElement>(null);
   const dispatch = useDispatch<AppDispatch>();
   const { jobs: reduxJobs, loading } = useSelector((state: RootState) => state.drive);
+  const { companies } = useSelector((state: RootState) => state.company);
 
   useEffect(() => {
     dispatch(fetchJobs({ status: 'APPROVED' }));
+    dispatch(fetchCompanies({ limit: 500 }));
   }, [dispatch]);
 
   useEffect(() => {
@@ -110,7 +113,11 @@ const PlacementDriveManagement: React.FC = () => {
     const enrichedJobs = reduxJobs.map((row: Job & Record<string, unknown>) => {
       const j = (row as { job?: Job }).job;
       const title = j?.title ?? row.title;
-      const company = j?.company ?? row.company;
+      
+      // Fallback for missing company object
+      const companyIdFromJob = j?.companyId ?? row.companyId;
+      const foundCompany = companies.find(c => c.id === companyIdFromJob);
+      const company = j?.company ?? row.company ?? foundCompany;
       const scheduleDate = (row as { sentAt?: string }).sentAt
         ? new Date((row as { sentAt: string }).sentAt)
         : row.createdAt
@@ -164,12 +171,12 @@ const PlacementDriveManagement: React.FC = () => {
 
     const groups: Record<number, { company: Company, jobs: any[] }> = {};
     filteredJobs.forEach(job => {
-      const companyId = job.company?.id;
+      const companyId = job.company?.id || (job as any).job?.companyId || (job as any).companyId;
       if (!companyId) return;
 
       if (!groups[companyId]) {
         groups[companyId] = {
-          company: job.company as Company,
+          company: job.company || { id: companyId, name: `Company #${companyId}` } as Company,
           jobs: []
         };
       }

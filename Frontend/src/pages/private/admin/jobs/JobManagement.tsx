@@ -150,7 +150,14 @@ const AdminJobManagement: React.FC = () => {
       );
     }
 
-    result = [...result].sort((a, b) => {
+    result = [...result].map(row => {
+      const companyId = row.job?.companyId ?? row.companyId;
+      const foundCompany = reduxCompanies.find(c => c.id === companyId);
+      return {
+        ...row,
+        displayCompany: row.job?.company || foundCompany
+      };
+    }).sort((a, b) => {
       if (sortBy === 'newest') return new Date(b.sentAt || b.id).getTime() - new Date(a.sentAt || a.id).getTime();
       if (sortBy === 'oldest') return new Date(a.sentAt || a.id).getTime() - new Date(b.sentAt || b.id).getTime();
       if (sortBy === 'salary-high') {
@@ -162,7 +169,7 @@ const AdminJobManagement: React.FC = () => {
     });
 
     return result;
-  }, [jobs, searchTerm, sortBy, filterDepartment, filterLocation]);
+  }, [jobs, searchTerm, sortBy, filterDepartment, filterLocation, reduxCompanies]);
 
   const locations = useMemo(() => {
     const locs = new Set(
@@ -297,8 +304,8 @@ const AdminJobManagement: React.FC = () => {
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-start gap-4">
                     <div className="w-14 h-14 bg-muted/50 rounded-2xl flex items-center justify-center border border-border group-hover:border-primary/30 transition-all duration-300 shadow-sm overflow-hidden">
-                      {row.job?.company?.logo ? (
-                        <img src={row.job.company.logo} alt={row.job.company.name} className="w-10 h-10 object-contain" />
+                      {(row as any).displayCompany?.logo ? (
+                        <img src={(row as any).displayCompany.logo} alt={(row as any).displayCompany.name} className="w-10 h-10 object-contain" />
                       ) : (
                         <Building2 className="w-7 h-7 text-muted-foreground group-hover:text-primary transition-colors" />
                       )}

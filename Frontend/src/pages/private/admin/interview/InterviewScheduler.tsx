@@ -17,7 +17,17 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { EditScheduleModal } from './components/EditScheduleModal';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '@/redux/store/store';
-import { fetchSchedules, deleteSchedule, fetchScheduleMessages, sendScheduleMessage } from '@/redux/thunks/interviewThunk';
+import { 
+  fetchSchedules, 
+  deleteSchedule, 
+  fetchScheduleMessages, 
+  sendScheduleMessage,
+  fetchActiveCompaniesForSchedule,
+  fetchActiveUniversitiesForSchedule,
+  fetchCompanyJobsForSchedule,
+  fetchUniversityJobsForSchedule,
+  createSchedule
+} from '@/redux/thunks/interviewThunk';
 import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import { toast } from 'sonner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -25,11 +35,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Loader from '@/components/Loader';
 import { AdminPageLayout } from '@/components/layout/AdminPageLayout';
 import { PageHeader } from '@/components/PageHeader';
+import { Separator } from '@/components/ui/separator';
 
 const InterviewSchedulerPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { schedules, loading } = useSelector((state: RootState) => state.interview);
+  const { 
+    schedules, 
+    loading,
+    schedulerCompanies,
+    schedulerUniversities,
+    schedulerJobs,
+    schedulerLoading
+  } = useSelector((state: RootState) => state.interview);
   const { companies } = useSelector((state: RootState) => state.company);
+  const { user, userType } = useSelector((state: RootState) => state.auth);
+
+  const isSuperAdmin = userType === 'SUPER_ADMIN' || userType === 'SUPERADMIN';
+  const isUniversityAdmin = userType === 'ADMIN';
+  const universityId = (user as any)?.profile?.university?.id;
 
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -43,17 +66,117 @@ const InterviewSchedulerPage: React.FC = () => {
   const [msgLoading, setMsgLoading] = useState<number | null>(null);
   const [sendingMsg, setSendingMsg] = useState(false);
 
-  useEffect(() => {
-    dispatch(fetchCompanies({ page: 1, limit: 100 }));
-  }, [dispatch]);
+  // New Scheduler Flow State
+  const [schedulerType, setSchedulerType] = useState<'companies' | 'universities'>('companies');
+  const [isJobsModalOpen, setIsJobsModalOpen] = useState(false);
+  const [selectedEntity, setSelectedEntity] = useState<any>(null);
+  const [isFinalizeModalOpen, setIsFinalizeModalOpen] = useState(false);
+  const [selectedJobToSchedule, setSelectedJobToSchedule] = useState<any>(null);
+  const [finalizeData, setFinalizeData] = useState({
+    title: '',
+    startTime: '',
+    endTime: '',
+    venue: ''
+  });
+  const [isSubmittingSchedule, setIsSubmittingSchedule] = useState(false);
 
   useEffect(() => {
-    if (selectedCompanyId) {
+    dispatch(fetchCompanies({ page: 1, limit: 100 }));
+    // Fetch initial scheduler data
+    if (schedulerType === 'companies') {
+      dispatch(fetchActiveCompaniesForSchedule());
+    } else {
+      dispatch(fetchActiveUniversitiesForSchedule());
+    }
+  }, [dispatch, schedulerType]);
+
+  useEffect(() => {
+    if (selectedCompanyId && selectedCompanyId !== 'all') {
       dispatch(fetchSchedules(Number(selectedCompanyId)));
-    } else if (companies.length > 0) {
+    } else if (companies.length > 0 && !selectedCompanyId) {
       setSelectedCompanyId(companies[0].id.toString());
     }
   }, [selectedCompanyId, companies, dispatch]);
+
+  const handleEntityClick = (entity: any) => {
+    setSelectedEntity(entity);
+    if (schedulerType === 'companies') {
+      dispatch(fetchCompanyJobsForSchedule(entity.id));
+    } else {
+      dispatch(fetchUniversityJobsForSchedule({ universityId: entity.id }));
+    }
+    setIsJobsModalOpen(true);
+  };
+
+  const handleScheduleClick = (job: any) => {
+    setSelectedJobToSchedule(job);
+    setFinalizeData({
+      title: `${job.job?.title || 'Drive'} @ ${job.university?.name || job.job?.company?.name || 'Campus'}`,
+      startTime: '',
+      endTime: '',
+      venue: ''
+    });
+    setIsFinalizeModalOpen(true);
+  };
+
+  const handleFinalSubmit = async () => {
+    if (!finalizeData.title || !finalizeData.startTime || !finalizeData.endTime || !finalizeData.venue) {
+      toast.error("Please fill all fields");
+      return;
+    }
+
+    setIsSubmittingSchedule(true);
+    try {
+      const payload = {
+        title: finalizeData.title,
+        companyId: selectedJobToSchedule.job.companyId,
+        universityId: selectedJobToSchedule.universityId,
+        jobUniversityIds: [selectedJobToSchedule.id],
+        startTime: new Date(finalizeData.startTime).toISOString(),
+        endTime: new Date(finalizeData.endTime).toISOString(),
+        venue: finalizeData.venue
+      };
+
+      await dispatch(createSchedule(payload)).unwrap();
+      toast.success("Interview scheduled successfully!");
+      setIsFinalizeModalOpen(false);
+      setIsJobsModalOpen(false);
+      // Refresh schedules if needed
+      if (selectedCompanyId) {
+        dispatch(fetchSchedules(Number(selectedCompanyId)));
+      }
+    } catch (error: any) {
+      toast.error(error || "Failed to schedule interview");
+    } finally {
+      setIsSubmittingSchedule(false);
+    }
+  };
+
+  const [jobUniversityFilter, setJobUniversityFilter] = useState<string>('all');
+
+  const filteredSchedulerJobs = useMemo(() => {
+    let result = schedulerJobs;
+    
+    if (isUniversityAdmin && universityId) {
+      result = result.filter(item => item.university?.id === universityId);
+    }
+
+    if (isSuperAdmin && jobUniversityFilter !== 'all') {
+      result = result.filter(item => item.university?.id === Number(jobUniversityFilter));
+    }
+
+    return result;
+  }, [schedulerJobs, isUniversityAdmin, universityId, isSuperAdmin, jobUniversityFilter]);
+
+  const schedulerUniversitiesForFilter = useMemo(() => {
+    const uniMap = new Map();
+    schedulerJobs.forEach(ju => {
+      if (ju.university) {
+        uniMap.set(ju.university.id, ju.university.name);
+      }
+    });
+    return Array.from(uniMap.entries()).map(([id, name]) => ({ id, name }));
+  }, [schedulerJobs]);
 
   const toggleExpand = (id: number) => {
     setExpandedId(expandedId === id ? null : id);
@@ -152,11 +275,35 @@ const InterviewSchedulerPage: React.FC = () => {
         variant="indigo"
       >
         <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+          {isSuperAdmin && (
+            <div className="flex bg-muted/50 p-1 rounded-xl border border-border mr-2">
+              <button
+                onClick={() => setSchedulerType('companies')}
+                className={cn(
+                  "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                  schedulerType === 'companies' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Companies
+              </button>
+              <button
+                onClick={() => setSchedulerType('universities')}
+                className={cn(
+                  "px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+                  schedulerType === 'universities' ? "bg-background shadow-sm text-primary" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                Universities
+              </button>
+            </div>
+          )}
+
           <Select value={selectedCompanyId} onValueChange={setSelectedCompanyId}>
             <SelectTrigger className="w-full sm:w-[180px] h-10 rounded-xl bg-background/50 border-border text-xs font-black uppercase tracking-widest px-4">
-              <SelectValue placeholder="Company" />
+              <SelectValue placeholder="Filter By" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
+              <SelectItem value="all">All Companies</SelectItem>
               {companies.map((company) => (
                 <SelectItem key={company.id} value={company.id.toString()}>
                   {company.name}
@@ -168,23 +315,72 @@ const InterviewSchedulerPage: React.FC = () => {
           <div className="relative w-full sm:w-[220px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="Search drives..."
+              placeholder="Search..."
               className="pl-9 bg-background/50 border-border rounded-xl h-10 text-sm focus-visible:ring-primary/20"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-
-          <Button 
-            onClick={handleOpenCreate} 
-            className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white rounded-xl h-10 font-black uppercase tracking-widest text-[10px] px-6 shadow-lg shadow-primary/10 active:scale-95 transition-all"
-          >
-            <Plus className="size-3.5 mr-1.5" /> New Schedule
-          </Button>
         </div>
       </PageHeader>
 
-      <div className="space-y-6">
+      <div className="space-y-12">
+        {/* Entity Selection Flow */}
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3">
+              <span className="size-2 rounded-full bg-primary animate-pulse" />
+              Schedule New Drive
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {schedulerLoading ? (
+              Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="h-48 rounded-[2rem] bg-muted/20 animate-pulse border border-dashed border-border" />
+              ))
+            ) : (
+              (schedulerType === 'companies' ? schedulerCompanies : schedulerUniversities).map((item) => (
+                <motion.div
+                  key={item.id}
+                  whileHover={{ y: -5, scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleEntityClick(item)}
+                  className="group relative cursor-pointer"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-[2.5rem] opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="saas-card p-8 h-full flex flex-col items-center justify-center text-center gap-4 border-2 border-transparent group-hover:border-primary/20 transition-all bg-background/50 backdrop-blur-xl">
+                    <div className="size-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-2 group-hover:scale-110 transition-transform">
+                      {schedulerType === 'companies' ? <Building2 size={32} /> : <Sparkles size={32} />}
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">{item.name}</h4>
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                        {schedulerType === 'companies' ? item.user?.email : `${item.city}, ${item.state}`}
+                      </p>
+                    </div>
+                    <div className="pt-4 mt-auto">
+                      <span className="px-4 py-1.5 rounded-xl bg-muted text-[9px] font-black uppercase tracking-widest text-muted-foreground group-hover:bg-primary group-hover:text-white transition-all">
+                        Fetch Jobs
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </div>
+        </section>
+
+        <Separator className="opacity-50" />
+
+        {/* Existing Schedules List */}
+        <section className="space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-black uppercase tracking-[0.2em] text-muted-foreground flex items-center gap-3">
+              <Calendar className="size-4" />
+              Active Timelines
+            </h2>
+          </div>
         {loading ? (
           <div className="py-32 flex justify-center">
             <Loader text="Syncing schedule data..." />
@@ -348,7 +544,162 @@ const InterviewSchedulerPage: React.FC = () => {
             </Button>
           </div>
         )}
-      </div>
+      </section>
+    </div>
+
+      {/* Jobs Selection Modal */}
+      <Modal
+        isOpen={isJobsModalOpen}
+        onClose={() => setIsJobsModalOpen(false)}
+        title={`Available Jobs`}
+        subtitle={`Recruitment opportunities for ${selectedEntity?.name}`}
+        maxWidth="sm:max-w-4xl"
+      >
+        <div className="space-y-6 py-4">
+          {isSuperAdmin && schedulerType === 'companies' && schedulerUniversitiesForFilter.length > 0 && (
+            <div className="flex items-center gap-3 mb-4">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Filter by University:</label>
+              <Select value={jobUniversityFilter} onValueChange={setJobUniversityFilter}>
+                <SelectTrigger className="w-[200px] h-8 rounded-lg text-[10px] font-bold uppercase tracking-widest px-3">
+                  <SelectValue placeholder="All Universities" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  <SelectItem value="all">All Universities</SelectItem>
+                  {schedulerUniversitiesForFilter.map((uni) => (
+                    <SelectItem key={uni.id} value={uni.id.toString()}>
+                      {uni.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {schedulerLoading ? (
+            <div className="py-20 flex justify-center">
+              <Loader text="Loading opportunities..." />
+            </div>
+          ) : filteredSchedulerJobs.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+              {filteredSchedulerJobs.map((ju: any) => (
+                <div key={ju.id} className="saas-card bg-muted/10 p-6 space-y-4 hover:border-primary/30 transition-all group">
+                  <div className="flex justify-between items-start">
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-foreground group-hover:text-primary transition-colors">{ju.job?.title}</h4>
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                        <Building2 size={10} /> {ju.job?.company?.name || selectedEntity?.name}
+                      </p>
+                      <p className="text-[10px] font-black text-primary uppercase tracking-widest flex items-center gap-1.5">
+                        <Sparkles size={10} /> {ju.university?.name || selectedEntity?.name}
+                      </p>
+                    </div>
+                    <Badge variant="outline" className="bg-primary/5 text-primary border-primary/10 text-[8px] font-black px-2 py-0.5">
+                      {ju.status}
+                    </Badge>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-4 py-3 border-y border-border/50">
+                    <div className="space-y-0.5">
+                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.15em]">Package</p>
+                      <p className="text-xs font-bold text-emerald-600">₹ {(ju.salary / 100000).toFixed(1)} LPA</p>
+                    </div>
+                    <div className="space-y-0.5 text-right">
+                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-[0.15em]">Openings</p>
+                      <p className="text-xs font-bold text-foreground">{ju.openings} Seats</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-[10px] text-muted-foreground line-clamp-2 italic font-medium leading-relaxed">
+                      {ju.description || "No specific drive description provided."}
+                    </p>
+                  </div>
+
+                  <Button 
+                    onClick={() => handleScheduleClick(ju)}
+                    className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl h-10 font-black uppercase tracking-widest text-[9px] shadow-lg shadow-primary/5 group-hover:shadow-primary/20 transition-all"
+                  >
+                    Schedule Interview
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-20 bg-muted/10 rounded-[2rem] border border-dashed border-border">
+              <Briefcase className="size-12 text-muted-foreground/20 mx-auto mb-4" />
+              <p className="text-muted-foreground text-xs font-black uppercase tracking-widest">No active job listings found.</p>
+            </div>
+          )}
+        </div>
+      </Modal>
+
+      {/* Finalize Schedule Modal */}
+      <Modal
+        isOpen={isFinalizeModalOpen}
+        onClose={() => setIsFinalizeModalOpen(false)}
+        title="Drive Logistics"
+        subtitle="Finalize the interview schedule details"
+      >
+        <div className="space-y-6 py-4">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Drive Title</label>
+            <Input 
+              value={finalizeData.title}
+              onChange={(e) => setFinalizeData({...finalizeData, title: e.target.value})}
+              placeholder="e.g. Campus Recruitment 2024"
+              className="h-12 rounded-xl bg-muted/30 border-border font-medium focus:ring-primary/20"
+            />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Start Time</label>
+              <Input 
+                type="datetime-local"
+                value={finalizeData.startTime}
+                onChange={(e) => setFinalizeData({...finalizeData, startTime: e.target.value})}
+                className="h-12 rounded-xl bg-muted/30 border-border font-medium"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">End Time</label>
+              <Input 
+                type="datetime-local"
+                value={finalizeData.endTime}
+                onChange={(e) => setFinalizeData({...finalizeData, endTime: e.target.value})}
+                className="h-12 rounded-xl bg-muted/30 border-border font-medium"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Venue / Link</label>
+            <Input 
+              value={finalizeData.venue}
+              onChange={(e) => setFinalizeData({...finalizeData, venue: e.target.value})}
+              placeholder="e.g. Main Auditorium or G-Meet Link"
+              className="h-12 rounded-xl bg-muted/30 border-border font-medium"
+            />
+          </div>
+
+          <div className="pt-4 space-y-3">
+            <Button 
+              onClick={handleFinalSubmit}
+              disabled={isSubmittingSchedule}
+              className="w-full h-12 bg-primary hover:bg-primary/90 text-white rounded-xl font-black uppercase tracking-widest text-[10px] shadow-xl shadow-primary/20 transition-all"
+            >
+              {isSubmittingSchedule ? <Loader size="sm" /> : "Confirm & Schedule"}
+            </Button>
+            <Button 
+              variant="ghost"
+              onClick={() => setIsFinalizeModalOpen(false)}
+              className="w-full h-10 rounded-xl text-[10px] font-black uppercase tracking-widest text-muted-foreground"
+            >
+              Back to jobs
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <EditScheduleModal
         schedule={selectedSchedule}

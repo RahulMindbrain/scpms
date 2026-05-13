@@ -160,4 +160,54 @@ export const fetchScheduleApplications = createAsyncThunk(
   }
 );
 
+// ✅ Fetch active companies for scheduling flow
+export const fetchActiveCompaniesForSchedule = createAsyncThunk(
+  "interview/fetchActiveCompaniesForSchedule",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAPI<any>("/admin/get-companies", { status: "ACTIVE", limit: 100 });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch companies");
+    }
+  }
+);
 
+// ✅ Fetch active universities for scheduling flow
+export const fetchActiveUniversitiesForSchedule = createAsyncThunk(
+  "interview/fetchActiveUniversitiesForSchedule",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAPI<any>("/university/", { limit: 100, status: "ACTIVE" });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch universities");
+    }
+  }
+);
+
+// ✅ Fetch jobs by company ID for scheduling flow
+export const fetchCompanyJobsForSchedule = createAsyncThunk(
+  "interview/fetchCompanyJobsForSchedule",
+  async (companyId: number, { rejectWithValue }) => {
+    try {
+      const response = await getAPI<any>(`/admin/get-jobs-company/${companyId}`);
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch company jobs");
+    }
+  }
+);
+
+// ✅ Fetch jobs by university for scheduling flow
+export const fetchUniversityJobsForSchedule = createAsyncThunk(
+  "interview/fetchUniversityJobsForSchedule",
+  async (params: { universityId?: number; page?: number; limit?: number }, { rejectWithValue }) => {
+    try {
+      const response = await getAPI<any>("/job-universities", { ...params, limit: params.limit || 100 });
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch university jobs");
+    }
+  }
+);

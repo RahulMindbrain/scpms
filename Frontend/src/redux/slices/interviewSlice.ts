@@ -1,11 +1,16 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { fetchSchedules, createSchedule, updateSchedule, deleteSchedule, fetchSchedulesByCompany, fetchCompanySchedules, approveSchedule, fetchScheduleMessages, sendScheduleMessage, fetchScheduleApplications } from "../thunks/interviewThunk";
+import { fetchSchedules, createSchedule, updateSchedule, deleteSchedule, fetchSchedulesByCompany, fetchCompanySchedules, approveSchedule, fetchScheduleMessages, sendScheduleMessage, fetchScheduleApplications, fetchActiveCompaniesForSchedule, fetchActiveUniversitiesForSchedule, fetchCompanyJobsForSchedule, fetchUniversityJobsForSchedule } from "../thunks/interviewThunk";
 
 interface InterviewState {
   schedules: any[];
   applications: any[];
   loading: boolean;
   error: string | null;
+  // Scheduler flow state
+  schedulerCompanies: any[];
+  schedulerUniversities: any[];
+  schedulerJobs: any[];
+  schedulerLoading: boolean;
 }
 
 const initialState: InterviewState = {
@@ -13,6 +18,10 @@ const initialState: InterviewState = {
   applications: [],
   loading: false,
   error: null,
+  schedulerCompanies: [],
+  schedulerUniversities: [],
+  schedulerJobs: [],
+  schedulerLoading: false,
 };
 
 const interviewSlice = createSlice({
@@ -144,6 +153,57 @@ const interviewSlice = createSlice({
         state.loading = false;
         state.applications = [];
         state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch applications";
+      })
+
+      // ── Scheduler Flow ──
+      // Active Companies
+      .addCase(fetchActiveCompaniesForSchedule.pending, (state) => {
+        state.schedulerLoading = true;
+      })
+      .addCase(fetchActiveCompaniesForSchedule.fulfilled, (state, action: PayloadAction<any>) => {
+        state.schedulerLoading = false;
+        state.schedulerCompanies = action.payload?.data || [];
+      })
+      .addCase(fetchActiveCompaniesForSchedule.rejected, (state) => {
+        state.schedulerLoading = false;
+      })
+
+      // Active Universities
+      .addCase(fetchActiveUniversitiesForSchedule.pending, (state) => {
+        state.schedulerLoading = true;
+      })
+      .addCase(fetchActiveUniversitiesForSchedule.fulfilled, (state, action: PayloadAction<any>) => {
+        state.schedulerLoading = false;
+        state.schedulerUniversities = action.payload?.data || [];
+      })
+      .addCase(fetchActiveUniversitiesForSchedule.rejected, (state) => {
+        state.schedulerLoading = false;
+      })
+
+      // Company Jobs
+      .addCase(fetchCompanyJobsForSchedule.pending, (state) => {
+        state.schedulerLoading = true;
+        state.schedulerJobs = [];
+      })
+      .addCase(fetchCompanyJobsForSchedule.fulfilled, (state, action: PayloadAction<any>) => {
+        state.schedulerLoading = false;
+        state.schedulerJobs = action.payload?.data || [];
+      })
+      .addCase(fetchCompanyJobsForSchedule.rejected, (state) => {
+        state.schedulerLoading = false;
+      })
+
+      // University Jobs
+      .addCase(fetchUniversityJobsForSchedule.pending, (state) => {
+        state.schedulerLoading = true;
+        state.schedulerJobs = [];
+      })
+      .addCase(fetchUniversityJobsForSchedule.fulfilled, (state, action: PayloadAction<any>) => {
+        state.schedulerLoading = false;
+        state.schedulerJobs = action.payload?.data || [];
+      })
+      .addCase(fetchUniversityJobsForSchedule.rejected, (state) => {
+        state.schedulerLoading = false;
       });
   },
 });

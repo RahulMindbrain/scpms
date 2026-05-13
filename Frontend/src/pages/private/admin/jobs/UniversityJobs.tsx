@@ -66,9 +66,14 @@ const UniversityJobs: React.FC = () => {
 
   const filteredAndSortedJobs = useMemo(() => {
     let result = (Array.isArray(jobs) ? jobs : []).filter((row) => {
-      const title = row.job?.title ?? "";
+      const j = row.job;
+      const title = j?.title ?? "";
       const uniName = row.university?.name ?? "";
-      const companyName = row.job?.company?.name ?? "";
+      
+      const companyId = j?.companyId ?? row.companyId;
+      const foundCompany = reduxCompanies.find(c => c.id === companyId);
+      const companyName = j?.company?.name ?? foundCompany?.name ?? "";
+      
       return (
         title.toLowerCase().includes(searchTerm.toLowerCase()) ||
         uniName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -92,12 +97,19 @@ const UniversityJobs: React.FC = () => {
       );
     }
 
-    return [...result].sort((a, b) => {
+    return [...result].map(row => {
+      const companyId = row.job?.companyId ?? row.companyId;
+      const foundCompany = reduxCompanies.find(c => c.id === companyId);
+      return {
+        ...row,
+        displayCompany: row.job?.company || foundCompany
+      };
+    }).sort((a, b) => {
       if (sortBy === 'newest') return new Date(b.sentAt || b.id).getTime() - new Date(a.sentAt || a.id).getTime();
       if (sortBy === 'oldest') return new Date(a.sentAt || a.id).getTime() - new Date(b.sentAt || b.id).getTime();
       return 0;
     });
-  }, [jobs, searchTerm, sortBy, filterDepartment, filterLocation]);
+  }, [jobs, searchTerm, sortBy, filterDepartment, filterLocation, reduxCompanies]);
 
   if (loading && jobs.length === 0) return <Loader text="Loading university jobs..." fullScreen />;
 
@@ -176,7 +188,7 @@ const UniversityJobs: React.FC = () => {
                 </h3>
                 <p className="text-sm font-semibold text-muted-foreground mt-1 flex items-center gap-2">
                   <Building2 size={14} className="text-primary/60" />
-                  {row.job?.company?.name || 'Unknown Company'}
+                  {(row as any).displayCompany?.name || 'Unknown Company'}
                 </p>
               </div>
 
