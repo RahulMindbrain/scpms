@@ -54,10 +54,7 @@ const CompanyManagement: React.FC = () => {
     description: ''
   });
 
-  const [selectedCompanyId, setSelectedCompanyId] = useState<number | null>(null);
-  const [isJobsModalOpen, setIsJobsModalOpen] = useState(false);
-  const { jobs: companyJobs } = useSelector((state: RootState) => state.company);
-  const [jobsStatusFilter, setJobsStatusFilter] = useState('APPROVED');
+
 
   useEffect(() => {
     dispatch(fetchCompanies({}));

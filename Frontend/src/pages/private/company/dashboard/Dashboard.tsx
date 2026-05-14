@@ -9,16 +9,13 @@ import { fetchCompanyJobs, fetchJobApplications } from "@/redux/thunks/companyTh
 import { fetchUpcomingEvents } from "@/redux/thunks/notificationThunks"
 
 import Loader from "@/components/Loader"
-import CountdownTimer from "@/components/CountdownTimer"
-import { Calendar, Clock, MapPin, Sparkles } from "lucide-react"
+import { Sparkles } from "lucide-react"
 import { NextInterviewCountdown } from "@/components/dashboard/NextInterviewCountdown"
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>()
   const { jobs, applications, loading, error } = useSelector((state: RootState) => state.company)
   const { upcomingEvents = [] } = useSelector((state: RootState) => state.notification || {})
-
-  const nextEvent = upcomingEvents.length > 0 ? upcomingEvents[0] : null
 
   useEffect(() => {
     dispatch(fetchCompanyJobs({ page: 1, limit: 100 }))

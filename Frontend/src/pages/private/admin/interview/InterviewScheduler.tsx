@@ -5,7 +5,6 @@ import {
   Search, MessageSquare, Send, Trash2,
   Calendar,
   Sparkles,
-  IndianRupee,
   CheckCircle2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,7 +27,6 @@ import {
   fetchActiveCompaniesForSchedule,
   fetchActiveUniversitiesForSchedule,
   fetchCompanyJobsForSchedule,
-  fetchUniversityJobsForSchedule,
   createSchedule
 } from '@/redux/thunks/interviewThunk';
 import { fetchCompanies } from '@/redux/thunks/companyThunk';
@@ -38,24 +36,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import Loader from '@/components/Loader';
 import { AdminPageLayout } from '@/components/layout/AdminPageLayout';
 import { PageHeader } from '@/components/PageHeader';
-import { Separator } from '@/components/ui/separator';
 
 const InterviewSchedulerPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { 
     schedules, 
     loading,
-    schedulerCompanies,
     schedulerUniversities,
     schedulerJobs,
     schedulerLoading
   } = useSelector((state: RootState) => state.interview);
   const { companies } = useSelector((state: RootState) => state.company);
-  const { user, userType } = useSelector((state: RootState) => state.auth);
+  const { userType } = useSelector((state: RootState) => state.auth);
 
   const isSuperAdmin = userType === 'SUPER_ADMIN' || userType === 'SUPERADMIN';
-  const isUniversityAdmin = userType === 'ADMIN';
-  const universityId = (user as any)?.profile?.university?.id;
+
 
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,10 +66,7 @@ const InterviewSchedulerPage: React.FC = () => {
   const [msgLoading, setMsgLoading] = useState<number | null>(null);
   const [sendingMsg, setSendingMsg] = useState(false);
 
-  // New Scheduler Flow State
   const [schedulerType, setSchedulerType] = useState<'companies' | 'universities'>('companies');
-  const [isJobsModalOpen, setIsJobsModalOpen] = useState(false);
-  const [selectedEntity, setSelectedEntity] = useState<any>(null);
   const [isFinalizeModalOpen, setIsFinalizeModalOpen] = useState(false);
   const [selectedJobToSchedule, setSelectedJobToSchedule] = useState<any>(null);
   const [finalizeData, setFinalizeData] = useState({
@@ -118,16 +110,8 @@ const InterviewSchedulerPage: React.FC = () => {
     // Optionally fetch companies for this university if the API supports it
   };
 
-  const handleEntityClick = (entity: any) => {
-    setSelectedEntity(entity);
-    if (schedulerType === 'companies') {
-      handleWizardCompanyChange(entity.id.toString());
-    } else {
-      setWizardUniversityId(entity.id.toString());
-      dispatch(fetchUniversityJobsForSchedule({ universityId: entity.id }));
-    }
-    // We'll keep the modal open but switch view if needed, 
-    // or just use the new consolidated UI
+  const toggleExpand = (id: number) => {
+    setExpandedId(expandedId === id ? null : id);
   };
 
   const handleScheduleClick = (job: any) => {
@@ -168,7 +152,6 @@ const InterviewSchedulerPage: React.FC = () => {
 
       toast.success("Interview scheduled successfully!");
       setIsFinalizeModalOpen(false);
-      setIsJobsModalOpen(false);
       setIsWizardOpen(false);
       // Refresh schedules if needed
       if (selectedCompanyId) {
@@ -179,50 +162,6 @@ const InterviewSchedulerPage: React.FC = () => {
     } finally {
       setIsSubmittingSchedule(false);
     }
-  };
-
-  const [jobUniversityFilter, setJobUniversityFilter] = useState<string>('all');
-
-  const filteredSchedulerJobs = useMemo(() => {
-    let result = schedulerJobs;
-    
-    if (isUniversityAdmin && universityId) {
-      result = result.filter(item => item.university?.id === universityId);
-    }
-
-    if (isSuperAdmin && jobUniversityFilter !== 'all') {
-      result = result.filter(item => item.university?.id === Number(jobUniversityFilter));
-    }
-
-    return result;
-  }, [schedulerJobs, isUniversityAdmin, universityId, isSuperAdmin, jobUniversityFilter]);
-
-  const schedulerUniversitiesForFilter = useMemo(() => {
-    const uniMap = new Map();
-    schedulerJobs.forEach(ju => {
-      if (ju.university) {
-        uniMap.set(ju.university.id, ju.university.name);
-      }
-    });
-    return Array.from(uniMap.entries()).map(([id, name]) => ({ id, name }));
-  }, [schedulerJobs]);
-
-  const toggleExpand = (id: number) => {
-    setExpandedId(expandedId === id ? null : id);
-  };
-
-  const handleOpenCreate = () => {
-    setMode('create');
-    setSelectedSchedule({
-      title: "",
-      companyId: "",
-      jobIds: [],
-      startTime: "",
-      endTime: "",
-      venue: "",
-      status: "PENDING",
-    });
-    setIsEditModalOpen(true);
   };
 
   const handleOpenEdit = (e: React.MouseEvent, schedule: any) => {

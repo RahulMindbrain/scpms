@@ -4,7 +4,7 @@ import {
   Search, ArrowRight, Sparkles, UserCircle,
   Rocket, Calendar, Building2, 
   ChevronDown, 
-  Activity, Zap, ShieldCheck, Target,
+  Activity, ShieldCheck, Target,
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobApplications, updateApplicationStatus } from '@/redux/thunks/studentThunk';

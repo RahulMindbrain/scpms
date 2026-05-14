@@ -222,7 +222,6 @@ const JobListing = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           <AnimatePresence mode='popLayout'>
             {paginatedJobs.map((job: JobUniversity, idx) => {
-              const isEligible = checkEligibility(job);
               const isApplied = appliedJobIds.has(Number(job.id));
               
               return (

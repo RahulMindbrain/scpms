@@ -4,9 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
-  Edit3, PlusCircle, MapPin, 
+  Edit3, MapPin, 
   Calendar as CalendarIcon, 
-  Building2, Briefcase, MessageSquare,
+  Briefcase,
   Clock
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -23,7 +23,6 @@ import {
 } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
-import { Separator } from '@/components/ui/separator';
 import Loader from '@/components/Loader';
 
 interface EditModalProps {

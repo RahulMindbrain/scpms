@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import {
   Briefcase,
   Building2,
-  CheckCircle,
   XCircle,
   MapPin,
   IndianRupee,
@@ -17,7 +16,6 @@ import {
   ChevronRight,
   CheckCircle2,
   ListChecks,
-  Eye,
   Building,
   Target,
   FileText,

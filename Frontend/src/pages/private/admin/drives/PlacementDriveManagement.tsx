@@ -62,6 +62,8 @@ interface Job {
   maxBacklogs?: number | null;
   interviewScheduleId?: number | null;
   createdAt?: string;
+  sentAt?: string;
+  companyId?: number;
   company?: Company;
   eligibleDepartments?: Department[];
 }
@@ -118,8 +120,8 @@ const PlacementDriveManagement: React.FC = () => {
       const companyIdFromJob = j?.companyId ?? row.companyId;
       const foundCompany = companies.find(c => c.id === companyIdFromJob);
       const company = j?.company ?? row.company ?? foundCompany;
-      const scheduleDate = (row as { sentAt?: string }).sentAt
-        ? new Date((row as { sentAt: string }).sentAt)
+      const scheduleDate = row.sentAt
+        ? new Date(row.sentAt)
         : row.createdAt
           ? new Date(row.createdAt)
           : null;

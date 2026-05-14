@@ -14,12 +14,12 @@ import {
   IndianRupee,
   Plus,
   RefreshCw,
-  Clock,
   ExternalLink,
   History,
   CheckCircle2,
   XCircle,
-  Timer
+  Timer,
+  MapPin
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
@@ -29,7 +29,7 @@ import type { RootState } from "@/redux/reducers/rootReducer";
 import type { AppDispatch } from "@/redux/store/store";
 import { fetchCompanyJobs } from "@/redux/thunks/companyThunk";
 import { sendJobToUniversity } from "@/redux/thunks/superadmin/companyUniversityThunk";
-import { getAPI, postAPI, putAPI } from "@/apis/api";
+import { getAPI, putAPI } from "@/apis/api";
 import Loader from "@/components/Loader";
 
 const SendJobUniversityRequest = () => {

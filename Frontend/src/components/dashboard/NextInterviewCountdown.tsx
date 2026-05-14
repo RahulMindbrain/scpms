@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Calendar, Timer, Building2, ArrowUpRight, ShieldCheck } from 'lucide-react';
 
 interface NextInterviewCountdownProps {

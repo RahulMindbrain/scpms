@@ -30,7 +30,6 @@ export default function StudentDashboard() {
   )
 
   const { user } = useSelector((state: RootState) => state.auth)
-  const nextEvent = upcomingEvents.length > 0 ? upcomingEvents[0] : null
 
   useEffect(() => {
     dispatch(fetchUpcomingEvents())

@@ -7,7 +7,6 @@ import {
   Search,
   Clock,
   Filter,
-  Eye,
   FileText,
   Target,
   Building,
@@ -15,8 +14,7 @@ import {
   ExternalLink,
   Calendar,
   Users,
-  ArrowUpDown,
-  ArrowUpRight
+  ArrowUpDown
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobs } from '@/redux/thunks/driveThunk';
@@ -24,7 +22,6 @@ import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
   Select,
@@ -44,12 +41,12 @@ const UniversityJobs: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { jobs, loading } = useSelector((state: RootState) => state.drive);
   const { companies: reduxCompanies } = useSelector((state: RootState) => state.company);
-  const [page, _setPage] = useState();
+  const [page] = useState();
   const PAGE_LIMIT = 10;
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<string>('newest');
   const [filterDepartment, setFilterDepartment] = useState<string>('all');
-  const [filterCompany, setFilterCompany] = useState<string>('all');
+  const [filterCompany] = useState<string>('all');
   const [filterLocation, setFilterLocation] = useState<string>('all');
 
   // Modal State
