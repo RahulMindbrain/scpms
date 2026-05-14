@@ -19,9 +19,9 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from "@/components/ui/card";
 import {StudentPageLayout} from '@/components/layout/StudentPageLayout';
-type Status = 'APPLIED' | 'SHORTLISTED' | 'TECHNICAL_ROUND' | 'HR_ROUND' | 'SELECTED' | 'REJECTED';
+type Status = 'APPLIED' | 'SHORTLISTED' | 'TECHNICAL_ROUND' | 'HR_ROUND' | 'SELECTED' | 'REJECTED' | 'OFFER_ACCEPTED' | 'OFFER_REJECTED' | 'WITHDRAWN' | 'NOT_ELIGIBLE';
 
-const STATUS_CONFIG: Record<Status, { label: string; color: string; bgColor: string; icon: any; shadow: string; accent: string }> = {
+const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string; icon: any; shadow: string; accent: string }> = {
   APPLIED: { 
     label: 'Applied', 
     color: 'text-blue-500', 
@@ -69,6 +69,38 @@ const STATUS_CONFIG: Record<Status, { label: string; color: string; bgColor: str
     icon: XCircle,
     shadow: 'shadow-rose-500/20',
     accent: 'bg-rose-500'
+  },
+  OFFER_ACCEPTED: { 
+    label: 'Offer Accepted', 
+    color: 'text-emerald-500', 
+    bgColor: 'bg-emerald-500/10', 
+    icon: ShieldCheck,
+    shadow: 'shadow-emerald-500/20',
+    accent: 'bg-emerald-600'
+  },
+  OFFER_REJECTED: { 
+    label: 'Offer Declined', 
+    color: 'text-rose-500', 
+    bgColor: 'bg-rose-500/10', 
+    icon: XCircle,
+    shadow: 'shadow-rose-500/20',
+    accent: 'bg-rose-600'
+  },
+  WITHDRAWN: { 
+    label: 'Withdrawn', 
+    color: 'text-slate-400', 
+    bgColor: 'bg-slate-500/10', 
+    icon: XCircle,
+    shadow: 'shadow-slate-500/20',
+    accent: 'bg-slate-500'
+  },
+  NOT_ELIGIBLE: { 
+    label: 'Not Eligible', 
+    color: 'text-amber-600', 
+    bgColor: 'bg-amber-500/10', 
+    icon: XCircle,
+    shadow: 'shadow-amber-500/20',
+    accent: 'bg-amber-600'
   },
 };
 
@@ -224,71 +256,128 @@ const ApplicationCard = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.05]">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Activity size={14} className="text-blue-600" />
-                      <h4 className="text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Process Details</h4>
-                    </div>
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center text-[11px]">
-                        <span className="text-slate-500 font-medium">Applied</span>
-                        <span className="text-slate-900 dark:text-slate-200 font-bold">{new Date(app.createdAt).toLocaleDateString()}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  {/* Left Column: Process Details & Status History */}
+                  <div className="space-y-6">
+                    <div className="p-5 rounded-3xl bg-slate-50 dark:bg-white/[0.02] border border-slate-100 dark:border-white/[0.05]">
+                      <div className="flex items-center gap-2 mb-4">
+                        <Activity size={14} className="text-blue-600" />
+                        <h4 className="text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-widest">Application Journey</h4>
                       </div>
-                      <div className="flex justify-between items-center text-[11px]">
-                        <span className="text-slate-500 font-medium">Last Activity</span>
-                        <span className="text-slate-900 dark:text-slate-200 font-bold">{new Date(app.updatedAt).toLocaleDateString()}</span>
+                      
+                      <div className="space-y-4 relative before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 dark:before:bg-white/10">
+                        {app.statusHistory && app.statusHistory.length > 0 ? (
+                          app.statusHistory.map((history: any, idx: number) => {
+                            const stageConfig = STATUS_CONFIG[history.status as Status] || STATUS_CONFIG.APPLIED;
+                            const HistoryIcon = stageConfig.icon;
+                            
+                            return (
+                              <div key={history.id} className="relative pl-8 group/item">
+                                <div className={cn(
+                                  "absolute left-0 top-0.5 w-6 h-6 rounded-lg flex items-center justify-center border shadow-sm transition-all duration-500 z-10",
+                                  idx === 0 ? "bg-blue-600 border-blue-600 text-white" : "bg-white dark:bg-[#1e1f26] border-slate-200 dark:border-white/10 text-slate-400"
+                                )}>
+                                  <HistoryIcon size={12} strokeWidth={3} />
+                                </div>
+                                <div className="flex flex-col">
+                                  <div className="flex items-center justify-between">
+                                    <span className={cn(
+                                      "text-[11px] font-black uppercase tracking-tight",
+                                      idx === 0 ? "text-blue-600" : "text-slate-600 dark:text-slate-400"
+                                    )}>
+                                      {stageConfig.label}
+                                      {history.round && <span className="ml-2 text-[9px] opacity-60">({history.round})</span>}
+                                    </span>
+                                    <span className="text-[9px] font-bold text-slate-400">
+                                      {new Date(history.createdAt).toLocaleDateString()}
+                                    </span>
+                                  </div>
+                                  {history.remarks && (
+                                    <p className="text-[10px] text-slate-500 dark:text-slate-500 mt-0.5 font-medium italic">
+                                      "{history.remarks}"
+                                    </p>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })
+                        ) : (
+                          <div className="relative pl-8">
+                            <div className="absolute left-0 top-0.5 w-6 h-6 rounded-lg flex items-center justify-center border border-slate-200 dark:border-white/10 bg-white dark:bg-[#1e1f26] text-slate-400">
+                              <Clock size={12} strokeWidth={3} />
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="text-[11px] font-black text-slate-600 dark:text-slate-400 uppercase">Applied</span>
+                              <p className="text-[10px] text-slate-500 mt-0.5">Awaiting initial review</p>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
 
-                  {isRejected ? (
-                    <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-500/5 border border-rose-100 dark:border-rose-500/10">
-                       <div className="flex items-center gap-2 mb-3 text-rose-600 dark:text-rose-400">
-                        <XCircle size={14} strokeWidth={3} />
-                        <h4 className="text-[9px] font-black uppercase tracking-widest">Feedback</h4>
+                  {/* Right Column: Actions & Feedback */}
+                  <div className="space-y-6">
+                    {isRejected ? (
+                      <div className="p-5 rounded-3xl bg-rose-50 dark:bg-rose-500/5 border border-rose-100 dark:border-rose-500/10">
+                        <div className="flex items-center gap-2 mb-3 text-rose-600 dark:text-rose-400">
+                          <XCircle size={14} strokeWidth={3} />
+                          <h4 className="text-[9px] font-black uppercase tracking-widest">Final Outcome</h4>
+                        </div>
+                        <p className="text-[11px] text-rose-800/80 dark:text-rose-200/60 leading-relaxed font-medium">
+                          {app.reason || "The process for this role has been finalized. Your profile remains in our talent network."}
+                        </p>
                       </div>
-                      <p className="text-[11px] text-rose-800/80 dark:text-rose-200/60 leading-relaxed font-medium">
-                        {app.reason || "The process for this role has been finalized. Your profile remains in our talent network."}
-                      </p>
-                    </div>
-                  ) : isSelected ? (
-                    <div className="p-4 rounded-2xl bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10">
-                      <div className="flex items-center gap-2 mb-3 text-emerald-600 dark:text-emerald-400">
-                        <Sparkles size={14} />
-                        <h4 className="text-[9px] font-black uppercase tracking-widest">Decision Required</h4>
+                    ) : isSelected ? (
+                      <div className="p-5 rounded-3xl bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10">
+                        <div className="flex items-center gap-2 mb-4 text-emerald-600 dark:text-emerald-400">
+                          <Sparkles size={14} />
+                          <h4 className="text-[9px] font-black uppercase tracking-widest">Decision Required</h4>
+                        </div>
+                        <p className="text-[11px] text-emerald-800/80 dark:text-emerald-200/60 mb-4 font-medium leading-relaxed">
+                          Congratulations! You have received an offer. Please review the details and respond.
+                        </p>
+                        <div className="flex gap-3">
+                          <Button
+                            size="sm"
+                            className="flex-1 h-10 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-md shadow-emerald-500/10"
+                            disabled={updatingId === app.id}
+                            onClick={() => onAction(app.id, "ACCEPT")}
+                          >
+                            Accept Offer
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 h-10 border-rose-200 text-rose-600 hover:bg-rose-50 dark:border-rose-500/20 dark:text-rose-400 dark:hover:bg-rose-500/10 rounded-xl font-black text-[10px] uppercase tracking-widest"
+                            disabled={updatingId === app.id}
+                            onClick={() => onAction(app.id, "REJECT")}
+                          >
+                            Decline
+                          </Button>
+                        </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          className="flex-1 h-9 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-black text-[10px] uppercase tracking-widest shadow-md shadow-emerald-500/10"
-                          disabled={updatingId === app.id}
-                          onClick={() => onAction(app.id, "ACCEPT")}
-                        >
-                          Accept
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="flex-1 h-9 border-rose-200 text-rose-600 hover:bg-rose-50 dark:border-rose-500/20 dark:text-rose-400 dark:hover:bg-rose-500/10 rounded-lg font-black text-[10px] uppercase tracking-widest"
-                          disabled={updatingId === app.id}
-                          onClick={() => onAction(app.id, "REJECT")}
-                        >
-                          Decline
-                        </Button>
+                    ) : (
+                      <div className="p-5 rounded-3xl bg-blue-50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10 h-full">
+                        <div className="flex items-center gap-2 mb-3 text-blue-600 dark:text-blue-400">
+                          <Target size={14} />
+                          <h4 className="text-[9px] font-black uppercase tracking-widest">Next Steps</h4>
+                        </div>
+                        <p className="text-[11px] text-blue-800/80 dark:text-blue-100/60 leading-relaxed font-medium">
+                          Your application is currently being evaluated. We will notify you as soon as there is an update from the {app.jobUniversity?.job?.company?.name} hiring team.
+                        </p>
+                        <div className="mt-6 flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-[#1e1f26] border border-blue-100 dark:border-white/5">
+                          <div className="w-8 h-8 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-600">
+                            <Activity size={14} />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-black uppercase text-slate-400">Current Phase</span>
+                            <span className="text-[11px] font-bold text-slate-900 dark:text-white">{config.label}</span>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  ) : (
-                    <div className="p-4 rounded-2xl bg-blue-50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10">
-                      <div className="flex items-center gap-2 mb-3 text-blue-600 dark:text-blue-400">
-                        <Zap size={14} />
-                        <h4 className="text-[9px] font-black uppercase tracking-widest">Current Status</h4>
-                      </div>
-                      <p className="text-[11px] text-blue-800/80 dark:text-blue-100/60 leading-relaxed font-medium">
-                        Your application is under review by the {app.jobUniversity?.job?.company?.name} hiring team.
-                      </p>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             </motion.div>
