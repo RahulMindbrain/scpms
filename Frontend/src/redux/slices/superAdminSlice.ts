@@ -111,7 +111,7 @@ const superAdminSlice = createSlice({
         state.isSubmitting = false;
         const { ids, status } = action.payload;
         state.companies = state.companies.map(company => 
-          ids.includes(company.id) ? { ...company, status: status ? 'ACTIVE' : 'INACTIVE' } : company
+          ids.includes(company.id) ? { ...company, user: { ...company.user, status: status ? 'ACTIVE' : 'INACTIVE' } } : company
         );
       })
       .addCase(updateCompanyStatus.rejected, (state, action) => {

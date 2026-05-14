@@ -66,7 +66,7 @@ export const activateAdmin = createAsyncThunk(
   async (ids: number[], { rejectWithValue }) => {
     try {
       const response = await putAPI<any>(
-        "/superadmin/activate",
+        "/superadmin/admins/activate",
         { ids }
       );
 
