@@ -128,7 +128,13 @@ const CompanyInterviewManager: React.FC = () => {
   };
 
   const filteredSchedules = useMemo(() => {
-    return schedules.filter(s => {
+    return schedules.map(s => ({
+      ...s,
+      // Derive jobTitle from the first job in the schedule
+      jobTitle: s.jobUniversities?.[0]?.job?.title || 'Recruitment Drive',
+      // Derive adminName from the admin user relation
+      adminName: s.admin?.user ? `${s.admin.user.firstname} ${s.admin.user.lastname || ''}` : 'Placement Admin'
+    })).filter(s => {
       const matchesFilter = filterType === 'ALL' || s.companyApprovalStatus === filterType;
       const matchesSearch = s.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         s.jobTitle.toLowerCase().includes(searchQuery.toLowerCase());
@@ -139,7 +145,7 @@ const CompanyInterviewManager: React.FC = () => {
   const stats = useMemo(() => ({
     total: schedules.length,
     pending: schedules.filter(s => s.companyApprovalStatus === 'PENDING').length,
-    activeCandidates: schedules.reduce((acc, s) => acc + (s.applications?.length || 0), 0),
+    activeCandidates: schedules.reduce((acc, s) => acc + (s.jobUniversities?.reduce((sum: number, ju: any) => sum + (ju._count?.applications || 0), 0) || 0), 0),
   }), [schedules]);
 
   return (
@@ -321,7 +327,7 @@ const CompanyInterviewManager: React.FC = () => {
                           className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-primary/10 text-[10px] font-bold text-muted-foreground hover:text-primary transition-all border border-border/50 uppercase tracking-widest group/btn"
                         >
                           <Users size={12} className="group-hover/btn:scale-110 transition-transform" />
-                          <span>{schedule.applications?.length || 0} Candidates</span>
+                          <span>Candidates {(schedule.applications?.length || 0) > 0 ? `(${schedule.applications.length})` : ''}</span>
                         </button>
                         <button
                           onClick={() => handleOpenMessages(schedule)}
@@ -412,20 +418,20 @@ const CompanyInterviewManager: React.FC = () => {
           ) : activeSchedule?.applications && activeSchedule.applications.length > 0 ? (
             <div className="max-h-[450px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
               {activeSchedule.applications.map((app: any) => (
-                <div key={app.id} className="flex items-center justify-between p-4 saas-card border-border/50 hover:border-primary/20 hover:bg-primary/[0.01] transition-all group rounded-2xl">
+                <div key={app.applicationId || app.id} className="flex items-center justify-between p-4 saas-card border-border/50 hover:border-primary/20 hover:bg-primary/[0.01] transition-all group rounded-2xl">
                   <div className="flex items-center gap-4">
                     <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary flex items-center justify-center font-black text-xs border border-primary/10 shadow-sm">
-                      {app.student?.user?.name?.charAt(0).toUpperCase() || 'C'}
+                      {(app.name || app.student?.user?.firstname || 'C').charAt(0).toUpperCase()}
                     </div>
                     <div className="space-y-0.5">
-                      <p className="text-sm font-black text-foreground">{app.student?.user?.name || app.studentName || 'Candidate'}</p>
+                      <p className="text-sm font-black text-foreground">{app.name || (app.student?.user?.firstname ? `${app.student.user.firstname} ${app.student.user.lastname || ''}` : 'Candidate')}</p>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                          {app.student?.rollNumber || 'ID: #' + app.studentId}
+                          {app.student?.rollNumber || `ID: #${app.studentId || app.applicationId}`}
                         </span>
                         <div className="w-1 h-1 rounded-full bg-border" />
                         <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
-                          {app.student?.department?.name || 'Technical'}
+                          {app.department?.name || app.student?.department?.name || 'Technical'}
                         </span>
                       </div>
                     </div>
