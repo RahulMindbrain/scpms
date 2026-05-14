@@ -215,7 +215,17 @@ export const getJobUniversities = async (params: {
             location: true,
             companyId: true,
             eligibleDepartments: {
-              select: { id: true },
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+
+            skills: {
+              select: {
+                id: true,
+                name: true,
+              },
             },
           },
         },
