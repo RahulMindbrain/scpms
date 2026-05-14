@@ -29,14 +29,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 const UniversityJobs: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { jobs, meta, loading } = useSelector((state: RootState) => state.drive);
+  const { jobs, loading } = useSelector((state: RootState) => state.drive);
   const { companies: reduxCompanies } = useSelector((state: RootState) => state.company);
-  const [page, setPage] = useState(1);
+  const [page, _setPage] = useState();
   const PAGE_LIMIT = 10;
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<string>('newest');
+  const [sortBy, _setSortBy] = useState<string>('newest');
   const [filterDepartment, setFilterDepartment] = useState<string>('all');
-  const [filterLocation, setFilterLocation] = useState<string>('all');
+  const [filterLocation, _setFilterLocation] = useState<string>('all');
   const [filterCompany, setFilterCompany] = useState<string>('all');
 
   useEffect(() => {

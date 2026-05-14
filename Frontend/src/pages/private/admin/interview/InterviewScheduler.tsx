@@ -571,17 +571,20 @@ const InterviewSchedulerPage: React.FC = () => {
           <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
             <div className="size-1.5 rounded-full bg-primary" /> Target University
           </label>
-          <Select value={wizardUniversityId} onValueChange={handleWizardUniversityChange}>
-            <SelectTrigger className="h-12 rounded-2xl bg-white border-slate-200 shadow-sm font-semibold text-xs uppercase tracking-tighter px-4 focus:ring-primary/10">
-              <SelectValue placeholder="Select University" />
-            </SelectTrigger>
-            <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
-              <SelectItem value="all">All Universities</SelectItem>
-              {schedulerUniversities.map((uni) => (
-                <SelectItem key={uni.id} value={uni.id.toString()}>{uni.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <div className="relative group">
+            <Select value={wizardUniversityId} onValueChange={handleWizardUniversityChange}>
+              <SelectTrigger className="h-12 rounded-2xl bg-white border-slate-200 shadow-sm font-semibold text-xs uppercase tracking-tighter pl-11 pr-4 focus:ring-primary/10">
+                <SelectValue placeholder="Select University" />
+              </SelectTrigger>
+              <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+              <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
+                <SelectItem value="all">All Universities</SelectItem>
+                {schedulerUniversities.map((uni) => (
+                  <SelectItem key={uni.id} value={uni.id.toString()}>{uni.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       )}
 
@@ -589,16 +592,19 @@ const InterviewSchedulerPage: React.FC = () => {
         <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
           <div className="size-1.5 rounded-full bg-primary" /> Select Company
         </label>
-        <Select value={wizardCompanyId} onValueChange={handleWizardCompanyChange}>
-          <SelectTrigger className="h-12 rounded-2xl bg-white border-slate-200 shadow-sm font-semibold text-xs uppercase tracking-tighter px-4 focus:ring-primary/10">
-            <SelectValue placeholder="Select Company" />
-          </SelectTrigger>
-          <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
-            {companies.map((c) => (
-              <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="relative group">
+          <Select value={wizardCompanyId} onValueChange={handleWizardCompanyChange}>
+            <SelectTrigger className="h-12 rounded-2xl bg-white border-slate-200 shadow-sm font-semibold text-xs uppercase tracking-tighter pl-11 pr-4 focus:ring-primary/10">
+              <SelectValue placeholder="Select Company" />
+            </SelectTrigger>
+            <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-slate-400 group-focus-within:text-primary transition-colors" />
+            <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
+              {companies.map((c) => (
+                <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </div>
 
@@ -741,32 +747,41 @@ const InterviewSchedulerPage: React.FC = () => {
 
     <div className="space-y-3">
       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Drive Identifier</label>
-      <Input 
-        value={finalizeData.title}
-        onChange={(e) => setFinalizeData({...finalizeData, title: e.target.value})}
-        placeholder="e.g. 2024 Product Engineering Drive"
-        className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold focus:ring-primary/20 text-slate-800 placeholder:font-medium"
-      />
+      <div className="relative group">
+        <Input 
+          value={finalizeData.title}
+          onChange={(e) => setFinalizeData({...finalizeData, title: e.target.value})}
+          placeholder="e.g. 2024 Product Engineering Drive"
+          className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold focus:ring-primary/20 text-slate-800 placeholder:font-medium pl-12"
+        />
+        <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+      </div>
     </div>
 
-   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div className="space-y-3">
         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Date & Time</label>
-        <Input 
-          type="datetime-local"
-          value={finalizeData.startTime}
-          onChange={(e) => setFinalizeData({...finalizeData, startTime: e.target.value})}
-          className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold text-slate-800"
-        />
+        <div className="relative group">
+          <Input 
+            type="datetime-local"
+            value={finalizeData.startTime}
+            onChange={(e) => setFinalizeData({...finalizeData, startTime: e.target.value})}
+            className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold text-slate-800 pl-12 focus:ring-primary/20 [color-scheme:light]"
+          />
+          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+        </div>
       </div>
       <div className="space-y-3">
         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Expected End</label>
-        <Input 
-          type="datetime-local"
-          value={finalizeData.endTime}
-          onChange={(e) => setFinalizeData({...finalizeData, endTime: e.target.value})}
-          className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold text-slate-800"
-        />
+        <div className="relative group">
+          <Input 
+            type="datetime-local"
+            value={finalizeData.endTime}
+            onChange={(e) => setFinalizeData({...finalizeData, endTime: e.target.value})}
+            className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold text-slate-800 pl-12 focus:ring-primary/20 [color-scheme:light]"
+          />
+          <Clock className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+        </div>
       </div>
     </div>
 

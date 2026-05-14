@@ -175,13 +175,16 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
       <form onSubmit={handleSubmit} className="space-y-6 py-2">
         <div className="space-y-3">
           <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Drive Title</label>
-          <Input
-            placeholder="e.g. Campus Recruitment 2024"
-            value={formData.title}
-            disabled={!isCreate}
-            className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium focus:ring-[#1A6CFF]/10 text-slate-700"
-            onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-          />
+          <div className="relative group">
+            <Input
+              placeholder="e.g. Campus Recruitment 2024"
+              value={formData.title}
+              disabled={!isCreate}
+              className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium focus:ring-[#1A6CFF]/10 text-slate-700 pl-12"
+              onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+            />
+            <Edit3 className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-[#1A6CFF] transition-colors" />
+          </div>
         </div>
 
         {isCreate && (
@@ -203,43 +206,52 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
         <div className="grid grid-cols-2 gap-6">
           <div className="space-y-3">
             <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Start Time</label>
-            <Input
-              type="datetime-local"
-              value={formData.startTime}
-              className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium text-slate-700"
-              onChange={(e) => {
-                const newStart = e.target.value;
-                setFormData(prev => {
-                  const updates: any = { ...prev, startTime: newStart };
-                  if (newStart && (!prev.endTime || prev.endTime <= newStart)) {
-                    const startDate = new Date(newStart);
-                    const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
-                    updates.endTime = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-                  }
-                  return updates;
-                });
-              }}
-            />
+            <div className="relative group">
+              <Input
+                type="datetime-local"
+                value={formData.startTime}
+                className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium text-slate-700 pl-12 [color-scheme:light]"
+                onChange={(e) => {
+                  const newStart = e.target.value;
+                  setFormData(prev => {
+                    const updates: any = { ...prev, startTime: newStart };
+                    if (newStart && (!prev.endTime || prev.endTime <= newStart)) {
+                      const startDate = new Date(newStart);
+                      const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+                      updates.endTime = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                    }
+                    return updates;
+                  });
+                }}
+              />
+              <CalendarIcon className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-[#1A6CFF] transition-colors" />
+            </div>
           </div>
           <div className="space-y-3">
             <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">End Time</label>
-            <Input
-              type="datetime-local"
-              value={formData.endTime}
-              className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium text-slate-700"
-              onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
-            />
+            <div className="relative group">
+              <Input
+                type="datetime-local"
+                value={formData.endTime}
+                className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium text-slate-700 pl-12 [color-scheme:light]"
+                onChange={(e) => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
+              />
+              <Clock className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-[#1A6CFF] transition-colors" />
+            </div>
           </div>
         </div>
 
         <div className="space-y-3">
           <label className="text-[11px] font-black text-slate-500 uppercase tracking-[0.1em] ml-1">Venue / Link</label>
-          <Input
-            placeholder="e.g. Main Auditorium or G-Meet Link"
-            value={formData.venue}
-            className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium text-slate-700"
-            onChange={(e) => setFormData(prev => ({ ...prev, venue: e.target.value }))}
-          />
+          <div className="relative group">
+            <Input
+              placeholder="e.g. Main Auditorium or G-Meet Link"
+              value={formData.venue}
+              className="h-14 rounded-2xl bg-[#F8FAFC] border-slate-200/60 font-medium text-slate-700 pl-12"
+              onChange={(e) => setFormData(prev => ({ ...prev, venue: e.target.value }))}
+            />
+            <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-[#1A6CFF] transition-colors" />
+          </div>
         </div>
 
         {isCreate && (

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, User, GraduationCap, Briefcase, CheckCircle2, XCircle, Clock, Sparkles, Target } from 'lucide-react';
+import { Search, User, GraduationCap, Briefcase, CheckCircle2, XCircle, Clock, Sparkles, Target, Building2 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobApplications, updateJobApplicationStatus } from '@/redux/thunks/companyThunk';
 import { toast } from 'sonner';
@@ -39,12 +39,12 @@ const Applicants: React.FC = () => {
   const filteredApplicants = (applications || []).filter((app: any) => {
     const studentName = `${app.student?.user?.firstname || ''} ${app.student?.user?.lastname || ''}`.toLowerCase();
     const matchesSearch = studentName.includes(searchTerm.toLowerCase());
-    const matchesJob = selectedJob === 'All Jobs' || app.job?.title === selectedJob;
+    const matchesJob = selectedJob === 'All Jobs' || app.jobUniversity?.job?.title === selectedJob;
     return matchesSearch && matchesJob;
   });
 
   const uniqueJobs = Array.from(
-    new Set((applications || []).map((app: any) => app.job?.title))
+    new Set((applications || []).map((app: any) => app.jobUniversity?.job?.title))
   ).filter(Boolean);
 
   const handleStatusUpdate = async (id: number, newStatus: string, currentStatus: string) => {
@@ -202,10 +202,15 @@ const Applicants: React.FC = () => {
                       </td>
                       <td className="px-6 py-6">
                         <div className="flex flex-col gap-1.5">
-                          <div className="flex items-center gap-2">
+                          <div className="flex flex-wrap items-center gap-2">
                             <div className="px-2 py-0.5 bg-violet-500/10 text-violet-600 rounded text-[10px] font-black uppercase tracking-widest border border-violet-500/10">
                               CGPA: {app.student?.cgpa || 'N/A'}
                             </div>
+                            {app.student?.activeBacklogs > 0 && (
+                              <div className="px-2 py-0.5 bg-rose-500/10 text-rose-600 rounded text-[10px] font-black uppercase tracking-widest border border-rose-500/10">
+                                Backlogs: {app.student?.activeBacklogs}
+                              </div>
+                            )}
                           </div>
                           <div className="flex items-center gap-2 text-muted-foreground font-bold text-[9px] uppercase tracking-wider">
                             <GraduationCap size={12} className="text-violet-500" /> Academic Eligibility Verified
@@ -213,11 +218,17 @@ const Applicants: React.FC = () => {
                         </div>
                       </td>
                       <td className="px-6 py-6">
-                        <div className="flex items-center gap-2 text-foreground font-bold">
-                          <div className="p-1.5 bg-emerald-500/10 text-emerald-600 rounded-lg">
-                            <Briefcase size={14} />
+                        <div className="flex flex-col gap-1">
+                          <div className="flex items-center gap-2 text-foreground font-bold">
+                            <div className="p-1.5 bg-emerald-500/10 text-emerald-600 rounded-lg">
+                              <Briefcase size={14} />
+                            </div>
+                            <span className="text-xs">{app.jobUniversity?.job?.title || 'N/A'}</span>
                           </div>
-                          <span className="text-xs">{app.job?.title || 'N/A'}</span>
+                          <div className="flex items-center gap-1.5 pl-9 text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                            <Building2 size={10} className="text-primary" />
+                            {app.jobUniversity?.university?.name || 'Global'}
+                          </div>
                         </div>
                       </td>
                       <td className="px-8 py-6">
@@ -297,17 +308,28 @@ const Applicants: React.FC = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="px-2 py-0.5 bg-violet-500/10 text-violet-600 rounded text-[9px] font-black uppercase tracking-widest border border-violet-500/10 shrink-0">
-                    {app.student?.cgpa} CGPA
+                  <div className="flex flex-wrap items-center gap-2">
+                    <div className="px-2 py-0.5 bg-violet-500/10 text-violet-600 rounded text-[9px] font-black uppercase tracking-widest border border-violet-500/10 shrink-0">
+                      {app.student?.cgpa} CGPA
+                    </div>
+                    {app.student?.activeBacklogs > 0 && (
+                      <div className="px-2 py-0.5 bg-rose-500/10 text-rose-600 rounded text-[9px] font-black uppercase tracking-widest border border-rose-500/10 shrink-0">
+                        {app.student?.activeBacklogs} Backlogs
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <div className="py-4 border-y border-border/50 flex items-center justify-between">
+                <div className="py-4 border-y border-border/50 space-y-3">
                   <div className="flex items-center gap-2 text-foreground font-bold">
                     <div className="p-1.5 bg-emerald-500/10 text-emerald-600 rounded-lg">
                       <Briefcase size={12} />
                     </div>
-                    <span className="text-[11px] truncate max-w-[150px]">{app.job?.title}</span>
+                    <span className="text-[11px] truncate max-w-[150px]">{app.jobUniversity?.job?.title}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 pl-8 text-[9px] font-black text-muted-foreground uppercase tracking-widest">
+                    <Building2 size={10} className="text-primary" />
+                    {app.jobUniversity?.university?.name}
                   </div>
                 </div>
 
