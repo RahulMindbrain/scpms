@@ -27,20 +27,23 @@ import { StudentPageLayout } from '@/components/layout/StudentPageLayout';
 interface JobUniversity {
   id: number;
   salary: number;
+  description?: string;
   minCgpa?: number;
   maxBacklogs?: number;
   openings?: number;
   deadline?: string;
-  postedAt: string;
+  postedAt?: string;
+  sentAt: string;
   job: {
     id: number;
     title: string;
     location: string;
-    company: {
+    company?: {
       id: number;
       name: string;
     };
-    description: string;
+    skills?: { id: number; name: string }[];
+    eligibleDepartments?: { id: number; name: string }[];
   };
 }
 
@@ -77,8 +80,19 @@ const JobListing = () => {
 
   const checkEligibility = (job: JobUniversity) => {
     if (!profile) return true;
-    if (job.minCgpa && profile.cgpa < job.minCgpa) return false;
-    if (job.maxBacklogs !== undefined && profile.activeBacklogs > job.maxBacklogs) return false;
+    
+    // Safety check for profile data
+    const studentCgpa = profile.cgpa ?? 0;
+    const studentBacklogs = profile.activeBacklogs ?? 0;
+    const studentDeptId = profile.department?.id || profile.departmentId;
+
+    if (job.minCgpa && studentCgpa < job.minCgpa) return false;
+    if (job.maxBacklogs !== undefined && studentBacklogs > job.maxBacklogs) return false;
+    
+    // Department check
+    const eligibleDeptIds = job.job.eligibleDepartments?.map((d: any) => d.id) || [];
+    if (eligibleDeptIds.length > 0 && !eligibleDeptIds.includes(studentDeptId)) return false;
+    
     return true;
   };
 
@@ -92,8 +106,12 @@ const JobListing = () => {
       
       if (!matchesSearch) return false;
 
+      // In any tab, the job must be eligible to be shown (as per user request)
+      const isEligible = checkEligibility(job);
+      if (!isEligible) return false;
+
       if (activeTab === 'applied') return appliedJobIds.has(Number(job.id));
-      if (activeTab === 'eligible') return checkEligibility(job) && !appliedJobIds.has(Number(job.id));
+      if (activeTab === 'eligible') return !appliedJobIds.has(Number(job.id));
       
       return true;
     });
@@ -224,22 +242,18 @@ const JobListing = () => {
                         <div className="flex items-start justify-between gap-4">
                           <div className={cn(
                             "w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center font-black text-xl md:text-2xl text-white shadow-2xl shrink-0 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3",
-                            isApplied ? "bg-blue-500" : isEligible ? "bg-gradient-to-br from-blue-500 to-blue-700" : "bg-slate-400 grayscale"
+                            isApplied ? "bg-blue-500" : "bg-gradient-to-br from-blue-500 to-blue-700"
                           )}>
-                            {job.job?.company?.name?.[0]}
+                            {job.job?.company?.name?.[0] || job.job?.title?.[0] || 'J'}
                           </div>
                           <div className="flex flex-col items-end gap-3">
                             {isApplied ? (
                               <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20 text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] px-3 md:px-4 py-1 md:py-1.5 rounded-full shadow-sm">
                                 Applied
                               </Badge>
-                            ) : isEligible ? (
+                            ) : (
                               <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] px-3 md:px-4 py-1 md:py-1.5 rounded-full shadow-sm">
                                 Recommended
-                              </Badge>
-                            ) : (
-                              <Badge className="bg-rose-500/10 text-rose-500 border-rose-500/20 text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] px-3 md:px-4 py-1 md:py-1.5 rounded-full shadow-sm">
-                                Ineligible
                               </Badge>
                             )}
                           </div>
@@ -251,7 +265,7 @@ const JobListing = () => {
                           </h3>
                           <p className="text-[9px] md:text-[10px] font-black text-slate-500 flex items-center gap-2 uppercase tracking-[0.15em] truncate">
                             <Building2 size={14} className="text-blue-500 shrink-0" />
-                            {job.job?.company?.name}
+                            {job.job?.company?.name || 'Top Tier Recruiter'}
                           </p>
                         </div>
 
@@ -271,7 +285,7 @@ const JobListing = () => {
                       <div className="px-6 md:px-8 py-4 md:py-6 bg-slate-50 dark:bg-black/20 border-t border-slate-200/60 dark:border-white/[0.05] flex items-center justify-between mt-auto">
                         <div className="flex items-center gap-2 text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
                           <Clock size={14} className="text-indigo-500" />
-                          {new Date(job.postedAt || (job as any).createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                          {new Date(job.postedAt || job.sentAt || (job as any).createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                         </div>
                         <Button
                           onClick={() => {
@@ -282,9 +296,7 @@ const JobListing = () => {
                             "rounded-[1.25rem] font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] px-6 md:px-8 h-10 md:h-12 transition-all duration-500 border-none shadow-xl",
                             isApplied 
                               ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-none hover:bg-blue-500/20" 
-                              : isEligible
-                              ? "bg-blue-600 text-white shadow-blue-500/30 hover:scale-105 hover:shadow-blue-500/50"
-                              : "bg-slate-200 dark:bg-white/5 text-slate-400 cursor-not-allowed shadow-none"
+                              : "bg-blue-600 text-white shadow-blue-500/30 hover:scale-105 hover:shadow-blue-500/50"
                           )}
                         >
                           {isApplied ? 'Details' : 'Apply Now'}
@@ -356,17 +368,17 @@ const JobListing = () => {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           title={selectedJob?.job.title}
-          subtitle={`${selectedJob?.job?.company?.name} • ${selectedJob?.job?.location}`}
+          subtitle={`${selectedJob?.job?.company?.name || 'Top Tier Recruiter'} • ${selectedJob?.job?.location}`}
           maxWidth="sm:max-w-lg"
         >
           <div className="space-y-6 md:space-y-8 py-2 md:py-4">
             <div className="flex items-center gap-4 md:gap-6">
               <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl md:rounded-3xl flex items-center justify-center text-white font-black text-2xl md:text-3xl shadow-xl border border-white/10">
-                {selectedJob?.job?.company?.name?.[0]}
+                {selectedJob?.job?.company?.name?.[0] || selectedJob?.job?.title?.[0] || 'J'}
               </div>
               <div className="space-y-1 min-w-0">
                 <p className="text-[8px] md:text-[10px] font-black text-blue-600 uppercase tracking-widest">Company Overview</p>
-                <h4 className="text-lg md:text-xl font-black text-slate-900 dark:text-white truncate">{selectedJob?.job?.company?.name}</h4>
+                <h4 className="text-lg md:text-xl font-black text-slate-900 dark:text-white truncate">{selectedJob?.job?.company?.name || 'Top Tier Recruiter'}</h4>
                 <div className="flex items-center gap-2 text-slate-500 font-bold text-xs md:text-sm">
                   <MapPin size={12} className="text-blue-500" />
                   <span className="truncate">{selectedJob?.job?.location}</span>
@@ -391,12 +403,28 @@ const JobListing = () => {
               </div>
             </div>
 
-            <div className="space-y-2 md:space-y-3">
-              <h4 className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Job Description</h4>
-              <div className="bg-slate-50 dark:bg-white/[0.02] p-4 md:p-6 rounded-2xl border border-slate-100 dark:border-white/5 max-h-40 md:max-h-48 overflow-y-auto no-scrollbar">
-                <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium text-xs md:text-sm">
-                  {selectedJob?.job?.description}
-                </p>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <h4 className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Required Skills</h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedJob?.job?.skills?.map((skill) => (
+                    <Badge key={skill.id} variant="secondary" className="bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 border-none px-3 py-1 text-[10px] font-bold">
+                      {skill.name}
+                    </Badge>
+                  ))}
+                  {(!selectedJob?.job?.skills || selectedJob.job.skills.length === 0) && (
+                    <span className="text-xs text-slate-400 italic">No specific skills listed</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="space-y-2 md:space-y-3">
+                <h4 className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Job Description</h4>
+                <div className="bg-slate-50 dark:bg-white/[0.02] p-4 md:p-6 rounded-2xl border border-slate-100 dark:border-white/5 max-h-40 md:max-h-48 overflow-y-auto no-scrollbar">
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium text-xs md:text-sm">
+                    {selectedJob?.description}
+                  </p>
+                </div>
               </div>
             </div>
 
