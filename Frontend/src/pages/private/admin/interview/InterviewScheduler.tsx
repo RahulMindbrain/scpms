@@ -5,7 +5,8 @@ import {
   Search, MessageSquare, Send, Trash2,
   Calendar,
   Sparkles,
-  IndianRupee
+  IndianRupee,
+  CheckCircle2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -108,6 +109,7 @@ const InterviewSchedulerPage: React.FC = () => {
     setWizardCompanyId(id);
     if (id && id !== 'all') {
       dispatch(fetchCompanyJobsForSchedule(Number(id)));
+      dispatch(fetchSchedules(Number(id))); // Ensure we have the schedules for this company to check against
     }
   };
 
@@ -504,16 +506,16 @@ const InterviewSchedulerPage: React.FC = () => {
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                          {drive.jobs?.map((job: any) => (
-                            <div key={job.id} className="saas-card bg-background p-6 space-y-4 hover:border-primary/30 transition-all">
+                          {(drive.jobUniversities || []).map((ju: any) => (
+                            <div key={ju.id} className="saas-card bg-background p-6 space-y-4 hover:border-primary/30 transition-all">
                               <div className="space-y-1">
-                                <p className="font-bold text-foreground tracking-tight">{job.title}</p>
+                                <p className="font-bold text-foreground tracking-tight">{ju.job?.title}</p>
                                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                                  <MapPin size={10} /> {job.location || 'Remote'}
+                                  <MapPin size={10} /> {ju.job?.location || 'Remote'}
                                 </p>
                               </div>
                               <div className="pt-4 border-t border-border flex items-center justify-between">
-                                <Badge variant="secondary" className="bg-muted text-muted-foreground text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg border-none">{job.status}</Badge>
+                                <Badge variant="secondary" className="bg-muted text-muted-foreground text-[8px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg border-none">{ju.status}</Badge>
                                 <div className="text-[10px] font-black text-primary uppercase tracking-widest">View Specs</div>
                               </div>
                             </div>
@@ -705,10 +707,25 @@ const InterviewSchedulerPage: React.FC = () => {
 
                 <Button 
                   onClick={() => handleScheduleClick(ju)}
-                  className="w-full bg-slate-900 hover:bg-primary text-white rounded-xl h-11 font-bold uppercase tracking-widest text-[9px] transition-all flex items-center justify-center gap-2"
+                  disabled={schedules.some((s: any) => s.jobUniversities?.some((j: any) => j.id === ju.id || j.job?.id === ju.job?.id))}
+                  className={cn(
+                    "w-full rounded-xl h-11 font-bold uppercase tracking-widest text-[9px] transition-all flex items-center justify-center gap-2",
+                    schedules.some((s: any) => s.jobUniversities?.some((j: any) => j.id === ju.id || j.job?.id === ju.job?.id))
+                      ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 hover:bg-emerald-500/20"
+                      : "bg-slate-900 hover:bg-primary text-white"
+                  )}
                 >
-                  <Calendar size={14} className="opacity-70" />
-                  Launch Drive
+                  {schedules.some((s: any) => s.jobUniversities?.some((j: any) => j.id === ju.id || j.job?.id === ju.job?.id)) ? (
+                    <>
+                      <CheckCircle2 size={14} className="opacity-70" />
+                      Interview Scheduled
+                    </>
+                  ) : (
+                    <>
+                      <Calendar size={14} className="opacity-70" />
+                      Launch Drive
+                    </>
+                  )}
                 </Button>
               </motion.div>
             ))}
@@ -765,7 +782,19 @@ const InterviewSchedulerPage: React.FC = () => {
           <Input 
             type="datetime-local"
             value={finalizeData.startTime}
-            onChange={(e) => setFinalizeData({...finalizeData, startTime: e.target.value})}
+            onChange={(e) => {
+              const newStart = e.target.value;
+              setFinalizeData(prev => {
+                const updates = { ...prev, startTime: newStart };
+                if (newStart) {
+                  const startDate = new Date(newStart);
+                  const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Add 1 hour
+                  // Format to datetime-local string (YYYY-MM-DDTHH:mm)
+                  updates.endTime = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                }
+                return updates;
+              });
+            }}
             className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold text-slate-800 pl-12 focus:ring-primary/20 [color-scheme:light]"
           />
           <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
