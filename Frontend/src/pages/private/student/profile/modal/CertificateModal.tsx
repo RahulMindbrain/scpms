@@ -86,7 +86,7 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
           <div className="space-y-2">
             <Label htmlFor="date" className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Issue Date</Label>
             <div className="relative">
-              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-amber-500" />
               <Input
                 id="date"
                 type="date"

@@ -12,7 +12,14 @@ import {
   AlertCircle,
   AlignLeft,
   IndianRupee,
-  Plus
+  Plus,
+  RefreshCw,
+  Clock,
+  ExternalLink,
+  History,
+  CheckCircle2,
+  XCircle,
+  Timer
 } from "lucide-react";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
@@ -22,7 +29,7 @@ import type { RootState } from "@/redux/reducers/rootReducer";
 import type { AppDispatch } from "@/redux/store/store";
 import { fetchCompanyJobs } from "@/redux/thunks/companyThunk";
 import { sendJobToUniversity } from "@/redux/thunks/superadmin/companyUniversityThunk";
-import { getAPI } from "@/apis/api";
+import { getAPI, postAPI, putAPI } from "@/apis/api";
 import Loader from "@/components/Loader";
 
 const SendJobUniversityRequest = () => {
@@ -45,6 +52,9 @@ const SendJobUniversityRequest = () => {
     openings: "",
     description: "",
   });
+  const [jobRequests, setJobRequests] = useState<any[]>([]);
+  const [isRequestsLoading, setIsRequestsLoading] = useState(false);
+  const [isReapplying, setIsReapplying] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(fetchCompanyJobs({ page: 1, limit: 200 }));
@@ -66,6 +76,23 @@ const SendJobUniversityRequest = () => {
     };
 
     loadUniversities();
+  }, []);
+
+  const loadJobRequests = async () => {
+    try {
+      setIsRequestsLoading(true);
+      const response = await getAPI<any>("/job-universities", { page: 1, limit: 100 });
+      const rows = response?.data?.data || [];
+      setJobRequests(Array.isArray(rows) ? rows : []);
+    } catch (error: any) {
+      console.error("Failed to load job requests:", error);
+    } finally {
+      setIsRequestsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadJobRequests();
   }, []);
 
   useEffect(() => {
@@ -113,6 +140,7 @@ const SendJobUniversityRequest = () => {
       ).unwrap();
 
       toast.success("Job request sent successfully");
+      loadJobRequests();
       setFormData((prev) => ({
         ...prev,
         universityId: "",
@@ -124,6 +152,53 @@ const SendJobUniversityRequest = () => {
       }));
     } catch (error: any) {
       toast.error(error?.message || error || "Failed to send request");
+    }
+  };
+
+  const handleReapply = async (request: any) => {
+    try {
+      setIsReapplying(request.id);
+      await putAPI("/job-universities/reapply", {
+        jobId: request.jobId,
+        universityId: request.universityId,
+        salary: request.salary,
+        minCgpa: request.minCgpa,
+        maxBacklogs: request.maxBacklogs,
+        openings: request.openings,
+        description: request.description
+      });
+      toast.success("Re-applied successfully");
+      loadJobRequests();
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to re-apply");
+    } finally {
+      setIsReapplying(null);
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "APPROVED":
+        return (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider shadow-sm">
+            <CheckCircle2 size={12} className="animate-pulse" />
+            Approved
+          </div>
+        );
+      case "REJECTED":
+        return (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-[10px] font-black uppercase tracking-wider shadow-sm">
+            <XCircle size={12} />
+            Rejected
+          </div>
+        );
+      default:
+        return (
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase tracking-wider shadow-sm">
+            <Timer size={12} className="animate-bounce" />
+            Pending
+          </div>
+        );
     }
   };
 
@@ -356,6 +431,135 @@ const SendJobUniversityRequest = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+
+        {/* Syndication History Section */}
+        <div className="px-4 md:px-10 pb-20">
+          <div className="saas-card p-0 overflow-hidden bg-card/90 backdrop-blur-xl shadow-2xl shadow-black/5">
+            <div className="p-8 border-b border-border/40 bg-muted/10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 text-primary">
+                  <History size={18} />
+                  <h2 className="text-xl font-black tracking-tight">Syndication History</h2>
+                </div>
+                <p className="text-xs text-muted-foreground font-medium">Monitoring the transmission status of your institutional job requests.</p>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="saas-table">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Destination University</th>
+                    <th>Manifest (Job Role)</th>
+                    <th>Compensation</th>
+                    <th className="text-center">Transmission Status</th>
+                    <th className="text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/40">
+                  {isRequestsLoading ? (
+                    <tr>
+                      <td colSpan={6} className="py-20 text-center">
+                        <div className="flex flex-col items-center gap-4">
+                          <Loader size="lg" />
+                          <span className="text-xs font-black uppercase tracking-widest text-muted-foreground animate-pulse">Syncing History...</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : jobRequests.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-20 text-center">
+                        <div className="flex flex-col items-center gap-2 opacity-50">
+                          <Target size={40} className="text-muted-foreground mb-2" />
+                          <span className="text-sm font-bold">No history found</span>
+                          <span className="text-xs text-muted-foreground">Sent requests will appear here for monitoring.</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    jobRequests.map((req, idx) => (
+                      <tr key={req.id} className="group hover:bg-primary/[0.02] transition-colors">
+                        <td className="w-16 text-center font-black text-[10px] text-muted-foreground/50">
+                          {(idx + 1).toString().padStart(2, "0")}
+                        </td>
+                        <td>
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center border border-primary/10">
+                              <GraduationCap className="h-5 w-5 text-primary" />
+                            </div>
+                            <div className="space-y-0.5">
+                              <div className="text-sm font-bold text-foreground truncate max-w-[200px]">
+                                {req.university?.name || "Target Campus"}
+                              </div>
+                              <div className="text-[10px] text-muted-foreground font-medium flex items-center gap-1">
+                                <MapPin size={10} /> {req.university?.city}, {req.university?.state}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/10">
+                              <Briefcase className="h-4 w-4 text-blue-600" />
+                            </div>
+                            <div className="space-y-0.5">
+                              <div className="text-xs font-bold text-foreground">
+                                {req.job?.title || "Syndicated Job"}
+                              </div>
+                              <div className="text-[9px] font-black text-blue-500/60 uppercase tracking-tight">
+                                ID: {String(req.jobId).slice(-6).toUpperCase()}
+                              </div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="inline-flex items-center gap-1 text-xs font-black text-foreground tracking-tight">
+                            <IndianRupee size={12} className="text-primary/60" />
+                            {(req.salary / 100000).toFixed(1)} <span className="text-[9px] text-muted-foreground ml-0.5">LPA</span>
+                          </div>
+                        </td>
+                        <td className="text-center">
+                          {getStatusBadge(req.status)}
+                        </td>
+                        <td className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            {req.status === "REJECTED" && (
+                              <button
+                                disabled={isReapplying === req.id}
+                                onClick={() => handleReapply(req)}
+                                className="p-2 rounded-lg bg-amber-500/10 text-amber-600 hover:bg-amber-500 hover:text-white transition-all shadow-sm"
+                                title="Retry Syndication"
+                              >
+                                {isReapplying === req.id ? (
+                                  <RefreshCw size={14} className="animate-spin" />
+                                ) : (
+                                  <RefreshCw size={14} />
+                                )}
+                              </button>
+                            )}
+                            <button className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-muted-foreground hover:text-primary transition-all shadow-sm">
+                              <ExternalLink size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="p-6 border-t border-border/40 bg-muted/5 flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+              <div className="flex items-center gap-4">
+                <span>Successful Transmissions: {jobRequests.filter(r => r.status === "APPROVED").length}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Target size={12} className="text-primary" /> Syndication Log
+              </div>
+            </div>
           </div>
         </div>
       </div>

@@ -150,7 +150,7 @@ export default function StudentDashboard() {
             {upcomingEvents.length === 0 ? (
               <div className="border-2 border-dashed border-border rounded-[2.5rem] py-16 md:py-24 flex flex-col items-center justify-center text-center bg-muted/20">
                 <div className="bg-card p-6 rounded-3xl shadow-sm mb-6 transition-transform hover:scale-105">
-                  <Calendar className="h-10 w-10 text-primary/40" />
+                  <Calendar className="h-10 w-10 text-primary/60" />
                 </div>
                 <p className="text-foreground font-bold text-lg tracking-tight">Your schedule is clear</p>
                 <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto px-4">

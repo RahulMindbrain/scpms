@@ -1,9 +1,10 @@
-import {
-  Mail, GraduationCap,
+import{
+Mail, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
   Briefcase, FileText, Building2,
   CheckCircle, Globe, MapPin,
-  Award, Layers, Cpu, Rocket
+  Award, Layers, Cpu, Rocket,
+  Calendar, CalendarDays
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
@@ -308,7 +309,7 @@ const StudentProfile = () => {
                         {profile.stats?.department || 'Department Not Set'}
                       </div>
                       <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-white font-bold text-[9px] md:text-xs">
-                        <GraduationCap className="h-3.5 w-3.5 text-purple-300" />
+                        <Calendar className="h-3.5 w-3.5 text-indigo-200" />
                         Batch {profile.stats?.passingYear || '20xx'}
                       </div>
                     </div>
@@ -445,11 +446,11 @@ const StudentProfile = () => {
                     {[
                       { label: 'Department', value: profile.stats?.department || 'N/A', icon: Building2 },
                       { label: 'CGPA', value: `${profile.stats?.cgpa || '0.0'} / 10`, icon: Award },
-                      { label: 'Academic Year', value: profile.stats?.year ? `${profile.stats.year}${profile.stats.year === 1 ? 'st' : profile.stats.year === 2 ? 'nd' : profile.stats.year === 3 ? 'rd' : 'th'} Year` : 'N/A', icon: Layers },
-                      { label: 'Passing Batch', value: profile.stats?.passingYear || 'N/A', icon: Rocket },
+                      { label: 'Academic Year', value: profile.stats?.year ? `${profile.stats.year}${profile.stats.year === 1 ? 'st' : profile.stats.year === 2 ? 'nd' : profile.stats.year === 3 ? 'rd' : 'th'} Year` : 'N/A', icon: Calendar },
+                      { label: 'Passing Batch', value: profile.stats?.passingYear || 'N/A', icon: CalendarDays },
                     ].map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-[#f8fafc] dark:bg-white/5 border border-slate-100 dark:border-white/10 transition-all hover:bg-white dark:hover:bg-white/10 hover:shadow-md hover:border-transparent group/item">
-                        <div className="h-10 w-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover/item:text-blue-500 transition-colors shadow-sm shrink-0">
+                      <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-blue-500/30 transition-all group/item">
+                        <div className="h-10 w-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover/item:text-blue-500 transition-colors shadow-sm shrink-0">
                           <item.icon className="h-5 w-5" />
                         </div>
                         <div className="min-w-0">

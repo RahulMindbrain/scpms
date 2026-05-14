@@ -78,7 +78,7 @@ const ExperienceModal = ({ isOpen, onClose, onAddExperience }: ExperienceModalPr
             <div className="space-y-2">
               <Label htmlFor="startDate" className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Start Date</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500" />
                 <Input
                   id="startDate"
                   type="date"
@@ -91,7 +91,7 @@ const ExperienceModal = ({ isOpen, onClose, onAddExperience }: ExperienceModalPr
             <div className="space-y-2">
               <Label htmlFor="endDate" className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">End Date (Optional)</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-blue-500" />
                 <Input
                   id="endDate"
                   type="date"
