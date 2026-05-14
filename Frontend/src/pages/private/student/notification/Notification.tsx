@@ -230,7 +230,7 @@ const Notification = () => {
                           ? cn(config.bg, config.color, config.border)
                           : "bg-slate-100 dark:bg-white/5 text-slate-400 border-slate-200/50 dark:border-white/10 shadow-inner"
                       )}>
-                        <TagIcon size={20} md:size={28} className="md:w-7 md:h-7" strokeWidth={2.5} />
+                        <TagIcon size={20} className="md:w-7 md:h-7" strokeWidth={2.5} />
                       </div>
 
                       <div className="min-w-0 flex-1 space-y-3">
@@ -317,7 +317,7 @@ const Notification = () => {
               className="py-20 md:py-32 flex flex-col items-center text-center bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl rounded-[2.5rem] md:rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10 shadow-sm px-4"
             >
               <div className="w-20 h-20 md:w-24 md:h-24 bg-slate-100 dark:bg-white/5 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 border-2 border-slate-200 dark:border-white/5 shadow-inner">
-                <Bell size={40} md:size={48} strokeWidth={1.5} />
+                <Bell size={40} className="md:w-12 md:h-12" strokeWidth={1.5} />
               </div>
               <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight uppercase">All caught up!</h3>
               <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 max-w-xs mt-2 font-medium opacity-80">

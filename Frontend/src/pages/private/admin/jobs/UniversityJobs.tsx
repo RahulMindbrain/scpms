@@ -47,9 +47,10 @@ const UniversityJobs: React.FC = () => {
   const [page, _setPage] = useState();
   const PAGE_LIMIT = 10;
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, _setSortBy] = useState<string>('newest');
+  const [sortBy, setSortBy] = useState<string>('newest');
   const [filterDepartment, setFilterDepartment] = useState<string>('all');
   const [filterCompany, setFilterCompany] = useState<string>('all');
+  const [filterLocation, setFilterLocation] = useState<string>('all');
 
   // Modal State
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);

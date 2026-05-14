@@ -6,7 +6,6 @@ import {
   Plus,
   Briefcase,
   MapPin,
-  IndianRupee,
   Calendar,
   Sparkles,
 } from "lucide-react"
@@ -53,12 +52,7 @@ const ManageJobs: React.FC = () => {
     }
   }
 
-  const formatSalary = (salary: number) => {
-    if (salary >= 100000) {
-      return `${(salary / 100000).toFixed(2)} LPA`
-    }
-    return `${salary} INR`
-  }
+
 
   const filteredJobs = jobs?.filter(
     (job: any) =>

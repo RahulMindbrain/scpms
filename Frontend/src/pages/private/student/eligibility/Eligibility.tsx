@@ -289,11 +289,11 @@ const Eligibility = () => {
                         
                         <div className="flex flex-wrap items-center justify-center md:justify-start gap-x-4 md:gap-x-6 gap-y-2 text-[9px] md:text-[10px] font-black text-slate-500 uppercase tracking-tighter">
                           <div className="flex items-center gap-1.5">
-                            <TrendingUp size={12} md:size={14} className="text-indigo-500 shrink-0" />
+                            <TrendingUp size={12} className="text-indigo-500 shrink-0 md:w-3.5 md:h-3.5" />
                             <span>Min {company.minCGPA} CGPA</span>
                           </div>
                           <div className="flex items-center gap-1.5 min-w-0">
-                            <Building2 size={12} md:size={14} className="text-purple-500 shrink-0" />
+                            <Building2 size={12} className="text-purple-500 shrink-0 md:w-3.5 md:h-3.5" />
                             <span className="truncate max-w-[150px] md:max-w-[200px]">{company.branches.join(', ') || 'All Branches'}</span>
                           </div>
                         </div>
@@ -331,7 +331,7 @@ const Eligibility = () => {
               {filteredCompanies.length === 0 && (
                 <div className="py-20 md:py-24 text-center bg-white/50 dark:bg-[#1e1f26]/30 rounded-[2.5rem] md:rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10 px-4">
                   <div className="w-16 h-16 md:w-20 md:h-20 bg-slate-100 dark:bg-white/5 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mx-auto mb-6">
-                    <Search size={32} md:size={40} />
+                    <Search size={32} className="md:w-10 md:h-10" />
                   </div>
                   <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white">No criteria matches found</h3>
                   <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm mt-2 max-w-xs mx-auto">Try adjusting your filters or check your academic profile for any updates.</p>
@@ -346,7 +346,7 @@ const Eligibility = () => {
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/2 pointer-events-none" />
           <div className="relative z-10 flex flex-col sm:flex-row items-center gap-6 md:gap-8">
             <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl md:rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white shrink-0 shadow-xl border border-white/10">
-              <Sparkles size={28} md:size={32} />
+              <Sparkles size={28} className="md:w-8 md:h-8" />
             </div>
             <div className="flex-1 text-center sm:text-left">
               <h4 className="text-lg md:text-xl font-black uppercase tracking-widest mb-2">Maximize your Eligibility</h4>

@@ -242,7 +242,7 @@ const Documents = () => {
                     />
                   ) : (
                     <div className="p-8 text-indigo-500/40 group-hover:scale-110 transition-transform duration-500">
-                      <FileText size={56} md:size={64} strokeWidth={1} />
+                      <FileText size={56} className="md:w-16 md:h-16" strokeWidth={1} />
                     </div>
                   )}
                   {/* Hover Overlay */}
@@ -279,7 +279,7 @@ const Documents = () => {
                       onClick={() => deleteDocument(doc.id)}
                       className="p-2 md:p-3 text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 rounded-xl transition-all duration-300 opacity-0 group-hover:opacity-100"
                     >
-                      <Trash2 size={16} md:size={18} />
+                      <Trash2 size={16} className="md:w-[18px] md:h-[18px]" />
                     </button>
                   </div>
                 </div>
@@ -288,7 +288,7 @@ const Documents = () => {
           ) : (
             <div className="col-span-full py-24 md:py-32 text-center bg-white/40 dark:bg-white/[0.02] border-2 border-dashed border-slate-200/60 dark:border-white/10 rounded-[2.5rem] md:rounded-[3rem] shadow-sm px-4">
               <div className="w-20 h-20 md:w-24 md:h-24 bg-slate-100 dark:bg-white/5 rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mx-auto mb-6">
-                <FileClock size={40} md:size={48} />
+                <FileClock size={40} className="md:w-12 md:h-12" />
               </div>
               <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Vault is Empty</h3>
               <p className="text-slate-500 dark:text-slate-400 mt-2 text-xs md:text-sm font-medium">Start by uploading your academic credentials.</p>

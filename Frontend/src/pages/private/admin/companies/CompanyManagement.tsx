@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button.tsx';
 import { toast } from 'sonner';
 import { Modal } from '@/components/ui/modal.tsx';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchCompanies, activateCompanies, fetchJobsByCompanyId } from '@/redux/thunks/companyThunk';
+import { fetchCompanies, activateCompanies } from '@/redux/thunks/companyThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import Loader from '@/components/Loader';

@@ -141,11 +141,11 @@ const InterviewSchedule: React.FC = () => {
                         <div className="flex flex-col items-center lg:items-end gap-4 w-full">
                           <div className="flex items-center gap-6 text-slate-500">
                             <div className="flex items-center gap-2 text-[10px] md:text-xs font-black uppercase tracking-wider">
-                              <Calendar size={14} md:size={16} className="text-indigo-500" />
+                              <Calendar size={14} className="text-indigo-500 md:w-4 md:h-4" />
                               {new Date(item.startTime).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </div>
                             <div className="flex items-center gap-2 text-[10px] md:text-xs font-black uppercase tracking-wider">
-                              <Clock size={14} md:size={16} className="text-indigo-500" />
+                              <Clock size={14} className="text-indigo-500 md:w-4 md:h-4" />
                               {new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                             </div>
                           </div>
@@ -173,7 +173,7 @@ const InterviewSchedule: React.FC = () => {
               ) : (
                 <div className="py-20 md:py-24 flex flex-col items-center text-center bg-white dark:bg-[#1e1f26]/30 rounded-[2.5rem] md:rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10 px-4">
                   <div className="w-20 h-20 md:w-24 md:h-24 bg-slate-100 dark:bg-white/5 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 mx-auto">
-                    <Calendar size={40} md:size={48} strokeWidth={1.5} />
+                    <Calendar size={40} className="md:w-12 md:h-12" strokeWidth={1.5} />
                   </div>
                   <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white">No upcoming interviews</h3>
                   <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm max-w-xs mt-2 font-medium mx-auto">We'll notify you as soon as a recruiter schedules a round with you.</p>
