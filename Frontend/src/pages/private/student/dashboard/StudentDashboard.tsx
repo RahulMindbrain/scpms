@@ -192,7 +192,7 @@ export default function StudentDashboard() {
             {[
               { to: "/student/profile", icon: User, label: "My Profile", color: "blue", bg: "bg-blue-50" },
               { to: "/student/jobs", icon: Briefcase, label: "Job Portal", color: "emerald", bg: "bg-emerald-50" },
-              { to: "/student/interview", icon: CalendarClock, label: "Interview Hub", color: "indigo", bg: "bg-indigo-50" },
+              // { to: "/student/interview", icon: CalendarClock, label: "Interview Hub", color: "indigo", bg: "bg-indigo-50" },
               { to: "/student/application", icon: FileText, label: "Applications", color: "cyan", bg: "bg-cyan-50" },
               { to: "/student/notifications", icon: Bell, label: "Notifications", color: "amber", bg: "bg-amber-50" },
             ].map((nav) => (
