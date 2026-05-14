@@ -4,7 +4,6 @@ import {
   Search,
   MapPin,
   ChevronRight,
-  Pencil,
 } from "lucide-react";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -202,14 +201,6 @@ const UniversityManagement = () => {
                         {/* Actions */}
                         <TableCell className="text-right py-5 pr-8">
                           <div className="flex justify-end gap-2">
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="size-9 rounded-xl text-blue-600 hover:bg-blue-500/10"
-                            >
-                              <Pencil className="size-4" />
-                            </Button>
-
                             <Button
                               variant="ghost"
                               size="icon"

@@ -17,101 +17,104 @@ import { useDispatch, useSelector } from "react-redux";
 import type { AppDispatch } from "@/redux/store/store";
 import type { RootState } from "@/redux/reducers/rootReducer";
 import { fetchUniversities } from "@/redux/thunks/superadmin/universityThunks";
-import { fetchAdmins } from "@/redux/thunks/superadmin/adminThunks"
-const OnboardingFlow = ({ admins, companies }: any) => {
+import { fetchAdmins } from "@/redux/thunks/superadmin/adminThunks";
+import { fetchCompanies } from "@/redux/thunks/superadmin/companyThunks";
+import { motion } from "framer-motion";
+const OnboardingFlow = ({ admins, companies, universities }: any) => {
   const steps = [
     {
-      id: "superadmin",
-      title: "Account Activation",
-      desc: "Super Admin verification",
+      id: "admins",
+      title: "Admin Approval",
+      desc: "Verify institutional leads",
       icon: ShieldCheck,
-      count: admins.filter((a: any) => a.onboardingStep === 'ACTIVATE_ACCOUNT').length,
-      status: admins.some((a: any) => a.onboardingStep === 'ACTIVATE_ACCOUNT') ? 'attention' : 'completed'
+      count: admins.filter((a: any) => a.user?.status === 'INACTIVE').length,
+      status: admins.some((a: any) => a.user?.status === 'INACTIVE') ? 'attention' : 'completed'
     },
     {
-      id: "university",
-      title: "Univ. Acceptance",
-      desc: "Handle node requests",
+      id: "universities",
+      title: "Univ. Onboarding",
+      desc: "Node activation requests",
       icon: Building2,
-      count: admins.filter((a: any) => a.onboardingStep === 'UNIVERSITY_ACCEPTANCE').length,
-      status: admins.some((a: any) => a.onboardingStep === 'UNIVERSITY_ACCEPTANCE') ? 'attention' : 'pending'
+      count: universities.filter((u: any) => u.status === 'INACTIVE').length,
+      status: universities.some((u: any) => u.status === 'INACTIVE') ? 'attention' : 'completed'
     },
     {
-      id: "profile",
-      title: "Profile Genesis",
-      desc: "Institutional setup",
-      icon: Users,
-      count: admins.filter((a: any) => a.onboardingStep === 'CREATE_PROFILE').length,
-      status: admins.some((a: any) => a.onboardingStep === 'CREATE_PROFILE') ? 'attention' : 'pending'
-    },
-    {
-      id: "company",
-      title: "Company Active",
-      desc: "Final authorization",
+      id: "companies",
+      title: "Company Access",
+      desc: "Corporate partnership vetting",
       icon: Briefcase,
-      count: companies.filter((c: any) => c.activationStep === 'PENDING_COMPANY_APPROVAL').length,
-      status: companies.some((c: any) => c.activationStep === 'PENDING_COMPANY_APPROVAL') ? 'attention' : 'pending'
+      count: companies.filter((c: any) => c.user?.status === 'INACTIVE').length,
+      status: companies.some((c: any) => c.user?.status === 'INACTIVE') ? 'attention' : 'completed'
+    },
+    {
+      id: "security",
+      title: "System Integrity",
+      desc: "All nodes operational",
+      icon: Zap,
+      count: 0,
+      status: 'completed'
     }
   ];
 
   return (
-    <div className="saas-card">
-      <div className="flex items-center justify-between mb-8">
+    <div className="saas-card relative overflow-hidden bg-gradient-to-br from-card to-background border-border/40">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[100px] -mr-32 -mt-32" />
+      
+      <div className="flex items-center justify-between mb-8 relative z-10">
         <div>
           <h3 className="text-xl font-black text-foreground tracking-tight">Onboarding Pipeline</h3>
           <p className="text-xs font-medium text-muted-foreground mt-0.5">Real-time status of entities moving through the system</p>
         </div>
-        <div className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black text-indigo-600 uppercase tracking-widest">
-          Active Flow
+        <div className="px-4 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest shadow-sm">
+          Active Flow Control
         </div>
       </div>
 
       <div className="relative">
-        {/* Connection Line */}
-        <div className="absolute top-1/2 left-0 w-full h-0.5 bg-muted -translate-y-1/2 hidden lg:block" />
+        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-border to-transparent -translate-y-1/2 hidden lg:block" />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 relative z-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 relative z-10">
           {steps.map((step, idx) => (
             <div key={step.id} className="relative group">
-              <div className={`p-6 rounded-3xl border transition-all duration-300 ${step.status === 'attention'
-                  ? 'bg-indigo-500/5 border-indigo-500/20 shadow-lg shadow-indigo-500/5'
+              <div className={`p-6 rounded-[2rem] border transition-all duration-500 ${step.status === 'attention'
+                  ? 'bg-indigo-500/[0.03] border-indigo-500/30 shadow-2xl shadow-indigo-500/10'
                   : step.status === 'completed'
-                    ? 'bg-emerald-500/5 border-emerald-500/20'
-                    : 'bg-card border-border/50'
-                }`}>
-                <div className="flex items-start justify-between mb-4">
-                  <div className={`size-12 rounded-2xl flex items-center justify-center transition-transform group-hover:scale-110 ${step.status === 'attention'
-                      ? 'bg-indigo-500 text-white'
+                    ? 'bg-emerald-500/[0.03] border-emerald-500/20'
+                    : 'bg-muted/30 border-border/50'
+                } group-hover:translate-y-[-4px]`}>
+                <div className="flex items-start justify-between mb-5">
+                  <div className={`size-12 rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 ${step.status === 'attention'
+                      ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/40'
                       : step.status === 'completed'
-                        ? 'bg-emerald-500 text-white'
+                        ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/20'
                         : 'bg-muted text-muted-foreground'
                     }`}>
                     <step.icon className="size-6" />
                   </div>
                   {step.count > 0 && (
-                    <span className="flex size-6 items-center justify-center rounded-full bg-rose-500 text-[10px] font-black text-white animate-bounce">
-                      {step.count}
+                    <span className="flex px-2 h-6 items-center justify-center rounded-full bg-rose-500 text-[10px] font-black text-white shadow-lg shadow-rose-500/40 animate-pulse">
+                      {step.count} PENDING
                     </span>
                   )}
                 </div>
 
-                <h4 className="text-sm font-black text-foreground mb-1 flex items-center gap-2">
+                <h4 className="text-sm font-black text-foreground mb-1.5 flex items-center gap-2">
                   {step.title}
-                  {step.status === 'completed' && <CheckCircle2 className="size-3 text-emerald-500" />}
+                  {step.status === 'completed' && <CheckCircle2 className="size-3.5 text-emerald-500" />}
                 </h4>
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{step.desc}</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-relaxed">{step.desc}</p>
 
                 {step.status === 'attention' && (
-                  <div className="mt-4 flex items-center gap-1.5 text-[9px] font-black text-indigo-600 uppercase tracking-widest bg-indigo-500/10 w-fit px-2 py-0.5 rounded-md">
-                    <Clock className="size-3" /> Action Required
+                  <div className="mt-5 flex items-center gap-2 text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest bg-indigo-500/10 w-fit px-3 py-1 rounded-lg">
+                    <Clock className="size-3" /> Priority Action
                   </div>
                 )}
               </div>
 
               {idx < steps.length - 1 && (
-                <div className="absolute top-1/2 -right-4 -translate-y-1/2 z-20 hidden lg:flex">
-                  <div className="size-8 rounded-full bg-card border border-border/50 flex items-center justify-center text-muted-foreground shadow-sm">
-                    <ArrowRight className="size-4" />
+                <div className="absolute top-1/2 -right-3 -translate-y-1/2 z-20 hidden lg:flex">
+                  <div className="size-7 rounded-full bg-card border border-border/50 flex items-center justify-center text-muted-foreground shadow-sm group-hover:scale-110 transition-transform">
+                    <ArrowRight className="size-3.5" />
                   </div>
                 </div>
               )}
@@ -131,13 +134,14 @@ const SuperAdminDashboard = () => {
   useEffect(() => {
     dispatch(fetchUniversities());
     dispatch(fetchAdmins());
+    dispatch(fetchCompanies());
   }, [dispatch]);
 
   const stats = [
-    { label: "Total Universities", value: universities.length.toString(), icon: Building2, color: "text-blue-500", bg: "bg-blue-500/10" },
+    { label: "Universities", value: universities.length.toString(), icon: Building2, color: "text-blue-500", bg: "bg-blue-500/10" },
     { label: "Global Admins", value: admins.length.toString(), icon: ShieldCheck, color: "text-indigo-500", bg: "bg-indigo-500/10" },
-    { label: "Partner Companies", value: companies?.length.toString() || "0", icon: Briefcase, color: "text-amber-500", bg: "bg-amber-500/10" },
-    { label: "Total Students", value: "4,250", icon: Users, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+    { label: "Companies", value: companies?.length.toString() || "0", icon: Briefcase, color: "text-amber-500", bg: "bg-amber-500/10" },
+    { label: "Active Nodes", value: (universities.filter((u: any) => u.status === 'ACTIVE').length + admins.filter((a: any) => a.user?.status === 'ACTIVE').length).toString(), icon: Zap, color: "text-emerald-500", bg: "bg-emerald-500/10" },
   ];
 
   return (
@@ -164,7 +168,13 @@ const SuperAdminDashboard = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {stats.map((stat, idx) => (
-            <div key={idx} className="saas-card group hover:scale-[1.02] transition-all duration-300">
+            <motion.div 
+              key={idx} 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.1 }}
+              className="saas-card group hover:scale-[1.02] transition-all duration-300"
+            >
               <div className="flex items-center justify-between mb-4">
                 <div className={`size-12 rounded-2xl ${stat.bg} flex items-center justify-center transition-transform group-hover:rotate-12`}>
                   <stat.icon className={`size-6 ${stat.color}`} />
@@ -177,95 +187,129 @@ const SuperAdminDashboard = () => {
                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] mb-1">{stat.label}</p>
                 <p className="text-3xl font-black text-foreground tabular-nums">{stat.value}</p>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
         {/* Onboarding Flow Visualization */}
         <OnboardingFlow admins={admins} universities={universities} companies={companies} />
 
-        {/* Quick Actions & System Health */}
+        {/* Quick Actions & Recent Activity */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-8">
-            <div className="saas-card h-full">
-              <div className="flex items-center justify-between mb-8">
+            <div className="saas-card h-full bg-gradient-to-br from-card to-background border-border/40 overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[80px] -mr-32 -mt-32" />
+              
+              <div className="flex items-center justify-between mb-8 relative z-10">
                 <div>
-                  <h3 className="text-xl font-black text-foreground tracking-tight">System Infrastructure</h3>
-                  <p className="text-xs font-medium text-muted-foreground">Monitoring node health across the distributed network</p>
+                  <h3 className="text-xl font-black text-foreground tracking-tight">Recent Registrations</h3>
+                  <p className="text-xs font-medium text-muted-foreground">Monitoring new institutional and corporate partners</p>
                 </div>
-                <button className="text-[10px] font-black text-indigo-600 uppercase tracking-widest hover:underline">Full Audit</button>
+                <div className="flex items-center gap-2">
+                   <div className="size-2 rounded-full bg-emerald-500 animate-pulse" />
+                   <span className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Real-time Feed</span>
+                </div>
               </div>
 
-              <div className="space-y-6">
-                {[
-                  { node: "Central API Cluster", status: "Operational", load: "24%", color: "bg-emerald-500" },
-                  { node: "Real-time Socket Grid", status: "High Load", load: "78%", color: "bg-amber-500" },
-                  { node: "Asset Storage CDN", status: "Operational", load: "12%", color: "bg-emerald-500" },
-                  { node: "Database Shards", status: "Operational", load: "45%", color: "bg-emerald-500" },
-                ].map((shard, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-muted/30 border border-border/50">
-                    <div className="flex items-center gap-4">
-                      <div className={`size-3 rounded-full ${shard.color} animate-pulse`} />
-                      <div>
-                        <p className="text-sm font-black text-foreground">{shard.node}</p>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase">{shard.status}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <div className="hidden sm:flex flex-col items-end">
-                        <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Resource Load</span>
-                        <div className="w-24 h-1 bg-muted rounded-full mt-1">
-                          <div className={`h-full ${shard.color} rounded-full`} style={{ width: shard.load }} />
-                        </div>
-                      </div>
-                      <span className="text-sm font-black text-foreground tabular-nums">{shard.load}</span>
-                    </div>
-                  </div>
-                ))}
+              <div className="relative z-10 overflow-x-auto">
+                <table className="w-full text-left border-separate border-spacing-y-3">
+                  <thead>
+                    <tr className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+                      <th className="pb-2 px-4">Entity Name</th>
+                      <th className="pb-2 px-4">Category</th>
+                      <th className="pb-2 px-4">Joined On</th>
+                      <th className="pb-2 px-4 text-right">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[...universities.slice(0, 3), ...companies.slice(0, 3)]
+                      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+                      .slice(0, 5)
+                      .map((entity: any, i: number) => (
+                        <tr key={i} className="group hover:bg-muted/30 transition-colors">
+                          <td className="py-4 px-4 bg-muted/20 border-y border-l border-border/50 rounded-l-2xl">
+                            <div className="flex items-center gap-3">
+                              <div className={`size-8 rounded-lg flex items-center justify-center ${entity.code ? 'bg-blue-500/10 text-blue-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                                {entity.code ? <Building2 className="size-4" /> : <Briefcase className="size-4" />}
+                              </div>
+                              <div>
+                                <p className="text-sm font-black text-foreground">{entity.name}</p>
+                                <p className="text-[10px] font-medium text-muted-foreground">{entity.code || entity.user?.email}</p>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 bg-muted/20 border-y border-border/50">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                              {entity.code ? 'University' : 'Company'}
+                            </span>
+                          </td>
+                          <td className="py-4 px-4 bg-muted/20 border-y border-border/50">
+                            <span className="text-xs font-medium text-muted-foreground tabular-nums">
+                              {new Date(entity.createdAt).toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })}
+                            </span>
+                          </td>
+                          <td className="py-4 px-4 bg-muted/20 border-y border-r border-border/50 rounded-r-2xl text-right">
+                            <span className={`px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-widest ${
+                              (entity.status === 'ACTIVE' || entity.user?.status === 'ACTIVE')
+                                ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400' 
+                                : 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                            }`}>
+                              {entity.status || entity.user?.status}
+                            </span>
+                          </td>
+                        </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
 
           <div className="lg:col-span-4">
-            <div className="saas-card h-full relative overflow-hidden
-  bg-slate-950 text-white border border-slate-800
-  dark:bg-slate-900 dark:border-slate-800">
-              <div className="relative z-10">
-                <h3 className="text-xl font-black text-foreground tracking-tight">SuperAdmin Broadcast</h3>
-                <p className="text-sm text-slate-400 mb-8 font-medium">Issue high-level directives to all system administrators.</p>
+            <div className="saas-card h-full relative overflow-hidden bg-card text-card-foreground border-border/50 transition-all duration-500 hover:border-indigo-500/50">
+              <div className="relative z-10 flex flex-col h-full">
+                <div className="mb-8">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="size-2 rounded-full bg-indigo-500 animate-pulse" />
+                    <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Global Command</span>
+                  </div>
+                  <h3 className="text-2xl font-black text-foreground tracking-tight">System Broadcast</h3>
+                  <p className="text-sm text-muted-foreground mt-1 font-medium leading-relaxed italic">Deploy global directives and system-wide protocols.</p>
+                </div>
 
-                <div className="space-y-4">
-                  <button className="w-full p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center justify-between group">
-                    <div className=" flex text-xl font-black text-foreground tracking-tight">
-                      <div className="size-8 rounded-xl bg-indigo-500 flex items-center justify-center">
-                        <ShieldCheck className="size-4" />
+                <div className="space-y-3 flex-1">
+                  {[
+                    { label: "Update Security Policy", icon: ShieldCheck, color: "bg-indigo-500/5 text-indigo-600 dark:text-indigo-400 border-indigo-500/10 dark:border-indigo-500/20" },
+                    { label: "Onboard University", icon: Building2, color: "bg-emerald-500/5 text-emerald-600 dark:text-emerald-400 border-emerald-500/10 dark:border-emerald-500/20" },
+                    { label: "System Maintenance", icon: Zap, color: "bg-amber-500/5 text-amber-600 dark:text-amber-400 border-amber-500/10 dark:border-amber-500/20" }
+                  ].map((action, i) => (
+                    <button key={i} className={`w-full p-4 rounded-2xl ${action.color} border transition-all duration-300 flex items-center justify-between group`}>
+                      <div className="flex items-center gap-4">
+                        <div className="size-10 rounded-xl bg-white dark:bg-white/10 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                          <action.icon className="size-5" />
+                        </div>
+                        <div className="text-left">
+                          <span className="text-[10px] font-black opacity-50 uppercase tracking-widest block mb-0.5">Directive Control</span>
+                          <span className="text-xs font-black uppercase tracking-widest">{action.label}</span>
+                        </div>
                       </div>
-                      <span className="text-sm font-black text-muted-foreground uppercase tracking-widest">Update Security Policy</span>
-                    </div>
-                    <ArrowUpRight className="size-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </button>
-                  <button className="w-full p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center justify-between group">
-                    <div className="flex items-center gap-3">
-                      <div className="size-8 rounded-xl bg-emerald-500 flex items-center justify-center">
-                        <Building2 className="size-4" />
-                      </div>
-                      <span className="text-sm font-black text-muted-foreground uppercase tracking-widest">Onboard University</span>
-                    </div>
-                    <ArrowUpRight className="size-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </button>
-                  <button className="w-full p-4 rounded-2xl bg-white/5 hover:bg-white/10 border border-white/10 transition-all flex items-center justify-between group">
-                    <div className="flex items-center gap-3">
-                      <div className="size-8 rounded-xl bg-amber-500 flex items-center justify-center">
-                        <Zap className="size-4" />
-                      </div>
-                      <span className="text-sm font-black text-muted-foreground uppercase tracking-widest">System Maintenance</span>
-                    </div>
-                    <ArrowUpRight className="size-4 opacity-0 group-hover:opacity-100 transition-opacity" />
-                  </button>
+                      <ArrowUpRight className="size-4 opacity-40 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1 transition-all" />
+                    </button>
+                  ))}
+                </div>
+
+                <div className="mt-8 pt-6 border-t border-border/50 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Protocol v4.2.0 Active</span>
+                  </div>
+                  <div className="px-3 py-1 rounded-full bg-indigo-500/10 text-[9px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">
+                    Secure Link
+                  </div>
                 </div>
               </div>
-              {/* Background gradient */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/20 blur-[100px] rounded-full -mr-32 -mt-32" />
+              
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-[100px] rounded-full -mr-32 -mt-32" />
             </div>
           </div>
         </div>
