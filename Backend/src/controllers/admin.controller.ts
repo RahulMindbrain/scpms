@@ -101,6 +101,7 @@ export const getStudentsController = async (req: Request, res: Response) => {
       ...(parseNumber(departmentId) !== undefined && {
         departmentId: parseNumber(departmentId),
       }),
+      ...(status && { status }),
     };
 
     const students = await getStudentsService(params);

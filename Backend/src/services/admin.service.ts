@@ -113,6 +113,7 @@ export const getStudentsService = async (params: {
   minCgpa?: number;
   maxCgpa?: number;
   departmentId?: number;
+  status?: "ACTIVE" | "INACTIVE";
 }) => {
   const DEFAULT_LIMIT = parseInt(process.env.DEFAULT_PAGE_LIMIT || "10", 10);
   const MAX_LIMIT = 50;
