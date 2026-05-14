@@ -585,8 +585,6 @@ export const getScheduleWithJobsAndApplications = async (
 
               acceptedAt: true,
 
-              rejectedAt: true,
-
               student: {
                 select: {
                   id: true,
@@ -639,8 +637,6 @@ export const getScheduleWithJobsAndApplications = async (
                   round: true,
 
                   reason: true,
-
-                  remarks: true,
 
                   createdAt: true,
                 },
