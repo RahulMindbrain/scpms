@@ -546,8 +546,6 @@ export const getScheduleWithJobsAndApplications = async (
 
               location: true,
 
-              status: true,
-
               companyId: true,
 
               eligibleDepartments: {
