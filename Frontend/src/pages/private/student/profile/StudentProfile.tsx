@@ -194,16 +194,21 @@ const StudentProfile = () => {
 
   const normalizePreviewUrl = (url: string) => {
     if (!url) return '';
-
+    
     // Prefer HTTPS to avoid mixed content in production.
-    const secureUrl = url.replace(/^http:\/\//i, 'https://');
-    const lower = secureUrl.toLowerCase();
-    const hasPdfExt = lower.endsWith('.pdf');
-    const cloudinaryImageUpload = /\/image\/upload\//i.test(secureUrl);
-    const cloudinaryRawUpload = /\/raw\/upload\//i.test(secureUrl);
-
-    if ((cloudinaryImageUpload || cloudinaryRawUpload) && !hasPdfExt && !lower.includes('/f_pdf/')) {
-      return `${secureUrl}.pdf`;
+    let secureUrl = url.replace(/^http:\/\//i, 'https://');
+    
+    // Cloudinary specific handling to ensure PDF rendering
+    if (secureUrl.includes('cloudinary.com')) {
+      // Force PDF format for image uploads
+      if (secureUrl.includes('/image/upload/') && !secureUrl.includes('/f_pdf')) {
+        secureUrl = secureUrl.replace('/image/upload/', '/image/upload/f_pdf/');
+      }
+      // Ensure .pdf extension is present for raw/image uploads
+      if (!secureUrl.toLowerCase().endsWith('.pdf') && (secureUrl.includes('/image/upload/') || secureUrl.includes('/raw/upload/'))) {
+        // Remove existing extension if any and add .pdf
+        secureUrl = secureUrl.replace(/\.[a-z0-9]+$/i, '') + '.pdf';
+      }
     }
 
     return secureUrl;
@@ -832,39 +837,22 @@ const StudentProfile = () => {
             </DialogHeader>
             <div className="flex-1 bg-slate-100 overflow-hidden relative">
               {isPdfPreview ? (
-                <object
-                  data={`${previewUrl}#toolbar=0&navpanes=0`}
-                  type="application/pdf"
-                  className="w-full h-full"
-                >
-                  <div className="h-full flex items-center justify-center p-8">
-                    <div className="max-w-lg text-center space-y-5">
-                      <img
-                        src={previewUrl!.replace('/upload/', '/upload/pg_1,f_jpg,w_1200/').replace(/\.pdf$/i, '.jpg')}
-                        alt="PDF preview"
-                        className="w-full max-h-[60vh] object-contain rounded-xl border border-slate-200 bg-white"
-                      />
-                      <p className="text-sm text-slate-600 dark:text-slate-300">
-                        PDF preview is blocked in this browser. Use open or download to view the document.
-                      </p>
-                      <div className="flex justify-center gap-3">
-                        <Button
-                          variant="outline"
-                          onClick={() => window.open(previewUrl!, '_blank')}
-                          className="rounded-xl"
-                        >
-                          Open PDF
-                        </Button>
-                        <Button
-                          onClick={() => window.open(previewUrl!.replace('/upload/', '/upload/fl_attachment/'), '_blank')}
-                          className="rounded-xl"
-                        >
-                          Download PDF
-                        </Button>
-                      </div>
-                    </div>
+                <div className="w-full h-full relative">
+                  <iframe
+                    src={`https://docs.google.com/viewer?url=${encodeURIComponent(previewUrl!)}&embedded=true`}
+                    className="w-full h-full border-none"
+                    title="PDF Preview"
+                  />
+                  <div className="absolute bottom-6 right-6 flex gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => window.open(previewUrl!, '_blank')}
+                      className="rounded-xl bg-white shadow-lg border-slate-200"
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" /> Original View
+                    </Button>
                   </div>
-                </object>
+                </div>
               ) : (
                 <iframe src={previewUrl!} className="w-full h-full border-none" title="Document Preview" />
               )}
