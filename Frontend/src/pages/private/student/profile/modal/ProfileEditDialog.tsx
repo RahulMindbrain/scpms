@@ -31,7 +31,6 @@ const profileSchema = z.object({
     cgpa: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(0, "CGPA cannot be negative").max(10, "CGPA must be 10 or less").optional()),
     year: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(1, "Year must be at least 1").max(5, "Year must be 5 or less")),
     passingYear: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(2000, "Invalid year").max(2100, "Invalid year")),
-    departmentId: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(1, "Required")),
     activeBacklogs: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(0, "Cannot be negative").default(0)),
   }),
   resumeUrl: z.string().url("Invalid Resume URL").or(z.literal("")).nullable(),
@@ -53,7 +52,6 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isUploading, setIsUploading] = useState(false);
   const [allSkillsList, setAllSkillsList] = useState<SkillOption[]>([]);
-  const [allDepartmentsList, setAllDepartmentsList] = useState<any[]>([]);
 
   const { upload } = useCloudinaryUpload();
 
@@ -67,7 +65,6 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
           cgpa: profile.stats?.cgpa ?? profile.cgpa ?? '',
           year: profile.stats?.year ?? profile.year ?? '',
           passingYear: profile.stats?.passingYear ?? profile.passingYear ?? '',
-          departmentId: profile.stats?.departmentId || profile.departmentId || "",
         },
         linkedinUrl: profile.linkedinUrl || "",
         githubUrl: profile.githubUrl || "",
@@ -85,28 +82,13 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [skillsRes, deptRes] = await Promise.all([
-          getAPI<ApiResponse<SkillOption[]>>("/skills/get-all").catch(() => null),
-          getAPI<any>("/dept/").catch(() => null)
-        ]);
+        const skillsRes = await getAPI<ApiResponse<SkillOption[]>>("/skills/get-all").catch(() => null);
 
         if (skillsRes) {
           setAllSkillsList(Array.isArray(skillsRes.data) ? skillsRes.data : []);
         }
-
-        if (deptRes) {
-          const depts = Array.isArray(deptRes.data?.data)
-            ? deptRes.data.data
-            : Array.isArray(deptRes.data)
-              ? deptRes.data
-              : Array.isArray(deptRes)
-                ? deptRes
-                : [];
-          setAllDepartmentsList(depts);
-        }
       } catch (error) {
         setAllSkillsList([]);
-        setAllDepartmentsList([]);
       }
     };
 
@@ -243,24 +225,6 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
               {/* ACADEMIC CONTENT */}
               <TabsContent value="academic" className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="departmentId" className="text-sm font-bold text-slate-700 dark:text-slate-300">Department</Label>
-                    <div className="relative">
-                       <GraduationCap className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                       <select
-                        id="departmentId"
-                        className={`pl-10 flex h-11 w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${errors['stats.departmentId'] ? 'border-rose-500' : ''}`}
-                        value={formData.stats?.departmentId || ""}
-                        onChange={(e) => updateStat("departmentId", e.target.value)}
-                      >
-                        <option value="" disabled>Select Department</option>
-                        {allDepartmentsList.map((dept: any) => (
-                          <option key={dept.id} value={dept.id}>{dept.name}</option>
-                        ))}
-                      </select>
-                    </div>
-                    {errors['stats.departmentId'] && <p className="text-[10px] text-rose-500 font-bold uppercase">{errors['stats.departmentId']}</p>}
-                  </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="cgpa" className="text-sm font-bold text-slate-700 dark:text-slate-300">Current CGPA</Label>

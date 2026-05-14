@@ -16,7 +16,7 @@ import ProjectModal from './modal/ProjectModal';
 import { toast } from 'sonner';
 import { Badge } from '@/components/ui/badge';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchStudentProfile, updateStudentProfile, createStudentProfile } from '../../../../redux/thunks/studentThunk';
+import { fetchStudentProfile, updateStudentProfile } from '../../../../redux/thunks/studentThunk';
 import { useEffect, useState } from 'react';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
@@ -119,98 +119,71 @@ const StudentProfile = () => {
         resumeUrl: cleanUrl(updatedProfile.resumeUrl),
       };
 
-      if (backendProfile) {
-        const backendSkillIds = backendProfile.skills?.map((s: any) => s.id) || [];
-        const updatedSkillIds = updatedProfile.skills
-          ?.map((s: any) => s.id)
-          ?.filter((id: any) => typeof id === "number") || [];
+      const backendSkillIds = backendProfile?.skills?.map((s: any) => s.id) || [];
+      const updatedSkillIds = updatedProfile.skills
+        ?.map((s: any) => s.id)
+        ?.filter((id: any) => typeof id === "number") || [];
 
-        const addSkillIds = updatedSkillIds.filter((id: number) => !backendSkillIds.includes(id));
-        const removeSkillIds = backendSkillIds.filter((id: number) => !updatedSkillIds.includes(id));
+      const addSkillIds = updatedSkillIds.filter((id: number) => !backendSkillIds.includes(id));
+      const removeSkillIds = backendSkillIds.filter((id: number) => !updatedSkillIds.includes(id));
 
-        const putPayload = {
-          ...commonPayload,
-          addSkillIds,
-          removeSkillIds,
-          addExperiences: updatedProfile.experiences?.filter((exp: any) => !exp.id).map((exp: any) => ({
-            companyName: exp.companyName,
-            role: exp.role,
-            description: exp.description || undefined,
-            startDate: exp.startDate,
-            endDate: exp.endDate || undefined,
-          })),
-          updateExperiences: updatedProfile.experiences?.filter((exp: any) => exp.id).map((exp: any) => ({
-            id: exp.id,
-            companyName: exp.companyName,
-            role: exp.role,
-            description: exp.description || undefined,
-            startDate: exp.startDate,
-            endDate: exp.endDate || undefined,
-          })),
-          deleteExperienceIds: updatedProfile.deleteExperienceIds || [],
-          addCertificates: updatedProfile.certificates?.filter((cert: any) => !cert.id).map((cert: any) => ({
-            title: cert.title,
-            issuer: cert.issuer,
-            certificateUrl: cleanUrl(cert.certificateUrl),
-            issuedDate: cert.issuedDate || undefined,
-          })),
-          updateCertificates: updatedProfile.certificates?.filter((cert: any) => cert.id).map((cert: any) => ({
-            id: cert.id,
-            title: cert.title,
-            issuer: cert.issuer,
-            certificateUrl: cleanUrl(cert.certificateUrl),
-            issuedDate: cert.issuedDate || undefined,
-          })),
-          deleteCertificateIds: updatedProfile.deleteCertificateIds || [],
-          addProjects: updatedProfile.projects?.filter((proj: any) => !proj.id).map((proj: any) => ({
-            title: proj.title,
-            description: proj.description || undefined,
-            techStack: proj.techStack || undefined,
-            githubUrl: cleanUrl(proj.githubUrl),
-            liveUrl: cleanUrl(proj.liveUrl),
-          })),
-          updateProjects: updatedProfile.projects?.filter((proj: any) => proj.id).map((proj: any) => ({
-            id: proj.id,
-            title: proj.title,
-            description: proj.description || undefined,
-            techStack: proj.techStack || undefined,
-            githubUrl: cleanUrl(proj.githubUrl),
-            liveUrl: cleanUrl(proj.liveUrl),
-          })),
-          deleteProjectIds: updatedProfile.deleteProjectIds || [],
-        };
-        await dispatch(updateStudentProfile(putPayload)).unwrap();
-        toast.success("Profile updated successfully");
-      } else {
-        const deptId = parseInt(updatedProfile.stats?.departmentId);
-        const postPayload = {
-          ...commonPayload,
-          departmentId: isNaN(deptId) ? undefined : deptId,
-          skillIds: updatedProfile.skills?.map((s: any) => s.id)?.filter((id: any) => typeof id === "number") || [],
-          experiences: updatedProfile.experiences?.map((exp: any) => ({
-            companyName: exp.companyName,
-            role: exp.role,
-            description: exp.description || undefined,
-            startDate: exp.startDate,
-            endDate: exp.endDate || undefined,
-          })) || [],
-          certificates: updatedProfile.certificates?.map((cert: any) => ({
-            title: cert.title,
-            issuer: cert.issuer,
-            certificateUrl: cleanUrl(cert.certificateUrl),
-            issuedDate: cert.issuedDate || undefined,
-          })) || [],
-          projects: updatedProfile.projects?.map((proj: any) => ({
-            title: proj.title,
-            description: proj.description || undefined,
-            techStack: proj.techStack || undefined,
-            githubUrl: cleanUrl(proj.githubUrl),
-            liveUrl: cleanUrl(proj.liveUrl),
-          })) || [],
-        };
-        await dispatch(createStudentProfile(postPayload)).unwrap();
-        toast.success("Profile created successfully");
-      }
+      const deptId = parseInt(updatedProfile.stats?.departmentId);
+
+      const putPayload = {
+        ...commonPayload,
+        departmentId: isNaN(deptId) ? undefined : deptId,
+        addSkillIds,
+        removeSkillIds,
+        addExperiences: updatedProfile.experiences?.filter((exp: any) => !exp.id).map((exp: any) => ({
+          companyName: exp.companyName,
+          role: exp.role,
+          description: exp.description || undefined,
+          startDate: exp.startDate,
+          endDate: exp.endDate || undefined,
+        })),
+        updateExperiences: updatedProfile.experiences?.filter((exp: any) => exp.id).map((exp: any) => ({
+          id: exp.id,
+          companyName: exp.companyName,
+          role: exp.role,
+          description: exp.description || undefined,
+          startDate: exp.startDate,
+          endDate: exp.endDate || undefined,
+        })),
+        deleteExperienceIds: updatedProfile.deleteExperienceIds || [],
+        addCertificates: updatedProfile.certificates?.filter((cert: any) => !cert.id).map((cert: any) => ({
+          title: cert.title,
+          issuer: cert.issuer,
+          certificateUrl: cleanUrl(cert.certificateUrl),
+          issuedDate: cert.issuedDate || undefined,
+        })),
+        updateCertificates: updatedProfile.certificates?.filter((cert: any) => cert.id).map((cert: any) => ({
+          id: cert.id,
+          title: cert.title,
+          issuer: cert.issuer,
+          certificateUrl: cleanUrl(cert.certificateUrl),
+          issuedDate: cert.issuedDate || undefined,
+        })),
+        deleteCertificateIds: updatedProfile.deleteCertificateIds || [],
+        addProjects: updatedProfile.projects?.filter((proj: any) => !proj.id).map((proj: any) => ({
+          title: proj.title,
+          description: proj.description || undefined,
+          techStack: proj.techStack || undefined,
+          githubUrl: cleanUrl(proj.githubUrl),
+          liveUrl: cleanUrl(proj.liveUrl),
+        })),
+        updateProjects: updatedProfile.projects?.filter((proj: any) => proj.id).map((proj: any) => ({
+          id: proj.id,
+          title: proj.title,
+          description: proj.description || undefined,
+          techStack: proj.techStack || undefined,
+          githubUrl: cleanUrl(proj.githubUrl),
+          liveUrl: cleanUrl(proj.liveUrl),
+        })),
+        deleteProjectIds: updatedProfile.deleteProjectIds || [],
+      };
+
+      await dispatch(updateStudentProfile(putPayload)).unwrap();
+      toast.success("Profile updated successfully");
       return { success: true };
     } catch (err: any) {
       console.error("Profile save error:", err);
