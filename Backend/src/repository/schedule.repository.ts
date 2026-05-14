@@ -624,7 +624,7 @@ export const getScheduleWithJobsAndApplications = async (
                 },
               },
 
-              histories: {
+              history: {
                 orderBy: {
                   createdAt: "asc",
                 },
