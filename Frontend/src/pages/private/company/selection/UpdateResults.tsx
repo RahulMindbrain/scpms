@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { 
   CheckCircle2, XCircle, Clock, ChevronDown, 
-  Send, Briefcase, X
+  Send, Briefcase, X, User
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +18,15 @@ interface Result {
   status: string;
 }
 
+const STATUS_FLOW = ['Pending', 'Shortlisted', 'Technical Round', 'HR Round', 'Selected', 'Rejected'];
+
+const isBackward = (current: string, next: string) => {
+  const currentIndex = STATUS_FLOW.indexOf(current);
+  const nextIndex = STATUS_FLOW.indexOf(next);
+  if (currentIndex === -1 || nextIndex === -1) return false;
+  return nextIndex < currentIndex;
+};
+
 const UpdateResults: React.FC = () => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [selectedResult, setSelectedResult] = useState<Result | null>(null);
@@ -30,6 +39,12 @@ const UpdateResults: React.FC = () => {
 
   const handleUpdateStatus = (status: string) => {
     if (!selectedResult) return;
+    
+    if (isBackward(selectedResult.status, status)) {
+      toast.error("Process integrity: Status cannot be moved backward");
+      return;
+    }
+
     setResults(results.map(r => r.id === selectedResult.id ? { ...r, status } : r));
     setIsUpdateModalOpen(false);
     toast.success(`Status updated for ${selectedResult.name}`);
@@ -160,23 +175,32 @@ const UpdateResults: React.FC = () => {
             <div className="grid gap-3">
               {[
                 { id: 'Selected', icon: CheckCircle2, color: 'text-emerald-500', bg: 'bg-emerald-500/10', desc: 'Confirm candidate for selection' },
+                { id: 'Technical Round', icon: Briefcase, color: 'text-blue-500', bg: 'bg-blue-500/10', desc: 'Promote to technical evaluation' },
+                { id: 'HR Round', icon: User, color: 'text-amber-500', bg: 'bg-amber-500/10', desc: 'Promote to HR evaluation' },
                 { id: 'Rejected', icon: XCircle, color: 'text-destructive', bg: 'bg-destructive/10', desc: 'Mark as not suitable' },
                 { id: 'Pending', icon: Clock, color: 'text-muted-foreground', bg: 'bg-muted', desc: 'Keep in evaluation phase' }
-              ].map((opt) => (
-                <button
-                  key={opt.id}
-                  onClick={() => handleUpdateStatus(opt.id)}
-                  className="w-full flex items-center gap-4 p-4 rounded-2xl border border-border/50 hover:border-primary/30 hover:bg-primary/[0.02] transition-all group text-left"
-                >
-                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110", opt.bg, opt.color)}>
-                    <opt.icon size={20} />
-                  </div>
-                  <div>
-                    <div className="font-bold text-foreground text-sm leading-none mb-1">{opt.id}</div>
-                    <div className="text-[10px] text-muted-foreground font-medium">{opt.desc}</div>
-                  </div>
-                </button>
-              ))}
+              ].map((opt) => {
+                const disabled = selectedResult ? isBackward(selectedResult.status, opt.id) : false;
+                return (
+                  <button
+                    key={opt.id}
+                    disabled={disabled}
+                    onClick={() => handleUpdateStatus(opt.id)}
+                    className={cn(
+                      "w-full flex items-center gap-4 p-4 rounded-2xl border border-border/50 transition-all group text-left",
+                      disabled ? "opacity-50 cursor-not-allowed grayscale" : "hover:border-primary/30 hover:bg-primary/[0.02]"
+                    )}
+                  >
+                    <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center transition-transform", !disabled && "group-hover:scale-110", opt.bg, opt.color)}>
+                      <opt.icon size={20} />
+                    </div>
+                    <div>
+                      <div className="font-bold text-foreground text-sm leading-none mb-1">{opt.id}</div>
+                      <div className="text-[10px] text-muted-foreground font-medium">{opt.desc}</div>
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>

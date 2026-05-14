@@ -54,6 +54,8 @@ const ApplicationsManagement: React.FC = () => {
     switch (status) {
       case 'SELECTED': return 'bg-blue-500/10 text-blue-600 border-blue-500/20';
       case 'SHORTLISTED': return 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20';
+      case 'TECHNICAL_ROUND': return 'bg-indigo-500/10 text-indigo-600 border-indigo-500/20';
+      case 'HR_ROUND': return 'bg-amber-500/10 text-amber-600 border-amber-500/20';
       case 'REJECTED': return 'bg-rose-500/10 text-rose-600 border-rose-500/20';
       default: return 'bg-muted/30 text-muted-foreground border-border';
     }

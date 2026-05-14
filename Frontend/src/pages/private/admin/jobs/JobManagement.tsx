@@ -70,6 +70,17 @@ const STATUS_STYLES = {
   },
 } as const;
 
+const STATUS_FLOW = ['PENDING', 'APPROVED', 'REJECTED'];
+
+const isBackward = (current: string, next: string) => {
+  const currentIndex = STATUS_FLOW.indexOf(current);
+  const nextIndex = STATUS_FLOW.indexOf(next);
+  if (currentIndex === -1 || nextIndex === -1) return false;
+  // Cannot move back to PENDING once APPROVED or REJECTED
+  if (current !== 'PENDING' && next === 'PENDING') return true;
+  return false;
+};
+
 const AdminJobManagement: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { jobs, meta, loading } = useSelector((state: RootState) => state.drive);
@@ -110,7 +121,11 @@ const AdminJobManagement: React.FC = () => {
     setPage(1);
   }, [activeTab]);
 
-  const handleStatusUpdate = async (jobUniversityIds: number[], status: string) => {
+  const handleStatusUpdate = async (jobUniversityIds: number[], status: string, currentStatuses?: string[]) => {
+    if (currentStatuses?.some(curr => isBackward(curr, status))) {
+      toast.error("Process integrity: Job status cannot be moved backward to Pending");
+      return;
+    }
     const toastId = toast.loading(`Processing ${status.toLowerCase()}...`);
     try {
       let reason: string | undefined;
@@ -424,30 +439,40 @@ const AdminJobManagement: React.FC = () => {
                          Review & Preview Details
                          <ArrowUpRight size={16} className="transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
                        </Button>
-                       <div className="flex gap-3">
-                         <Button
-                           className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-10 font-black uppercase tracking-widest text-[9px] active:scale-95 transition-all"
-                           onClick={() => handleStatusUpdate([row.id], 'APPROVED')}
-                         >
-                           Approve
-                         </Button>
-                         <Button
-                           variant="outline"
-                           className="flex-1 border-rose-500/20 dark:border-rose-500/30 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 rounded-xl h-10 font-black uppercase tracking-widest text-[9px] active:scale-95 transition-all"
-                           onClick={() => handleStatusUpdate([row.id], 'REJECTED')}
-                         >
-                           Reject
-                         </Button>
-                       </div>
+                      <div className="flex gap-3">
+                        <Button
+                          className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-10 font-black uppercase tracking-widest text-[9px] active:scale-95 transition-all"
+                          onClick={() => handleStatusUpdate([row.id], 'APPROVED', [row.status])}
+                          disabled={isBackward(row.status, 'APPROVED')}
+                        >
+                          Approve
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="flex-1 border-rose-500/20 dark:border-rose-500/30 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 rounded-xl h-10 font-black uppercase tracking-widest text-[9px] active:scale-95 transition-all"
+                          onClick={() => handleStatusUpdate([row.id], 'REJECTED', [row.status])}
+                          disabled={isBackward(row.status, 'REJECTED')}
+                        >
+                          Reject
+                        </Button>
+                      </div>
                     </div>
                   ) : (
-                    <Button 
-                      className="w-full bg-slate-900 dark:bg-slate-100 dark:text-slate-900 hover:bg-primary dark:hover:bg-primary dark:hover:text-white text-white rounded-2xl h-12 font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2 group/btn shadow-xl shadow-slate-900/5 hover:shadow-primary/20 active:scale-[0.98]"
-                      onClick={() => handleShowDetails(row)}
-                    >
-                      View Record Details
-                      <ExternalLink size={16} className="opacity-40 group-hover/btn:opacity-100 transition-all" />
-                    </Button>
+                    <div className="space-y-3">
+                      <div className="flex gap-2 mb-2">
+                        <Badge variant="outline" className={cn("flex-1 justify-center py-2 rounded-xl text-[9px] font-black uppercase tracking-widest border-2", 
+                          row.status === 'APPROVED' ? "border-emerald-500/20 bg-emerald-500/5 text-emerald-600" : "border-rose-500/20 bg-rose-500/5 text-rose-600")}>
+                          {row.status}
+                        </Badge>
+                      </div>
+                      <Button 
+                        className="w-full bg-slate-900 dark:bg-slate-100 dark:text-slate-900 hover:bg-primary dark:hover:bg-primary dark:hover:text-white text-white rounded-2xl h-12 font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-2 group/btn shadow-xl shadow-slate-900/5 hover:shadow-primary/20 active:scale-[0.98]"
+                        onClick={() => handleShowDetails(row)}
+                      >
+                        View Record Details
+                        <ExternalLink size={16} className="opacity-40 group-hover/btn:opacity-100 transition-all" />
+                      </Button>
+                    </div>
                   )}
                 </div>
               </motion.div>
@@ -630,9 +655,10 @@ const AdminJobManagement: React.FC = () => {
                        <Button 
                          className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl h-12 font-black uppercase tracking-widest text-[10px]"
                          onClick={() => {
-                           handleStatusUpdate([selectedJob.id], 'APPROVED');
+                           handleStatusUpdate([selectedJob.id], 'APPROVED', [selectedJob.status]);
                            setIsDetailsModalOpen(false);
                          }}
+                         disabled={isBackward(selectedJob.status, 'APPROVED')}
                        >
                          Approve Role
                        </Button>
@@ -640,9 +666,10 @@ const AdminJobManagement: React.FC = () => {
                          variant="outline" 
                          className="w-full border-rose-500/20 text-rose-600 hover:bg-rose-500/10 rounded-2xl h-12 font-black uppercase tracking-widest text-[10px]"
                          onClick={() => {
-                           handleStatusUpdate([selectedJob.id], 'REJECTED');
+                           handleStatusUpdate([selectedJob.id], 'REJECTED', [selectedJob.status]);
                            setIsDetailsModalOpen(false);
                          }}
+                         disabled={isBackward(selectedJob.status, 'REJECTED')}
                        >
                          Decline Role
                        </Button>
