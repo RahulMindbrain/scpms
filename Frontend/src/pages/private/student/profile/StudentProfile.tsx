@@ -295,73 +295,77 @@ const StudentProfile = () => {
         {/* Hero Section */}
         <motion.div variants={itemVariants} className="relative group/hero">
           {/* Adaptive Banner */}
-          <div className="student-hero-banner group !p-0 !rounded-[2.5rem] min-h-[260px] md:min-h-[320px] h-auto overflow-hidden relative">
+          <div className="student-hero-banner group overflow-hidden">
             <div className="student-hero-mesh">
-              <div className="bubble-blue"></div>
+              <div className="bubble-indigo"></div>
               <div className="bubble-sky"></div>
             </div>
             <div className="student-hero-texture"></div>
+            <div className="student-hero-overlay"></div>
 
-            {/* New Integrated Profile Content (No standalone Avatar) */}
-            <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-12 bg-gradient-to-t from-black/60 via-black/20 to-transparent">
-              <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6 flex-wrap">
-
-                {/* Initials Badge - Replaces the empty Avatar */}
-                <div className="h-20 w-20 md:h-32 md:w-32 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-2xl shrink-0 group-hover:scale-105 transition-transform duration-500">
+            <div className="relative z-10">
+              <div className="flex flex-col md:flex-row md:items-end gap-6 md:gap-10">
+                {/* Initials Badge - Refined sizing */}
+                <div className="h-20 w-20 md:h-32 md:w-32 rounded-[2rem] bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center shadow-2xl shrink-0 group-hover:scale-105 transition-transform duration-500">
                   <span className="text-3xl md:text-5xl font-black text-white tracking-tighter">
-                    {profile.name.split(' ').map((n: string) => n[0]).join('')}
+                    {profile.name ? profile.name.split(' ').filter(Boolean).map((n: string) => n[0]).join('') : 'ST'}
                   </span>
                 </div>
 
-                <div className="space-y-3 md:space-y-4 flex-1 min-w-0">
+                <div className="flex-1 min-w-0 space-y-4">
                   <div className="space-y-2">
-                    <h1 className="truncate max-w-[180px] sm:max-w-[250px] md:max-w-full">
-                      <h1 className="text-2xl md:text-5xl font-black text-white tracking-tight drop-shadow-lg truncate max-w-full">
+                    <div className="flex flex-wrap items-center gap-4">
+                      <h1 className="hero-title !mt-0 !text-2xl md:!text-4xl drop-shadow-lg text-white">
                         {profile.name}
                       </h1>
-                      <div className="inline-flex items-center gap-1 bg-emerald-500 text-white px-1.5 py-[1px] rounded-full text-[8px] font-semibold">
-                        <CheckCircle className="h-3 w-3" />
+                      <div className="inline-flex items-center gap-1.5 bg-emerald-500 text-white px-2.5 py-1 rounded-full text-[9px] font-black shadow-lg shadow-emerald-500/20 uppercase tracking-widest">
+                        <CheckCircle className="h-2.5 w-2.5" />
                         Verified
-                      </div>       </h1>
-
-                    <div className="flex flex-wrap items-center gap-2 md:gap-3">
-                      <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 md:px-4 md:py-2 rounded-xl border border-white/10 text-white font-bold text-[10px] md:text-sm shadow-sm transition-all hover:bg-white/20">
-                        <Building2 className="h-3.5 w-3.5 md:h-4 md:w-4 text-blue-300" />
-                        <span className="truncate">{profile.stats?.department || 'Department Not Set'}</span>
                       </div>
-                      <div className="hidden md:block w-1.5 h-1.5 rounded-full bg-white/40"></div>
-                      <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 md:px-4 md:py-2 rounded-xl border border-white/10 text-white font-bold text-[10px] md:text-sm shadow-sm transition-all hover:bg-white/20">
-                        <GraduationCap className="h-3.5 w-3.5 md:h-4 md:w-4 text-purple-300" />
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                      <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-white font-bold text-[9px] md:text-xs">
+                        <Building2 className="h-3.5 w-3.5 text-blue-300" />
+                        {profile.stats?.department || 'Department Not Set'}
+                      </div>
+                      <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-white font-bold text-[9px] md:text-xs">
+                        <GraduationCap className="h-3.5 w-3.5 text-purple-300" />
                         Batch {profile.stats?.passingYear || '20xx'}
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-4">
-                    <div className="flex items-center gap-2.5 text-white/90">
-                      <div className="p-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/10">
-                        <Mail className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                  <div className="flex flex-wrap items-center gap-6 md:gap-10 pt-2">
+                    <div className="flex items-center gap-3 group/mail cursor-pointer">
+                      <div className="p-2 rounded-xl bg-white/10 text-white border border-white/20 group-hover/mail:bg-white/20 transition-all">
+                        <Mail className="h-4 w-4" />
                       </div>
-                      <span className="text-[11px] md:text-sm font-bold tracking-wide truncate max-w-[150px] md:max-w-none">{profile.email}</span>
+                      <div className="space-y-0.5">
+                        <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/60">Email Address</p>
+                        <p className="text-xs md:text-sm font-bold text-white tracking-wide truncate max-w-[180px] md:max-w-none">{profile.email}</p>
+                      </div>
                     </div>
                     {profile.location && (
-                      <div className="flex items-center gap-2.5 text-white/90">
-                        <div className="p-1.5 rounded-lg bg-white/10 backdrop-blur-md border border-white/10">
-                          <MapPin className="h-3.5 w-3.5 md:h-4 md:w-4" />
+                      <div className="flex items-center gap-3 group/loc cursor-pointer">
+                        <div className="p-2 rounded-xl bg-white/10 text-white border border-white/20 group-hover/loc:bg-white/20 transition-all">
+                          <MapPin className="h-4 w-4" />
                         </div>
-                        <span className="text-[11px] md:text-sm font-bold tracking-wide">{profile.location}</span>
+                        <div className="space-y-0.5">
+                          <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/60">Location</p>
+                          <p className="text-xs md:text-sm font-bold text-white tracking-wide">{profile.location}</p>
+                        </div>
                       </div>
                     )}
                   </div>
                 </div>
 
-                {/* Edit Button moved inside banner for better composition */}
-                <div className="pt-2 md:pt-0 w-full md:w-auto flex justify-start md:justify-end">
+                <div className="pt-4 md:pt-0 shrink-0 w-full md:w-auto">
                   <Button
                     onClick={() => setShowProfileEditDialog(true)}
-                    className="w-full md:w-auto bg-white text-slate-900 hover:bg-blue-50 rounded-2xl px-6 h-11 md:h-12 font-black shadow-xl transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-3 text-xs md:text-sm"
+                    className="w-full md:w-auto bg-white text-slate-900 hover:bg-slate-50 dark:bg-white dark:text-slate-900 rounded-2xl px-8 h-12 md:h-14 font-black shadow-xl transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-2.5 text-xs md:text-sm"
                   >
-                    <Edit3 className="h-4.5 w-4.5 text-blue-600" />
+                    <Edit3 className="h-4 w-4 md:h-5 md:w-5" />
                     Edit Profile
                   </Button>
                 </div>
