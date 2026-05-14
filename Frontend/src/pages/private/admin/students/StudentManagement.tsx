@@ -66,7 +66,7 @@ const StudentManagement: React.FC = () => {
       return {
         id: s.id,
         name: s.firstname ? `${s.firstname} ${s.lastname || ''}` : 'Unknown',
-        dept: isVerified ? departmentName : '',
+        dept: departmentName,
         deptId: s.student?.department?.id || null,
         verified: isVerified,
         status: s.status === 'ACTIVE' ? 'approved' : (s.status === 'REJECTED' ? 'rejected' : 'pending'),

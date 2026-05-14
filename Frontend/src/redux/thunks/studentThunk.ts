@@ -17,7 +17,7 @@ export const fetchInactiveStudents = createAsyncThunk(
     "student/fetchInactiveStudents",
     async (params: any, { rejectWithValue }) => {
         try {
-            const response = await getAPI<any>("/admin/get-inactive-students", params);
+            const response = await getAPI<any>("/admin/get-students", params);
             return response;
         } catch (error: any) {
             return rejectWithValue(error?.message || "Failed to fetch inactive students");
