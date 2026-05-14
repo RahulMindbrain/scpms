@@ -124,8 +124,24 @@ const studentSlice = createSlice({
       })
       .addCase(fetchJobs.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.jobs = action.payload.data.data;
-        state.meta = action.payload.data.meta;
+        const payload = action.payload;
+        
+        if (payload?.data && Array.isArray(payload.data.data)) {
+          // Case: { success: true, data: { data: [], meta: {} } }
+          state.jobs = payload.data.data;
+          state.meta = payload.data.meta || null;
+        } else if (payload && Array.isArray(payload.data)) {
+          // Case: { data: [], meta: {} } OR { success: true, data: [] }
+          state.jobs = payload.data;
+          state.meta = payload.meta || null;
+        } else if (Array.isArray(payload)) {
+          // Case: []
+          state.jobs = payload;
+          state.meta = null;
+        } else {
+          state.jobs = [];
+          state.meta = null;
+        }
       })
       .addCase(fetchJobs.rejected, (state, action) => {
         state.loading = false;

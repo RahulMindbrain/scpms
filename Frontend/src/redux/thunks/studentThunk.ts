@@ -78,7 +78,7 @@ export const fetchJobs = createAsyncThunk(
     "student/fetchJobs",
     async (params: any, { rejectWithValue }) => {
         try {
-            const response = await getAPI<any>("/student/show-all-jobs", params);
+            const response = await getAPI<any>("/job-universities", params);
             return response;
         } catch (error: any) {
             return rejectWithValue(error?.message || "Failed to fetch jobs");

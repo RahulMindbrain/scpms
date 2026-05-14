@@ -83,7 +83,7 @@ const JobListing = () => {
   };
 
   const filteredJobs = useMemo(() => {
-    return jobs.filter((job: any) => {
+    return (jobs || []).filter((job: any) => {
       if (!job?.job) return false;
       
       const matchesSearch =
@@ -126,7 +126,7 @@ const JobListing = () => {
     }
   };
 
-  if (loading && jobs.length === 0) {
+  if (loading && (jobs?.length || 0) === 0) {
     return <Loader text="Syncing career opportunities..." fullScreen />;
   }
 
@@ -160,7 +160,7 @@ const JobListing = () => {
         </div>
 
         {/* ─── Compact Controls Bar ─── */}
-        {jobs.length > 0 && (
+        {(jobs?.length || 0) > 0 && (
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-6 bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl p-4 md:p-6 rounded-[2rem] border border-slate-200/60 dark:border-white/[0.08] shadow-sm">
             <div className="flex items-center gap-1.5 md:gap-2 bg-slate-100 dark:bg-white/5 p-1 md:p-1.5 rounded-2xl border border-slate-200 dark:border-white/[0.05] overflow-x-auto no-scrollbar w-full lg:w-fit">
               {[
