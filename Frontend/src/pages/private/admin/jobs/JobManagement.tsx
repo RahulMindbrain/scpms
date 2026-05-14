@@ -16,7 +16,12 @@ import {
   ChevronLeft,
   ChevronRight,
   CheckCircle2,
-  ListChecks
+  ListChecks,
+  Eye,
+  Building,
+  Target,
+  FileText,
+  UserCheck
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobs, updateJobStatus } from '@/redux/thunks/driveThunk';
@@ -24,6 +29,8 @@ import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Modal } from '@/components/ui/modal';
+import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -74,6 +81,15 @@ const AdminJobManagement: React.FC = () => {
   const [searchParams] = useSearchParams();
   const initialCompany = searchParams.get('companyId') || 'all';
   const [filterCompany, setFilterCompany] = useState<string>(initialCompany);
+
+  // Modal State
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<any>(null);
+
+  const handleShowDetails = (job: any) => {
+    setSelectedJob(job);
+    setIsDetailsModalOpen(true);
+  };
 
   useEffect(() => {
     dispatch(fetchCompanies({ limit: 100 })); // Fetch companies for filter
@@ -209,8 +225,8 @@ const AdminJobManagement: React.FC = () => {
       </PageHeader>
 
       {/* Tabs & Filters Bar */}
-      <div className="flex flex-col lg:flex-row items-center justify-between gap-4 md:gap-6 pb-6 border-b border-border">
-        <div className="flex bg-muted/30 p-1 rounded-2xl border border-border w-full lg:w-auto overflow-x-auto scrollbar-hide">
+      <div className="flex flex-col xl:flex-row items-center justify-between gap-6 pb-8">
+        <div className="flex bg-slate-100/80 p-1.5 rounded-2xl border border-slate-200/50 w-full xl:w-auto overflow-x-auto scrollbar-hide shadow-inner">
           {(['PENDING', 'APPROVED', 'REJECTED'] as const).map((tab) => {
             const config = STATUS_STYLES[tab];
             const isActive = activeTab === tab;
@@ -218,74 +234,76 @@ const AdminJobManagement: React.FC = () => {
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`flex-1 sm:flex-none flex items-center justify-center gap-2 px-4 md:px-6 py-2 rounded-xl text-[10px] md:text-xs font-black uppercase tracking-widest transition-all whitespace-nowrap ${isActive
-                  ? `bg-${config.color}-500/10 text-${config.color}-600 border border-${config.color}-500/20 shadow-sm`
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                className={`flex-1 sm:flex-none flex items-center justify-center gap-2.5 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${isActive
+                  ? `bg-white text-${config.color}-600 shadow-md shadow-slate-200/50 border border-slate-200`
+                  : 'text-slate-400 hover:text-slate-600 hover:bg-white/50'
                   }`}
               >
-                <config.icon className={`size-3.5 ${isActive ? `text-${config.color}-600` : 'text-muted-foreground'}`} />
+                <config.icon className={`size-3.5 ${isActive ? `text-${config.color}-500` : 'text-slate-300'}`} />
                 {tab}
               </button>
             );
           })}
         </div>
 
-        <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 md:gap-3 w-full lg:w-auto">
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-full sm:w-[150px] h-10 rounded-xl bg-background/50 border-border text-[10px] font-bold uppercase tracking-widest">
-              <ArrowUpDown className="size-3.5 mr-2 text-muted-foreground" />
-              <SelectValue placeholder="Sort" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="newest">Newest</SelectItem>
-              <SelectItem value="oldest">Oldest</SelectItem>
-              <SelectItem value="salary-high">Salary: High</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+          <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-50 rounded-2xl border border-slate-200/50 shadow-sm w-full xl:w-auto">
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger className="flex-1 sm:w-[130px] h-9 rounded-xl bg-white border-slate-200 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all">
+                <ArrowUpDown className="size-3 mr-2 text-slate-400" />
+                <SelectValue placeholder="Sort" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-slate-200 shadow-xl">
+                <SelectItem value="newest" className="text-[10px] font-bold uppercase tracking-widest">Newest First</SelectItem>
+                <SelectItem value="oldest" className="text-[10px] font-bold uppercase tracking-widest">Oldest First</SelectItem>
+                <SelectItem value="salary-high" className="text-[10px] font-bold uppercase tracking-widest">Salary: High</SelectItem>
+              </SelectContent>
+            </Select>
 
-          <Select value={filterDepartment} onValueChange={setFilterDepartment}>
-            <SelectTrigger className="w-full sm:w-[150px] h-10 rounded-xl bg-background/50 border-border text-[10px] font-bold uppercase tracking-widest">
-              <Filter className="size-3.5 mr-2 text-muted-foreground" />
-              <SelectValue placeholder="Dept" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="all">All Depts</SelectItem>
-              {departments.map((dept) => (
-                <SelectItem key={dept} value={dept}>{dept}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <Select value={filterDepartment} onValueChange={setFilterDepartment}>
+              <SelectTrigger className="flex-1 sm:w-[130px] h-9 rounded-xl bg-white border-slate-200 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all">
+                <Filter className="size-3 mr-2 text-slate-400" />
+                <SelectValue placeholder="Dept" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-slate-200 shadow-xl">
+                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Depts</SelectItem>
+                {departments.map((dept) => (
+                  <SelectItem key={dept} value={dept} className="text-[10px] font-bold uppercase tracking-widest">{dept}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          <Select value={filterLocation} onValueChange={setFilterLocation}>
-            <SelectTrigger className="w-full sm:w-[150px] h-10 rounded-xl bg-background/50 border-border text-[10px] font-bold uppercase tracking-widest">
-              <MapPin className="size-3.5 mr-2 text-muted-foreground" />
-              <SelectValue placeholder="Loc" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="all">All Locations</SelectItem>
-              {locations.map(loc => (
-                <SelectItem key={loc} value={loc || 'Remote'}>{loc || 'Remote'}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <Select value={filterLocation} onValueChange={setFilterLocation}>
+              <SelectTrigger className="flex-1 sm:w-[130px] h-9 rounded-xl bg-white border-slate-200 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all">
+                <MapPin className="size-3 mr-2 text-slate-400" />
+                <SelectValue placeholder="Loc" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-slate-200 shadow-xl">
+                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Locations</SelectItem>
+                {locations.map(loc => (
+                  <SelectItem key={loc} value={loc || 'Remote'} className="text-[10px] font-bold uppercase tracking-widest">{loc || 'Remote'}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-          <Select value={filterCompany} onValueChange={setFilterCompany}>
-            <SelectTrigger className="w-full sm:w-[150px] h-10 rounded-xl bg-background/50 border-border text-[10px] font-bold uppercase tracking-widest">
-              <Building2 className="size-3.5 mr-2 text-muted-foreground" />
-              <SelectValue placeholder="Brand" />
-            </SelectTrigger>
-            <SelectContent className="rounded-xl">
-              <SelectItem value="all">All Brands</SelectItem>
-              {reduxCompanies.map((company: any) => (
-                <SelectItem key={company.id} value={company.id.toString()}>{company.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+            <Select value={filterCompany} onValueChange={setFilterCompany}>
+              <SelectTrigger className="flex-1 sm:w-[130px] h-9 rounded-xl bg-white border-slate-200 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all">
+                <Building2 className="size-3 mr-2 text-slate-400" />
+                <SelectValue placeholder="Brand" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-slate-200 shadow-xl">
+                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Brands</SelectItem>
+                {reduxCompanies.map((company: any) => (
+                  <SelectItem key={company.id} value={company.id.toString()} className="text-[10px] font-bold uppercase tracking-widest">{company.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {loading ? (
           <div className="col-span-full py-32 flex justify-center">
             <Loader text="Retrieving job listings..." />
@@ -299,112 +317,106 @@ const AdminJobManagement: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="group saas-card overflow-hidden h-full flex flex-col"
+                className="group saas-card overflow-hidden h-full flex flex-col p-6 bg-white"
               >
-                <div className="flex items-start justify-between mb-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-14 h-14 bg-muted/50 rounded-2xl flex items-center justify-center border border-border group-hover:border-primary/30 transition-all duration-300 shadow-sm overflow-hidden">
+                <div className="flex items-start justify-between mb-5">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 group-hover:border-primary/20 transition-all duration-300 shadow-sm overflow-hidden shrink-0">
                       {(row as any).displayCompany?.logo ? (
-                        <img src={(row as any).displayCompany.logo} alt={(row as any).displayCompany.name} className="w-10 h-10 object-contain" />
+                        <img src={(row as any).displayCompany.logo} alt={(row as any).displayCompany.name} className="w-8 h-8 object-contain" />
                       ) : (
-                        <Building2 className="w-7 h-7 text-muted-foreground group-hover:text-primary transition-colors" />
+                        <Building2 className="w-6 h-6 text-slate-400 group-hover:text-primary transition-colors" />
                       )}
                     </div>
-                    <div className="overflow-hidden">
-                      <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors truncate tracking-tight pr-4">
+                    <div className="min-w-0">
+                      <h3 className="text-lg font-black text-slate-900 group-hover:text-primary transition-colors truncate tracking-tight leading-tight">
                         {row.job?.title ?? '—'}
                       </h3>
-                      <p className="text-sm text-muted-foreground font-medium truncate">{row.university?.name}</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 truncate">{row.university?.name}</p>
                     </div>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="size-8 rounded-full">
-                        <MoreVertical className="size-4 text-muted-foreground" />
+                      <Button variant="ghost" size="icon" className="size-8 rounded-xl hover:bg-slate-100">
+                        <MoreVertical className="size-4 text-slate-300" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="rounded-xl border-border">
-                      <DropdownMenuItem className="text-xs font-bold uppercase tracking-widest text-rose-500 cursor-pointer">
+                    <DropdownMenuContent align="end" className="rounded-xl border-slate-100 shadow-xl">
+                      <DropdownMenuItem className="text-[10px] font-black uppercase tracking-widest text-rose-500 cursor-pointer p-2.5">
                         Delete Record
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
 
-                  <div className="grid grid-cols-2 gap-2 mb-6">
-                    <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-muted/50 border border-border text-[9px] font-black text-muted-foreground uppercase tracking-widest">
-                      <MapPin className="size-3 text-muted-foreground shrink-0" />
-                      <span className="truncate">{row.job?.location || 'Remote'}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black text-emerald-600 uppercase tracking-widest">
-                      <IndianRupee className="size-3 shrink-0" />
-                      <span className="truncate">{row.salary > 100000 ? (row.salary / 100000).toFixed(1) : row.salary} LPA</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-[9px] font-black text-blue-600 uppercase tracking-widest">
-                      <Clock className="size-3 shrink-0" />
-                      <span className="truncate">{new Date(row.sentAt).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[9px] font-black text-amber-600 uppercase tracking-widest">
-                      <Briefcase className="size-3 shrink-0" />
-                      <span className="truncate">{row.openings} Positions</span>
-                    </div>
+                <div className="grid grid-cols-2 gap-2.5 mb-5">
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50/80 border border-slate-100/50 text-[9px] font-bold text-slate-500 uppercase tracking-wider">
+                    <MapPin className="size-3 text-primary/50 shrink-0" />
+                    <span className="truncate">{row.job?.location || 'Remote'}</span>
                   </div>
-
-                  <div className="grid grid-cols-2 gap-3 mb-6">
-                    <div className="p-3 bg-muted/20 rounded-xl border border-border/50">
-                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Min. CGPA</p>
-                      <p className="text-xs font-bold text-foreground">{row.minCgpa}</p>
-                    </div>
-                    <div className="p-3 bg-muted/20 rounded-xl border border-border/50">
-                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-1">Max Backlogs</p>
-                      <p className="text-xs font-bold text-foreground">{row.maxBacklogs}</p>
-                    </div>
+                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50/80 border border-emerald-100/50 text-[9px] font-bold text-emerald-600 uppercase tracking-wider">
+                    <IndianRupee className="size-3 shrink-0" />
+                    <span className="truncate">{(row.salary / 100000).toFixed(1)} LPA</span>
                   </div>
+                </div>
 
-                <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2 min-h-[40px] mb-6">
-                  {row.description || "No specific job description provided for this listing."}
+                <div className="grid grid-cols-2 gap-3 mb-5">
+                  <div className="p-3 bg-slate-900 rounded-2xl text-white">
+                    <p className="text-[8px] font-black text-white/30 uppercase tracking-widest mb-0.5">Min. CGPA</p>
+                    <p className="text-xs font-black tracking-tight">{row.minCgpa}</p>
+                  </div>
+                  <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                    <p className="text-[8px] font-black text-slate-300 uppercase tracking-widest mb-0.5">Backlogs</p>
+                    <p className="text-xs font-black text-slate-800 tracking-tight">{row.maxBacklogs}</p>
+                  </div>
+                </div>
+
+                <p className="text-[12px] text-slate-500 leading-relaxed line-clamp-1 mb-5 font-medium px-1">
+                  {row.description || "No specific job description provided."}
                 </p>
 
-                  <div className="flex flex-wrap gap-2 mb-6 mt-auto">
-                    {(Array.isArray(row.job?.eligibleDepartments) ? row.job.eligibleDepartments : []).slice(0, 3).map((dept: { id: number; name?: string }) => (
-                      <Badge
-                        key={dept.id}
-                        variant="outline"
-                        className="bg-muted/30 border-border font-black text-[9px] uppercase tracking-widest"
-                      >
-                        {dept.name || `Dept #${dept.id}`}
-                      </Badge>
-                    ))}
-                    {(row.job?.eligibleDepartments?.length ?? 0) > 3 && (
-                      <Badge variant="outline" className="bg-muted/30 border-border font-black text-[9px] uppercase tracking-widest">
-                        +{(row.job?.eligibleDepartments?.length ?? 0) - 3}
-                      </Badge>
-                    )}
-                  </div>
+                <div className="flex flex-wrap gap-1.5 mb-6 mt-auto">
+                  {(Array.isArray(row.job?.eligibleDepartments) ? row.job.eligibleDepartments : []).slice(0, 2).map((dept: any) => (
+                    <Badge
+                      key={dept.id}
+                      variant="outline"
+                      className="bg-white border-slate-100 text-slate-400 font-bold text-[8px] uppercase tracking-widest px-2 py-1 rounded-lg"
+                    >
+                      {dept.name || `Dept #${dept.id}`}
+                    </Badge>
+                  ))}
+                  {(row.job?.eligibleDepartments?.length ?? 0) > 2 && (
+                    <Badge variant="outline" className="bg-slate-50 border-slate-100 text-slate-300 font-bold text-[8px] uppercase tracking-widest px-2 py-1 rounded-lg">
+                      +{(row.job?.eligibleDepartments?.length ?? 0) - 2}
+                    </Badge>
+                  )}
+                </div>
 
-                <div className="pt-5 border-t border-border mt-auto">
-                  {activeTab === 'PENDING' ? (
-                    <div className="flex items-center gap-3">
-                      <Button
-                        className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-10 font-black uppercase tracking-widest text-[10px] shadow-lg shadow-emerald-500/10 active:scale-95 transition-all"
-                        onClick={() => handleStatusUpdate([row.id], 'APPROVED')}
+                <div className="flex gap-2">
+                  {row.status === 'PENDING' ? (
+                    <>
+                      <Button 
+                        className="flex-1 bg-slate-900 hover:bg-primary text-white rounded-xl h-10 font-black uppercase tracking-widest text-[9px] shadow-lg shadow-slate-900/10"
+                        onClick={() => handleShowDetails(row)}
                       >
-                        <CheckCircle className="size-3.5 mr-1.5" /> Approve
-                      </Button>
-                      <Button
-                        variant="outline"
-                        className="flex-1 border-rose-500/20 text-rose-600 hover:bg-rose-500/10 rounded-xl h-10 font-black uppercase tracking-widest text-[10px] active:scale-95 transition-all"
-                        onClick={() => handleStatusUpdate([row.id], 'REJECTED')}
-                      >
-                        <XCircle className="size-3.5 mr-1.5" /> Reject
-                      </Button>
-                    </div>
+                          <CheckCircle className="size-3.5 mr-1.5" /> Approve
+                        </Button>
+                        <Button
+                          variant="outline"
+                          className="flex-1 border-rose-500/20 text-rose-600 hover:bg-rose-500/10 rounded-xl h-10 font-black uppercase tracking-widest text-[10px] active:scale-95 transition-all"
+                          onClick={() => handleStatusUpdate([row.id], 'REJECTED')}
+                        >
+                          <XCircle className="size-3.5 mr-1.5" /> Reject
+                        </Button>
+                      </div>
+                    </>
                   ) : (
                     <Button
                       variant="outline"
+                      onClick={() => handleShowDetails(row)}
                       className="w-full border-border hover:bg-primary/5 hover:text-primary rounded-xl h-10 font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-2 group/btn active:scale-[0.98] transition-all"
                     >
-                      Details
+                      View Details
                       <ExternalLink className="size-3.5 transition-transform group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5" />
                     </Button>
                   )}
@@ -467,6 +479,161 @@ const AdminJobManagement: React.FC = () => {
           </div>
         </div>
       )}
+      {/* Job Details Modal */}
+      <Modal
+        isOpen={isDetailsModalOpen}
+        onClose={() => setIsDetailsModalOpen(false)}
+        title="Job Specification Details"
+        subtitle="Comprehensive breakdown of the job opportunity and institutional requirements"
+        maxWidth="max-w-4xl"
+      >
+        {selectedJob && (
+          <div className="space-y-10 py-4">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 bg-slate-900 rounded-[2.5rem] relative overflow-hidden text-white">
+              <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+                <Briefcase size={120} />
+              </div>
+              <div className="flex items-center gap-6 relative z-10">
+                <div className="size-20 bg-white/10 rounded-3xl flex items-center justify-center border border-white/20 backdrop-blur-xl">
+                   {selectedJob.displayCompany?.logo ? (
+                     <img src={selectedJob.displayCompany.logo} alt="" className="size-14 object-contain" />
+                   ) : (
+                     <Building2 className="size-10 text-white/60" />
+                   )}
+                </div>
+                <div>
+                   <h2 className="text-2xl font-black tracking-tight">{selectedJob.job?.title}</h2>
+                   <p className="text-primary font-bold uppercase tracking-widest text-xs mt-1">
+                     {selectedJob.displayCompany?.name} • {selectedJob.university?.name}
+                   </p>
+                </div>
+              </div>
+              <div className="flex flex-col items-end gap-2 relative z-10">
+                <Badge className={cn(
+                  "px-4 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-[0.2em]",
+                  selectedJob.status === 'APPROVED' ? "bg-emerald-500 text-white" : 
+                  selectedJob.status === 'PENDING' ? "bg-amber-500 text-white" : "bg-rose-500 text-white"
+                )}>
+                  {selectedJob.status}
+                </Badge>
+                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Job ID: #{selectedJob.id}</span>
+              </div>
+            </div>
+
+            {/* Core Metrics Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[
+                { icon: MapPin, label: "Location", value: selectedJob.job?.location || 'Remote', color: 'slate' },
+                { icon: IndianRupee, label: "Salary Package", value: `${(selectedJob.salary/100000).toFixed(1)} LPA`, color: 'emerald' },
+                { icon: UserCheck, label: "Min. CGPA", value: selectedJob.minCgpa, color: 'blue' },
+                { icon: Clock, label: "Max Backlogs", value: selectedJob.maxBacklogs, color: 'amber' }
+              ].map((item, idx) => (
+                <div key={idx} className="p-5 rounded-3xl border border-slate-100 bg-slate-50/50 flex flex-col gap-3">
+                  <div className={`size-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-${item.color}-600 shadow-sm`}>
+                    <item.icon size={20} />
+                  </div>
+                  <div>
+                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{item.label}</p>
+                    <p className="text-sm font-black text-slate-900 mt-0.5">{item.value}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Main Content Sections */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-8">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="size-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
+                      <FileText size={16} />
+                    </div>
+                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">Description</h4>
+                  </div>
+                  <div className="p-6 rounded-[2rem] bg-slate-50 border border-slate-100 text-slate-600 text-sm leading-relaxed font-medium">
+                    {selectedJob.job?.description || selectedJob.description || "No job description provided."}
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="size-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
+                      <Target size={16} />
+                    </div>
+                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">Skills & Expertise</h4>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {(selectedJob.job?.skills || []).map((skill: any) => (
+                      <Badge key={skill.id} className="bg-white border-slate-200 text-slate-600 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest">
+                        {skill.name}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-8">
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="size-8 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
+                      <Building size={16} />
+                    </div>
+                    <h4 className="text-sm font-black text-slate-900 uppercase tracking-widest">Target Depts</h4>
+                  </div>
+                  <div className="space-y-2">
+                    {(selectedJob.job?.eligibleDepartments || selectedJob.eligibleDepartments || []).map((dept: any, idx: number) => {
+                      const deptName = typeof dept === 'string' ? dept : (dept?.name || `Dept #${dept?.id || idx}`);
+                      return (
+                        <div key={dept?.id || idx} className="p-3 bg-white border border-slate-100 rounded-2xl flex items-center justify-between shadow-sm">
+                          <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{deptName}</span>
+                          <div className="size-1.5 rounded-full bg-emerald-500" />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <div className="p-6 rounded-[2rem] bg-primary/[0.03] border border-primary/10 space-y-4">
+                  <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] text-center">Institutional Action</h4>
+                  {selectedJob.status === 'PENDING' ? (
+                    <div className="flex flex-col gap-3">
+                       <Button 
+                         className="w-full bg-emerald-500 hover:bg-emerald-600 text-white rounded-2xl h-12 font-black uppercase tracking-widest text-[10px]"
+                         onClick={() => {
+                           handleStatusUpdate([selectedJob.id], 'APPROVED');
+                           setIsDetailsModalOpen(false);
+                         }}
+                       >
+                         Approve Role
+                       </Button>
+                       <Button 
+                         variant="outline" 
+                         className="w-full border-rose-500/20 text-rose-600 hover:bg-rose-500/10 rounded-2xl h-12 font-black uppercase tracking-widest text-[10px]"
+                         onClick={() => {
+                           handleStatusUpdate([selectedJob.id], 'REJECTED');
+                           setIsDetailsModalOpen(false);
+                         }}
+                       >
+                         Decline Role
+                       </Button>
+                    </div>
+                  ) : (
+                      <div className="text-center py-4">
+                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Status Finalized on</p>
+                         <p className="text-xs font-black text-slate-900 mt-1">
+                           {selectedJob.updatedAt || selectedJob.approvedAt || selectedJob.sentAt 
+                             ? new Date(selectedJob.updatedAt || selectedJob.approvedAt || selectedJob.sentAt).toLocaleDateString() 
+                             : 'N/A'}
+                         </p>
+                      </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </Modal>
     </AdminPageLayout>
   );
 };

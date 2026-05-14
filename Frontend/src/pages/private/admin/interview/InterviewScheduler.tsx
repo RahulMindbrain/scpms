@@ -558,57 +558,74 @@ const InterviewSchedulerPage: React.FC = () => {
     setWizardCompanyId('');
     setWizardUniversityId('');
   }}
-  title="Interview Scheduler"
-  subtitle="Configure and launch new recruitment interview drives"
+  title="Campus Drive Wizard"
+  subtitle="Initiate and configure new recruitment timelines"
+  maxWidth="max-w-5xl"
 >
-  <div className="space-y-8 py-2">
-    {/* Step 1: Selection Header */}
-    <div className="relative overflow-hidden flex flex-col md:flex-row items-end gap-4 bg-slate-50 p-6 rounded-[2rem] border border-slate-200/60 shadow-sm">
-      <div className="absolute top-0 right-0 p-4 opacity-5 pointer-events-none">
-        <Building2 size={80} />
+  <div className="space-y-10 py-2">
+    {/* Step 1: Configuration Header */}
+    <div className="relative overflow-hidden bg-slate-900 rounded-[2.5rem] p-8 shadow-2xl">
+      <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+        <Sparkles size={120} className="text-white" />
       </div>
       
-      {isSuperAdmin && (
-        <div className="flex-1 space-y-2.5 z-10 w-full">
-          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
-            <div className="size-1.5 rounded-full bg-primary" /> Target University
+        {isSuperAdmin && (
+          <div className="flex-1 space-y-3 w-full">
+            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+              <Building2 size={12} className="text-primary" /> Target University
+            </label>
+            <div className="relative group">
+              <Select value={wizardUniversityId} onValueChange={handleWizardUniversityChange}>
+                <SelectTrigger className="h-14 rounded-2xl bg-white/5 border-white/10 text-white font-bold text-xs uppercase tracking-tight pl-12 focus:ring-primary/40 transition-all hover:bg-white/10">
+                  <SelectValue placeholder="Select University" />
+                </SelectTrigger>
+                <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-500 group-focus-within:text-primary transition-colors" />
+                <SelectContent className="rounded-2xl border-slate-200 shadow-2xl">
+                  <SelectItem value="all">All Universities</SelectItem>
+                  {schedulerUniversities.map((uni) => (
+                    <SelectItem key={uni.id} value={uni.id.toString()}>{uni.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
+
+        <div className="flex-1 space-y-3 w-full">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
+            <Briefcase size={12} className="text-primary" /> Select Company
           </label>
           <div className="relative group">
-            <Select value={wizardUniversityId} onValueChange={handleWizardUniversityChange}>
-              <SelectTrigger className="h-12 rounded-2xl bg-white border-slate-200 shadow-sm font-semibold text-xs uppercase tracking-tighter pl-11 pr-4 focus:ring-primary/10">
-                <SelectValue placeholder="Select University" />
+            <Select value={wizardCompanyId} onValueChange={handleWizardCompanyChange}>
+              <SelectTrigger className="h-14 rounded-2xl bg-white/5 border-white/10 text-white font-bold text-xs uppercase tracking-tight pl-12 focus:ring-primary/40 transition-all hover:bg-white/10">
+                <SelectValue placeholder="Select Company" />
               </SelectTrigger>
-              <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-              <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
-                <SelectItem value="all">All Universities</SelectItem>
-                {schedulerUniversities.map((uni) => (
-                  <SelectItem key={uni.id} value={uni.id.toString()}>{uni.name}</SelectItem>
+              <Briefcase className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-500 group-focus-within:text-primary transition-colors" />
+              <SelectContent className="rounded-2xl border-slate-200 shadow-2xl">
+                {companies.map((comp) => (
+                  <SelectItem key={comp.id} value={comp.id.toString()}>{comp.name}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
         </div>
-      )}
+    </div>
 
-      <div className="flex-1 space-y-2.5 z-10 w-full">
-        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 flex items-center gap-2">
-          <div className="size-1.5 rounded-full bg-primary" /> Select Company
-        </label>
-        <div className="relative group">
-          <Select value={wizardCompanyId} onValueChange={handleWizardCompanyChange}>
-            <SelectTrigger className="h-12 rounded-2xl bg-white border-slate-200 shadow-sm font-semibold text-xs uppercase tracking-tighter pl-11 pr-4 focus:ring-primary/10">
-              <SelectValue placeholder="Select Company" />
-            </SelectTrigger>
-            <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-slate-400 group-focus-within:text-primary transition-colors" />
-            <SelectContent className="rounded-2xl border-slate-200 shadow-xl">
-              {companies.map((c) => (
-                <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+    {/* Section Title */}
+    {wizardCompanyId && (
+      <div className="flex items-center justify-between px-2">
+        <div className="space-y-1">
+          <h3 className="text-xl font-black text-slate-900 tracking-tight">Approved Openings</h3>
+          <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+            <div className="size-1.5 rounded-full bg-emerald-500" />
+            Ready for Scheduling
+          </p>
+        </div>
+        <div className="bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
+           <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Found: {schedulerJobs.length}</span>
         </div>
       </div>
-    </div>
+    )}
 
     <AnimatePresence mode="wait">
       {!wizardCompanyId ? (
@@ -657,51 +674,49 @@ const InterviewSchedulerPage: React.FC = () => {
           </div>
 
           {/* Jobs Grid */}
-          <div className="grid
-  grid-cols-1
-  xl:grid-cols-2
-  gap-5
-  max-h-[45vh]
-  overflow-y-auto
-  pr-3
-  custom-scrollbar">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[50vh] overflow-y-auto pr-3 custom-scrollbar py-2">
             {schedulerJobs.map((ju: any) => (
               <motion.div
                 key={ju.id}
                 whileHover={{ y: -4 }}
-                className="group relative bg-white border border-slate-200 hover:border-primary/40 p-6 rounded-3xl transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-primary/5"
+                className="group relative bg-white border border-slate-200 hover:border-primary/40 p-6 rounded-[2.5rem] transition-all duration-300 shadow-sm hover:shadow-xl hover:shadow-primary/5 flex flex-col"
               >
-                <div className="flex justify-between items-start mb-5">
-                  <div className="min-w-0 flex-1">
-                    <div className="size-12 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-lg shadow-lg group-hover:bg-primary transition-colors">
+                <div className="flex justify-between items-start mb-6">
+                  <div className="flex items-center gap-4 min-w-0">
+                    <div className="size-14 shrink-0 rounded-2xl bg-slate-900 text-white flex items-center justify-center font-black text-xl shadow-lg group-hover:bg-primary transition-colors">
                       {ju.job?.title?.[0] || 'J'}
                     </div>
-                    <div className="min-w-0 flex-1">
-                      <h5 className="font-bold text-slate-900 text-[15px] leading-tight">{ju.job?.title}</h5>
-                      <span className="text-[9px] font-black text-primary/60 uppercase tracking-widest">{ju.university?.name || "Global"}</span>
+                    <div className="min-w-0">
+                      <h5 className="font-black text-slate-900 text-lg leading-none tracking-tight truncate">{ju.job?.title}</h5>
+                      <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest mt-1 truncate">{ju.university?.name || "Global"}</p>
                     </div>
                   </div>
-                  <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100 text-[8px] font-black uppercase px-2 py-1">
+                  <Badge className="bg-emerald-50 text-emerald-600 border-emerald-100 text-[8px] font-black uppercase px-3 py-1 shrink-0">
                     {ju.status}
                   </Badge>
                 </div>
 
-                <div className="flex flex-wrap gap-1.5 mb-5">
-                  {(ju.job?.eligibleDepartments || []).slice(0, 3).map((dept: any) => (
-                    <Badge key={dept.id} variant="secondary" className="bg-slate-100 text-slate-600 border-transparent text-[8px] font-bold uppercase px-2">
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {(ju.job?.eligibleDepartments || []).slice(0, 2).map((dept: any) => (
+                    <Badge key={dept.id} variant="secondary" className="bg-slate-50 text-slate-500 border-slate-100 text-[8px] font-black uppercase px-3 py-1 tracking-widest">
                       {dept.name || `Dept #${dept.id}`}
                     </Badge>
                   ))}
+                  {(ju.job?.eligibleDepartments || []).length > 2 && (
+                    <Badge variant="secondary" className="bg-slate-50 text-slate-400 border-slate-100 text-[8px] font-black uppercase px-3 py-1">
+                      +{(ju.job?.eligibleDepartments || []).length - 2}
+                    </Badge>
+                  )}
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 py-4 border-y border-slate-100 mb-6 bg-slate-50/50 rounded-2xl px-4">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">CTC Package</p>
+                <div className="grid grid-cols-2 gap-4 p-4 bg-slate-50/50 rounded-3xl border border-slate-100 mb-6">
+                  <div>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Package</p>
                     <p className="text-sm font-black text-emerald-600">₹{(ju.salary / 100000).toFixed(1)} LPA</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Slots</p>
-                    <p className="text-sm font-black text-slate-900">{ju.openings} Open</p>
+                    <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-0.5">Vacancies</p>
+                    <p className="text-sm font-black text-slate-900">{ju.openings} Seats</p>
                   </div>
                 </div>
 
@@ -709,20 +724,20 @@ const InterviewSchedulerPage: React.FC = () => {
                   onClick={() => handleScheduleClick(ju)}
                   disabled={schedules.some((s: any) => s.jobUniversities?.some((j: any) => j.id === ju.id || j.job?.id === ju.job?.id))}
                   className={cn(
-                    "w-full rounded-xl h-11 font-bold uppercase tracking-widest text-[9px] transition-all flex items-center justify-center gap-2",
+                    "mt-auto w-full rounded-2xl h-12 font-black uppercase tracking-widest text-[10px] transition-all flex items-center justify-center gap-3",
                     schedules.some((s: any) => s.jobUniversities?.some((j: any) => j.id === ju.id || j.job?.id === ju.job?.id))
-                      ? "bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 hover:bg-emerald-500/20"
-                      : "bg-slate-900 hover:bg-primary text-white"
+                      ? "bg-emerald-50 text-emerald-600 border border-emerald-100"
+                      : "bg-slate-900 hover:bg-primary text-white shadow-lg shadow-slate-900/10 hover:shadow-primary/20"
                   )}
                 >
                   {schedules.some((s: any) => s.jobUniversities?.some((j: any) => j.id === ju.id || j.job?.id === ju.job?.id)) ? (
                     <>
-                      <CheckCircle2 size={14} className="opacity-70" />
-                      Interview Scheduled
+                      <CheckCircle2 size={16} />
+                      Scheduled
                     </>
                   ) : (
                     <>
-                      <Calendar size={14} className="opacity-70" />
+                      <Calendar size={16} />
                       Launch Drive
                     </>
                   )}
@@ -753,104 +768,126 @@ const InterviewSchedulerPage: React.FC = () => {
   onClose={() => setIsFinalizeModalOpen(false)}
   title="Drive Logistics"
   subtitle="Finalize the interview schedule details"
+  maxWidth="max-w-xl"
 >
-  <div className="space-y-6 py-4">
-    {/* Visual Progress Indicator - Optional Decoration */}
-    <div className="flex items-center gap-4 mb-2">
-       <div className="h-1 flex-1 bg-primary rounded-full" />
-       <div className="h-1 flex-1 bg-primary rounded-full" />
-       <div className="h-1 flex-1 bg-primary rounded-full opacity-30" />
-    </div>
-
-    <div className="space-y-3">
-      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Drive Identifier</label>
-      <div className="relative group">
-        <Input 
-          value={finalizeData.title}
-          onChange={(e) => setFinalizeData({...finalizeData, title: e.target.value})}
-          placeholder="e.g. 2024 Product Engineering Drive"
-          className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold focus:ring-primary/20 text-slate-800 placeholder:font-medium pl-12"
-        />
-        <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+  <div className="space-y-8 py-2">
+    {/* Selection Summary Card */}
+    {selectedJobToSchedule && (
+      <div className="relative overflow-hidden bg-primary/[0.03] border border-primary/10 rounded-3xl p-6 flex items-center gap-5">
+        <div className="size-14 rounded-2xl bg-white shadow-sm border border-slate-100 flex items-center justify-center shrink-0">
+          <Briefcase className="size-7 text-primary" />
+        </div>
+        <div className="min-w-0">
+          <h4 className="text-sm font-black text-slate-900 uppercase tracking-tight truncate">
+            {selectedJobToSchedule.job?.title}
+          </h4>
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mt-0.5">
+            <Building2 size={12} className="text-primary/60" />
+            {selectedJobToSchedule.university?.name || "Global Selection"}
+          </p>
+        </div>
+        <div className="absolute -right-4 -top-4 size-24 bg-primary/5 rounded-full blur-2xl" />
       </div>
-    </div>
+    )}
 
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="space-y-6">
       <div className="space-y-3">
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Date & Time</label>
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Drive Identifier</label>
         <div className="relative group">
           <Input 
-            type="datetime-local"
-            value={finalizeData.startTime}
-            onChange={(e) => {
-              const newStart = e.target.value;
-              setFinalizeData(prev => {
-                const updates = { ...prev, startTime: newStart };
-                if (newStart) {
-                  const startDate = new Date(newStart);
-                  const endDate = new Date(startDate.getTime() + 60 * 60 * 1000); // Add 1 hour
-                  // Format to datetime-local string (YYYY-MM-DDTHH:mm)
-                  updates.endTime = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-                }
-                return updates;
-              });
-            }}
-            className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold text-slate-800 pl-12 focus:ring-primary/20 [color-scheme:light]"
+            value={finalizeData.title}
+            onChange={(e) => setFinalizeData({...finalizeData, title: e.target.value})}
+            placeholder="e.g. 2024 Product Engineering Drive"
+            className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold focus:ring-primary/20 text-slate-800 placeholder:font-medium pl-12 transition-all group-focus-within:bg-white"
           />
-          <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+          <Sparkles className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
         </div>
       </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="space-y-3">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Start Date & Time</label>
+          <div className="relative group">
+            <Input 
+              type="datetime-local"
+              value={finalizeData.startTime}
+              onChange={(e) => {
+                const newStart = e.target.value;
+                setFinalizeData(prev => {
+                  const updates = { ...prev, startTime: newStart };
+                  if (newStart) {
+                    const startDate = new Date(newStart);
+                    const endDate = new Date(startDate.getTime() + 60 * 60 * 1000);
+                    updates.endTime = new Date(endDate.getTime() - endDate.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                  }
+                  return updates;
+                });
+              }}
+              className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold text-slate-800 pl-12 focus:ring-primary/20 [color-scheme:light] transition-all group-focus-within:bg-white"
+            />
+            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+          </div>
+        </div>
+        <div className="space-y-3">
+          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Expected End</label>
+          <div className="relative group">
+            <Input 
+              type="datetime-local"
+              value={finalizeData.endTime}
+              onChange={(e) => setFinalizeData({...finalizeData, endTime: e.target.value})}
+              className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold text-slate-800 pl-12 focus:ring-primary/20 [color-scheme:light] transition-all group-focus-within:bg-white"
+            />
+            <Clock className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+          </div>
+        </div>
+      </div>
+
       <div className="space-y-3">
-        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Expected End</label>
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Venue / Virtual Link</label>
         <div className="relative group">
           <Input 
-            type="datetime-local"
-            value={finalizeData.endTime}
-            onChange={(e) => setFinalizeData({...finalizeData, endTime: e.target.value})}
-            className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold text-slate-800 pl-12 focus:ring-primary/20 [color-scheme:light]"
+              value={finalizeData.venue}
+              onChange={(e) => setFinalizeData({...finalizeData, venue: e.target.value})}
+              placeholder="Room 402 or Zoom/Meet URL"
+              className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold pl-12 text-slate-800 focus:ring-primary/20 transition-all group-focus-within:bg-white"
           />
-          <Clock className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+          <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
+        </div>
+      </div>
+
+      <div className="space-y-3">
+        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Candidate Briefing</label>
+        <div className="relative group">
+          <Textarea 
+            placeholder="Detailed instructions for students..."
+            value={finalizeData.message}
+            onChange={(e) => setFinalizeData({...finalizeData, message: e.target.value})}
+            className="min-h-[120px] rounded-2xl bg-slate-50 border-slate-200 font-medium p-5 pl-12 text-slate-700 focus:ring-primary/20 resize-none transition-all group-focus-within:bg-white"
+          />
+          <MessageSquare className="absolute left-4 top-5 size-5 text-slate-400 group-focus-within:text-primary transition-colors" />
         </div>
       </div>
     </div>
 
-    <div className="space-y-3">
-      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Venue / Virtual Link</label>
-      <div className="relative">
-        <Input 
-            value={finalizeData.venue}
-            onChange={(e) => setFinalizeData({...finalizeData, venue: e.target.value})}
-            placeholder="Room 402 or Zoom/Meet URL"
-            className="h-14 rounded-2xl bg-slate-50 border-slate-200 font-bold pl-12 text-slate-800"
-        />
-        <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 size-5 text-slate-400" />
-      </div>
-    </div>
-
-    <div className="space-y-3">
-      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Candidate Briefing</label>
-      <Textarea 
-        placeholder="Detailed instructions for students..."
-        value={finalizeData.message}
-        onChange={(e) => setFinalizeData({...finalizeData, message: e.target.value})}
-        className="min-h-[100px] rounded-2xl bg-slate-50 border-slate-200 font-medium p-5 text-slate-700 focus:ring-primary/10"
-      />
-    </div>
-
-    <div className="pt-6 grid grid-cols-1 gap-3">
+    <div className="pt-4 flex flex-col gap-3">
       <Button 
         onClick={handleFinalSubmit}
         disabled={isSubmittingSchedule}
-        className="h-14 bg-primary hover:bg-blue-600 text-white rounded-2xl font-black uppercase tracking-widest text-[11px] shadow-xl shadow-primary/20 transition-all active:scale-95"
+        className="h-14 bg-primary hover:bg-[#0045FF] text-white rounded-2xl font-black uppercase tracking-[0.2em] text-[11px] shadow-xl shadow-primary/20 transition-all active:scale-95 flex items-center justify-center gap-3"
       >
-        {isSubmittingSchedule ? <Loader size="sm" /> : "Confirm & Launch Drive"}
+        {isSubmittingSchedule ? <Loader size="sm" /> : (
+          <>
+            <Send size={16} />
+            Confirm & Launch Timeline
+          </>
+        )}
       </Button>
       <Button 
-        variant="ghost"
+        variant="ghost" 
         onClick={() => setIsFinalizeModalOpen(false)}
-        className="h-10 text-[10px] font-black uppercase text-slate-400 hover:text-slate-900 transition-colors"
+        className="h-11 rounded-xl text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:bg-slate-100 transition-all"
       >
-        Back to Jobs
+        Go Back
       </Button>
     </div>
   </div>
