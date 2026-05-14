@@ -12,7 +12,11 @@ import {
   Target,
   Building,
   UserCheck,
-  ExternalLink
+  ExternalLink,
+  Calendar,
+  Users,
+  ArrowUpDown,
+  ArrowUpRight
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobs } from '@/redux/thunks/driveThunk';
@@ -139,31 +143,51 @@ const UniversityJobs: React.FC = () => {
         variant="blue"
       />
 
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-card/50 backdrop-blur-md p-6 rounded-3xl border border-border shadow-sm">
-        <div className="relative flex-1 max-w-md group">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
+      <div className="flex flex-col xl:flex-row items-center justify-between gap-6 pb-10">
+        <div className="relative w-full xl:w-[400px] group">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 size-4 text-slate-300 dark:text-slate-600 group-focus-within:text-primary transition-colors" />
           <Input
             placeholder="Search by title or company..."
-            className="pl-11 h-11 bg-background/50 border-border rounded-2xl text-sm font-medium focus-visible:ring-primary/20"
+            className="pl-11 h-12 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 rounded-2xl text-[13px] font-medium focus-visible:ring-primary/20 shadow-sm text-slate-900 dark:text-slate-100"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
-                <SelectItem key={c.id} value={c.id.toString()}>{c.name}</SelectItem>
-              ))}
+        <div className="flex flex-wrap items-center gap-2.5 p-2 bg-slate-100/50 dark:bg-slate-800/30 rounded-[1.5rem] border border-slate-200/50 dark:border-slate-700/50 shadow-sm w-full xl:w-auto">
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="flex-1 sm:w-[140px] h-10 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all text-slate-900 dark:text-slate-100">
+              <ArrowUpDown className="size-3.5 mr-2 text-slate-400" />
+              <SelectValue placeholder="Sort" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl">
+              <SelectItem value="newest" className="text-[10px] font-bold uppercase tracking-widest">Newest First</SelectItem>
+              <SelectItem value="oldest" className="text-[10px] font-bold uppercase tracking-widest">Oldest First</SelectItem>
             </SelectContent>
           </Select>
 
           <Select value={filterDepartment} onValueChange={setFilterDepartment}>
-            <SelectTrigger className="w-[160px] h-11 rounded-2xl bg-background/50 border-border text-xs font-bold uppercase tracking-widest">
-              <Filter className="size-3.5 mr-2 text-muted-foreground" />
+            <SelectTrigger className="flex-1 sm:w-[140px] h-10 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all text-slate-900 dark:text-slate-100">
+              <Filter className="size-3.5 mr-2 text-slate-400" />
               <SelectValue placeholder="Dept" />
             </SelectTrigger>
-            <SelectContent className="rounded-2xl">
-              <SelectItem value="all">All Depts</SelectItem>
-              {departments.map(d => (
-                <SelectItem key={d} value={d}>{d}</SelectItem>
+            <SelectContent className="rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl">
+              <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Depts</SelectItem>
+              {departments.map((dept) => (
+                <SelectItem key={dept} value={dept} className="text-[10px] font-bold uppercase tracking-widest">{dept}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={filterLocation} onValueChange={setFilterLocation}>
+            <SelectTrigger className="flex-1 sm:w-[140px] h-10 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all text-slate-900 dark:text-slate-100">
+              <MapPin className="size-3.5 mr-2 text-slate-400" />
+              <SelectValue placeholder="Loc" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-xl">
+              <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Locations</SelectItem>
+              {locations.map(loc => (
+                <SelectItem key={loc} value={loc || 'Remote'} className="text-[10px] font-bold uppercase tracking-widest">{loc || 'Remote'}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -179,61 +203,94 @@ const UniversityJobs: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="group bg-white hover:bg-slate-50/50 border border-slate-100 hover:border-primary/20 rounded-[2rem] p-6 transition-all duration-500 shadow-sm hover:shadow-xl hover:shadow-primary/5 flex flex-col cursor-pointer"
+              whileHover={{ y: -4, transition: { duration: 0.2 } }}
+              className="group bg-white dark:bg-slate-900 rounded-[2rem] border border-slate-100 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] hover:shadow-[0_20px_50px_rgba(37,99,235,0.1)] dark:hover:shadow-[0_20px_50px_rgba(37,99,235,0.05)] p-7 flex flex-col transition-all duration-300 overflow-hidden h-full cursor-pointer"
               onClick={() => handleShowDetails(row)}
             >
-              <div className="flex justify-between items-start mb-6">
-                <div className="size-14 bg-primary/5 rounded-2xl flex items-center justify-center text-primary font-black text-xl border border-primary/10">
-                  {row.job?.title?.[0] || 'J'}
+              {/* Top Section */}
+              <div className="flex items-start justify-between mb-6">
+                <div className="flex items-center gap-4">
+                  <div className="size-14 bg-primary/5 dark:bg-primary/10 rounded-2xl flex items-center justify-center text-primary dark:text-primary/70 font-black text-xl border border-primary/10 group-hover:scale-105 transition-transform">
+                    {row.job?.title?.[0] || 'J'}
+                  </div>
+                  <div className="min-w-0">
+                    <h3 className="text-lg font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors truncate tracking-tight leading-tight">
+                      {row.job?.title}
+                    </h3>
+                    <p className="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-1.5 flex items-center gap-1.5">
+                      <Building2 size={11} className="text-primary/60 dark:text-primary/40" />
+                      {(row as any).displayCompany?.name || 'Unknown Company'}
+                    </p>
+                  </div>
                 </div>
-                <Badge variant="outline" className="bg-emerald-500/5 text-emerald-600 border-emerald-500/10 font-black text-[9px] uppercase tracking-[0.2em] px-3 py-1.5 rounded-lg">
+                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-transparent font-black text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-lg">
                   Active
                 </Badge>
               </div>
 
-              <div className="mb-6">
-                <h3 className="text-lg font-black text-slate-900 group-hover:text-primary transition-colors line-clamp-1 tracking-tight leading-tight">
-                  {row.job?.title}
-                </h3>
-                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1.5 flex items-center gap-1.5">
-                  <Building2 size={11} className="text-primary/60" />
-                  {(row as any).displayCompany?.name || 'Unknown Company'}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-2 gap-2.5 mb-6">
-                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 border border-slate-100/50 text-[9px] font-bold text-slate-500 uppercase tracking-wider">
-                  <MapPin size={12} className="text-slate-400" />
+              {/* Info Pills Section */}
+              <div className="grid grid-cols-2 gap-2 mb-6">
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100/50 dark:border-slate-700/50 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
+                  <MapPin size={12} className="text-slate-300 dark:text-slate-600" />
                   <span className="truncate">{row.job?.location || 'Remote'}</span>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 border border-emerald-100/50 text-[9px] font-bold text-emerald-600 uppercase tracking-wider">
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/10 text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
                   <IndianRupee size={12} />
                   <span className="truncate">{(row.salary / 100000).toFixed(1)} LPA</span>
                 </div>
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/10 text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">
+                  <Calendar size={12} className="text-blue-500 dark:text-blue-400" />
+                  <span className="truncate">{new Date(row.approvedAt).toLocaleDateString()}</span>
+                </div>
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/10 text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
+                  <Users size={12} className="text-amber-500 dark:text-amber-400" />
+                  <span className="truncate">{row.openings} Open</span>
+                </div>
               </div>
 
-              <div className="flex flex-wrap gap-1.5 mt-auto">
-                {(row.job?.eligibleDepartments || []).slice(0, 2).map((d: any) => (
-                  <Badge key={d.id} variant="secondary" className="text-[8px] font-bold uppercase tracking-widest bg-slate-100 text-slate-400 px-2 py-1 rounded-lg border-transparent">
-                    {d.name || `Dept #${d.id}`}
+              {/* Eligibility Section */}
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div className="p-4 rounded-3xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-blue-100/50 dark:bg-blue-800/20 rounded-full -mr-8 -mt-8" />
+                  <p className="text-[9px] font-black text-blue-400 dark:text-blue-500 uppercase tracking-widest mb-1">Min. CGPA</p>
+                  <p className="text-2xl font-black text-blue-600 dark:text-blue-400 tracking-tight">{row.minCgpa}</p>
+                </div>
+                <div className="p-4 rounded-3xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 relative overflow-hidden">
+                  <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Max Backlogs</p>
+                  <p className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{row.maxBacklogs}</p>
+                </div>
+              </div>
+
+              {/* Description */}
+              <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 mb-6 font-medium px-1">
+                {row.description || "Premium job listing with high growth potential and competitive benefits package."}
+              </p>
+
+              {/* Dept Tags */}
+              <div className="flex flex-wrap gap-2 mb-8 mt-auto">
+                {(row.job?.eligibleDepartments || []).slice(0, 2).map((d: any, idx: number) => (
+                  <Badge 
+                    key={d.id || idx} 
+                    variant="outline" 
+                    className="bg-primary/5 dark:bg-primary/10 border-transparent text-primary/70 dark:text-primary/50 font-black text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-xl"
+                  >
+                    {typeof d === 'object' ? (d.name || `Dept #${d.id}`) : d}
                   </Badge>
                 ))}
                 {(row.job?.eligibleDepartments || []).length > 2 && (
-                   <Badge variant="secondary" className="text-[8px] font-bold uppercase tracking-widest bg-slate-50 text-slate-300 px-2 py-1 rounded-lg border-transparent">
+                   <Badge variant="outline" className="bg-slate-50 dark:bg-slate-800 border-transparent text-slate-300 dark:text-slate-600 font-black text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-xl">
                      +{(row.job?.eligibleDepartments || []).length - 2}
                    </Badge>
                 )}
               </div>
 
-              <div className="pt-5 border-t border-slate-100 mt-6 flex justify-between items-center text-[9px] font-black text-slate-300 uppercase tracking-widest">
-                <span className="flex items-center gap-1.5">
-                  <Clock size={11} className="text-slate-200" />
-                  {new Date(row.approvedAt).toLocaleDateString()}
-                </span>
-                <span className="bg-primary/5 text-primary/60 px-2.5 py-1 rounded-md text-[8px]">
-                  {row.openings} Open
-                </span>
-              </div>
+              {/* Bottom CTA */}
+              <Button 
+                className="w-full bg-slate-900 dark:bg-slate-100 dark:text-slate-900 hover:bg-primary dark:hover:bg-primary dark:hover:text-white text-white rounded-[1.5rem] h-14 font-black uppercase tracking-widest text-[11px] transition-all duration-300 flex items-center justify-center gap-3 group/btn shadow-xl shadow-slate-900/5 dark:shadow-none hover:shadow-primary/30 active:scale-[0.98]"
+              >
+                View Full Details
+                <ExternalLink size={18} className="transition-transform group-hover/btn:scale-110" />
+              </Button>
             </motion.div>
           ))}
         </AnimatePresence>
