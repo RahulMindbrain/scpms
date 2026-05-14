@@ -291,21 +291,21 @@ const StudentProfile = () => {
         animate="visible"
         className="space-y-8"
       >
-     
-       {/* Hero Section */}
+
+        {/* Hero Section */}
         <motion.div variants={itemVariants} className="relative group/hero">
           {/* Adaptive Banner */}
-          <div className="student-hero-banner group !p-0 !rounded-[2.5rem] h-64 md:h-80 overflow-hidden relative">
+          <div className="student-hero-banner group !p-0 !rounded-[2.5rem] min-h-[260px] md:min-h-[320px] h-auto overflow-hidden relative">
             <div className="student-hero-mesh">
               <div className="bubble-blue"></div>
               <div className="bubble-sky"></div>
             </div>
             <div className="student-hero-texture"></div>
-            
+
             {/* New Integrated Profile Content (No standalone Avatar) */}
             <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-12 bg-gradient-to-t from-black/60 via-black/20 to-transparent">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
-                
+              <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6 flex-wrap">
+
                 {/* Initials Badge - Replaces the empty Avatar */}
                 <div className="h-20 w-20 md:h-32 md:w-32 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 flex items-center justify-center shadow-2xl shrink-0 group-hover:scale-105 transition-transform duration-500">
                   <span className="text-3xl md:text-5xl font-black text-white tracking-tighter">
@@ -315,15 +315,14 @@ const StudentProfile = () => {
 
                 <div className="space-y-3 md:space-y-4 flex-1 min-w-0">
                   <div className="space-y-2">
-                    <div className="flex flex-wrap items-center gap-3">
+                    <h1 className="truncate max-w-[180px] sm:max-w-[250px] md:max-w-full">
                       <h1 className="text-2xl md:text-5xl font-black text-white tracking-tight drop-shadow-lg truncate max-w-full">
                         {profile.name}
                       </h1>
-                      <div className="flex items-center gap-1.5 bg-emerald-500 text-white px-3 py-1 rounded-full text-[9px] md:text-[10px] font-black uppercase tracking-wider shadow-lg shadow-emerald-500/40 shrink-0">
+                      <div className="inline-flex items-center gap-1 bg-emerald-500 text-white px-1.5 py-[1px] rounded-full text-[8px] font-semibold">
                         <CheckCircle className="h-3 w-3" />
                         Verified
-                      </div>
-                    </div>
+                      </div>       </h1>
 
                     <div className="flex flex-wrap items-center gap-2 md:gap-3">
                       <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 md:px-4 md:py-2 rounded-xl border border-white/10 text-white font-bold text-[10px] md:text-sm shadow-sm transition-all hover:bg-white/20">
@@ -357,7 +356,7 @@ const StudentProfile = () => {
                 </div>
 
                 {/* Edit Button moved inside banner for better composition */}
-                <div className="pt-2 md:pt-0 w-full md:w-auto">
+                <div className="pt-2 md:pt-0 w-full md:w-auto flex justify-start md:justify-end">
                   <Button
                     onClick={() => setShowProfileEditDialog(true)}
                     className="w-full md:w-auto bg-white text-slate-900 hover:bg-blue-50 rounded-2xl px-6 h-11 md:h-12 font-black shadow-xl transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-3 text-xs md:text-sm"
@@ -373,9 +372,9 @@ const StudentProfile = () => {
 
 
         {/* Stats Row */}
-        <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div variants={itemVariants} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group overflow-hidden border border-slate-200/60 dark:border-white/[0.08]">
-            <CardContent className="p-6 md:p-8">
+            <CardContent className="p-4 sm:p-4 sm:p-4 sm:p-6 md:p-8">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">CGPA Score</p>
@@ -392,13 +391,13 @@ const StudentProfile = () => {
           </Card>
 
           <Card className="rounded-[2rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group border border-slate-200/60 dark:border-white/[0.08]">
-            <CardContent className="p-6 md:p-8">
+            <CardContent className="p-4 sm:p-4 sm:p-4 sm:p-6 md:p-8">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Projects</p>
                   <h3 className="text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">{profile.projects?.length || 0}</h3>
                 </div>
-                 <div className="h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
+                <div className="h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-xl">
                   <Cpu className="h-6 w-6 md:h-7 md:w-7" />
                 </div>
               </div>
@@ -406,8 +405,8 @@ const StudentProfile = () => {
             </CardContent>
           </Card>
 
-              <Card className="rounded-[2rem] border-none shadow-sm bg-card dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group border border-border dark:border-white/[0.08]">
-            <CardContent className="p-6 md:p-8">
+          <Card className="rounded-[2rem] border-none shadow-sm bg-card dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group border border-border dark:border-white/[0.08]">
+            <CardContent className="p-4 sm:p-4 sm:p-4 sm:p-6 md:p-8">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Verified Skills</p>
@@ -421,8 +420,8 @@ const StudentProfile = () => {
             </CardContent>
           </Card>
 
-              <Card className="rounded-[2rem] border-none shadow-sm bg-card dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group border border-border dark:border-white/[0.08]">
-            <CardContent className="p-6 md:p-8">
+          <Card className="rounded-[2rem] border-none shadow-sm bg-card dark:bg-[#161b22]/40 backdrop-blur-xl hover:shadow-2xl hover:translate-y-[-4px] transition-all duration-500 group border border-border dark:border-white/[0.08]">
+            <CardContent className="p-4 sm:p-4 sm:p-4 sm:p-6 md:p-8">
               <div className="flex items-center justify-between">
                 <div className="space-y-2">
                   <p className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-[0.2em]">Active Backlogs</p>
@@ -490,7 +489,7 @@ const StudentProfile = () => {
                 <CardContent className="p-6 md:p-10">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-10 gap-4">
                     <div className="flex items-center gap-4">
-                       <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-inner">
+                      <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-inner">
                         <Briefcase className="h-6 w-6 md:h-7 md:w-7" />
                       </div>
                       <div>
@@ -503,14 +502,14 @@ const StudentProfile = () => {
                     </Button>
                   </div>
 
-                   <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-blue-100 dark:before:from-blue-900/50 before:via-slate-100 dark:before:via-slate-800 before:to-transparent">
+                  <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-blue-100 dark:before:from-blue-900/50 before:via-slate-100 dark:before:via-slate-800 before:to-transparent">
                     {profile.experiences?.length > 0 ? (
                       profile.experiences.map((exp: any, i: number) => (
                         <div key={i} className="relative flex items-start justify-between md:justify-normal md:odd:flex-row-reverse group/timeline">
                           <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-slate-800 bg-blue-50 dark:bg-blue-900 text-blue-600 dark:text-blue-400 shadow-sm shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
                             <Building2 className="h-5 w-5" />
                           </div>
-                          <div className="w-[calc(100%-3.5rem)] md:w-[calc(50%-2.5rem)] p-5 rounded-2xl bg-[#f8fafc] dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm transition-all hover:shadow-md hover:bg-white dark:hover:bg-white/10 group-hover/timeline:border-blue-100 dark:group-hover/timeline:border-blue-500/30">
+                          <div className="w-full md:w-[calc(50%-2.5rem)] md:w-[calc(50%-2.5rem)] p-5 rounded-2xl bg-[#f8fafc] dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm transition-all hover:shadow-md hover:bg-white dark:hover:bg-white/10 group-hover/timeline:border-blue-100 dark:group-hover/timeline:border-blue-500/30">
                             <div className="flex justify-between items-start mb-1">
                               <h4 className="font-bold text-slate-900 dark:text-white text-sm md:text-base">{exp.role}</h4>
                               <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-rose-500 opacity-0 group-hover/timeline:opacity-100 transition-opacity"
@@ -691,7 +690,7 @@ const StudentProfile = () => {
             <motion.div variants={itemVariants}>
               <Card className="rounded-2xl border-none shadow-sm bg-gradient-to-br from-slate-900 to-slate-800 text-white overflow-hidden relative group">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-                <CardContent className="p-6 md:p-8 relative z-10">
+                <CardContent className="p-4 sm:p-4 sm:p-4 sm:p-6 md:p-8 relative z-10">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="p-2 md:p-2.5 rounded-xl bg-white/10 backdrop-blur-md text-white">
                       <FileText className="h-5 w-5 md:h-6 md:w-6" />
@@ -754,7 +753,7 @@ const StudentProfile = () => {
                 >
                   <Card className="rounded-[2.5rem] border-none shadow-sm bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl h-full flex flex-col overflow-hidden transition-all duration-500 hover:shadow-2xl hover:translate-y-[-8px] hover:border-indigo-500/30 border border-slate-200/60 dark:border-white/[0.08]">
                     <div className="h-2 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-                    <CardContent className="p-6 md:p-8 flex-1 flex flex-col">
+                    <CardContent className="p-4 sm:p-4 sm:p-6 md:p-8 flex-1 flex flex-col">
                       <div className="flex justify-between items-start mb-6">
                         <div className="h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-slate-100 dark:bg-black/20 flex items-center justify-center text-indigo-500 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-inner">
                           <Globe className="h-6 w-6 md:h-7 md:w-7" />

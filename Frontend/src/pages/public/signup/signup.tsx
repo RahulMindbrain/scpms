@@ -317,7 +317,7 @@ useEffect(() => {
                       <div className="space-y-2 relative group">
                         <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Password</label>
                         <Lock className="absolute left-4 top-[46px] -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
-                        <input name="password" type={showPassword ? "text" : "password"} value={form.password} onChange={handleChange} required placeholder="••••••••" className={inputClasses(false)} />
+                        <input name="password" type={showPassword ? "text" : "password"} value={form.password} onChange={handleChange} required placeholder="••••••••" className={inputClasses(false)}  minLength={6} maxLength={18}/>
                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-[46px] -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
                           {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>
@@ -325,7 +325,7 @@ useEffect(() => {
                       <div className="space-y-2 relative group">
                         <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Confirm</label>
                         <Lock className="absolute left-4 top-[46px] -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
-                        <input name="confirmPassword" type={showConfirmPassword ? "text" : "password"} value={form.confirmPassword} onChange={handleChange} required placeholder="••••••••" className={inputClasses(false)} />
+                        <input name="confirmPassword" type={showConfirmPassword ? "text" : "password"} value={form.confirmPassword} onChange={handleChange} required placeholder="••••••••" className={inputClasses(false)} minLength={6} maxLength={18} />
                         <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="absolute right-4 top-[46px] -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors">
                           {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                         </button>

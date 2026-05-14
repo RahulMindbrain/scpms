@@ -152,6 +152,8 @@ const SignIn: React.FC = () => {
                   required
                   placeholder="••••••••"
                   value={password}
+                  minLength={6}
+                  maxLength={18}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-11 pr-11 py-3.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white placeholder-slate-400 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm"
                 />
