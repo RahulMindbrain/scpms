@@ -11,6 +11,7 @@ import { fetchUpcomingEvents } from "@/redux/thunks/notificationThunks"
 import Loader from "@/components/Loader"
 import CountdownTimer from "@/components/CountdownTimer"
 import { Calendar, Clock, MapPin, Sparkles } from "lucide-react"
+import { NextInterviewCountdown } from "@/components/dashboard/NextInterviewCountdown"
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>()
@@ -111,40 +112,7 @@ export default function Dashboard() {
             </p>
           </div>
 
-          {nextEvent && (
-            <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-[2.5rem] p-6 lg:p-8 shadow-2xl animate-in zoom-in-95 duration-700">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="p-3 bg-white/10 rounded-2xl">
-                  <Calendar className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-white font-black text-lg leading-tight">Next Event</h3>
-                  <p className="text-white/60 text-[10px] font-bold uppercase tracking-widest mt-0.5">Upcoming Schedule</p>
-                </div>
-                <div className="ml-auto">
-                   <CountdownTimer targetDate={nextEvent.startTime} />
-                </div>
-              </div>
-
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white font-bold text-xl truncate">{nextEvent.title}</p>
-                    <div className="flex flex-wrap items-center gap-4 mt-3">
-                       <div className="flex items-center gap-1.5 text-white/70 text-xs font-medium">
-                          <Clock size={14} className="text-blue-400" />
-                          {new Date(nextEvent.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                       </div>
-                       <div className="flex items-center gap-1.5 text-white/70 text-xs font-medium">
-                          <MapPin size={14} className="text-blue-400" />
-                          Virtual / On-campus
-                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+         
         </div>
       </div>
 
@@ -187,6 +155,9 @@ export default function Dashboard() {
              <div className="flex-1 overflow-auto p-2">
                 <DeptStatsTable deptStats={metrics.deptStats} />
              </div>
+          </div>
+           <div className="w-full lg:w-[400px]">
+            <NextInterviewCountdown schedules={upcomingEvents} />
           </div>
         </div>
       </div>

@@ -12,6 +12,7 @@ import {
   Calendar,
   ArrowUpRight,
 } from "lucide-react"
+import { NextInterviewCountdown } from "@/components/dashboard/NextInterviewCountdown"
 
 import type { AppDispatch } from "@/redux/store/store"
 import type { RootState } from "@/redux/reducers/rootReducer"
@@ -66,7 +67,8 @@ export default function StudentDashboard() {
 
   return (
     <StudentPageLayout containerClassName="student-hero-animate">
-      {/* Hero Section */}
+      <>
+        {/* Hero Section */}
       <section className="student-hero-banner relative overflow-hidden">
         <div className="student-hero-mesh">
           <div className="bubble-indigo"></div>
@@ -106,14 +108,6 @@ export default function StudentDashboard() {
             bg: "bg-amber-50",
             iconColor: "text-amber-500"
           },
-          { 
-            label: "Next Scheduled", 
-            isNext: true,
-            icon: Calendar, 
-            color: "emerald",
-            bg: "bg-emerald-50",
-            iconColor: "text-emerald-500"
-          }
         ].map((stat, idx) => (
           <div
             key={idx}
@@ -123,34 +117,21 @@ export default function StudentDashboard() {
               <div className={`p-3 rounded-xl ${stat.bg} dark:bg-primary/10 transition-transform group-hover:scale-110`}>
                 <stat.icon className={`h-6 w-6 ${stat.iconColor} dark:text-primary`} />
               </div>
-              {stat.isNext && nextEvent && (
-                <div className="text-[10px] font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full uppercase tracking-wider">
-                  Next Up
-                </div>
-              )}
             </div>
             
             <div className="mt-6">
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                 {stat.label}
               </p>
-              {stat.isNext ? (
-                <div className="mt-2">
-                  <p className="text-xl font-bold text-foreground truncate">
-                    {nextEvent ? nextEvent.title : "No events"}
-                  </p>
-                  <p className="text-xs font-medium text-muted-foreground mt-1">
-                    {nextEvent ? new Date(nextEvent.startTime).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) : "All caught up"}
-                  </p>
-                </div>
-              ) : (
-                <p className="mt-2 text-3xl md:text-4xl font-extrabold text-foreground">
-                  {stat.value}
-                </p>
-              )}
+              <p className="mt-2 text-3xl md:text-4xl font-extrabold text-foreground">
+                {stat.value}
+              </p>
             </div>
           </div>
         ))}
+        <div className="lg:col-span-1">
+          <NextInterviewCountdown schedules={upcomingEvents} />
+        </div>
       </section>
 
       {/* Main Content Grid */}
@@ -247,6 +228,7 @@ export default function StudentDashboard() {
         </div>
 
       </section>
-    </StudentPageLayout>
+    </>
+  </StudentPageLayout>
   )
 }
