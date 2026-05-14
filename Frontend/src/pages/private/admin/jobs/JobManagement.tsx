@@ -456,7 +456,7 @@ const AdminJobManagement: React.FC = () => {
         ) : (
           <div className="col-span-full py-32 flex flex-col items-center justify-center saas-card border-dashed bg-muted/10 text-center">
             <div className="size-20 bg-muted/30 rounded-[2.5rem] flex items-center justify-center mb-6">
-              <Briefcase className="size-10 text-muted-foreground/30" />
+              <Briefcase className="size-10 text-muted-foreground/60" />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">No listings found</h3>
             <p className="text-muted-foreground text-sm max-w-xs mb-8">
@@ -519,8 +519,8 @@ const AdminJobManagement: React.FC = () => {
         {selectedJob && (
           <div className="space-y-10 py-4">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 bg-slate-900 rounded-[2.5rem] relative overflow-hidden text-white">
-              <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 bg-indigo-600 dark:bg-slate-900 rounded-[2.5rem] relative overflow-hidden text-white">
+              <div className="absolute top-0 right-0 p-8 opacity-20 pointer-events-none">
                 <Briefcase size={120} />
               </div>
               <div className="flex items-center gap-6 relative z-10">

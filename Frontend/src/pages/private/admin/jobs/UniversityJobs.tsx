@@ -315,8 +315,8 @@ const UniversityJobs: React.FC = () => {
         {selectedJob && (
           <div className="space-y-10 py-4">
             {/* Header Section */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 bg-slate-900 rounded-[2.5rem] relative overflow-hidden text-white text-left">
-              <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 p-8 bg-indigo-600 dark:bg-slate-900 rounded-[2.5rem] relative overflow-hidden text-white text-left">
+              <div className="absolute top-0 right-0 p-8 opacity-20 pointer-events-none">
                 <Briefcase size={120} />
               </div>
               <div className="flex items-center gap-6 relative z-10">

@@ -531,7 +531,7 @@ const InterviewSchedulerPage: React.FC = () => {
         ) : (
           <div className="py-32 text-center saas-card border-dashed bg-muted/10">
             <div className="size-20 bg-muted/30 rounded-2xl flex items-center justify-center mx-auto mb-6">
-              <Calendar className="size-10 text-muted-foreground/30" />
+              <Calendar className="size-10 text-muted-foreground/60" />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">No schedules found</h3>
             <p className="text-muted-foreground text-sm max-w-xs mx-auto mb-8">
@@ -564,8 +564,8 @@ const InterviewSchedulerPage: React.FC = () => {
 >
   <div className="space-y-10 py-2">
     {/* Step 1: Configuration Header */}
-    <div className="relative overflow-hidden bg-slate-900 rounded-[2.5rem] p-8 shadow-2xl">
-      <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+    <div className="relative overflow-hidden bg-indigo-600 dark:bg-slate-900 rounded-[2.5rem] p-8 shadow-2xl">
+      <div className="absolute top-0 right-0 p-8 opacity-20 pointer-events-none">
         <Sparkles size={120} className="text-white" />
       </div>
       

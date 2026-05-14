@@ -71,20 +71,20 @@ const NextInterviewCountdown = ({ schedules }: { schedules: any[] }) => {
 
   if (!nextSchedule) {
     return (
-      <div className="saas-card h-full bg-muted/50 dark:bg-slate-900 text-foreground dark:text-white border-none overflow-hidden group relative min-h-[180px]">
+      <div className="saas-card h-full bg-white dark:bg-slate-900 text-foreground dark:text-white border border-slate-100 dark:border-slate-800 overflow-hidden group relative min-h-[180px] shadow-sm">
         <div className="relative z-10 h-full flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Calendar className="size-4 text-indigo-500 dark:text-indigo-400" />
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-indigo-500 dark:text-indigo-400">Next Event</h3>
+              <Calendar className="size-4 text-indigo-600 dark:text-indigo-400" />
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Next Event</h3>
             </div>
-            <h3 className="text-xl font-black mb-1 text-foreground dark:text-white">No Upcoming Drives</h3>
-            <p className="text-muted-foreground dark:text-white/50 text-[10px] font-medium leading-relaxed">All systems operational. No interview schedules pending for the immediate future.</p>
+            <h3 className="text-xl font-black mb-1 text-slate-900 dark:text-white">No Upcoming Drives</h3>
+            <p className="text-slate-500 dark:text-slate-400 text-[10px] font-medium leading-relaxed">All systems operational. No interview schedules pending for the immediate future.</p>
           </div>
           <div className="mt-6 flex items-end justify-between">
-            <div className="text-3xl font-black text-foreground/5 dark:text-white/5">--:--:--</div>
-            <div className="size-10 rounded-full bg-foreground/5 dark:bg-white/10 flex items-center justify-center backdrop-blur-md">
-              <ShieldCheck className="size-5 text-foreground/20 dark:text-white/30" />
+            <div className="text-3xl font-black text-slate-100 dark:text-white/5">--:--:--</div>
+            <div className="size-10 rounded-full bg-slate-50 dark:bg-white/5 flex items-center justify-center backdrop-blur-md border border-slate-100 dark:border-white/5">
+              <ShieldCheck className="size-5 text-slate-200 dark:text-white/20" />
             </div>
           </div>
         </div>
@@ -93,15 +93,15 @@ const NextInterviewCountdown = ({ schedules }: { schedules: any[] }) => {
   }
 
   return (
-    <div className="saas-card h-full bg-indigo-600 dark:bg-indigo-700 text-white border-none overflow-hidden group relative">
+    <div className="saas-card h-full bg-gradient-to-br from-indigo-600 to-violet-700 dark:from-indigo-900 dark:to-slate-900 text-white border-none overflow-hidden group relative shadow-xl shadow-indigo-500/20">
       <div className="relative z-10 h-full flex flex-col justify-between">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Timer className="size-4 text-sky-300 animate-pulse" />
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-300">Countdown Initiated</h3>
+              <Timer className="size-4 text-indigo-100 animate-pulse" />
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-100">Countdown Initiated</h3>
             </div>
-            <span className="px-2 py-0.5 rounded-md bg-white/10 border border-white/20 text-[9px] font-black uppercase text-white">Next Drive</span>
+            <span className="px-2 py-0.5 rounded-md bg-white/20 border border-white/30 text-[9px] font-black uppercase text-white">Next Drive</span>
           </div>
           
           <div>
@@ -139,8 +139,8 @@ const NextInterviewCountdown = ({ schedules }: { schedules: any[] }) => {
         </div>
       </div>
       {/* Decorative elements */}
-      <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-10 -mt-10 blur-2xl" />
-      <div className="absolute bottom-0 left-0 w-24 h-24 bg-sky-400/20 rounded-full -ml-10 -mb-10 blur-xl" />
+      <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl" />
+      <div className="absolute bottom-0 left-0 w-24 h-24 bg-sky-400/30 rounded-full -ml-10 -mb-10 blur-xl" />
     </div>
   )
 }
@@ -170,11 +170,13 @@ const DeptStatsTable = ({ deptStats }: { deptStats: any[] }) => {
           </TableHeader>
           <TableBody>
             {deptStats.map((dept, idx) => {
-              const rate = ((dept.placedStudents / dept.totalStudents) * 100).toFixed(1)
+              const rate = dept.totalStudents > 0 
+                ? ((dept.placedStudents / dept.totalStudents) * 100).toFixed(1) 
+                : "0.0"
               return (
                 <TableRow key={idx} className="border-border/50 hover:bg-muted/30 transition-all group cursor-default">
                   <TableCell className="font-bold text-foreground py-4 group-hover:text-primary transition-colors">
-                    {dept.departmentName}
+                    {dept.department || dept.departmentName || dept.name || dept.deptName || 'N/A'}
                   </TableCell>
                   <TableCell className="text-center font-medium text-muted-foreground py-4 tabular-nums">
                     {dept.totalStudents}
