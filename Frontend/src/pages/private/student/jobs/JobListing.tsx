@@ -67,7 +67,7 @@ const JobListing = () => {
   }, [dispatch, profile]);
 
   const appliedJobIds = useMemo(() => new Set(
-    applications.map((app: any) => Number(app?.jobId || app?.job?.id)).filter(Boolean)
+    applications.map((app: any) => Number(app?.jobUniversityId || app?.jobUniversity?.id)).filter(Boolean)
   ), [applications]);
 
   const formatSalary = (salary: number) => {
@@ -117,6 +117,7 @@ const JobListing = () => {
     const toastId = toast.loading(`Submitting application...`);
     try {
       await dispatch(applyJob(selectedJob.id)).unwrap();
+      await dispatch(fetchJobApplications({}));
       toast.success("Application submitted!", { id: toastId });
       setIsModalOpen(false);
     } catch (error: any) {
