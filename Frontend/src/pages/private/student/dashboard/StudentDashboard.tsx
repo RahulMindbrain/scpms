@@ -68,63 +68,78 @@ export default function StudentDashboard() {
     <StudentPageLayout containerClassName="student-hero-animate">
       <>
         {/* Hero Section */}
-      <section className="student-hero-banner relative overflow-hidden">
+      <section className="student-hero-banner group">
         <div className="student-hero-mesh">
           <div className="bubble-indigo"></div>
           <div className="bubble-sky"></div>
         </div>
         <div className="student-hero-texture"></div>
+        <div className="student-hero-overlay"></div>
         
-        <div className="relative z-10">
-          <div className="student-hero-badge mb-6">
-            <span>Student Overview</span>
+        <div className="relative z-10 w-full">
+          <div className="student-hero-badge">
+            <span>Dashboard Overview</span>
           </div>
-          <h1 className="student-hero-title text-3xl md:text-5xl">
-            Welcome back, <span className="text-primary">{user?.firstname || "Student"}</span>
+          
+          <h1 className="student-hero-title">
+            Welcome back, <span>{user?.firstname || "Student"}</span>
           </h1>
-          <p className="student-hero-description mt-4 text-base md:text-lg">
+          
+          <p className="student-hero-description">
             Your personalized workspace for tracking interviews, applications, and upcoming placement milestones.
           </p>
+          
+          <div className="mt-8 flex flex-wrap gap-4">
+            <Link to="/student/jobs" className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/20 px-6 py-3 rounded-xl font-bold text-xs transition-all flex items-center gap-2">
+              Browse Jobs <ChevronRight size={14} />
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* Stats Grid */}
-      <section className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
         {[
           { 
             label: "Upcoming Events", 
             value: upcomingEvents.length, 
             icon: CalendarClock, 
-            color: "blue",
-            bg: "bg-blue-50",
-            iconColor: "text-blue-500"
+            gradient: "from-blue-500 to-indigo-600",
+            iconBg: "bg-blue-500/10",
+            iconColor: "text-blue-600"
           },
           { 
             label: "Unread Updates", 
             value: unreadCount, 
             icon: Bell, 
-            color: "amber",
-            bg: "bg-amber-50",
-            iconColor: "text-amber-500"
+            gradient: "from-amber-400 to-orange-500",
+            iconBg: "bg-amber-500/10",
+            iconColor: "text-amber-600"
           },
         ].map((stat, idx) => (
           <div
             key={idx}
-            className="bg-card rounded-[1.5rem] p-6 md:p-7 shadow-sm border border-border transition-all hover:shadow-md group"
+            className="saas-card group"
           >
-            <div className="flex items-center justify-between">
-              <div className={`p-3 rounded-xl ${stat.bg} dark:bg-primary/10 transition-transform group-hover:scale-110`}>
-                <stat.icon className={`h-6 w-6 ${stat.iconColor} dark:text-primary`} />
+            <div className="flex items-start justify-between">
+              <div className={`p-4 rounded-2xl ${stat.iconBg} transition-transform group-hover:scale-110 duration-500`}>
+                <stat.icon className={`h-7 w-7 ${stat.iconColor}`} />
+              </div>
+              <div className="h-10 w-10 rounded-full border border-border flex items-center justify-center text-muted-foreground/30 group-hover:border-primary/30 group-hover:text-primary/30 transition-colors">
+                <ArrowUpRight size={20} />
               </div>
             </div>
             
-            <div className="mt-6">
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+            <div className="mt-8">
+              <p className="text-[11px] font-bold text-muted-foreground uppercase tracking-[0.1em]">
                 {stat.label}
               </p>
-              <p className="mt-2 text-3xl md:text-4xl font-extrabold text-foreground">
-                {stat.value}
-              </p>
+              <div className="flex items-baseline gap-2 mt-2">
+                <p className="text-5xl font-black text-foreground tracking-tighter">
+                  {stat.value}
+                </p>
+                <div className="h-2 w-2 rounded-full bg-primary animate-pulse"></div>
+              </div>
             </div>
           </div>
         ))}
@@ -134,7 +149,7 @@ export default function StudentDashboard() {
       </section>
 
       {/* Main Content Grid */}
-      <section className="grid gap-10 grid-cols-1 lg:grid-cols-12">
+      <section className="grid gap-8 grid-cols-1 lg:grid-cols-12">
         
         {/* Upcoming Schedule */}
         <div className="lg:col-span-8 space-y-6">
@@ -147,12 +162,12 @@ export default function StudentDashboard() {
 
           <div className="space-y-4">
             {upcomingEvents.length === 0 ? (
-              <div className="border-2 border-dashed border-border rounded-[2.5rem] py-16 md:py-24 flex flex-col items-center justify-center text-center bg-muted/20">
-                <div className="bg-card p-6 rounded-3xl shadow-sm mb-6 transition-transform hover:scale-105">
-                  <Calendar className="h-10 w-10 text-primary/60" />
+              <div className="saas-card py-20 flex flex-col items-center justify-center text-center bg-muted/20 border-dashed border-2">
+                <div className="bg-background p-8 rounded-[2.5rem] shadow-premium mb-8 group-hover:scale-110 transition-transform duration-500">
+                  <Calendar className="h-12 w-12 text-primary" />
                 </div>
-                <p className="text-foreground font-bold text-lg tracking-tight">Your schedule is clear</p>
-                <p className="text-sm text-muted-foreground mt-2 max-w-xs mx-auto px-4">
+                <h4 className="text-2xl font-black text-foreground tracking-tight">Your schedule is clear</h4>
+                <p className="text-muted-foreground mt-3 max-w-sm mx-auto font-medium">
                   We couldn't find any upcoming events. Stay tuned for new placement activities and interviews!
                 </p>
               </div>
@@ -160,24 +175,28 @@ export default function StudentDashboard() {
               upcomingEvents.map((event) => (
                 <div
                   key={event.id}
-                  className="bg-card border border-border rounded-2xl p-4 md:p-5 flex items-center gap-4 md:gap-5 transition-all hover:border-primary/50 group shadow-sm"
+                  className="bg-card border border-border/50 rounded-[2rem] p-5 flex items-center gap-6 transition-all hover:shadow-premium hover:border-primary/30 group"
                 >
-                  <div className="h-12 w-12 md:h-14 md:w-14 rounded-xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                    <Briefcase className="h-5 w-5 md:h-6 md:w-6" />
+                  <div className="h-16 w-16 rounded-2xl bg-primary/5 flex flex-col items-center justify-center text-primary shrink-0 group-hover:bg-primary group-hover:text-white transition-all duration-500">
+                    <span className="text-xs font-black uppercase">{new Date(event.startTime).toLocaleDateString([], { month: 'short' })}</span>
+                    <span className="text-xl font-black leading-none">{new Date(event.startTime).toLocaleDateString([], { day: 'numeric' })}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h4 className="font-bold text-foreground group-hover:text-primary transition-colors truncate">{event.title}</h4>
-                    <p className="text-sm text-muted-foreground font-medium truncate">{event.company}</p>
+                    <h4 className="text-lg font-black text-foreground group-hover:text-primary transition-colors truncate tracking-tight">{event.title}</h4>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Briefcase size={14} className="text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground font-bold truncate">{event.company}</p>
+                    </div>
                   </div>
                   <div className="text-right hidden sm:block">
-                    <p className="text-sm font-bold text-foreground whitespace-nowrap">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-secondary-foreground text-[10px] font-black uppercase tracking-wider mb-1">
+                      <CalendarClock size={12} />
                       {new Date(event.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </p>
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">
-                      {new Date(event.startTime).toLocaleDateString([], { day: 'numeric', month: 'short' })}
-                    </p>
+                    </div>
                   </div>
-                  <ChevronRight className="h-5 w-5 text-muted-foreground/40 group-hover:text-primary transition-all group-hover:translate-x-1 shrink-0" />
+                  <div className="h-10 w-10 rounded-full border border-border flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all duration-300">
+                    <ChevronRight className="h-5 w-5" />
+                  </div>
                 </div>
               ))
             )}
@@ -189,39 +208,46 @@ export default function StudentDashboard() {
           <h3 className="text-2xl font-bold text-foreground tracking-tight">Navigation</h3>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
             {[
-              { to: "/student/profile", icon: User, label: "My Profile", color: "blue", bg: "bg-blue-50" },
-              { to: "/student/jobs", icon: Briefcase, label: "Job Portal", color: "emerald", bg: "bg-emerald-50" },
-              // { to: "/student/interview", icon: CalendarClock, label: "Interview Hub", color: "indigo", bg: "bg-indigo-50" },
-              { to: "/student/application", icon: FileText, label: "Applications", color: "cyan", bg: "bg-cyan-50" },
-              { to: "/student/notifications", icon: Bell, label: "Notifications", color: "amber", bg: "bg-amber-50" },
+              { to: "/student/profile", icon: User, label: "My Profile", color: "text-blue-600", bg: "bg-blue-500/10", desc: "View and edit your personal details" },
+              { to: "/student/jobs", icon: Briefcase, label: "Job Portal", color: "text-emerald-600", bg: "bg-emerald-500/10", desc: "Discover new opportunities" },
+              { to: "/student/application", icon: FileText, label: "Applications", color: "text-purple-600", bg: "bg-purple-500/10", desc: "Track your active status" },
+              { to: "/student/notifications", icon: Bell, label: "Notifications", color: "text-amber-600", bg: "bg-amber-500/10", desc: "Stay updated with latest news" },
             ].map((nav) => (
               <Link
                 key={nav.to}
                 to={nav.to}
-                className="bg-card border border-border rounded-2xl p-4 flex items-center gap-4 transition-all hover:shadow-md hover:translate-y-[-2px] group"
+                className="bg-card border border-border/60 rounded-[2rem] p-5 flex items-center gap-5 transition-all hover:shadow-premium hover:-translate-y-1 group"
               >
-                <div className={`h-11 w-11 rounded-xl ${nav.bg} dark:bg-primary/10 flex items-center justify-center transition-transform group-hover:scale-110`}>
-                  <nav.icon className={`h-5 w-5 text-${nav.color}-500 dark:text-primary`} />
+                <div className={`h-14 w-14 rounded-2xl ${nav.bg} flex items-center justify-center transition-all duration-500 group-hover:scale-110 group-hover:rotate-3`}>
+                  <nav.icon className={`h-6 w-6 ${nav.color}`} />
                 </div>
-                <span className="font-bold text-foreground/80 dark:text-foreground flex-1">{nav.label}</span>
-                <ArrowUpRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
+                <div className="flex-1">
+                  <span className="block font-black text-foreground tracking-tight">{nav.label}</span>
+                  <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{nav.desc}</span>
+                </div>
+                <div className="h-8 w-8 rounded-full bg-muted/50 flex items-center justify-center text-muted-foreground group-hover:bg-primary group-hover:text-white transition-all">
+                  <ArrowUpRight className="h-4 w-4" />
+                </div>
               </Link>
             ))}
           </div>
 
           {/* Recruiter Insight Card */}
-          <div className="bg-primary rounded-[2rem] p-6 md:p-8 text-white relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-6 opacity-10 transition-transform group-hover:scale-110">
-              <Sparkles size={80} />
+          <div className="bg-foreground rounded-[2.5rem] p-8 text-white relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-8 opacity-20 transition-transform group-hover:scale-125 duration-1000 rotate-12">
+              <Sparkles size={100} />
             </div>
             <div className="relative z-10">
-              <div className="flex items-center gap-2 mb-4">
-                <Sparkles className="h-4 w-4 text-primary-foreground/60" />
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary-foreground/60">Pro Insight</span>
+              <div className="flex items-center gap-2 mb-6">
+                <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/60">Pro Insight</span>
               </div>
-              <p className="text-sm font-medium leading-relaxed opacity-90">
-                Update your skills bi-weekly to increase visibility by <span className="font-bold text-primary-foreground">40%</span> to top recruiters.
+              <p className="text-lg font-bold leading-snug">
+                Update your skills <span className="text-primary italic">bi-weekly</span> to increase visibility by <span className="text-white px-2 py-0.5 rounded bg-primary/20 border border-primary/30">40%</span> to top recruiters.
               </p>
+              <button className="mt-8 text-xs font-black uppercase tracking-widest text-primary hover:text-white transition-colors flex items-center gap-2">
+                Learn More <ChevronRight size={14} />
+              </button>
             </div>
           </div>
         </div>

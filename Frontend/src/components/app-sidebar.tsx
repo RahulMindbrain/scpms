@@ -187,19 +187,19 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       collapsible="icon"
-      className="border-r border-sidebar-border bg-sidebar transition-all duration-300 dark:bg-[#0B0E14]"
+      className="border-r border-sidebar-border bg-sidebar transition-all duration-300"
       {...props}
     >
-      <SidebarHeader className="flex h-16 shrink-0 items-center overflow-hidden border-b border-sidebar-border/30 px-3">
-        <div className="flex w-full items-center justify-start gap-3 group-data-[collapsible=icon]:justify-center">
-          <div className="flex aspect-square size-9 shrink-0 items-center justify-center rounded-xl bg-blue-600 shadow-sm">
-            <GraduationCap className="size-5 text-white" />
+      <SidebarHeader className="flex h-16 shrink-0 items-center overflow-hidden border-b border-sidebar-border/50 px-4">
+        <div className="flex w-full items-center justify-start gap-4 group-data-[collapsible=icon]:justify-center">
+          <div className="flex aspect-square size-10 shrink-0 items-center justify-center rounded-2xl bg-primary shadow-lg shadow-primary/20">
+            <GraduationCap className="size-6 text-primary-foreground" />
           </div>
-          <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
-            <span className="text-[15px] font-bold tracking-tight text-slate-900 dark:text-white">
-              CPMS
+          <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden animate-in fade-in slide-in-from-left-2">
+            <span className="text-[16px] font-black tracking-tight text-foreground">
+              SCPMS
             </span>
-            <span className="text-[10px] font-semibold tracking-wider text-slate-500 uppercase">
+            <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase opacity-70">
               {role} Portal
             </span>
           </div>

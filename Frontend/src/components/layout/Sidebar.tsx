@@ -22,7 +22,7 @@ interface SidebarProps {
 
 const Sidebar = ({ items, isCollapsed, onToggle, onSignOut, isOpenMobile, onCloseMobile, subtitle, title }: SidebarProps) => {
   const sidebarClasses = `
-    bg-[#111827] text-white flex flex-col shadow-2xl z-50 border-r border-white/5 transition-all duration-300 ease-in-out
+    bg-sidebar text-sidebar-foreground flex flex-col shadow-2xl z-50 border-r border-sidebar-border transition-all duration-300 ease-in-out
     ${isCollapsed ? 'lg:w-20' : 'lg:w-64'}
     ${isOpenMobile ? 'fixed inset-y-0 left-0 w-64' : 'fixed inset-y-0 -left-64 lg:sticky lg:inset-auto lg:h-screen lg:top-0'}
   `;
@@ -89,8 +89,8 @@ const Sidebar = ({ items, isCollapsed, onToggle, onSignOut, isOpenMobile, onClos
                   className={({ isActive }) =>
                     `flex items-center rounded-xl transition-all duration-300 group relative ${isCollapsed ? 'lg:w-12 lg:h-12 lg:justify-center' : 'px-4 py-2.5 gap-3 w-full'
                     } ${isOpenMobile ? 'px-4 py-2.5 gap-3 w-full' : ''} ${isActive
-                      ? 'bg-[#1f2937] text-white shadow-sm border border-white/5'
-                      : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                      ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-sidebar-primary/20'
+                      : 'text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                     }`
                   }
                 >

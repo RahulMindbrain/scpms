@@ -501,10 +501,10 @@ const ApplicationStatus = () => {
           <div className="student-hero-texture"></div>
           <div className="student-hero-overlay"></div>
           
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+          <div className="relative z-10 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div className="max-w-2xl">
               <div className="student-hero-badge">
-                <Sparkles /> 
+                <Sparkles size={14} className="text-blue-400" /> 
                 <span>Application Command</span>
               </div>
               <h1 className="student-hero-title">

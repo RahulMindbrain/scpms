@@ -150,20 +150,18 @@ const Notification = () => {
           <div className="student-hero-texture"></div>
           <div className="student-hero-overlay"></div>
           
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-            <div className="max-w-2xl">
-              <div className="student-hero-badge">
-                <span>Notification Center</span>
-              </div>
-              <h1 className="student-hero-title">
-                Stay <span>Updated</span>
-              </h1>
-              <p className="student-hero-description">
-                {unreadCount > 0 
-                  ? `You have ${unreadCount} new alerts that require your attention. Stay on top of your journey!`
-                  : "Track all your recruitment milestones, interview calls, and placement activities in real-time."}
-              </p>
+          <div className="relative z-10 w-full">
+            <div className="student-hero-badge">
+              <span>Notification Center</span>
             </div>
+            <h1 className="student-hero-title">
+              Stay <span>Updated</span>
+            </h1>
+            <p className="student-hero-description">
+              {unreadCount > 0 
+                ? `You have ${unreadCount} new alerts that require your attention. Stay on top of your journey!`
+                : "Track all your recruitment milestones, interview calls, and placement activities in real-time."}
+            </p>
           </div>
         </div>
 

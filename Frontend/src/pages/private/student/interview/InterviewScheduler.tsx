@@ -59,7 +59,7 @@ const InterviewSchedule: React.FC = () => {
           <div className="student-hero-texture"></div>
           <div className="student-hero-overlay"></div>
           
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+          <div className="relative z-10 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div className="max-w-2xl">
               <div className="student-hero-badge">
                 <Sparkles size={14} /> 
@@ -72,8 +72,8 @@ const InterviewSchedule: React.FC = () => {
                 Prepare, practice, and ace your upcoming technical and behavioral rounds with confidence.
               </p>
             </div>
-            <div className="hidden lg:block">
-              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl">
+            <div className="hidden lg:block shrink-0">
+              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl group-hover:scale-110 transition-transform duration-500">
                 <Video className="h-16 w-16 text-white/40" />
               </div>
             </div>

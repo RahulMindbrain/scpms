@@ -163,18 +163,16 @@ const JobListing = () => {
           <div className="student-hero-texture"></div>
           <div className="student-hero-overlay"></div>
           
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-            <div className="max-w-2xl">
-              <div className="student-hero-badge">
-                <span>Career Opportunities</span>
-              </div>
-              <h1 className="student-hero-title">
-                Find Your <span>Dream Career</span>
-              </h1>
-              <p className="student-hero-description">
-                Explore the latest job openings, internships, and placement opportunities from top-tier companies.
-              </p>
+          <div className="relative z-10 w-full">
+            <div className="student-hero-badge">
+              <span>Career Opportunities</span>
             </div>
+            <h1 className="student-hero-title">
+              Find Your <span>Dream Career</span>
+            </h1>
+            <p className="student-hero-description">
+              Explore the latest job openings, internships, and placement opportunities from top-tier companies.
+            </p>
           </div>
         </div>
 
