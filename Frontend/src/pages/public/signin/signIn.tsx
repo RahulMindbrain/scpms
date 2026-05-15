@@ -43,7 +43,9 @@ const SignIn: React.FC = () => {
       await dispatch(loginUser({ email: email.toLowerCase(), password })).unwrap();
       toast.success("Signed in successfully");
     } catch (err: any) {
-      toast.error(err?.message || "Invalid credentials");
+      // Handle both string error (from rejectWithValue) and object error
+      const errorMessage = typeof err === 'string' ? err : (err?.message || "Invalid credentials");
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }

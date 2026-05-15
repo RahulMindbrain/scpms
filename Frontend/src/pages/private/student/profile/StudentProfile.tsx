@@ -29,6 +29,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { StudentPageLayout } from '@/components/layout/StudentPageLayout';
+import WarningBanner from '@/components/WarningBanner';
 
 const StudentProfile = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -39,6 +40,7 @@ const StudentProfile = () => {
   const [showExperienceModal, setShowExperienceModal] = useState(false)
   const [showCertificateModal, setShowCertificateModal] = useState(false)
   const [showProfileEditDialog, setShowProfileEditDialog] = useState(false)
+  const isApproved = user?.status === 'ACTIVE';
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewName, setPreviewName] = useState<string>('');
   const [isPdfPreview, setIsPdfPreview] = useState(false);
@@ -270,7 +272,6 @@ const StudentProfile = () => {
         animate="visible"
         className="space-y-8"
       >
-
         {/* Hero Section */}
         <motion.div variants={itemVariants} className="relative group/hero">
           {/* Adaptive Banner */}
@@ -336,8 +337,9 @@ const StudentProfile = () => {
 
                 <div className="pt-4 md:pt-0 shrink-0 w-full md:w-auto self-center">
                   <Button
-                    onClick={() => setShowProfileEditDialog(true)}
-                    className="w-full md:w-auto bg-white/20 hover:bg-white/30 backdrop-blur-xl text-white border border-white/30 rounded-2xl px-6 h-11 md:h-12 font-bold shadow-2xl transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-2 text-xs md:text-sm"
+                    onClick={() => isApproved && setShowProfileEditDialog(true)}
+                    disabled={!isApproved}
+                    className="w-full md:w-auto bg-white/20 hover:bg-white/30 backdrop-blur-xl text-white border border-white/30 rounded-2xl px-6 h-11 md:h-12 font-bold shadow-2xl transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-2 text-xs md:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Edit3 className="h-4 w-4" />
                     Edit Profile
@@ -475,7 +477,7 @@ const StudentProfile = () => {
                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Career Timeline & Roles</p>
                       </div>
                     </div>
-                    <Button onClick={() => setShowExperienceModal(true)} variant="ghost" size="sm" className="w-fit text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all">
+                    <Button onClick={() => isApproved && setShowExperienceModal(true)} disabled={!isApproved} variant="ghost" size="sm" className="w-fit text-blue-600 dark:text-blue-400 hover:bg-blue-500/10 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-50">
                       <Plus className="h-4 w-4 mr-2" /> Add Entry
                     </Button>
                   </div>
@@ -490,8 +492,9 @@ const StudentProfile = () => {
                           <div className="w-full md:w-[calc(50%-2.5rem)] md:w-[calc(50%-2.5rem)] p-5 rounded-2xl bg-[#f8fafc] dark:bg-white/5 border border-slate-100 dark:border-white/10 shadow-sm transition-all hover:shadow-md hover:bg-white dark:hover:bg-white/10 group-hover/timeline:border-blue-100 dark:group-hover/timeline:border-blue-500/30">
                             <div className="flex justify-between items-start mb-1">
                               <h4 className="font-bold text-slate-900 dark:text-white text-sm md:text-base">{exp.role}</h4>
-                              <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-rose-500 opacity-0 group-hover/timeline:opacity-100 transition-opacity"
+                              <Button variant="ghost" size="icon" disabled={!isApproved} className="h-7 w-7 text-slate-400 hover:text-rose-500 opacity-0 group-hover/timeline:opacity-100 transition-opacity disabled:opacity-0"
                                 onClick={() => {
+                                  if (!isApproved) return;
                                   const expId = profile.experiences[i]?.id;
                                   const updated = profile.experiences.filter((_: any, idx: number) => idx !== i);
                                   setProfile({ ...profile, experiences: updated });
@@ -572,9 +575,10 @@ const StudentProfile = () => {
                     <h4 className="text-sm font-bold text-slate-900 dark:text-white mb-4">Quick Actions</h4>
                     <div className="grid grid-cols-2 gap-3">
                       <Button
-                        onClick={() => setShowProjectModal(true)}
+                        onClick={() => isApproved && setShowProjectModal(true)}
+                        disabled={!isApproved}
                         variant="outline"
-                        className="rounded-xl border-slate-200 dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-500/30 transition-all h-auto py-3 flex-col gap-2"
+                        className="rounded-xl border-slate-200 dark:border-slate-800 hover:bg-blue-50 dark:hover:bg-blue-500/10 hover:text-blue-600 dark:hover:text-blue-400 hover:border-blue-200 dark:hover:border-blue-500/30 transition-all h-auto py-3 flex-col gap-2 disabled:opacity-50"
                       >
                         <div className="p-2 rounded-lg bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400">
                           <Cpu className="h-4 w-4" />
@@ -582,9 +586,10 @@ const StudentProfile = () => {
                         <span className="text-[10px] font-bold">Add Project</span>
                       </Button>
                       <Button
-                        onClick={() => setShowExperienceModal(true)}
+                        onClick={() => isApproved && setShowExperienceModal(true)}
+                        disabled={!isApproved}
                         variant="outline"
-                        className="rounded-xl border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-200 dark:hover:border-emerald-500/30 transition-all h-auto py-3 flex-col gap-2"
+                        className="rounded-xl border-slate-200 dark:border-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-200 dark:hover:border-emerald-500/30 transition-all h-auto py-3 flex-col gap-2 disabled:opacity-50"
                       >
                         <div className="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                           <Briefcase className="h-4 w-4" />
@@ -613,7 +618,7 @@ const StudentProfile = () => {
                         <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Professional Recognition</p>
                       </div>
                     </div>
-                    <Button onClick={() => setShowCertificateModal(true)} variant="ghost" size="sm" className="text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 rounded-xl px-2 md:px-3 py-1.5 shrink-0">
+                    <Button onClick={() => isApproved && setShowCertificateModal(true)} disabled={!isApproved} variant="ghost" size="sm" className="text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 rounded-xl px-2 md:px-3 py-1.5 shrink-0 disabled:opacity-50">
                       <Plus className="h-5 w-5" />
                     </Button>
                   </div>
@@ -643,8 +648,9 @@ const StudentProfile = () => {
                                 </div>
                               </div>
                             </div>
-                            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-rose-500 md:opacity-0 group-hover/cert:opacity-100 transition-opacity shrink-0"
+                            <Button variant="ghost" size="icon" disabled={!isApproved} className="h-8 w-8 text-slate-400 hover:text-rose-500 md:opacity-0 group-hover/cert:opacity-100 transition-opacity shrink-0 disabled:opacity-0"
                               onClick={() => {
+                                if (!isApproved) return;
                                 const certId = profile.certificates[i]?.id;
                                 const updated = profile.certificates.filter((_: any, idx: number) => idx !== i);
                                 setProfile({ ...profile, certificates: updated });
@@ -714,8 +720,9 @@ const StudentProfile = () => {
               </div>
             </div>
             <Button
-              onClick={() => setShowProjectModal(true)}
-              className="w-full sm:w-auto bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl border border-slate-200/60 dark:border-white/[0.1] text-slate-700 dark:text-white hover:bg-purple-500 hover:text-white dark:hover:bg-purple-500 transition-all rounded-[1.5rem] px-8 h-12 md:h-14 text-[10px] md:text-xs font-black uppercase tracking-widest shadow-sm"
+              onClick={() => isApproved && setShowProjectModal(true)}
+              disabled={!isApproved}
+              className="w-full sm:w-auto bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl border border-slate-200/60 dark:border-white/[0.1] text-slate-700 dark:text-white hover:bg-purple-500 hover:text-white dark:hover:bg-purple-500 transition-all rounded-[1.5rem] px-8 h-12 md:h-14 text-[10px] md:text-xs font-black uppercase tracking-widest shadow-sm disabled:opacity-50"
             >
               <Plus className="h-5 w-5 mr-3" /> Add Project
             </Button>
@@ -736,8 +743,9 @@ const StudentProfile = () => {
                         <div className="h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-slate-100 dark:bg-black/20 flex items-center justify-center text-indigo-500 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 shadow-inner">
                           <Globe className="h-6 w-6 md:h-7 md:w-7" />
                         </div>
-                        <Button variant="ghost" size="icon" className="h-10 w-10 text-slate-400 hover:text-rose-500 md:opacity-0 group-hover:opacity-100 transition-all"
+                        <Button variant="ghost" size="icon" disabled={!isApproved} className="h-10 w-10 text-slate-400 hover:text-rose-500 md:opacity-0 group-hover:opacity-100 transition-all disabled:opacity-0"
                           onClick={() => {
+                            if (!isApproved) return;
                             const projId = profile.projects[i]?.id;
                             const updated = profile.projects.filter((_: any, idx: number) => idx !== i);
                             setProfile({ ...profile, projects: updated });

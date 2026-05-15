@@ -56,6 +56,8 @@ interface JobUniversity {
 const JobListing = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { jobs, profile, applications = [], loading } = useSelector((state: RootState) => state.student);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const isApproved = user?.status === 'ACTIVE';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'applied' | 'eligible'>('all');
@@ -518,9 +520,9 @@ const JobListing = () => {
               <Button
                 className="w-full !bg-blue-600 !text-white py-6 md:py-8 rounded-2xl font-black text-sm md:text-base uppercase tracking-widest shadow-xl shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all border-none"
                 onClick={handleApply}
-                disabled={isApplying || !selectedJob || appliedJobIds.has(Number(selectedJob.id)) || !checkEligibility(selectedJob).eligible}
+                disabled={isApplying || !selectedJob || appliedJobIds.has(Number(selectedJob.id)) || !checkEligibility(selectedJob).eligible || !isApproved}
               >
-                {isApplying ? <Loader size="sm" /> : (selectedJob && appliedJobIds.has(Number(selectedJob.id))) ? 'Already Applied' : (selectedJob && !checkEligibility(selectedJob).eligible) ? 'Not Eligible to Apply' : 'Confirm Application'}
+                {isApplying ? <Loader size="sm" /> : (selectedJob && appliedJobIds.has(Number(selectedJob.id))) ? 'Already Applied' : !isApproved ? 'Account Pending Approval' : (selectedJob && !checkEligibility(selectedJob).eligible) ? 'Not Eligible to Apply' : 'Confirm Application'}
               </Button>
             </div>
           </div>

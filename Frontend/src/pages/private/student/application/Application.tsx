@@ -124,13 +124,15 @@ const ApplicationCard = ({
   isExpanded,
   onToggle,
   onAction,
-  updatingId
+  updatingId,
+  isApproved
 }: {
   app: any;
   isExpanded: boolean;
   onToggle: () => void;
   onAction: (id: number, action: "ACCEPT" | "REJECT") => void;
   updatingId: number | null;
+  isApproved: boolean;
 }) => {
   const status = app.status as Status;
   const isSelected = status === 'SELECTED';
@@ -324,8 +326,8 @@ const ApplicationCard = ({
                         <div className="flex gap-3">
                           <Button
                             size="sm"
-                            className="flex-1 h-10 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-md shadow-emerald-500/10"
-                            disabled={updatingId === app.id}
+                            className="flex-1 h-10 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-[10px] uppercase tracking-widest shadow-md shadow-emerald-500/10 disabled:opacity-50"
+                            disabled={updatingId === app.id || !isApproved}
                             onClick={() => onAction(app.id, "ACCEPT")}
                           >
                             Accept Offer
@@ -333,8 +335,8 @@ const ApplicationCard = ({
                           <Button
                             size="sm"
                             variant="outline"
-                            className="flex-1 h-10 border-rose-200 text-rose-600 hover:bg-rose-50 dark:border-rose-500/20 dark:text-rose-400 dark:hover:bg-rose-500/10 rounded-xl font-black text-[10px] uppercase tracking-widest"
-                            disabled={updatingId === app.id}
+                            className="flex-1 h-10 border-rose-200 text-rose-600 hover:bg-rose-50 dark:border-rose-500/20 dark:text-rose-400 dark:hover:bg-rose-500/10 rounded-xl font-black text-[10px] uppercase tracking-widest disabled:opacity-50"
+                            disabled={updatingId === app.id || !isApproved}
                             onClick={() => onAction(app.id, "REJECT")}
                           >
                             Decline
@@ -407,6 +409,8 @@ const ApplicationStatus = () => {
   const navigate = useNavigate();
   const { id: routeApplicationId } = useParams<{ id?: string }>();
   const { applications = [], loading } = useSelector((state: RootState) => state.student);
+  const { user } = useSelector((state: RootState) => state.auth);
+  const isApproved = user?.status === 'ACTIVE';
 
   const [searchQuery, setSearchQuery] = useState("");
   const [activeFilter, setActiveFilter] = useState<string>("All");
@@ -601,6 +605,7 @@ const ApplicationStatus = () => {
                     onToggle={() => setExpandedId(expandedId === app.id ? null : app.id)}
                     onAction={handleApplicationAction}
                     updatingId={updatingId}
+                    isApproved={isApproved}
                   />
                 ))
               ) : (
