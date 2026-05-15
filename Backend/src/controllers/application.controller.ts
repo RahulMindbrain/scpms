@@ -104,6 +104,26 @@ export const updateApplicationController = async (
 
     const { status, currentRound, reason, remarks } = req.body;
 
+    if (user.role === "STUDENT") {
+      const allowedStudentStatuses = ["OFFER_ACCEPTED", "OFFER_REJECTED"];
+
+      if (!allowedStudentStatuses.includes(status)) {
+        return sendError(res, 403, "Students can only accept or reject offers");
+      }
+
+      if (currentRound) {
+        return sendError(res, 403, "Students cannot update interview rounds");
+      }
+    }
+
+    if (user.role === "COMPANY") {
+      const allowedCompanyStatuses = ["SHORTLISTED", "REJECTED", "SELECTED"];
+
+      if (!allowedCompanyStatuses.includes(status)) {
+        return sendError(res, 403, "Companies cannot manage offer actions");
+      }
+    }
+
     const data = await updateApplicationService({
       applicationId,
       status,

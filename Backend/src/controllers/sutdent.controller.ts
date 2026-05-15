@@ -72,8 +72,14 @@ export const applicationActionController = async (
 ) => {
   try {
     const user = res.locals.user;
+
     const { applicationId } = req.params;
+
     const { action } = req.body;
+
+    if (!["ACCEPT", "REJECT"].includes(action)) {
+      return sendError(res, 400, "Action must be ACCEPT or REJECT");
+    }
 
     const result = await applicationActionService(
       user.id,

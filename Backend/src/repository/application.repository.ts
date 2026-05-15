@@ -334,13 +334,16 @@ export const withdrawOtherApplications = async (
   return prisma.application.updateMany({
     where: {
       studentId: studentId,
+
       id: {
         not: acceptedApplicationId,
       },
+
       status: "SELECTED",
     },
+
     data: {
-      status: "WITHDRAWN",
+      status: "OFFER_REJECTED",
     },
   });
 };

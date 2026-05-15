@@ -71,7 +71,7 @@ StudentRoutes.get(
 );
 
 StudentRoutes.put(
-  "/application/:applicationId",
+  "/application/:applicationId/offer-response",
   authenticateUser,
   requireActiveUser,
   authorizeRoles("STUDENT"),
