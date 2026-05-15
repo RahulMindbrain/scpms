@@ -116,7 +116,6 @@ const PlacementDriveManagement: React.FC = () => {
       const j = (row as { job?: Job }).job;
       const title = j?.title ?? row.title;
       
-      // Fallback for missing company object
       const companyIdFromJob = j?.companyId ?? row.companyId;
       const foundCompany = companies.find(c => c.id === companyIdFromJob);
       const company = j?.company ?? row.company ?? foundCompany;
@@ -186,7 +185,7 @@ const PlacementDriveManagement: React.FC = () => {
     });
 
     return Object.values(groups);
-  }, [reduxJobs, activeFilter, searchQuery]);
+  }, [reduxJobs, companies, activeFilter, searchQuery]);
 
   return (
     <AdminPageLayout>
@@ -212,7 +211,7 @@ const PlacementDriveManagement: React.FC = () => {
             <Button
               variant="outline"
               onClick={() => setIsFilterOpen(!isFilterOpen)}
-              className="w-full lg:w-auto flex items-center justify-between gap-3 h-10 rounded-xl border-border bg-background/50 text-xs font-black uppercase tracking-widest px-4"
+              className="w-full lg:w-auto flex items-center justify-between gap-3 h-10 rounded-xl border-border bg-background/50 text-[10px] font-black uppercase tracking-widest px-4"
             >
               <div className="flex items-center gap-2">
                 <Filter className="size-3.5 text-primary" />
@@ -255,13 +254,13 @@ const PlacementDriveManagement: React.FC = () => {
       {/* Quick Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
         {[
-          { label: 'Total Drives', value: reduxJobs.length, icon: Trophy, color: 'primary' },
-          { label: 'Active Brands', value: processedDrives.length, icon: Building2, color: 'emerald' },
-          { label: 'Interviews', value: reduxJobs.filter((job: Job) => !!job.interviewScheduleId).length, icon: Calendar, color: 'indigo' }
+          { label: 'Total Drives', value: reduxJobs.length, icon: Trophy, color: 'primary', bg: 'bg-primary/10', text: 'text-primary' },
+          { label: 'Active Brands', value: processedDrives.length, icon: Building2, color: 'emerald', bg: 'bg-emerald-500/10', text: 'text-emerald-600' },
+          { label: 'Interviews', value: reduxJobs.filter((job: Job) => !!job.interviewScheduleId).length, icon: Calendar, color: 'indigo', bg: 'bg-indigo-500/10', text: 'text-indigo-600' }
         ].map((stat, i) => (
           <div key={i} className="saas-card flex items-center gap-4 p-4 md:p-6">
-            <div className={`size-10 md:size-12 rounded-xl md:rounded-2xl bg-${stat.color}-500/10 flex items-center justify-center border border-${stat.color}-500/20 shrink-0`}>
-              <stat.icon className={`size-5 md:size-6 text-${stat.color}-600`} />
+            <div className={cn("size-10 md:size-12 rounded-xl md:rounded-2xl flex items-center justify-center border shrink-0", stat.bg, stat.text, `border-${stat.color}-500/20`)}>
+              <stat.icon className="size-5 md:size-6" />
             </div>
             <div>
               <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-0.5 md:mb-1">{stat.label}</p>
@@ -375,25 +374,25 @@ const PlacementDriveManagement: React.FC = () => {
 
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
                                       <div className="space-y-1">
-                                        <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">
+                                        <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
                                           <IndianRupee className="size-2.5 md:size-3 text-emerald-500" /> Package
                                         </p>
                                         <p className="text-xs md:text-sm font-bold text-foreground">{job.formattedSalary} LPA</p>
                                       </div>
                                       <div className="space-y-1">
-                                        <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">
+                                        <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
                                           <Target className="size-2.5 md:size-3 text-indigo-500" /> Eligibility
                                         </p>
                                         <p className="text-xs md:text-sm font-bold text-foreground">{job.minCgpa ?? 'No'} CGPA</p>
                                       </div>
                                       <div className="space-y-1">
-                                        <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">
+                                        <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
                                           <Users className="size-2.5 md:size-3 text-violet-500" /> Applicants
                                         </p>
                                         <p className="text-xs md:text-sm font-bold text-foreground">{job._count?.applications || 0} Applied</p>
                                       </div>
                                       <div className="space-y-1">
-                                        <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1">
+                                        <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
                                           <Calendar className="size-2.5 md:size-3 text-amber-500" /> Posted
                                         </p>
                                         <p className="text-xs md:text-sm font-bold text-foreground">{job.formattedDate}</p>
@@ -404,7 +403,7 @@ const PlacementDriveManagement: React.FC = () => {
                                   <div className="flex xl:flex-col items-stretch xl:justify-center gap-3 md:gap-4 xl:pl-8 xl:border-l border-border min-w-full md:min-w-[160px]">
                                     <Button
                                       onClick={() => { setSelectedJob(job); setIsDetailsOpen(true); }}
-                                      className="flex-1 bg-slate-900 hover:bg-primary text-white rounded-xl h-9 md:h-10 font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-lg active:scale-95 transition-all"
+                                      className="flex-1 bg-primary hover:bg-primary/90 text-white rounded-xl h-10 font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-lg shadow-primary/20 active:scale-95 transition-all"
                                     >
                                       Review Drive
                                       <ChevronRight className="size-3 md:size-3.5 ml-1.5" />
@@ -422,7 +421,7 @@ const PlacementDriveManagement: React.FC = () => {
               );
             })
           ) : (
-            <div className="py-32 text-center saas-card border-dashed bg-muted/10">
+            <div className="py-32 text-center saas-card border-dashed bg-muted/5 border-2">
               <div className="size-20 bg-muted/30 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6">
                 <Search className="size-10 text-muted-foreground/30" />
               </div>
@@ -453,33 +452,33 @@ const PlacementDriveManagement: React.FC = () => {
           <div className="space-y-8 py-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 pb-6 border-b border-border">
               <div className="flex items-center gap-4">
-                <div className="size-14 bg-muted/50 rounded-2xl flex items-center justify-center border border-border">
+                <div className="size-14 bg-primary/5 rounded-2xl flex items-center justify-center border border-primary/20 shrink-0">
                   <Building2 className="size-7 text-primary" />
                 </div>
-                <div>
-                  <h2 className="text-2xl font-black text-foreground tracking-tight uppercase leading-none">
+                <div className="min-w-0">
+                  <h2 className="text-2xl font-black text-foreground tracking-tight uppercase leading-none truncate">
                     {selectedJob.company?.name}
                   </h2>
-                  <p className="text-[10px] font-black text-primary pt-2 tracking-[0.2em] uppercase">
+                  <p className="text-[10px] font-black text-primary pt-2 tracking-[0.2em] uppercase truncate">
                     {selectedJob.title}
                   </p>
                 </div>
               </div>
-              <div className={cn("px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-sm", statusConfig[selectedJob.status].bg, statusConfig[selectedJob.status].color)}>
+              <div className={cn("px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border shadow-sm shrink-0", statusConfig[selectedJob.status].bg, statusConfig[selectedJob.status].color)}>
                 {statusConfig[selectedJob.status].label}
               </div>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {[
-                { label: 'Package', value: `${selectedJob.formattedSalary} LPA`, icon: IndianRupee, color: 'emerald' },
-                { label: 'Location', value: selectedJob.location || 'Remote', icon: MapPin, color: 'rose' },
-                { label: 'CGPA Limit', value: `${selectedJob.minCgpa ?? 'N/A'}`, icon: GraduationCap, color: 'indigo' },
-                { label: 'Backlogs', value: selectedJob.maxBacklogs ?? 'None', icon: Clock, color: 'amber' }
+                { label: 'Package', value: `${selectedJob.formattedSalary} LPA`, icon: IndianRupee, color: 'emerald', bg: 'bg-emerald-500/10' },
+                { label: 'Location', value: selectedJob.location || 'Remote', icon: MapPin, color: 'rose', bg: 'bg-rose-500/10' },
+                { label: 'CGPA Limit', value: `${selectedJob.minCgpa ?? 'N/A'}`, icon: GraduationCap, color: 'indigo', bg: 'bg-indigo-500/10' },
+                { label: 'Backlogs', value: selectedJob.maxBacklogs ?? 'None', icon: Clock, color: 'amber', bg: 'bg-amber-500/10' }
               ].map((item, idx) => (
                 <div key={idx} className="p-5 bg-muted/30 rounded-2xl border border-border group hover:border-primary/20 transition-all">
                   <div className="flex items-center gap-2 text-[9px] font-black text-muted-foreground uppercase tracking-widest mb-2">
-                    <item.icon className={`size-3.5 text-${item.color}-500`} /> {item.label}
+                    <item.icon className={cn("size-3.5", `text-${item.color}-500`)} /> {item.label}
                   </div>
                   <p className="text-lg font-black text-foreground">{item.value}</p>
                 </div>
@@ -490,8 +489,8 @@ const PlacementDriveManagement: React.FC = () => {
               <div className="flex items-center gap-2 text-[10px] font-black text-foreground uppercase tracking-[0.2em]">
                 <Info className="size-4 text-primary" /> Comprehensive Description
               </div>
-              <div className="p-8 bg-muted/20 border border-border rounded-[2rem]">
-                <p className="text-muted-foreground leading-relaxed text-base whitespace-pre-line">
+              <div className="p-8 bg-muted/20 border border-border rounded-[2.5rem]">
+                <p className="text-muted-foreground leading-relaxed text-sm md:text-base whitespace-pre-line font-medium">
                   {selectedJob.description || "No detailed description provided for this placement drive."}
                 </p>
               </div>
@@ -503,7 +502,7 @@ const PlacementDriveManagement: React.FC = () => {
               </div>
               <div className="flex flex-wrap gap-2">
                 {(selectedJob.departments?.length ? selectedJob.departments : ['All Specializations']).map((dept: string) => (
-                  <Badge key={dept} variant="outline" className="px-5 py-2.5 rounded-xl border-border bg-background text-[10px] font-black uppercase tracking-widest">
+                  <Badge key={dept} variant="outline" className="px-5 py-2.5 rounded-xl border-border bg-background text-[10px] font-black uppercase tracking-widest text-primary">
                     {dept}
                   </Badge>
                 ))}
@@ -513,7 +512,7 @@ const PlacementDriveManagement: React.FC = () => {
             <div className="flex justify-end pt-6">
               <Button
                 onClick={() => setIsDetailsOpen(false)}
-                className="px-12 h-12 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary transition-all shadow-xl active:scale-95"
+                className="px-12 h-12 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary/90 transition-all shadow-xl shadow-primary/20 active:scale-95"
               >
                 Close Specification
               </Button>
