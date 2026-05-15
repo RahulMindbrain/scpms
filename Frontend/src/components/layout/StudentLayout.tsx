@@ -1,11 +1,18 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { AppSidebar } from '../app-sidebar';
-import { SidebarInset, SidebarProvider } from '../ui/sidebar';
-import { SiteHeader } from '../site-header';
-import { TooltipProvider } from '../ui/tooltip';
+import { AppSidebar } from '@/components/app-sidebar';
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
+import { SiteHeader } from '@/components/site-header';
+import { TooltipProvider } from '@/components/ui/tooltip';
+
+import { useSelector } from 'react-redux';
+import type { RootState } from '@/redux/reducers/rootReducer';
+import WarningBanner from '@/components/WarningBanner';
 
 const StudentLayout: React.FC = () => {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const isApproved = user?.status === 'ACTIVE';
+
   return (
     <TooltipProvider>
       <SidebarProvider
@@ -17,10 +24,15 @@ const StudentLayout: React.FC = () => {
         }
       >
         <AppSidebar variant="inset" />
-        <SidebarInset className="bg-background">
+        <SidebarInset className="bg-background overflow-y-auto overflow-x-hidden">
           <SiteHeader />
-          <main className="relative flex flex-1 flex-col bg-background min-h-0">
-            <div className="flex-1 px-0 pt-0 pb-10 w-full mx-auto">
+          <main className="relative flex flex-1 flex-col bg-background min-h-0 @container/main">
+            <div className="flex-1 p-4 md:p-8 lg:p-10 w-full mx-auto max-w-7xl">
+              <WarningBanner 
+                isVisible={!isApproved}
+                role="STUDENT"
+                message="Your student profile is currently pending approval. Access to applications and events will be limited until verified."
+              />
               <Outlet />
             </div>
           </main>

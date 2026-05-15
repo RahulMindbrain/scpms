@@ -159,8 +159,11 @@ const PostJob: React.FC = () => {
 
   const prevStep = () => setCurrentStep(prev => prev - 1);
 
+  const isApproved = useSelector((state: RootState) => state.auth.user?.status === 'ACTIVE');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isApproved) return toast.error("Your account is pending verification.");
     if (!validateStep(3)) return;
 
     try {
@@ -618,8 +621,8 @@ const PostJob: React.FC = () => {
             ) : (
               <button
                 type="submit"
-                disabled={isSubmitting}
-                className="group relative flex items-center gap-3 px-10 py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-1 active:translate-y-0 transition-all overflow-hidden"
+                disabled={isSubmitting || !isApproved}
+                className="group relative flex items-center gap-3 px-10 py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-[10px] hover:shadow-2xl hover:shadow-primary/30 hover:-translate-y-1 active:translate-y-0 transition-all overflow-hidden disabled:opacity-50"
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-[shine_1.5s_infinite] transition-transform" />
                 {isSubmitting ? (

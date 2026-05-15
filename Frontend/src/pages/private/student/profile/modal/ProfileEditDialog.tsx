@@ -47,7 +47,7 @@ type ApiResponse<T> = {
   data: T;
 };
 
-const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any) => {
+const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isApproved }: any) => {
   const [formData, setFormData] = useState<any>(profile);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isUploading, setIsUploading] = useState(false);
@@ -418,7 +418,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading }: any)
             type="submit"
             onClick={handleSubmit}
             className="rounded-2xl bg-primary hover:bg-primary/90 h-14 px-12 font-black text-[10px] uppercase tracking-[0.2em] text-white shadow-2xl shadow-primary/30 active:scale-95 transition-all flex-1 md:flex-none"
-            disabled={isLoading || isUploading}
+            disabled={isLoading || isUploading || !isApproved}
           >
             {isLoading ? <Loader size="sm" /> : "Commit Profile Updates"}
           </Button>

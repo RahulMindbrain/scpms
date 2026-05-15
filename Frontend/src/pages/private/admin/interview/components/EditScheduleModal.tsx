@@ -157,7 +157,7 @@ export const EditScheduleModal: React.FC<EditModalProps> = ({
       }
       onOpenChange(false);
     } catch (error: any) {
-      toast.error(error?.message || error?.toString() || "Something went wrong");
+      toast.error(error?.message || error?.toString() || "Unable to complete the request.");
     } finally {
       setIsSubmitting(false);
     }

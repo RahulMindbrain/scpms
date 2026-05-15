@@ -813,6 +813,7 @@ const StudentProfile = () => {
           profile={profile}
           onSave={handleSave}
           isLoading={backendLoading}
+          isApproved={isApproved}
         />
 
         {/* Document Preview Dialog */}

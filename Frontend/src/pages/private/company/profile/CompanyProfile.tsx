@@ -56,9 +56,11 @@ const CompanyProfile = () => {
     }
   }, [profile, setValue])
 
+  const isApproved = user?.status === 'ACTIVE'
+
   const onSubmit = async (data: ProfileFormData) => {
+    if (!isApproved) return toast.error("Your account is pending verification.")
     try {
-      await dispatch(updateCompanyProfile(data)).unwrap()
       toast.success("Profile updated successfully!")
       setIsEditing(false)
       dispatch(fetchCompanyProfile())
@@ -220,6 +222,7 @@ const CompanyProfile = () => {
                   variant="outline"
                   size="sm"
                   className="rounded-xl border-primary/20 hover:border-primary hover:bg-primary/5 text-primary gap-2 font-bold"
+                  disabled={!isApproved}
                 >
                   <Pencil size={14} />
                   Edit Details
