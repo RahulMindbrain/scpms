@@ -272,7 +272,7 @@ const OnboardingOverlay = ({ step, user }: { step: string; user: any }) => {
 export default function AdminDashboard() {
   const dispatch = useDispatch<AppDispatch>()
   const { data: dashboardData, loading: dashLoading, error } = useSelector((state: RootState) => state.dashboard)
-  const { schedules, loading: schedLoading } = useSelector((state: RootState) => state.interview)
+  const { loading: schedLoading } = useSelector((state: RootState) => state.interview)
   const { items: notifications, upcomingEvents = [], loading: notifLoading } = useSelector((state: RootState) => state.notification)
   const { user } = useSelector((state: RootState) => state.auth)
 
@@ -356,7 +356,7 @@ export default function AdminDashboard() {
           totalDepartments={totalDepartments}
         />
 
-        <UpcomingEventsList events={upcomingEvents} />
+        <UpcomingEventsList events={upcomingEvents.map(e => ({ ...e, status: 'SCHEDULED' }))} />
 
         {/* Row 2: Analytics & Feed */}
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">

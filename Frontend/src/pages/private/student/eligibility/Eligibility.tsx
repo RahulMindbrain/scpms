@@ -140,9 +140,7 @@ const Eligibility = () => {
             </div>
             
             <div className="hidden lg:block">
-              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl">
-                <CheckCircle2 className="h-16 w-16 text-white/40" />
-              </div>
+           
             </div>
           </div>
         </div>

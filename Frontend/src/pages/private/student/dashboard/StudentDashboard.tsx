@@ -9,7 +9,6 @@ import {
   Briefcase,
   ChevronRight,
   Sparkles,
-  Calendar,
   ArrowUpRight,
 } from "lucide-react"
 import { UpcomingEventsList } from "@/components/dashboard/UpcomingEventsList"
@@ -168,7 +167,7 @@ export default function StudentDashboard() {
               </Link>
             </div>
 
-            <UpcomingEventsList events={upcomingEvents} showApprovalStatus={false} />
+            <UpcomingEventsList events={upcomingEvents.map(e => ({ ...e, status: 'SCHEDULED' }))} showApprovalStatus={false} />
           </div>
 
           {/* Quick Navigation */}

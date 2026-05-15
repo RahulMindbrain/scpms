@@ -117,7 +117,7 @@ export default function Dashboard() {
           totalDepartments={metrics.deptStats.length}
         />
 
-        <UpcomingEventsList events={upcomingEvents} />
+        <UpcomingEventsList events={upcomingEvents.map(e => ({ ...e, status: 'SCHEDULED' }))} />
         
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
           <div className="xl:col-span-7 saas-card flex flex-col">

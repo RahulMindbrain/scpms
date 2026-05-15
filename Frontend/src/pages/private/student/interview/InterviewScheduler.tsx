@@ -1,16 +1,11 @@
 import React, { useEffect } from 'react';
 import {
-  Calendar,
-  Clock, MapPin,
-  ExternalLink,
   Sparkles,
   ChevronRight,
   Video,
-  UserCheck,
   Rocket,
   TrendingUp,
 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { UpcomingEventsList } from '@/components/dashboard/UpcomingEventsList';
 import { Button } from '@/components/ui/button';
@@ -29,17 +24,7 @@ const InterviewSchedule: React.FC = () => {
     dispatch(fetchUpcomingEvents());
   }, [dispatch]);
 
-  // Helper to get accent color based on index or company name
-  const getAccentColor = (_name: string, index: number) => {
-    const colors = [
-      'from-blue-500 to-indigo-600',
-      'from-emerald-500 to-teal-600',
-      'from-purple-500 to-indigo-600',
-      'from-orange-500 to-red-600',
-      'from-cyan-500 to-blue-600'
-    ];
-    return colors[index % colors.length];
-  };
+
 
   if (loading && upcomingEvents.length === 0) {
     return <Loader text="Syncing your interview schedule..." fullScreen />;
@@ -97,7 +82,7 @@ const InterviewSchedule: React.FC = () => {
               </Button>
             </div>
 
-            <UpcomingEventsList events={upcomingEvents} showApprovalStatus={false} />
+            <UpcomingEventsList events={upcomingEvents.map(e => ({ ...e, status: 'SCHEDULED' }))} showApprovalStatus={false} />
           </div>
 
           {/* Sidebar Area */}

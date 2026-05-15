@@ -167,11 +167,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           
         ],
         secondary: [
-          {
-            title: "Notifications",
-            url: "/superadmin/notifications",
-            icon: <Bell />,
-          },
+      
         ],
       }
     }

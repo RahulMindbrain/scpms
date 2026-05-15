@@ -1,14 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowUpRight,
   Bell,
   Clock,
-  Info,
-  Sparkles,
-  Trash2,
   X,
-  ShieldAlert,
-  AlertTriangle,
   Search,
   CheckCircle2,
   Calendar,
@@ -19,12 +13,11 @@ import type { RootState } from '@/redux/reducers/rootReducer';
 import {
   markAllNotificationsAsRead,
   markNotificationAsRead,
-  deleteNotification,
   fetchUpcomingEvents,
   fetchUnreadCount,
 } from '@/redux/thunks/notificationThunks';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -114,50 +107,7 @@ const AdminNotificationPage = () => {
     }
   };
 
-  const handleViewDetails = async (notification: NotificationItem) => {
-    if (!notification.read) {
-      await handleMarkAsRead(notification.id, false);
-    }
-    setSelectedNotification({ ...notification, read: true });
-  };
 
-  const handleDelete = async (id: number) => {
-    try {
-      await dispatch(deleteNotification(id)).unwrap();
-      toast.success('Alert purged from system');
-    } catch (error: any) {
-      toast.error(error?.toString() || 'Failed to purge alert');
-    }
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-
-    if (diffInSeconds < 60) return 'Just now';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
-    if (diffInSeconds < 604800) return `${Math.floor(diffInSeconds / 86400)}d ago`;
-    return date.toLocaleDateString();
-  };
-
-  const getTagConfig = (type: string) => {
-    switch (type) {
-      case 'SYSTEM_ALERT':
-      case 'CRITICAL_ERROR':
-        return { label: 'System', icon: ShieldAlert, color: 'text-rose-600', bg: 'bg-rose-500/10', border: 'border-rose-500/20' };
-      case 'PLACEMENT_UPDATE':
-      case 'DRIVE_CREATED':
-        return { label: 'Placement', icon: Sparkles, color: 'text-emerald-600', bg: 'bg-emerald-500/10', border: 'border-emerald-500/20' };
-      case 'USER_ACTIVITY':
-      case 'REGISTRATION':
-        return { label: 'Activity', icon: Info, color: 'text-indigo-600', bg: 'bg-indigo-500/10', border: 'border-indigo-500/20' };
-      case 'WARNING':
-        return { label: 'Warning', icon: AlertTriangle, color: 'text-amber-600', bg: 'bg-amber-500/10', border: 'border-amber-500/20' };
-      default: return { label: 'Notification', icon: Bell, color: 'text-slate-600', bg: 'bg-slate-500/10', border: 'border-slate-500/20' };
-    }
-  };
 
   const unreadCount = useMemo(() => notifications.filter(n => !n.read).length, [notifications]);
 
@@ -264,9 +214,6 @@ const AdminNotificationPage = () => {
             </div>
           ) : (
             filteredNotifications.map((notification) => {
-              const config = getTagConfig(notification.type);
-              const Icon = config.icon;
-
               return (
                 <div
                   key={notification.id}

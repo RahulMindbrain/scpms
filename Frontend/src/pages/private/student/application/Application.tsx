@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from 'react';
 import {
   CheckCircle2, Clock, XCircle, Briefcase,
-  Search, ArrowRight, Sparkles, UserCircle,
+  Search, ArrowRight, Sparkles,
   Rocket, Calendar, Building2, 
   ChevronDown, 
   Activity, ShieldCheck, Target,

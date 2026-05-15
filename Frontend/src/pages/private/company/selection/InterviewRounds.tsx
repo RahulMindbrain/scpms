@@ -91,7 +91,7 @@ const CompanyInterviewManager: React.FC = () => {
     setIsApplicationsModalOpen(true);
     setAppsLoading(schedule.id);
     try {
-      await dispatch(fetchScheduleApplications(schedule.id)).unwrap();
+      await dispatch(fetchScheduleApplications({ id: schedule.id })).unwrap();
     } catch (error: any) {
       toast.error(error || "Failed to load candidates");
     } finally {
