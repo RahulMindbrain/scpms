@@ -27,7 +27,7 @@ app.use(
     origin: [
       "http://localhost:5173",
       "https://7132f00b.scpms.pages.dev",
-      "https://scpms-2.pages.dev/",
+      "https://scpms-2.pages.dev",
       "https://scpms.pages.dev",
     ],
     methods: ["GET", "POST", "PUT", "DELETE"],
