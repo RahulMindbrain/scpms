@@ -22,10 +22,19 @@ const Applicants: React.FC = () => {
   const [selectedStatus, setSelectedStatus] = React.useState('ALL');
   const [selectedJob, setSelectedJob] = React.useState('All Jobs');
 
-  const STATUS_FLOW = ['APPLIED', 'SHORTLISTED', 'TECHNICAL_ROUND', 'HR_ROUND', 'SELECTED', 'REJECTED'];
+  const STATUS_FLOW = ['APPLIED', 'SHORTLISTED', 'SELECTED', 'OFFER_ACCEPTED'];
+  // Note: REJECTED, WITHDRAWN, NOT_ELIGIBLE are terminal or specific states handled separately in logic
 
   const isBackward = (current: string, next: string) => {
-    return STATUS_FLOW.indexOf(next) < STATUS_FLOW.indexOf(current);
+    if (next === 'REJECTED') return false; // Can always reject unless already rejected or finalized
+    const currentIndex = STATUS_FLOW.indexOf(current);
+    const nextIndex = STATUS_FLOW.indexOf(next);
+    
+    // If next status is not in our primary flow (like REJECTED), we handle it differently
+    if (nextIndex === -1) return false; 
+    if (currentIndex === -1) return false;
+
+    return nextIndex < currentIndex;
   };
 
   React.useEffect(() => {
@@ -48,17 +57,20 @@ const Applicants: React.FC = () => {
   ).filter(Boolean);
 
   const handleStatusUpdate = async (id: number, newStatus: string, currentStatus: string) => {
-    const currentIndex = STATUS_FLOW.indexOf(currentStatus);
-    const newIndex = STATUS_FLOW.indexOf(newStatus);
+    if (newStatus === currentStatus) return;
 
-    if (newIndex < currentIndex) {
+    if (isBackward(currentStatus, newStatus)) {
       toast.error("Process integrity: Status cannot be moved backward");
       return;
     }
 
-    if (newIndex === currentIndex) return;
+    // Backend specific restriction: Cannot update if already finalized
+    if (['REJECTED', 'OFFER_ACCEPTED', 'OFFER_REJECTED', 'WITHDRAWN'].includes(currentStatus)) {
+      toast.error("Candidate process is already finalized");
+      return;
+    }
 
-    const toastId = toast.loading(`Updating ${newStatus.toLowerCase()} status...`);
+    const toastId = toast.loading(`Updating to ${newStatus.toLowerCase()} status...`);
     try {
       await dispatch(updateJobApplicationStatus({ id, status: newStatus })).unwrap();
       toast.success("Candidate status updated!", { id: toastId });
@@ -244,8 +256,7 @@ const Applicants: React.FC = () => {
                               ${app.status === 'SELECTED' ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-600' :
                                 app.status === 'REJECTED' ? 'border-rose-500/50 bg-rose-500/5 text-rose-600' :
                                 app.status === 'SHORTLISTED' ? 'border-violet-500/50 bg-violet-500/5 text-violet-600' :
-                                app.status === 'TECHNICAL_ROUND' ? 'border-blue-500/50 bg-blue-500/5 text-blue-600' :
-                                app.status === 'HR_ROUND' ? 'border-amber-500/50 bg-amber-500/5 text-amber-600' :
+                                app.status === 'OFFER_ACCEPTED' ? 'border-teal-500/50 bg-teal-500/5 text-teal-600' :
                                 'border-primary/50 bg-primary/5 text-primary'}
                             `}>
                               <SelectValue />
@@ -259,16 +270,6 @@ const Applicants: React.FC = () => {
                               <SelectItem value="SHORTLISTED" disabled={isBackward(app.status, 'SHORTLISTED')}>
                                 <div className="flex items-center gap-2 py-1">
                                   <Sparkles size={14} className="text-violet-500" /> <span>Shortlisted</span>
-                                </div>
-                              </SelectItem>
-                              <SelectItem value="TECHNICAL_ROUND" disabled={isBackward(app.status, 'TECHNICAL_ROUND')}>
-                                <div className="flex items-center gap-2 py-1">
-                                  <Building2 size={14} className="text-blue-500" /> <span>Technical Round</span>
-                                </div>
-                              </SelectItem>
-                              <SelectItem value="HR_ROUND" disabled={isBackward(app.status, 'HR_ROUND')}>
-                                <div className="flex items-center gap-2 py-1">
-                                  <User size={14} className="text-amber-500" /> <span>HR Round</span>
                                 </div>
                               </SelectItem>
                               <SelectItem value="SELECTED" disabled={isBackward(app.status, 'SELECTED')}>
@@ -358,8 +359,7 @@ const Applicants: React.FC = () => {
                       ${app.status === 'SELECTED' ? 'border-emerald-500/50 bg-emerald-500/5 text-emerald-600' :
                         app.status === 'REJECTED' ? 'border-rose-500/50 bg-rose-500/5 text-rose-600' :
                         app.status === 'SHORTLISTED' ? 'border-violet-500/50 bg-violet-500/5 text-violet-600' :
-                        app.status === 'TECHNICAL_ROUND' ? 'border-blue-500/50 bg-blue-500/5 text-blue-600' :
-                        app.status === 'HR_ROUND' ? 'border-amber-500/50 bg-amber-500/5 text-amber-600' :
+                        app.status === 'OFFER_ACCEPTED' ? 'border-teal-500/50 bg-teal-500/5 text-teal-600' :
                         'border-primary/50 bg-primary/5 text-primary'}
                     `}>
                       <SelectValue />
@@ -367,8 +367,6 @@ const Applicants: React.FC = () => {
                     <SelectContent className="rounded-2xl border-border shadow-2xl">
                       <SelectItem value="APPLIED" disabled={isBackward(app.status, 'APPLIED')}>Applied</SelectItem>
                       <SelectItem value="SHORTLISTED" disabled={isBackward(app.status, 'SHORTLISTED')}>Shortlisted</SelectItem>
-                      <SelectItem value="TECHNICAL_ROUND" disabled={isBackward(app.status, 'TECHNICAL_ROUND')}>Technical Round</SelectItem>
-                      <SelectItem value="HR_ROUND" disabled={isBackward(app.status, 'HR_ROUND')}>HR Round</SelectItem>
                       <SelectItem value="SELECTED" disabled={isBackward(app.status, 'SELECTED')}>Selected</SelectItem>
                       <SelectItem value="REJECTED" disabled={isBackward(app.status, 'REJECTED')}>Rejected</SelectItem>
                     </SelectContent>

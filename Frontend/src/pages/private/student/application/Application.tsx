@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from "@/components/ui/card";
 import {StudentPageLayout} from '@/components/layout/StudentPageLayout';
-type Status = 'APPLIED' | 'SHORTLISTED' | 'TECHNICAL_ROUND' | 'HR_ROUND' | 'SELECTED' | 'REJECTED' | 'OFFER_ACCEPTED' | 'OFFER_REJECTED' | 'WITHDRAWN' | 'NOT_ELIGIBLE';
+type Status = 'APPLIED' | 'SHORTLISTED' | 'SELECTED' | 'REJECTED' | 'OFFER_ACCEPTED' | 'OFFER_REJECTED' | 'WITHDRAWN' | 'NOT_ELIGIBLE';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string; icon: any; shadow: string; accent: string }> = {
   APPLIED: { 
@@ -37,22 +37,6 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: str
     icon: CheckCircle2,
     shadow: 'shadow-purple-500/20',
     accent: 'bg-purple-500'
-  },
-  TECHNICAL_ROUND: { 
-    label: 'Technical', 
-    color: 'text-blue-400', 
-    bgColor: 'bg-blue-500/10', 
-    icon: Rocket,
-    shadow: 'shadow-blue-500/20',
-    accent: 'bg-blue-500'
-  },
-  HR_ROUND: { 
-    label: 'HR Round', 
-    color: 'text-amber-400', 
-    bgColor: 'bg-amber-500/10', 
-    icon: UserCircle,
-    shadow: 'shadow-amber-500/20',
-    accent: 'bg-amber-500'
   },
   SELECTED: { 
     label: 'Selected', 
@@ -104,7 +88,7 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: str
   },
 };
 
-const STAGES: Status[] = ['APPLIED', 'SHORTLISTED', 'TECHNICAL_ROUND', 'HR_ROUND', 'SELECTED'];
+const STAGES: Status[] = ['APPLIED', 'SHORTLISTED', 'SELECTED', 'OFFER_ACCEPTED'];
 
 /* ─── Premium Company Icon ─── */
 const CompanyIcon = ({ name, size = "md" }: { name: string, size?: "sm" | "md" | "lg" }) => {
