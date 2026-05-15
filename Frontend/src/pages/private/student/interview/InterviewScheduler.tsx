@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
-import CountdownTimer from '@/components/CountdownTimer';
+import { UpcomingEventsList } from '@/components/dashboard/UpcomingEventsList';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { fetchUpcomingEvents } from '@/redux/thunks/notificationThunks';
@@ -48,7 +48,7 @@ const InterviewSchedule: React.FC = () => {
   return (
     <StudentPageLayout>
       <div className="space-y-10 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
-        
+
         {/* Adaptive Hero Banner */}
         <div className="student-hero-banner group">
           <div className="student-hero-mesh">
@@ -58,11 +58,11 @@ const InterviewSchedule: React.FC = () => {
 
           <div className="student-hero-texture"></div>
           <div className="student-hero-overlay"></div>
-          
+
           <div className="relative z-10 w-full flex flex-col md:flex-row md:items-center md:justify-between gap-8">
             <div className="max-w-2xl">
               <div className="student-hero-badge">
-                <Sparkles size={14} /> 
+                <Sparkles size={14} />
                 <span>Interview Hub</span>
               </div>
               <h1 className="student-hero-title">
@@ -87,8 +87,8 @@ const InterviewSchedule: React.FC = () => {
               <div>
                 <h2 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">Active Invitations</h2>
                 <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm mt-1 font-medium">
-                  {upcomingEvents.length > 0 
-                    ? `You have ${upcomingEvents.length} interviews scheduled.` 
+                  {upcomingEvents.length > 0
+                    ? `You have ${upcomingEvents.length} interviews scheduled.`
                     : "No interviews scheduled at the moment."}
                 </p>
               </div>
@@ -97,89 +97,7 @@ const InterviewSchedule: React.FC = () => {
               </Button>
             </div>
 
-            <div className="space-y-6">
-              {upcomingEvents.length > 0 ? (
-                upcomingEvents.map((item, idx) => (
-                  <motion.div 
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: idx * 0.1 }}
-                    key={item.id} 
-                    className={cn(
-                      "group relative bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl border border-slate-200/60 dark:border-white/[0.08] rounded-[2.5rem] p-6 md:p-10 transition-all duration-500 hover:shadow-2xl hover:border-indigo-500/30 hover:translate-y-[-4px]",
-                    )}
-                  >
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
-                      <div className="flex flex-col sm:flex-row gap-6">
-                        <div className={cn(
-                          "w-14 h-14 md:w-20 md:h-20 rounded-[1.25rem] md:rounded-[1.5rem] bg-gradient-to-br flex items-center justify-center text-white font-black text-xl md:text-3xl shadow-xl transition-transform group-hover:scale-110 duration-500 shrink-0 mx-auto sm:mx-0",
-                          getAccentColor(item.company || 'C', idx)
-                        )}>
-                          {(item.company || item.title || 'C').charAt(0).toUpperCase()}
-                        </div>
-                        <div className="space-y-2 text-center sm:text-left">
-                          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 mb-1">
-                            <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-slate-200">{item.title}</h3>
-                            <span className={cn(
-                              "text-[8px] md:text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-[0.1em] border shadow-sm whitespace-nowrap",
-                              item.venue?.toLowerCase().includes('http') || item.venue?.toLowerCase().includes('meet') || item.venue?.toLowerCase().includes('zoom')
-                                ? 'bg-blue-500/10 text-blue-600 border-blue-500/20 shadow-blue-500/5' 
-                                : 'bg-amber-500/10 text-amber-600 border-amber-500/20 shadow-amber-500/5'
-                            )}>
-                              {item.venue?.toLowerCase().includes('http') || item.venue?.toLowerCase().includes('meet') || item.venue?.toLowerCase().includes('zoom') ? 'Online' : 'Offline'}
-                            </span>
-                          </div>
-                          <p className="text-indigo-600 dark:text-indigo-400 font-black text-xs md:text-sm uppercase tracking-wider">{item.company}</p>
-                          <p className="text-slate-500 dark:text-slate-400 text-[10px] md:text-xs font-bold flex items-center justify-center sm:justify-start gap-1.5 uppercase tracking-tighter">
-                            <UserCheck size={14} className="text-indigo-500" />
-                            Interview Round
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-center lg:items-end gap-6 pt-6 lg:pt-0 border-t lg:border-t-0 border-slate-100 dark:border-white/5">
-                        <div className="flex flex-col items-center lg:items-end gap-4 w-full">
-                          <div className="flex items-center gap-6 text-slate-500">
-                            <div className="flex items-center gap-2 text-[10px] md:text-xs font-black uppercase tracking-wider">
-                              <Calendar size={14} className="text-indigo-500 md:w-4 md:h-4" />
-                              {new Date(item.startTime).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                            </div>
-                            <div className="flex items-center gap-2 text-[10px] md:text-xs font-black uppercase tracking-wider">
-                              <Clock size={14} className="text-indigo-500 md:w-4 md:h-4" />
-                              {new Date(item.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                            </div>
-                          </div>
-                          <CountdownTimer targetDate={item.startTime} />
-                        </div>
-                        
-                        {item.venue?.toLowerCase().includes('http') || item.venue?.toLowerCase().includes('meet') || item.venue?.toLowerCase().includes('zoom') ? (
-                          <a 
-                            href={item.venue.startsWith('http') ? item.venue : `https://${item.venue}`} 
-                            target="_blank" 
-                            rel="noreferrer" 
-                            className="w-full sm:w-auto flex items-center justify-center gap-2 text-[10px] md:text-xs font-black uppercase tracking-widest text-white bg-indigo-600 hover:bg-indigo-700 px-6 md:px-8 py-3.5 md:py-4 rounded-2xl transition-all shadow-xl shadow-indigo-500/20 active:scale-95"
-                          >
-                            Launch Meeting <ExternalLink size={16} />
-                          </a>
-                        ) : (
-                          <button className="w-full sm:w-auto flex items-center justify-center gap-2 text-[10px] md:text-xs font-black uppercase tracking-widest text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-white/5 hover:bg-slate-200 dark:hover:bg-white/10 px-6 md:px-8 py-3.5 md:py-4 rounded-2xl transition-all border border-slate-200 dark:border-white/10 active:scale-95">
-                            <span className="truncate max-w-[150px]">{item.venue || "View Location"}</span> <MapPin size={16} />
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))
-              ) : (
-                <div className="py-20 md:py-24 flex flex-col items-center text-center bg-white dark:bg-[#1e1f26]/30 rounded-[2.5rem] md:rounded-[3rem] border border-dashed border-slate-200 dark:border-white/10 px-4">
-                  <div className="w-20 h-20 md:w-24 md:h-24 bg-slate-100 dark:bg-white/5 rounded-[1.5rem] md:rounded-[2rem] flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 mx-auto">
-                    <Calendar size={40} className="md:w-12 md:h-12" strokeWidth={1.5} />
-                  </div>
-                  <h3 className="text-lg md:text-xl font-bold text-slate-900 dark:text-white">No upcoming interviews</h3>
-                  <p className="text-slate-500 dark:text-slate-400 text-xs md:text-sm max-w-xs mt-2 font-medium mx-auto">We'll notify you as soon as a recruiter schedules a round with you.</p>
-                </div>
-              )}
-            </div>
+            <UpcomingEventsList events={upcomingEvents} />
           </div>
 
           {/* Sidebar Area */}

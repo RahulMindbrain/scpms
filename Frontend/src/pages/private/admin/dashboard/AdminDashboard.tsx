@@ -19,7 +19,7 @@ import {
   Mail,
   Building2
 } from "lucide-react"
-import { fetchNotifications } from "@/redux/thunks/notificationThunks"
+import { fetchNotifications, fetchUpcomingEvents } from "@/redux/thunks/notificationThunks"
 import { AdminPageLayout } from "@/components/layout/AdminPageLayout"
 import { PageHeader } from "@/components/PageHeader"
 import Loader from "@/components/Loader"
@@ -32,7 +32,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { NextInterviewCountdown } from "@/components/dashboard/NextInterviewCountdown"
+import { UpcomingEventsList } from "@/components/dashboard/UpcomingEventsList"
 
 
 
@@ -273,13 +273,14 @@ export default function AdminDashboard() {
   const dispatch = useDispatch<AppDispatch>()
   const { data: dashboardData, loading: dashLoading, error } = useSelector((state: RootState) => state.dashboard)
   const { schedules, loading: schedLoading } = useSelector((state: RootState) => state.interview)
-  const { items: notifications, loading: notifLoading } = useSelector((state: RootState) => state.notification)
+  const { items: notifications, upcomingEvents = [], loading: notifLoading } = useSelector((state: RootState) => state.notification)
   const { user } = useSelector((state: RootState) => state.auth)
 
   useEffect(() => {
     dispatch(fetchDashboardStats())
     dispatch(fetchSchedules(undefined))
     dispatch(fetchNotifications({ page: 1, limit: 10 }))
+    dispatch(fetchUpcomingEvents())
   }, [dispatch])
 
   // Onboarding Logic
@@ -355,6 +356,8 @@ export default function AdminDashboard() {
           totalDepartments={totalDepartments}
         />
 
+        <UpcomingEventsList events={upcomingEvents} />
+
         {/* Row 2: Analytics & Feed */}
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
           <div className="xl:col-span-8 flex flex-col">
@@ -387,7 +390,6 @@ export default function AdminDashboard() {
           
           <div className="xl:col-span-4 flex flex-col gap-8">
             <QuickActions />
-            <NextInterviewCountdown schedules={schedules} />
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ import { fetchUpcomingEvents } from "@/redux/thunks/notificationThunks"
 
 import Loader from "@/components/Loader"
 import { Sparkles } from "lucide-react"
-import { NextInterviewCountdown } from "@/components/dashboard/NextInterviewCountdown"
+import { UpcomingEventsList } from "@/components/dashboard/UpcomingEventsList"
 
 export default function Dashboard() {
   const dispatch = useDispatch<AppDispatch>()
@@ -95,21 +95,17 @@ export default function Dashboard() {
         </div>
         <div className="hero-texture" />
         
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div>
-            <div className="hero-badge mb-4">
-              <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
-              Company Command Center
-            </div>
-            <h1 className="hero-title text-4xl lg:text-5xl font-black mb-4">
-              Welcome back to <span className="text-blue-400">SCPMS</span>
-            </h1>
-            <p className="hero-description text-base opacity-90 max-w-lg mb-0">
-              Monitor your job drives, track applicant progress, and discover top talent effortlessly.
-            </p>
+        <div className="relative z-10">
+          <div className="hero-badge mb-4">
+            <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse" />
+            Company Command Center
           </div>
-
-         
+          <h1 className="hero-title text-4xl lg:text-5xl font-black mb-4">
+            Welcome back to <span className="text-blue-400">SCPMS</span>
+          </h1>
+          <p className="hero-description text-base opacity-90 max-w-lg mb-0">
+            Monitor your job drives, track applicant progress, and discover top talent effortlessly.
+          </p>
         </div>
       </div>
 
@@ -120,6 +116,8 @@ export default function Dashboard() {
           totalStudents={metrics.totalApplicants}
           totalDepartments={metrics.deptStats.length}
         />
+
+        <UpcomingEventsList events={upcomingEvents} />
         
         <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
           <div className="xl:col-span-7 saas-card flex flex-col">
@@ -152,9 +150,6 @@ export default function Dashboard() {
              <div className="flex-1 overflow-auto p-2">
                 <DeptStatsTable deptStats={metrics.deptStats} />
              </div>
-          </div>
-           <div className="w-full lg:w-[400px]">
-            <NextInterviewCountdown schedules={upcomingEvents} />
           </div>
         </div>
       </div>

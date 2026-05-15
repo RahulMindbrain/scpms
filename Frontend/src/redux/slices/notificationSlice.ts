@@ -106,9 +106,13 @@ const notificationSlice = createSlice({
           ? payload
           : Array.isArray(payload?.events)
             ? payload.events
-            : Array.isArray(payload?.data)
-              ? payload.data
-              : [];
+            : Array.isArray(payload?.items)
+              ? payload.items
+              : Array.isArray(payload?.data?.items)
+                ? payload.data.items
+                : Array.isArray(payload?.data)
+                  ? payload.data
+                  : [];
       })
       .addCase(fetchUpcomingEvents.rejected, (state, action) => {
         state.loading = false;
