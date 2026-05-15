@@ -1015,9 +1015,7 @@ export const getUpcomingSchedulesForCompany = async (
               select: {
                 id: true,
                 title: true,
-                description: true,
                 location: true,
-                status: true,
                 createdAt: true,
 
                 eligibleDepartments: {
@@ -1047,8 +1045,6 @@ export const getUpcomingSchedulesForCompany = async (
                 isAccepted: true,
 
                 acceptedAt: true,
-
-                rejectedAt: true,
 
                 createdAt: true,
               },
@@ -1182,9 +1178,7 @@ export const getUpcomingSchedulesForAdmin = async (
               select: {
                 id: true,
                 title: true,
-                description: true,
                 location: true,
-                status: true,
                 createdAt: true,
 
                 eligibleDepartments: {
@@ -1214,8 +1208,6 @@ export const getUpcomingSchedulesForAdmin = async (
                 isAccepted: true,
 
                 acceptedAt: true,
-
-                rejectedAt: true,
 
                 createdAt: true,
               },
