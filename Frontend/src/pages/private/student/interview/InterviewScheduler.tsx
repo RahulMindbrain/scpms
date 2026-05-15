@@ -97,7 +97,7 @@ const InterviewSchedule: React.FC = () => {
               </Button>
             </div>
 
-            <UpcomingEventsList events={upcomingEvents} />
+            <UpcomingEventsList events={upcomingEvents} showApprovalStatus={false} />
           </div>
 
           {/* Sidebar Area */}

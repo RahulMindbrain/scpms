@@ -17,6 +17,7 @@ import { UpcomingEventsList } from "@/components/dashboard/UpcomingEventsList"
 import type { AppDispatch } from "@/redux/store/store"
 import type { RootState } from "@/redux/reducers/rootReducer"
 import { fetchUpcomingEvents, fetchUnreadCount } from "@/redux/thunks/notificationThunks"
+import { fetchJobApplications } from "@/redux/thunks/studentThunk"
 import { useSocket } from "@/socket/SocketProvider"
 import { SOCKET_EVENTS } from "@/socket/socket.events"
 import { StudentPageLayout } from "@/components/layout/StudentPageLayout"
@@ -29,11 +30,13 @@ export default function StudentDashboard() {
     (state: RootState) => state.notification || {}
   )
 
+  const { applications = [] } = useSelector((state: RootState) => state.student)
   const { user } = useSelector((state: RootState) => state.auth)
 
   useEffect(() => {
     dispatch(fetchUpcomingEvents())
     dispatch(fetchUnreadCount())
+    dispatch(fetchJobApplications({ page: 1, limit: 100 }))
   }, [dispatch])
 
   useEffect(() => {
@@ -116,6 +119,14 @@ export default function StudentDashboard() {
               iconBg: "bg-amber-500/10",
               iconColor: "text-amber-600"
             },
+            { 
+              label: "Applied Jobs", 
+              value: applications.length, 
+              icon: Briefcase, 
+              gradient: "from-emerald-400 to-teal-500",
+              iconBg: "bg-emerald-500/10",
+              iconColor: "text-emerald-600"
+            },
           ].map((stat, idx) => (
             <div
               key={idx}
@@ -157,7 +168,7 @@ export default function StudentDashboard() {
               </Link>
             </div>
 
-            <UpcomingEventsList events={upcomingEvents} />
+            <UpcomingEventsList events={upcomingEvents} showApprovalStatus={false} />
           </div>
 
           {/* Quick Navigation */}

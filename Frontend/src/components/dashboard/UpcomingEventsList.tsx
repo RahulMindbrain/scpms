@@ -16,9 +16,10 @@ interface Event {
 
 interface UpcomingEventsListProps {
   events: Event[];
+  showApprovalStatus?: boolean;
 }
 
-export const UpcomingEventsList = ({ events }: UpcomingEventsListProps) => {
+export const UpcomingEventsList = ({ events, showApprovalStatus = true }: UpcomingEventsListProps) => {
   const [now, setNow] = useState(new Date().getTime());
 
   useEffect(() => {
@@ -61,11 +62,12 @@ export const UpcomingEventsList = ({ events }: UpcomingEventsListProps) => {
       <div className="grid gap-4">
         <AnimatePresence mode="popLayout">
           {sortedEvents.map((event, index) => (
-            <EventCard
-              key={event.id}
-              event={event}
-              isFirst={index === 0}
-              now={now}
+            <EventCard 
+              key={event.id} 
+              event={event} 
+              isFirst={index === 0} 
+              now={now} 
+              showApprovalStatus={showApprovalStatus}
             />
           ))}
         </AnimatePresence>
@@ -74,7 +76,7 @@ export const UpcomingEventsList = ({ events }: UpcomingEventsListProps) => {
   );
 };
 
-const EventCard = ({ event, isFirst, now }: { event: Event; isFirst: boolean; now: number }) => {
+const EventCard = ({ event, isFirst, now, showApprovalStatus }: { event: Event; isFirst: boolean; now: number; showApprovalStatus: boolean }) => {
   const startTime = new Date(event.startTime).getTime();
   const isOngoing = startTime <= now && new Date(event.endTime).getTime() > now;
   const distance = startTime - now;
@@ -141,7 +143,7 @@ const EventCard = ({ event, isFirst, now }: { event: Event; isFirst: boolean; no
               <Building2 className="size-3" />
               {companyName || 'Corporate Drive'}
             </span>
-            {event.companyApprovalStatus === 'PENDING' && (
+            {showApprovalStatus && event.companyApprovalStatus === 'PENDING' && (
               <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-600 text-[9px] font-black uppercase tracking-widest border border-amber-500/20">
                 Pending Approval
               </span>
