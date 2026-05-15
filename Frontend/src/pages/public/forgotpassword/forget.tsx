@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Mail, ChevronLeft, ArrowRight, GraduationCap, Lock, ShieldCheck, KeyRound, RotateCcw, Eye, EyeOff } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import forgot from '../../../assets/forgot.png';
 import { useDispatch } from 'react-redux';
 import { forgotPassword, verifyOTP, resetPassword } from '../../../redux/thunks/forgotPasswordThunk';
 import { toast } from 'sonner';
 import type { AppDispatch } from '@/redux/store/store';
+import { ModeToggle } from "@/components/mode-toggle";
+import { motion, AnimatePresence } from "framer-motion";
+
+// Import Assets
+import imgBG from "@/assets/img.jpg";
 
 type FlowStep = 'EMAIL' | 'OTP' | 'RESET';
 
@@ -19,7 +23,7 @@ const ForgotPassword: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [timer, setTimer] = useState(30);
+  const [timer, setTimer] = useState(300);
   const [canResend, setCanResend] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -42,13 +46,13 @@ const ForgotPassword: React.FC = () => {
 
     setIsLoading(true);
     try {
-      await dispatch(forgotPassword(email)).unwrap();
-      toast.success("OTP sent successfully to your email", { id: "otp-toast" });
+      await dispatch(forgotPassword(email.toLowerCase())).unwrap();
+      toast.success("OTP sent successfully to your email");
       setStep('OTP');
-      setTimer(30);
+      setTimer(300);
       setCanResend(false);
     } catch (error: any) {
-      toast.error(error || "Failed to send OTP", { id: "otp-toast" });
+      toast.error(error || "Failed to send OTP");
     } finally {
       setIsLoading(false);
     }
@@ -60,11 +64,11 @@ const ForgotPassword: React.FC = () => {
 
     setIsLoading(true);
     try {
-      await dispatch(verifyOTP({ email, otp })).unwrap();
-      toast.success("OTP verified successfully", { id: "otp-toast" });
+      await dispatch(verifyOTP({ email: email.toLowerCase(), otp })).unwrap();
+      toast.success("OTP verified successfully");
       setStep('RESET');
     } catch (error: any) {
-      toast.error(error || "Invalid OTP", { id: "otp-toast" });
+      toast.error(error || "Invalid OTP");
     } finally {
       setIsLoading(false);
     }
@@ -74,15 +78,14 @@ const ForgotPassword: React.FC = () => {
     if (!canResend) return;
     setIsLoading(true);
     try {
-      await dispatch(forgotPassword(email)).unwrap();
-      toast.success("OTP resent successfully", { id: "otp-toast" });
-      setTimer(30);
+      await dispatch(forgotPassword(email.toLowerCase())).unwrap();
+      toast.success("OTP resent successfully");
+      setTimer(300);
       setCanResend(false);
     } catch (error: any) {
-      toast.error(error || "Failed to resend OTP", { id: "otp-toast" });
-      // If OTP was already sent, we should still start the timer to prevent immediate spamming
+      toast.error(error || "Failed to resend OTP");
       if (error === "OTP already sent. Please wait.") {
-        setTimer(30);
+        setTimer(300);
         setCanResend(false);
       }
     } finally {
@@ -101,185 +104,154 @@ const ForgotPassword: React.FC = () => {
 
     setIsLoading(true);
     try {
-      await dispatch(resetPassword({ email, newpassword: newPassword })).unwrap();
-      toast.success("Password reset successful. Please login with your new password.", { id: "otp-toast" });
+      await dispatch(resetPassword({ email: email.toLowerCase(), newpassword: newPassword })).unwrap();
+      toast.success("Password reset successful. Please login.");
       navigate('/login');
     } catch (error: any) {
-      toast.error(error || "Failed to reset password", { id: "otp-toast" });
+      toast.error(error || "Failed to reset password");
     } finally {
       setIsLoading(false);
     }
   };
 
-  const renderCurrentStep = () => {
+  const renderStepContent = () => {
     switch (step) {
       case 'EMAIL':
         return (
-          <form className="space-y-6" onSubmit={handleSendOTP}>
+          <motion.div
+            key="email-step"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6"
+          >
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 ml-1">University Email</label>
+              <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">University Email</label>
               <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
-                  <Mail size={20} strokeWidth={2} />
-                </div>
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
                 <input
                   type="email"
+                  required
+                  placeholder="name@university.edu"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@university.edu"
-                  required
-                  className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium"
+                  className="w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm"
                 />
               </div>
             </div>
             <button
-              type="submit"
+              onClick={handleSendOTP}
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#1E40AF] to-[#1A365D] hover:from-[#1A365D] hover:to-[#1E3A8A] text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20 transition-all duration-300 flex items-center justify-center gap-2 group active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-xl shadow-blue-500/20 disabled:opacity-70 active:scale-[0.98]"
             >
-              <span>{isLoading ? "Sending OTP..." : "Send OTP"}</span>
-              {!isLoading && <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />}
+              {isLoading ? "Sending Code..." : "Send Verification Code"}
+              {!isLoading && <ArrowRight size={18} />}
             </button>
-          </form>
+          </motion.div>
         );
       case 'OTP':
         return (
-          <form className="space-y-6" onSubmit={handleVerifyOTP}>
+          <motion.div
+            key="otp-step"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6"
+          >
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700 ml-1">Verification Code</label>
+              <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Verification OTP</label>
               <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
-                  <ShieldCheck size={20} strokeWidth={2} />
-                </div>
+                <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
                 <input
                   type="text"
+                  required
+                  placeholder="Enter 6-digit OTP"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
-                  placeholder="Enter 6-digit OTP"
-                  minLength={6}
-                  maxLength={18}
-                  required
-                  className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-4 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium tracking-[0.5em]"
+                  className="w-full pl-11 pr-4 py-3.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm tracking-[0.2em] font-mono text-center"
                 />
               </div>
             </div>
             <button
-              type="submit"
+              onClick={handleVerifyOTP}
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#10B981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white font-bold py-4 rounded-xl shadow-lg shadow-emerald-900/20 transition-all duration-300 flex items-center justify-center gap-2 group active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-xl shadow-blue-500/20 disabled:opacity-70 active:scale-[0.98]"
             >
-              <span>{isLoading ? "Verifying..." : "Verify OTP"}</span>
-              {!isLoading && <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />}
+              {isLoading ? "Verifying..." : "Verify Identity"}
+              {!isLoading && <ArrowRight size={18} />}
             </button>
-            <div className="flex flex-col gap-4 mt-4">
+            <div className="pt-2">
               <button
                 type="button"
                 disabled={!canResend || isLoading}
                 onClick={handleResendOTP}
-                className={`w-full py-4 rounded-xl font-bold transition-all duration-300 flex items-center justify-center gap-3 active:scale-[0.98] ${
+                className={`w-full py-3.5 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 ${
                   canResend 
-                    ? "bg-blue-50 text-blue-600 hover:bg-blue-100 shadow-md shadow-blue-900/5 animate-in zoom-in-95 duration-300" 
-                    : "bg-slate-50 text-slate-400 cursor-not-allowed border border-slate-100"
+                    ? "bg-slate-100 dark:bg-white/5 text-slate-900 dark:text-white hover:bg-slate-200 dark:hover:bg-white/10" 
+                    : "bg-slate-50 dark:bg-white/5 text-slate-400 cursor-not-allowed opacity-50"
                 }`}
               >
                 {canResend ? (
                   <>
-                    <RotateCcw size={18} className="animate-in spin-in-180 duration-700" />
-                    <span>Resend OTP</span>
+                    <RotateCcw size={14} />
+                    Resend Code
                   </>
                 ) : (
                   <>
-                    <div className="relative flex items-center justify-center w-6 h-6">
-                      <svg className="w-full h-full transform -rotate-90">
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          fill="transparent"
-                          className="text-slate-200"
-                        />
-                        <circle
-                          cx="12"
-                          cy="12"
-                          r="10"
-                          stroke="currentColor"
-                          strokeWidth="2.5"
-                          fill="transparent"
-                          strokeDasharray={2 * Math.PI * 10}
-                          strokeDashoffset={2 * Math.PI * 10 * (1 - timer / 30)}
-                          strokeLinecap="round"
-                          className="text-blue-500 transition-all duration-1000 ease-linear"
-                        />
-                      </svg>
-                    </div>
-                    <span className="text-sm font-medium">
-                      Didn't receive code? Retry in <span className="text-blue-600 font-bold tabular-nums">{timer}s</span>
-                    </span>
+                    Wait {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')} to Resend
                   </>
                 )}
               </button>
-              
-              <button
-                type="button"
-                onClick={() => {
-                  setStep('EMAIL');
-                  setTimer(30);
-                  setCanResend(false);
-                }}
-                className="text-slate-400 text-xs font-medium hover:text-slate-600 transition-colors flex items-center justify-center gap-1"
-              >
-                Entered wrong email? <span className="text-blue-500 hover:underline">Change Email Address</span>
-              </button>
             </div>
-          </form>
+          </motion.div>
         );
       case 'RESET':
         return (
-          <form className="space-y-6" onSubmit={handleResetPassword}>
+          <motion.div
+            key="reset-step"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="space-y-6"
+          >
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 ml-1">New Password</label>
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">New Password</label>
                 <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
-                    <Lock size={20} strokeWidth={2} />
-                  </div>
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
                   <input
                     type={showNewPassword ? "text" : "password"}
+                    required
+                    placeholder="••••••••"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="••••••••"
-                    required
-                    className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium"
+                    className="w-full pl-11 pr-11 py-3.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm"
                   />
                   <button
                     type="button"
                     onClick={() => setShowNewPassword(!showNewPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                   >
                     {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700 ml-1">Confirm New Password</label>
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Confirm Password</label>
                 <div className="relative group">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors">
-                    <KeyRound size={20} strokeWidth={2} />
-                  </div>
+                  <KeyRound className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
                   <input
                     type={showConfirmPassword ? "text" : "password"}
+                    required
+                    placeholder="••••••••"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="••••••••"
-                    required
-                    className="w-full bg-[#F8FAFC] border border-slate-200 rounded-xl py-4 pl-12 pr-12 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/5 transition-all placeholder:text-slate-400 text-slate-900 font-medium"
+                    className="w-full pl-11 pr-11 py-3.5 bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-white/10 rounded-xl text-slate-900 dark:text-white placeholder:text-slate-400 outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors focus:outline-none"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                   >
                     {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
@@ -287,95 +259,115 @@ const ForgotPassword: React.FC = () => {
               </div>
             </div>
             <button
-              type="submit"
+              onClick={handleResetPassword}
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#1E40AF] to-[#1A365D] hover:from-[#1A365D] hover:to-[#1E3A8A] text-white font-bold py-4 rounded-xl shadow-lg shadow-blue-900/20 transition-all duration-300 flex items-center justify-center gap-2 group active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all shadow-xl shadow-blue-500/20 disabled:opacity-70 active:scale-[0.98]"
             >
-              <span>{isLoading ? "Resetting..." : "Reset Password"}</span>
-              {!isLoading && <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />}
+              {isLoading ? "Updating..." : "Reset My Password"}
+              {!isLoading && <ArrowRight size={18} />}
             </button>
-          </form>
+          </motion.div>
         );
     }
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-4 font-sans selection:bg-blue-100">
+    <div className="min-h-screen w-full flex bg-white dark:bg-[#02040a] font-sans selection:bg-blue-500/30">
+      
+      {/* Left Column: Branding & Image */}
+      <div className="hidden lg:flex lg:w-[45%] xl:w-[40%] relative overflow-hidden flex-col justify-between p-12 xl:p-16">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={imgBG} 
+            alt="Campus Architecture" 
+            className="w-full h-full object-cover grayscale-[20%] brightness-[0.4]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/40 to-slate-950/90"></div>
+        </div>
 
-      {/* Main Container */}
-      <div className="w-full max-w-[1000px] bg-white rounded-[2rem] shadow-2xl shadow-blue-900/10 overflow-hidden flex flex-col md:flex-row min-h-[600px]">
-
-        {/* Left Side: Form */}
-        <div className="flex-1 p-8 md:p-16 flex flex-col justify-center">
-
-          {/* Logo Section */}
-          <div className="flex items-center gap-3 mb-10">
-            <div className="w-10 h-10 bg-[#1A3785] rounded-xl flex items-center justify-center shadow-lg shadow-blue-900/20">
+        <div className="relative z-10">
+          <div className="flex items-center gap-3 mb-16">
+            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
               <GraduationCap className="text-white" size={24} />
             </div>
-            <span className="text-xl font-bold text-[#0F172A] tracking-tight">Smart CPMS</span>
+            <span className="text-xl font-bold tracking-tight text-white uppercase">Smart CPMS</span>
           </div>
 
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-[#0F172A] mb-2">
-              {step === 'EMAIL' ? 'Reset Password' : step === 'OTP' ? 'Verify OTP' : 'Set New Password'}
+          <div className="max-w-md">
+            <h1 className="text-4xl xl:text-5xl font-bold text-white leading-[1.1] mb-8 tracking-tight">
+              Secure Your <span className="text-blue-500">Access</span> Point.
             </h1>
-            <p className="text-slate-500 text-sm">
-              {step === 'EMAIL'
-                ? "Enter your registered email address and we'll send you an OTP to reset your password."
-                : step === 'OTP'
-                  ? `Enter the 6-digit verification code sent to ${email}`
-                  : "Create a strong new password for your account."}
+            <p className="text-slate-400 text-lg leading-relaxed mb-12">
+              Follow the automated verification process to recover your account credentials and resume your professional journey.
             </p>
+
+            <div className="space-y-6">
+              {[
+                "256-bit Secure Verification",
+                "Automated Credential Recovery",
+                "Multi-factor Identity Validation"
+              ].map((text, i) => (
+                <div key={i} className="flex items-center gap-4 text-slate-300">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                    <ShieldCheck className="text-blue-500" size={14} />
+                  </div>
+                  <span className="text-sm font-medium">{text}</span>
+                </div>
+              ))}
+            </div>
           </div>
+        </div>
 
-          {renderCurrentStep()}
-
-          {/* Back to Login */}
-          <div className="flex justify-center pt-8">
-            <Link to="/login" className="flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors group">
-              <ChevronLeft size={18} className="transition-transform group-hover:-translate-x-1" />
-              Back to Login
-            </Link>
-          </div>
-
-          <p className="mt-12 text-center text-slate-400 text-xs">
-            © 2026 Centralized Placement Management System
+        <div className="relative z-10 pt-12 border-t border-white/5">
+          <p className="text-slate-500 text-xs font-medium uppercase tracking-[0.2em]">
+            © 2024 Smart CPMS. Global Talent Ecosystem.
           </p>
         </div>
+      </div>
 
-        {/* Right Side: Decorative/Info */}
-        <div className="hidden md:flex flex-1 bg-gradient-to-br from-blue-600 to-indigo-900 p-12 items-center justify-center relative overflow-hidden">
-          <div className="absolute top-[-10%] right-[-10%] w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
-          <div className="absolute bottom-[-10%] left-[-10%] w-64 h-64 bg-blue-400/20 rounded-full blur-3xl"></div>
-
-          <div className="relative z-10 text-center max-w-sm">
-            <div className="bg-white p-3 rounded-2xl shadow-2xl rotate-3 mb-10 transform transition-transform hover:rotate-0 duration-500">
-              <div className="aspect-[4/3] bg-slate-200 rounded-lg overflow-hidden flex items-center justify-center">
-                <img
-                  src={forgot}
-                  alt="Forgot Password Illustration"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-
-            <h2 className="text-2xl font-bold text-white mb-4">Secure Access</h2>
-            <p className="text-blue-100/80 leading-relaxed">
-              We use multi-layered security to ensure your placement data and career profile stay protected at all times.
+      {/* Right Column: Form Area */}
+      <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 xl:p-24 relative bg-white dark:bg-[#0b0f1a]">
+        <div className="absolute top-12 right-12">
+          <ModeToggle />
+        </div>
+        
+        <div className="w-full max-w-sm space-y-10">
+          <div className="space-y-3">
+            <h2 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+              {step === 'EMAIL' ? 'Forgot Password' : step === 'OTP' ? 'Verify OTP' : 'Set New Password'}
+            </h2>
+            <p className="text-slate-500 dark:text-slate-400 text-sm">
+              {step === 'EMAIL'
+                ? "Enter your university email to receive a secure verification code."
+                : step === 'OTP'
+                  ? `We've sent a 6-digit code to your registered email address.`
+                  : "Create a unique, high-entropy password to secure your account."}
             </p>
+          </div>
 
-            <div className="flex justify-center gap-2 mt-8">
-              <div className={`h-1.5 transition-all duration-300 rounded-full ${step === 'EMAIL' ? 'w-8 bg-white' : 'w-1.5 bg-white/40'}`}></div>
-              <div className={`h-1.5 transition-all duration-300 rounded-full ${step === 'OTP' ? 'w-8 bg-white' : 'w-1.5 bg-white/40'}`}></div>
-              <div className={`h-1.5 transition-all duration-300 rounded-full ${step === 'RESET' ? 'w-8 bg-white' : 'w-1.5 bg-white/40'}`}></div>
-            </div>
+          <div className="min-h-[280px]">
+            <AnimatePresence mode="wait">
+              {renderStepContent()}
+            </AnimatePresence>
+          </div>
+
+          <div className="text-center pt-4">
+            <Link to="/login" className="inline-flex items-center gap-2 text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors">
+              <ChevronLeft size={14} />
+              Return to Login Gateway
+            </Link>
           </div>
         </div>
 
+        <div className="absolute bottom-12 text-center w-full px-6">
+          <p className="text-[10px] text-slate-400 dark:text-slate-600 font-medium uppercase tracking-[0.15em]">
+            Secure Identity Protocol • Encrypted Session
+          </p>
+        </div>
       </div>
     </div>
   );
 };
 
 export default ForgotPassword;
+
