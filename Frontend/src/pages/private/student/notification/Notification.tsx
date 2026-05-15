@@ -138,7 +138,7 @@ const Notification = () => {
 
   return (
     <StudentPageLayout>
-      <div className="space-y-8 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
+      <div className="space-y-8">
         
         {/* Adaptive Hero Banner */}
         <div className="student-hero-banner group">
@@ -210,11 +210,10 @@ const Notification = () => {
 
                 return (
                   <motion.div
-                    layout
                     key={notification.id}
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.95 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
                     onClick={() => !notification.read && handleMarkAsRead(notification.id)}
                     className={cn(
                       "group relative cursor-pointer rounded-[2rem] md:rounded-[2.5rem] border p-6 md:p-8 transition-all duration-500 overflow-hidden",
@@ -353,9 +352,9 @@ const Notification = () => {
                 className="absolute inset-0 bg-slate-950/60 backdrop-blur-md"
               />
               <motion.div
-                initial={{ y: 20, opacity: 0, scale: 0.95 }}
-                animate={{ y: 0, opacity: 1, scale: 1 }}
-                exit={{ y: 20, opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
                 className="relative w-full max-w-lg rounded-[2.5rem] bg-white dark:bg-[#1e1f26] p-6 md:p-10 shadow-2xl border border-slate-200 dark:border-white/10"
               >
                 <div className="mb-6 md:mb-8 flex items-start justify-between gap-4 md:gap-6">
