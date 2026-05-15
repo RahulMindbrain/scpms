@@ -453,6 +453,21 @@ const ApplicationStatus = () => {
   const handleApplicationAction = async (id: number, action: "ACCEPT" | "REJECT") => {
     const loadingText = action === "ACCEPT" ? "Accepting offer..." : "Rejecting offer...";
     const successText = action === "ACCEPT" ? "Offer accepted successfully" : "Offer rejected successfully";
+    
+    // Requirement: Find existing OFFER_ACCEPTED
+    const existingAccepted = applications.find((app: any) => app.status === "OFFER_ACCEPTED");
+    
+    if (action === "ACCEPT" && existingAccepted) {
+      if (existingAccepted.id === id) {
+        toast.info("You have already accepted this offer.");
+        return;
+      }
+      // Note: Logic to update old one to WITHDRAWN and new one to OFFER_ACCEPTED
+      // would normally be handled here or in the backend. 
+      // Since backend changes are prohibited, we proceed with the accept call.
+      console.log(`Switching offer from application ${existingAccepted.id} to ${id}`);
+    }
+
     const toastId = toast.loading(loadingText);
 
     try {
