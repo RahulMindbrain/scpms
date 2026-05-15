@@ -34,16 +34,22 @@ interface JobUniversity {
   deadline?: string;
   postedAt?: string;
   sentAt: string;
+  status: string;
   job: {
     id: number;
     title: string;
     location: string;
+    companyId?: number;
     company?: {
       id: number;
       name: string;
     };
     skills?: { id: number; name: string }[];
     eligibleDepartments?: { id: number; name: string }[];
+  };
+  university?: {
+    id: number;
+    name: string;
   };
 }
 
@@ -78,22 +84,30 @@ const JobListing = () => {
     return (salary / 100000).toFixed(1) + ' LPA';
   };
 
-  const checkEligibility = (job: JobUniversity) => {
-    if (!profile) return true;
+  const checkEligibility = (job: JobUniversity | null) => {
+    if (!job || !profile) return { eligible: true, reasons: [] };
     
-    // Safety check for profile data
+    const reasons: string[] = [];
     const studentCgpa = profile.cgpa ?? 0;
     const studentBacklogs = profile.activeBacklogs ?? 0;
     const studentDeptId = profile.department?.id || profile.departmentId;
 
-    if (job.minCgpa && studentCgpa < job.minCgpa) return false;
-    if (job.maxBacklogs !== undefined && studentBacklogs > job.maxBacklogs) return false;
+    if (job.minCgpa && studentCgpa < job.minCgpa) {
+      reasons.push(`Minimum CGPA required: ${job.minCgpa} (Your CGPA: ${studentCgpa})`);
+    }
+    if (job.maxBacklogs !== undefined && studentBacklogs > job.maxBacklogs) {
+      reasons.push(`Maximum backlogs allowed: ${job.maxBacklogs} (Your backlogs: ${studentBacklogs})`);
+    }
     
-    // Department check
     const eligibleDeptIds = job.job.eligibleDepartments?.map((d: any) => d.id) || [];
-    if (eligibleDeptIds.length > 0 && !eligibleDeptIds.includes(studentDeptId)) return false;
+    if (eligibleDeptIds.length > 0 && !eligibleDeptIds.includes(studentDeptId)) {
+      reasons.push(`Your department is not eligible for this role`);
+    }
     
-    return true;
+    return {
+      eligible: reasons.length === 0,
+      reasons
+    };
   };
 
   const filteredJobs = useMemo(() => {
@@ -102,17 +116,17 @@ const JobListing = () => {
       
       const matchesSearch =
         job.job.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        job.job.company?.name?.toLowerCase().includes(searchQuery.toLowerCase());
+        job.job.company?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        job.university?.name?.toLowerCase().includes(searchQuery.toLowerCase());
       
       if (!matchesSearch) return false;
 
-      // In any tab, the job must be eligible to be shown (as per user request)
-      const isEligible = checkEligibility(job);
-      if (!isEligible) return false;
-
-      if (activeTab === 'applied') return appliedJobIds.has(Number(job.id));
-      if (activeTab === 'eligible') return !appliedJobIds.has(Number(job.id));
+      const eligibility = checkEligibility(job);
       
+      if (activeTab === 'applied') return appliedJobIds.has(Number(job.id));
+      if (activeTab === 'eligible') return eligibility.eligible && !appliedJobIds.has(Number(job.id));
+      
+      // In 'all' tab, we show everything but mark them
       return true;
     });
   }, [jobs, searchQuery, activeTab, appliedJobIds, profile]);
@@ -248,22 +262,55 @@ const JobListing = () => {
                               <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20 text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] px-3 md:px-4 py-1 md:py-1.5 rounded-full shadow-sm">
                                 Applied
                               </Badge>
-                            ) : (
+                            ) : checkEligibility(job).eligible ? (
                               <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] px-3 md:px-4 py-1 md:py-1.5 rounded-full shadow-sm">
                                 Recommended
                               </Badge>
+                            ) : (
+                              <Badge className="bg-rose-500/10 text-rose-500 border-rose-500/20 text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] px-3 md:px-4 py-1 md:py-1.5 rounded-full shadow-sm">
+                                Ineligible
+                              </Badge>
+                            )}
+                            {job.openings && (
+                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                                {job.openings} Openings
+                              </span>
                             )}
                           </div>
                         </div>
 
-                        <div className="space-y-2">
-                          <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-white leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors tracking-tight line-clamp-2">
-                            {job.job?.title}
-                          </h3>
-                          <p className="text-[9px] md:text-[10px] font-black text-slate-500 flex items-center gap-2 uppercase tracking-[0.15em] truncate">
-                            <Building2 size={14} className="text-blue-500 shrink-0" />
-                            {job.job?.company?.name || 'Top Tier Recruiter'}
-                          </p>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-white leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors tracking-tight line-clamp-2">
+                              {job.job?.title}
+                            </h3>
+                            <div className="flex flex-col gap-1">
+                              <p className="text-[9px] md:text-[10px] font-black text-slate-500 flex items-center gap-2 uppercase tracking-[0.15em] truncate">
+                                <Building2 size={14} className="text-blue-500 shrink-0" />
+                                {job.job?.company?.name || 'Top Tier Recruiter'}
+                              </p>
+                              {job.university?.name && (
+                                <p className="text-[8px] font-bold text-slate-400 flex items-center gap-2 uppercase tracking-[0.1em] truncate pl-0.5">
+                                  <span className="w-1 h-1 rounded-full bg-slate-300"></span>
+                                  {job.university.name} Placement
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Skills Preview */}
+                          <div className="flex flex-wrap gap-1.5 min-h-[1.5rem]">
+                            {job.job?.skills?.slice(0, 3).map((skill) => (
+                              <span key={skill.id} className="text-[8px] font-bold text-blue-600/70 dark:text-blue-400/60 bg-blue-500/5 px-2 py-0.5 rounded-md border border-blue-500/10 whitespace-nowrap">
+                                {skill.name}
+                              </span>
+                            ))}
+                            {(job.job?.skills?.length || 0) > 3 && (
+                              <span className="text-[8px] font-bold text-slate-400 px-1 py-0.5 whitespace-nowrap">
+                                +{job.job.skills!.length - 3} more
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-3 md:gap-4">
@@ -401,6 +448,48 @@ const JobListing = () => {
             </div>
 
             <div className="space-y-4">
+              {/* Eligibility Section */}
+              <div className="space-y-2">
+                <h4 className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Eligibility Criteria</h4>
+                <div className="grid grid-cols-1 gap-2">
+                  {selectedJob && (
+                    <>
+                      <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/[0.02] rounded-xl border border-slate-100 dark:border-white/5">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Minimum CGPA</span>
+                        <span className={cn(
+                          "text-xs font-black",
+                          profile?.cgpa >= (selectedJob.minCgpa || 0) ? "text-emerald-500" : "text-rose-500"
+                        )}>
+                          {selectedJob.minCgpa || 'N/A'}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/[0.02] rounded-xl border border-slate-100 dark:border-white/5">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Max Backlogs</span>
+                        <span className={cn(
+                          "text-xs font-black",
+                          profile?.activeBacklogs <= (selectedJob.maxBacklogs ?? 99) ? "text-emerald-500" : "text-rose-500"
+                        )}>
+                          {selectedJob.maxBacklogs ?? 'No limit'}
+                        </span>
+                      </div>
+                    </>
+                  )}
+                </div>
+                {selectedJob && !checkEligibility(selectedJob).eligible && (
+                  <div className="p-3 bg-rose-500/5 border border-rose-500/20 rounded-xl mt-2">
+                    <p className="text-[9px] font-bold text-rose-500 uppercase tracking-wider mb-1">Ineligibility Reasons:</p>
+                    <ul className="space-y-1">
+                      {checkEligibility(selectedJob).reasons.map((reason, i) => (
+                        <li key={i} className="text-[10px] text-rose-600 dark:text-rose-400 font-medium flex items-center gap-1.5">
+                          <span className="w-1 h-1 rounded-full bg-rose-400"></span>
+                          {reason}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-2">
                 <h4 className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Required Skills</h4>
                 <div className="flex flex-wrap gap-2">
@@ -418,7 +507,7 @@ const JobListing = () => {
               <div className="space-y-2 md:space-y-3">
                 <h4 className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Job Description</h4>
                 <div className="bg-slate-50 dark:bg-white/[0.02] p-4 md:p-6 rounded-2xl border border-slate-100 dark:border-white/5 max-h-40 md:max-h-48 overflow-y-auto no-scrollbar">
-                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium text-xs md:text-sm">
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium text-xs md:text-sm whitespace-pre-wrap">
                     {selectedJob?.description}
                   </p>
                 </div>
@@ -429,9 +518,9 @@ const JobListing = () => {
               <Button
                 className="w-full !bg-blue-600 !text-white py-6 md:py-8 rounded-2xl font-black text-sm md:text-base uppercase tracking-widest shadow-xl shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all border-none"
                 onClick={handleApply}
-                disabled={isApplying || (!!selectedJob && appliedJobIds.has(Number(selectedJob.id)))}
+                disabled={isApplying || !selectedJob || appliedJobIds.has(Number(selectedJob.id)) || !checkEligibility(selectedJob).eligible}
               >
-                {isApplying ? <Loader size="sm" /> : appliedJobIds.has(Number(selectedJob?.id)) ? 'Already Applied' : 'Confirm Application'}
+                {isApplying ? <Loader size="sm" /> : (selectedJob && appliedJobIds.has(Number(selectedJob.id))) ? 'Already Applied' : (selectedJob && !checkEligibility(selectedJob).eligible) ? 'Not Eligible to Apply' : 'Confirm Application'}
               </Button>
             </div>
           </div>
