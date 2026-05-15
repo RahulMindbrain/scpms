@@ -4,6 +4,7 @@ import { fetchSchedules, createSchedule, updateSchedule, deleteSchedule, fetchSc
 interface InterviewState {
   schedules: any[];
   applications: any[];
+  meta: any;
   loading: boolean;
   error: string | null;
   // Scheduler flow state
@@ -16,6 +17,7 @@ interface InterviewState {
 const initialState: InterviewState = {
   schedules: [],
   applications: [],
+  meta: null,
   loading: false,
   error: null,
   schedulerCompanies: [],
@@ -142,9 +144,10 @@ const interviewSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchScheduleApplications.fulfilled, (state, action: PayloadAction<any>) => {
-        const { id, applications } = action.payload;
+        const { id, applications, meta } = action.payload;
         state.loading = false;
         state.applications = applications || [];
+        state.meta = meta;
         state.schedules = state.schedules.map((s) =>
           s.id === id ? { ...s, applications } : s
         );
@@ -152,6 +155,7 @@ const interviewSlice = createSlice({
       .addCase(fetchScheduleApplications.rejected, (state, action) => {
         state.loading = false;
         state.applications = [];
+        state.meta = null;
         state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch applications";
       })
 

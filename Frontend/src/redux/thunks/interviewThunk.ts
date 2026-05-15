@@ -150,12 +150,32 @@ export const fetchScheduleMessages = createAsyncThunk(
 
 export const fetchScheduleApplications = createAsyncThunk(
   "interview/fetchApplications",
-  async (id: number, { rejectWithValue }) => {
+  async (
+    {
+      id,
+      page = 1,
+      limit = 10,
+    }: {
+      id: number;
+      page?: number;
+      limit?: number;
+    },
+    { rejectWithValue }
+  ) => {
     try {
-      const response = await getAPI<any>(`/interview-schedule/${id}/applications`);
-      return { id, applications: response.data || response };
+      const response = await getAPI<any>(
+        `/interview-schedule/${id}/applications?page=${page}&limit=${limit}`
+      );
+
+      return {
+        id,
+        applications: response.data.data,
+        meta: response.data.meta,
+      };
     } catch (error: any) {
-      return rejectWithValue(error.message || "Failed to fetch applications");
+      return rejectWithValue(
+        error.message || "Failed to fetch applications"
+      );
     }
   }
 );

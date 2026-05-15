@@ -1,53 +1,76 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Building2, Briefcase, Users, UserCheck } from 'lucide-react';
+import { Search, Building2, Briefcase, Users, UserCheck, Hash, Layers, Download } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchScheduleApplications, fetchSchedules } from '@/redux/thunks/interviewThunk';
-import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import type { RootState, AppDispatch } from '@/redux/store/store';
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import Loader from '@/components/Loader';
 import { AdminPageLayout } from '@/components/layout/AdminPageLayout';
 import { PageHeader } from '@/components/PageHeader';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from '@/components/ui/button';
 
 const ApplicationsManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [page, setPage] = useState(1);
+  const limit = 10;
+  
   const dispatch = useDispatch<AppDispatch>();
-  const { companies } = useSelector((state: RootState) => state.company);
-  const { applications = [], schedules = [], loading } = useSelector((state: RootState) => state.interview);
+  const navigate = useNavigate();
+  
+  const { applications = [], schedules = [], meta, loading } = useSelector((state: RootState) => state.interview);
   const { id } = useParams<{ id?: string }>();
-  const routeScheduleId = id ? Number(id) : null;
-  const fallbackScheduleId = schedules[0]?.id ? Number(schedules[0].id) : null;
-  const scheduleId = routeScheduleId && Number.isFinite(routeScheduleId)
-    ? routeScheduleId
-    : fallbackScheduleId;
+  
+  const scheduleId = id ? Number(id) : null;
 
+  // Handle automatic redirection to first schedule if no ID is present
   useEffect(() => {
-    if (!routeScheduleId && companies.length === 0) {
-      dispatch(fetchCompanies({ page: 1, limit: 100 }));
+    if (!id && schedules.length > 0) {
+      navigate(`/admin/applications/${schedules[0].id}`, { replace: true });
     }
-  }, [dispatch, routeScheduleId, companies.length]);
+  }, [id, schedules, navigate]);
 
+  // Fetch all schedules on mount if not loaded
   useEffect(() => {
-    if (!routeScheduleId && companies.length > 0) {
-      dispatch(fetchSchedules(companies[0].id));
+    if (schedules.length === 0) {
+      dispatch(fetchSchedules());
     }
-  }, [dispatch, routeScheduleId, companies]);
+  }, [dispatch, schedules.length]);
 
+  // Reset page whenever schedule changes
+  useEffect(() => {
+    setPage(1);
+  }, [scheduleId]);
+
+  // Automatically fetch applications when scheduleId or page changes
   useEffect(() => {
     if (scheduleId && Number.isFinite(scheduleId)) {
-      dispatch(fetchScheduleApplications(scheduleId));
+      dispatch(
+        fetchScheduleApplications({
+          id: scheduleId,
+          page,
+          limit,
+        })
+      );
     }
-  }, [dispatch, scheduleId]);
+  }, [dispatch, scheduleId, page, limit]);
 
-  const applicationList = Array.isArray(applications) ? applications : [];
+  const applicationList = applications;
 
   const filteredApplications = applicationList.filter((app: any) =>
     app.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     app.jobTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    app.department?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    app.department?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    app.applicationId?.toString().includes(searchTerm)
   );
 
   const getStatusStyle = (status: string) => {
@@ -61,27 +84,105 @@ const ApplicationsManagement: React.FC = () => {
     }
   };
 
+  const handleScheduleChange = (val: string) => {
+    navigate(`/admin/applications/${val}`);
+  };
+
+  const handleExport = () => {
+    if (filteredApplications.length === 0) return;
+
+    const headers = ["Application ID", "Student ID", "Name", "Email", "Job Title", "Department", "Current Round", "Status"];
+    const csvContent = [
+      headers.join(","),
+      ...filteredApplications.map(app => [
+        app.applicationId,
+        app.studentId,
+        `"${app.name}"`,
+        app.email,
+        `"${app.jobTitle}"`,
+        `"${app.department?.name}"`,
+        `"${app.currentRound || 'Screening'}"`,
+        app.status
+      ].join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `Applications_Export_${new Date().toLocaleDateString()}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <AdminPageLayout>
       <PageHeader
-        title="Recruitment Tracking"
+        title="Applications Management"
         description="Monitor student application stages and track candidate progress across drives."
         badge="Talent Pipeline"
         icon={UserCheck}
         variant="indigo"
-      >
-        <div className="relative w-full sm:w-[320px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Search by student or role..."
-            className="pl-9 bg-background/50 border-border rounded-xl h-10 text-sm focus-visible:ring-primary/20"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </PageHeader>
+      />
 
       <div className="space-y-6">
+        {/* Controls Section */}
+        <div className="flex flex-col xl:flex-row gap-4 items-center justify-between saas-card p-4">
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <div className="relative w-full sm:w-[240px]">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Search students or ID..."
+                className="pl-9 bg-background/50 border-border rounded-xl h-10 text-sm focus-visible:ring-primary/20"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
+            
+            <Select 
+              value={scheduleId?.toString() || ""} 
+              onValueChange={handleScheduleChange}
+            >
+              <SelectTrigger className="w-full sm:w-[280px] bg-background/50 border-border rounded-xl h-10 text-sm">
+                <SelectValue placeholder="Select Interview Schedule" />
+              </SelectTrigger>
+              <SelectContent>
+                {schedules.map((s: any) => (
+                  <SelectItem key={s.id} value={s.id.toString()}>
+                    <div className="flex flex-col items-start py-1">
+                      <span className="font-bold text-sm">{s.title || `Schedule #${s.id}`}</span>
+                      <span className="text-[10px] text-muted-foreground uppercase tracking-widest">
+                        {s.companyName} • {new Date(s.startTime).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+             <Button
+                variant="outline"
+                size="sm"
+                onClick={handleExport}
+                disabled={filteredApplications.length === 0}
+                className="flex-1 sm:flex-none h-10 rounded-xl border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary font-bold text-[10px] uppercase tracking-widest gap-2"
+              >
+                <Download className="size-3.5" />
+                Export Data
+              </Button>
+
+              {meta && (
+                <div className="hidden sm:flex h-10 items-center px-4 rounded-xl bg-muted/30 border border-border text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                  Candidates: <span className="text-foreground ml-1.5">{meta.total}</span>
+                </div>
+              )}
+          </div>
+        </div>
+
         {loading && (
           <div className="py-32 flex justify-center">
             <Loader text="Retrieving application records..." />
@@ -95,36 +196,53 @@ const ApplicationsManagement: React.FC = () => {
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-muted/30 border-b border-border">
+                      <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest text-center">ID</th>
                       <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Student Information</th>
                       <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Target Role</th>
-                      <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Department</th>
-                      <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest text-right">Stage Status</th>
+                      <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest">Current Stage</th>
+                      <th className="px-6 py-5 text-[10px] font-black text-muted-foreground uppercase tracking-widest text-right">Status</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
                     {filteredApplications.map((app: any) => (
                       <tr key={app.applicationId} className="hover:bg-muted/20 transition-colors group">
+                        <td className="px-6 py-5 text-center">
+                           <span className="text-[10px] font-black text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                             #{app.applicationId}
+                           </span>
+                        </td>
                         <td className="px-6 py-5">
                           <div className="flex items-center gap-4">
                             <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-xs border border-primary/20">
-                              {app.name.charAt(0)}
+                              {app.name?.charAt(0) || "S"}
                             </div>
                             <div>
-                              <p className="font-bold text-foreground group-hover:text-primary transition-colors tracking-tight">{app.name}</p>
+                              <div className="flex items-center gap-2">
+                                <p className="font-bold text-foreground group-hover:text-primary transition-colors tracking-tight">{app.name}</p>
+                                <span className="text-[9px] font-black text-muted-foreground/50">ID: {app.studentId}</span>
+                              </div>
                               <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">{app.email}</p>
                             </div>
                           </div>
                         </td>
                         <td className="px-6 py-5">
-                          <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
-                            <Briefcase className="size-3.5 text-muted-foreground" />
-                            {app.jobTitle}
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 text-sm font-semibold text-foreground">
+                              <Briefcase className="size-3.5 text-muted-foreground" />
+                              {app.jobTitle}
+                            </div>
+                            <div className="flex items-center gap-2 text-[10px] font-medium text-muted-foreground">
+                              <Building2 className="size-3" />
+                              {app.department?.name}
+                            </div>
                           </div>
                         </td>
                         <td className="px-6 py-5">
-                          <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                            <Building2 className="size-3.5" />
-                            {app.department?.name}
+                          <div className="flex items-center gap-2">
+                            <Layers className="size-3.5 text-muted-foreground" />
+                            <span className="text-sm font-semibold text-foreground">
+                              {app.currentRound || "Initial Screening"}
+                            </span>
                           </div>
                         </td>
                         <td className="px-6 py-5 text-right">
@@ -145,10 +263,13 @@ const ApplicationsManagement: React.FC = () => {
                   <div className="flex justify-between items-start gap-4">
                     <div className="flex items-center gap-3">
                       <div className="size-11 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold text-sm border border-primary/20">
-                        {app.name.charAt(0)}
+                        {app.name?.charAt(0) || "S"}
                       </div>
                       <div className="min-w-0">
-                        <h3 className="font-bold text-foreground truncate">{app.name}</h3>
+                        <div className="flex items-center gap-2">
+                           <h3 className="font-bold text-foreground truncate">{app.name}</h3>
+                           <span className="text-[10px] font-black text-muted-foreground/40 bg-muted px-1.5 py-0.5 rounded">#{app.applicationId}</span>
+                        </div>
                         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest truncate">{app.email}</p>
                       </div>
                     </div>
@@ -166,14 +287,55 @@ const ApplicationsManagement: React.FC = () => {
                     </div>
                     <div className="space-y-1">
                       <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                        <Layers className="size-3" /> Stage
+                      </p>
+                      <p className="text-xs font-bold text-foreground truncate">{app.currentRound || "Screening"}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
                         <Building2 className="size-3" /> Dept
                       </p>
                       <p className="text-xs font-bold text-foreground truncate">{app.department?.name}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                        <Hash className="size-3" /> Student ID
+                      </p>
+                      <p className="text-xs font-bold text-foreground truncate">{app.studentId}</p>
                     </div>
                   </div>
                 </div>
               ))}
             </div>
+
+            {/* Pagination UI Integration */}
+            {meta && meta.totalPages > 1 && (
+              <div className="flex items-center justify-between mt-6 bg-background p-4 rounded-xl border border-border shadow-sm">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page === 1}
+                  onClick={() => setPage((p) => p - 1)}
+                  className="rounded-xl font-bold text-[10px] uppercase tracking-widest h-9 px-4"
+                >
+                  Previous
+                </Button>
+
+                <div className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">
+                  Page <span className="text-foreground">{meta.page}</span> of <span className="text-foreground">{meta.totalPages}</span>
+                </div>
+
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={page === meta.totalPages}
+                  onClick={() => setPage((p) => p + 1)}
+                  className="rounded-xl font-bold text-[10px] uppercase tracking-widest h-9 px-4"
+                >
+                  Next
+                </Button>
+              </div>
+            )}
           </>
         )}
 

@@ -43,11 +43,21 @@ export function SiteHeader() {
   const location = useLocation()
 
   const getTitle = () => {
-    if (routeTitles[location.pathname]) return routeTitles[location.pathname]
-    const path = location.pathname.split("/").filter(Boolean).pop()
-    if (!path) return "Dashboard"
-    return path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ")
-  }
+    // First check for exact matches
+    if (routeTitles[location.pathname]) return routeTitles[location.pathname];
+
+    // Check for dynamic routes (e.g., /admin/applications/7)
+    // We look for the longest matching prefix in routeTitles
+    const matchedRoute = Object.keys(routeTitles)
+      .filter(route => location.pathname.startsWith(route))
+      .sort((a, b) => b.length - a.length)[0];
+
+    if (matchedRoute) return routeTitles[matchedRoute];
+
+    const path = location.pathname.split("/").filter(Boolean).pop();
+    if (!path) return "Dashboard";
+    return path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ");
+  };
 
   return (
     <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background/80 shadow-sm backdrop-blur-2xl transition-all duration-300">
