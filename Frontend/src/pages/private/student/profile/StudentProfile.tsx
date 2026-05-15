@@ -312,19 +312,14 @@ const StudentProfile = () => {
                         <Calendar className="h-3.5 w-3.5 text-indigo-200" />
                         Batch {profile.stats?.passingYear || '20xx'}
                       </div>
+                      <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-white font-bold text-[9px] md:text-xs">
+                        <Mail className="h-3.5 w-3.5 text-amber-200" />
+                        {profile.email}
+                      </div>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-6 md:gap-10 pt-2">
-                    <div className="flex items-center gap-3 group/mail cursor-pointer">
-                      <div className="p-2 rounded-xl bg-white/10 text-white border border-white/20 group-hover/mail:bg-white/20 transition-all">
-                        <Mail className="h-4 w-4" />
-                      </div>
-                      <div className="space-y-0.5">
-                        <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/60">Email Address</p>
-                        <p className="text-xs md:text-sm font-bold text-white tracking-wide truncate max-w-[180px] md:max-w-none">{profile.email}</p>
-                      </div>
-                    </div>
                     {profile.location && (
                       <div className="flex items-center gap-3 group/loc cursor-pointer">
                         <div className="p-2 rounded-xl bg-white/10 text-white border border-white/20 group-hover/loc:bg-white/20 transition-all">
@@ -339,12 +334,12 @@ const StudentProfile = () => {
                   </div>
                 </div>
 
-                <div className="pt-4 md:pt-0 shrink-0 w-full md:w-auto">
+                <div className="pt-4 md:pt-0 shrink-0 w-full md:w-auto self-center">
                   <Button
                     onClick={() => setShowProfileEditDialog(true)}
-                    className="w-full md:w-auto bg-white text-slate-900 hover:bg-slate-50 dark:bg-white dark:text-slate-900 rounded-2xl px-8 h-12 md:h-14 font-black shadow-xl transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-2.5 text-xs md:text-sm"
+                    className="w-full md:w-auto bg-white/20 hover:bg-white/30 backdrop-blur-xl text-white border border-white/30 rounded-2xl px-6 h-11 md:h-12 font-bold shadow-2xl transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-2 text-xs md:text-sm"
                   >
-                    <Edit3 className="h-4 w-4 md:h-5 md:w-5" />
+                    <Edit3 className="h-4 w-4" />
                     Edit Profile
                   </Button>
                 </div>
