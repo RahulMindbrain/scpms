@@ -147,86 +147,124 @@ const ApplicationsManagement: React.FC = () => {
       />
 
       <div className="space-y-6">
-        {/* Controls Section */}
-        <div className="flex flex-col xl:flex-row gap-4 items-center justify-between saas-card p-4">
-          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-            <div className="relative w-full sm:w-[240px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <Input
-                placeholder="Search students or ID..."
-                className="pl-9 bg-background/50 border-border rounded-xl h-10 text-sm focus-visible:ring-primary/20"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+        {/* Filters & Actions Bar */}
+        <div className="saas-card overflow-hidden border-none shadow-xl bg-background/50 backdrop-blur-sm">
+          <div className="p-4 sm:p-6 border-b border-border/50 bg-muted/10">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
+              <div className="flex items-center gap-4">
+                <div className="p-3 rounded-2xl bg-primary/10 text-primary shadow-sm border border-primary/20">
+                  <Layers className="size-6" />
+                </div>
+                <div className="space-y-0.5">
+                  <h3 className="text-base font-black text-foreground tracking-tight leading-none">Application Pipeline</h3>
+                  <p className="text-[10px] text-muted-foreground font-black uppercase tracking-[0.2em] opacity-60">Admin Management Console</p>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3 w-full lg:w-auto">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleReset}
+                  className="flex-1 lg:flex-none h-11 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] gap-2 bg-background hover:bg-rose-50 transition-all duration-300"
+                >
+                  <FilterX className="size-4 text-rose-500" /> Reset
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExport}
+                  disabled={filteredApplications.length === 0}
+                  className="flex-1 lg:flex-none h-11 px-8 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] gap-2 bg-primary/5 text-primary border-primary/10 hover:bg-primary hover:text-white transition-all duration-300"
+                >
+                  <Download className="size-4" /> Export
+                </Button>
+                {meta && (
+                  <div className="hidden xl:flex h-11 items-center px-6 rounded-2xl bg-primary/5 border border-primary/10 text-[10px] font-black text-primary uppercase tracking-[0.2em]">
+                    Total: {meta.total}
+                  </div>
+                )}
+              </div>
             </div>
-
-            <Select 
-              value={selectedCompanyId} 
-              onValueChange={handleCompanyChange}
-            >
-              <SelectTrigger className="w-full sm:w-[220px] bg-background/50 border-border rounded-xl h-10 text-xs font-bold uppercase tracking-widest">
-                <SelectValue placeholder="All Companies" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-border shadow-xl">
-                <SelectItem value="all">All Companies</SelectItem>
-                {companies.map((c: any) => (
-                  <SelectItem key={c.id} value={c.id.toString()}>
-                    <span className="font-bold">{c.name}</span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Select 
-              value={scheduleId?.toString() || ""} 
-              onValueChange={handleScheduleChange}
-              disabled={schedules.length === 0}
-            >
-              <SelectTrigger className="w-full sm:w-[260px] bg-background/50 border-border rounded-xl h-10 text-xs font-bold uppercase tracking-widest">
-                <SelectValue placeholder={loading ? "Loading..." : "Select Schedule"} />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-border shadow-xl">
-                {schedules.map((s: any) => (
-                  <SelectItem key={s.id} value={s.id.toString()}>
-                    <div className="flex flex-col items-start py-1">
-                      <span className="font-bold text-sm">{s.title || `Schedule #${s.id}`}</span>
-                      <span className="text-[10px] text-muted-foreground uppercase tracking-widest">
-                        {s.companyName} • {s.startTime ? new Date(s.startTime).toLocaleDateString() : 'No Date'}
-                      </span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleReset}
-              className="h-10 w-10 rounded-xl hover:bg-rose-500/10 hover:text-rose-600 transition-colors"
-              title="Reset Filters"
-            >
-              <FilterX className="size-4" />
-            </Button>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleExport}
-              disabled={filteredApplications.length === 0}
-              className="flex-1 sm:flex-none h-10 rounded-xl border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary font-bold text-[10px] uppercase tracking-widest gap-2"
-            >
-              <Download className="size-3.5" />
-              Export Data
-            </Button>
-
-            {meta && (
-              <div className="hidden sm:flex h-10 items-center px-4 rounded-xl bg-muted/30 border border-border text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                Candidates: <span className="text-foreground ml-1.5">{meta.total}</span>
+          <div className="p-4 sm:p-8 bg-muted/5">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+              {/* Search Field */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70">Candidate Search</label>
+                </div>
+                <div className="relative group">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary/30 group-focus-within:text-primary transition-colors" />
+                  <Input
+                    placeholder="Search by name or email..."
+                    className="pl-11 h-14 bg-background border-border/40 rounded-2xl text-sm shadow-sm focus-visible:ring-primary/20 hover:border-primary/30 transition-all"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </div>
               </div>
-            )}
+
+              {/* Company Selector */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70">Hiring Partner</label>
+                </div>
+                <Select value={selectedCompanyId} onValueChange={handleCompanyChange}>
+                  <SelectTrigger className="h-14 bg-background border-border/40 rounded-2xl text-xs font-bold uppercase tracking-widest px-4 shadow-sm hover:border-primary/30 transition-all">
+                    <div className="flex items-center gap-2 truncate">
+                      <Building2 className="size-4 text-primary/40 shrink-0" />
+                      <SelectValue placeholder="All Companies" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl border-border shadow-2xl p-2 min-w-[240px]">
+                    <SelectItem value="all" className="rounded-xl py-3 focus:bg-primary/5">
+                      <span className="font-bold text-[10px] uppercase tracking-widest">All Companies</span>
+                    </SelectItem>
+                    {companies.map((c: any) => (
+                      <SelectItem key={c.id} value={c.id.toString()} className="rounded-xl py-3 focus:bg-primary/5">
+                        <span className="font-bold text-[10px] uppercase tracking-widest">{c.name}</span>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Schedule Selector */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between px-1">
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70">Interview Drive</label>
+                </div>
+                <Select 
+                  value={scheduleId?.toString() || ""} 
+                  onValueChange={handleScheduleChange}
+                  disabled={schedules.length === 0}
+                >
+                  <SelectTrigger className="h-14 bg-background border-border/40 rounded-2xl text-xs font-bold uppercase tracking-widest px-4 shadow-sm hover:border-primary/30 transition-all">
+                    <div className="flex items-center gap-2 truncate">
+                      <Briefcase className="size-4 text-primary shrink-0" />
+                      <SelectValue placeholder={loading ? "Loading..." : "Select Schedule"} />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="rounded-2xl border-border shadow-2xl p-2 w-[340px]">
+                    {schedules.map((s: any) => (
+                      <SelectItem key={s.id} value={s.id.toString()} className="rounded-xl py-3 focus:bg-primary/5 border-b border-border/5 last:border-0 mb-1">
+                        <div className="flex flex-col gap-1">
+                          <span className="font-bold text-[11px] text-foreground truncate max-w-[280px]">
+                            {s.title}
+                          </span>
+                          <div className="flex items-center gap-2 opacity-60">
+                            <span className="text-[9px] font-black text-primary uppercase tracking-widest">{s.companyName}</span>
+                            <span className="text-[9px] font-medium">• {s.startTime ? new Date(s.startTime).toLocaleDateString() : 'N/A'}</span>
+                          </div>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
           </div>
         </div>
 
