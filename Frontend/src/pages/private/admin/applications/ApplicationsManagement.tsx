@@ -18,18 +18,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { updateJobApplicationStatus, fetchCompanies } from '@/redux/thunks/companyThunk';
+import { FilterX } from 'lucide-react';
 
 const ApplicationsManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [page, setPage] = useState(1);
   const limit = 10;
-  
+
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  
+
   const { applications = [], schedules = [], meta, loading } = useSelector((state: RootState) => state.interview);
+  const { companies = [] } = useSelector((state: RootState) => state.company);
   const { id } = useParams<{ id?: string }>();
-  
+  const [selectedCompanyId, setSelectedCompanyId] = useState<string>("");
+
   const scheduleId = id ? Number(id) : null;
 
   // Handle automatic redirection to first schedule if no ID is present
@@ -39,12 +44,15 @@ const ApplicationsManagement: React.FC = () => {
     }
   }, [id, schedules, navigate]);
 
-  // Fetch all schedules on mount if not loaded
+  // Fetch companies on mount
   useEffect(() => {
-    if (schedules.length === 0) {
-      dispatch(fetchSchedules());
-    }
-  }, [dispatch, schedules.length]);
+    dispatch(fetchCompanies({ limit: 100 }));
+  }, [dispatch]);
+
+  // Fetch schedules when company changes or on mount
+  useEffect(() => {
+    dispatch(fetchSchedules(selectedCompanyId ? Number(selectedCompanyId) : undefined));
+  }, [dispatch, selectedCompanyId]);
 
   // Reset page whenever schedule changes
   useEffect(() => {
@@ -86,6 +94,17 @@ const ApplicationsManagement: React.FC = () => {
 
   const handleScheduleChange = (val: string) => {
     navigate(`/admin/applications/${val}`);
+  };
+
+  const handleCompanyChange = (val: string) => {
+    setSelectedCompanyId(val);
+    navigate('/admin/applications', { replace: true });
+  };
+
+  const handleReset = () => {
+    setSelectedCompanyId("");
+    setSearchTerm("");
+    navigate('/admin/applications');
   };
 
   const handleExport = () => {
@@ -140,46 +159,74 @@ const ApplicationsManagement: React.FC = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            
+
+            <Select 
+              value={selectedCompanyId} 
+              onValueChange={handleCompanyChange}
+            >
+              <SelectTrigger className="w-full sm:w-[220px] bg-background/50 border-border rounded-xl h-10 text-xs font-bold uppercase tracking-widest">
+                <SelectValue placeholder="All Companies" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl border-border shadow-xl">
+                <SelectItem value="all">All Companies</SelectItem>
+                {companies.map((c: any) => (
+                  <SelectItem key={c.id} value={c.id.toString()}>
+                    <span className="font-bold">{c.name}</span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             <Select 
               value={scheduleId?.toString() || ""} 
               onValueChange={handleScheduleChange}
+              disabled={schedules.length === 0}
             >
-              <SelectTrigger className="w-full sm:w-[280px] bg-background/50 border-border rounded-xl h-10 text-sm">
-                <SelectValue placeholder="Select Interview Schedule" />
+              <SelectTrigger className="w-full sm:w-[260px] bg-background/50 border-border rounded-xl h-10 text-xs font-bold uppercase tracking-widest">
+                <SelectValue placeholder={loading ? "Loading..." : "Select Schedule"} />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-xl border-border shadow-xl">
                 {schedules.map((s: any) => (
                   <SelectItem key={s.id} value={s.id.toString()}>
                     <div className="flex flex-col items-start py-1">
                       <span className="font-bold text-sm">{s.title || `Schedule #${s.id}`}</span>
                       <span className="text-[10px] text-muted-foreground uppercase tracking-widest">
-                        {s.companyName} • {new Date(s.startTime).toLocaleDateString()}
+                        {s.companyName} • {s.startTime ? new Date(s.startTime).toLocaleDateString() : 'No Date'}
                       </span>
                     </div>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-          </div>
-          
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-             <Button
-                variant="outline"
-                size="sm"
-                onClick={handleExport}
-                disabled={filteredApplications.length === 0}
-                className="flex-1 sm:flex-none h-10 rounded-xl border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary font-bold text-[10px] uppercase tracking-widest gap-2"
-              >
-                <Download className="size-3.5" />
-                Export Data
-              </Button>
 
-              {meta && (
-                <div className="hidden sm:flex h-10 items-center px-4 rounded-xl bg-muted/30 border border-border text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                  Candidates: <span className="text-foreground ml-1.5">{meta.total}</span>
-                </div>
-              )}
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleReset}
+              className="h-10 w-10 rounded-xl hover:bg-rose-500/10 hover:text-rose-600 transition-colors"
+              title="Reset Filters"
+            >
+              <FilterX className="size-4" />
+            </Button>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExport}
+              disabled={filteredApplications.length === 0}
+              className="flex-1 sm:flex-none h-10 rounded-xl border-dashed border-primary/30 bg-primary/5 hover:bg-primary/10 text-primary font-bold text-[10px] uppercase tracking-widest gap-2"
+            >
+              <Download className="size-3.5" />
+              Export Data
+            </Button>
+
+            {meta && (
+              <div className="hidden sm:flex h-10 items-center px-4 rounded-xl bg-muted/30 border border-border text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                Candidates: <span className="text-foreground ml-1.5">{meta.total}</span>
+              </div>
+            )}
           </div>
         </div>
 
@@ -207,9 +254,9 @@ const ApplicationsManagement: React.FC = () => {
                     {filteredApplications.map((app: any) => (
                       <tr key={app.applicationId} className="hover:bg-muted/20 transition-colors group">
                         <td className="px-6 py-5 text-center">
-                           <span className="text-[10px] font-black text-muted-foreground bg-muted px-2 py-1 rounded-md">
-                             #{app.applicationId}
-                           </span>
+                          <span className="text-[10px] font-black text-muted-foreground bg-muted px-2 py-1 rounded-md">
+                            #{app.applicationId}
+                          </span>
                         </td>
                         <td className="px-6 py-5">
                           <div className="flex items-center gap-4">
@@ -267,8 +314,8 @@ const ApplicationsManagement: React.FC = () => {
                       </div>
                       <div className="min-w-0">
                         <div className="flex items-center gap-2">
-                           <h3 className="font-bold text-foreground truncate">{app.name}</h3>
-                           <span className="text-[10px] font-black text-muted-foreground/40 bg-muted px-1.5 py-0.5 rounded">#{app.applicationId}</span>
+                          <h3 className="font-bold text-foreground truncate">{app.name}</h3>
+                          <span className="text-[10px] font-black text-muted-foreground/40 bg-muted px-1.5 py-0.5 rounded">#{app.applicationId}</span>
                         </div>
                         <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest truncate">{app.email}</p>
                       </div>

@@ -1,10 +1,11 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { fetchSchedules, createSchedule, updateSchedule, deleteSchedule, fetchSchedulesByCompany, fetchCompanySchedules, approveSchedule, fetchScheduleMessages, sendScheduleMessage, fetchScheduleApplications, fetchActiveCompaniesForSchedule, fetchActiveUniversitiesForSchedule, fetchCompanyJobsForSchedule, fetchUniversityJobsForSchedule } from "../thunks/interviewThunk";
+import { fetchSchedules, createSchedule, updateSchedule, deleteSchedule, fetchSchedulesByCompany, fetchCompanySchedules, approveSchedule, fetchScheduleMessages, sendScheduleMessage, fetchScheduleApplications, fetchActiveCompaniesForSchedule, fetchActiveUniversitiesForSchedule, fetchCompanyJobsForSchedule, fetchUniversityJobsForSchedule, fetchCompanyInterviewSchedules, fetchApplicationsBySchedule } from "../thunks/interviewThunk";
 
 interface InterviewState {
   schedules: any[];
   applications: any[];
   meta: any;
+  selectedSchedule: any | null;
   loading: boolean;
   error: string | null;
   // Scheduler flow state
@@ -18,6 +19,7 @@ const initialState: InterviewState = {
   schedules: [],
   applications: [],
   meta: null,
+  selectedSchedule: null,
   loading: false,
   error: null,
   schedulerCompanies: [],
@@ -32,6 +34,9 @@ const interviewSlice = createSlice({
   reducers: {
     clearError: (state) => {
       state.error = null;
+    },
+    setSelectedSchedule: (state, action: PayloadAction<any>) => {
+      state.selectedSchedule = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -91,17 +96,17 @@ const interviewSlice = createSlice({
         state.error = typeof action.payload === 'string' ? action.payload : "Failed to create schedule";
       })
       // Update Schedule
-    .addCase(updateSchedule.fulfilled, (state, action: PayloadAction<any>) => {
-      state.loading = false;
-      if (action.payload.success !== false && action.payload.data) {
-        const updated = action.payload.data;
-        state.schedules = state.schedules.map((s) =>
-          s.id === updated.id
-            ? { ...s, ...updated }
-            : s
-        );
-      }
-    })
+      .addCase(updateSchedule.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        if (action.payload.success !== false && action.payload.data) {
+          const updated = action.payload.data;
+          state.schedules = state.schedules.map((s) =>
+            s.id === updated.id
+              ? { ...s, ...updated }
+              : s
+          );
+        }
+      })
       .addCase(updateSchedule.rejected, (state, action) => {
         state.loading = false;
         state.error = typeof action.payload === 'string' ? action.payload : "Failed to update schedule";
@@ -153,6 +158,39 @@ const interviewSlice = createSlice({
         );
       })
       .addCase(fetchScheduleApplications.rejected, (state, action) => {
+        state.loading = false;
+        state.applications = [];
+        state.meta = null;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch applications";
+      })
+      // Fetch Company Interview Schedules (New)
+      .addCase(fetchCompanyInterviewSchedules.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchCompanyInterviewSchedules.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        state.schedules = action.payload || [];
+        if (state.schedules.length > 0 && !state.selectedSchedule) {
+          state.selectedSchedule = state.schedules[0];
+        }
+      })
+      .addCase(fetchCompanyInterviewSchedules.rejected, (state, action) => {
+        state.loading = false;
+        state.error = typeof action.payload === 'string' ? action.payload : "Failed to fetch schedules";
+      })
+      // Fetch Applications By Schedule (New)
+      .addCase(fetchApplicationsBySchedule.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchApplicationsBySchedule.fulfilled, (state, action: PayloadAction<any>) => {
+        const { id, applications, meta } = action.payload;
+        state.loading = false;
+        state.applications = applications || [];
+        state.meta = meta;
+      })
+      .addCase(fetchApplicationsBySchedule.rejected, (state, action) => {
         state.loading = false;
         state.applications = [];
         state.meta = null;
@@ -213,5 +251,5 @@ const interviewSlice = createSlice({
 });
 
 
-export const { clearError } = interviewSlice.actions;
+export const { clearError, setSelectedSchedule } = interviewSlice.actions;
 export default interviewSlice.reducer;

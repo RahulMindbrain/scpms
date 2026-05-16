@@ -180,6 +180,52 @@ export const fetchScheduleApplications = createAsyncThunk(
   }
 );
 
+// New requested thunks for Company Application Management
+export const fetchCompanyInterviewSchedules = createAsyncThunk(
+  "interview/fetchCompanyInterviewSchedules",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await getAPI<any>("/interview-schedule/company");
+      // Expecting response directly or wrapped in data
+      return response.data || response;
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch company interview schedules");
+    }
+  }
+);
+
+export const fetchApplicationsBySchedule = createAsyncThunk(
+  "interview/fetchApplicationsBySchedule",
+  async (
+    {
+      id,
+      page = 1,
+      limit = 10,
+    }: {
+      id: number;
+      page?: number;
+      limit?: number;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await getAPI<any>(
+        `/interview-schedule/${id}/applications?page=${page}&limit=${limit}`
+      );
+
+      return {
+        id,
+        applications: response.data?.data || response.data || [],
+        meta: response.data?.meta || null,
+      };
+    } catch (error: any) {
+      return rejectWithValue(
+        error.message || "Failed to fetch applications"
+      );
+    }
+  }
+);
+
 // ✅ Fetch active companies for scheduling flow
 export const fetchActiveCompaniesForSchedule = createAsyncThunk(
   "interview/fetchActiveCompaniesForSchedule",
