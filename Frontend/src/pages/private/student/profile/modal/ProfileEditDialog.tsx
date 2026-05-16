@@ -361,12 +361,12 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
 
             {/* RESUME SECTION */}
             <div className="space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Carrier-Grade Resume (PDF Only)</Label>
+              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Carrier-Grade Resume (PDF Only, Max 10MB)</Label>
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6 rounded-3xl bg-primary/[0.03] border border-primary/10">
                 <input
                   type="file"
                   id="resume-upload"
-                  accept=".pdf"
+                  accept=".pdf,application/pdf"
                   className="hidden"
                   onChange={async (e) => {
                     const file = e.target.files?.[0];
@@ -392,7 +392,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
 
                 <div className="flex-1">
                    <p className="text-sm font-black text-foreground mb-0.5">{formData.resumeUrl ? 'Document Synced' : 'Awaiting Document'}</p>
-                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{formData.resumeUrl ? 'Cloud reference active' : 'PDF format required for analysis'}</p>
+                   <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{formData.resumeUrl ? 'Cloud reference active' : 'PDF format required (Max 10MB)'}</p>
                 </div>
 
                 <Button

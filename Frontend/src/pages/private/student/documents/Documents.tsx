@@ -178,7 +178,7 @@ const Documents = () => {
                 Secure Your <span>Credentials</span> 📂
               </h1>
               <p className="student-hero-description">
-                Manage your resumes, certificates, and academic transcripts in one encrypted location.
+                Manage your resumes, certificates, and academic transcripts in one encrypted location. (PDF Only, Max 10MB)
               </p>
             </div>
             
@@ -193,7 +193,7 @@ const Documents = () => {
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <input type="file" ref={fileInputRef} className="hidden" onChange={handleFileUpload} />
+              <input type="file" ref={fileInputRef} className="hidden" accept=".pdf,application/pdf" onChange={handleFileUpload} />
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}

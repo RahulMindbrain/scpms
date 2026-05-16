@@ -103,11 +103,11 @@ const CertificateModal = ({ isOpen, onClose, onAddCertificate }: CertificateModa
               <label className="flex-1 flex items-center justify-center gap-2 px-4 py-4 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl cursor-pointer hover:border-amber-500 dark:hover:border-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/5 transition-all group">
                 {isUploading ? <Loader size="sm" /> : <Upload size={18} className="text-slate-400 group-hover:text-amber-600" />}
                 <span className="text-sm font-bold text-slate-500 dark:text-slate-400 group-hover:text-amber-700 dark:group-hover:text-amber-400">
-                  {file ? file.name : 'Upload PDF or Image'}
+                  {file ? file.name : 'Upload PDF (Max 10MB)'}
                 </span>
                 <input
                   type="file"
-                  accept="image/*,application/pdf"
+                  accept=".pdf,application/pdf"
                   className="hidden"
                   onChange={(e: any) => setFile(e.target.files[0])}
                 />
