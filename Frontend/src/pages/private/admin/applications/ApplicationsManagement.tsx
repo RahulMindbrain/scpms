@@ -18,8 +18,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { updateJobApplicationStatus, fetchCompanies } from '@/redux/thunks/companyThunk';
+
+import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import { FilterX } from 'lucide-react';
 
 const ApplicationsManagement: React.FC = () => {

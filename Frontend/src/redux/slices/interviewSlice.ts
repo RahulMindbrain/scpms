@@ -185,7 +185,7 @@ const interviewSlice = createSlice({
         state.error = null;
       })
       .addCase(fetchApplicationsBySchedule.fulfilled, (state, action: PayloadAction<any>) => {
-        const { id, applications, meta } = action.payload;
+        const {  applications, meta } = action.payload;
         state.loading = false;
         state.applications = applications || [];
         state.meta = meta;
