@@ -21,6 +21,8 @@ import {
   FilterX, 
   Award, 
   AlertCircle, 
+  ShieldAlert,
+  Info,
   Check, 
   ChevronRight,
   TrendingUp,
@@ -42,18 +44,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import Loader from '@/components/Loader';
+import { CandidateDetailsDrawer } from './CandidateDetailsDrawer';
+import { StatusUpdateModal } from './StatusUpdateModal';
 
 // Dynamic avatar gradient generator based on candidate's name for visual aesthetic consistency
 const getAvatarGradient = (name: string) => {
@@ -158,6 +155,86 @@ const getPipelineStages = (status: string, currentRound: string | null) => {
   });
 };
 
+export const STATUS_FLOW = ['APPLIED', 'SHORTLISTED', 'SELECTED', 'OFFER_ACCEPTED'];
+
+export const isBackward = (current: string, next: string) => {
+  if (next === 'REJECTED') return false; // Can always reject unless already rejected or finalized
+  const currentIndex = STATUS_FLOW.indexOf(current);
+  const nextIndex = STATUS_FLOW.indexOf(next);
+  
+  // If next status is not in our primary flow (like REJECTED), we handle it differently
+  if (nextIndex === -1) return false; 
+  if (currentIndex === -1) return false;
+
+  return nextIndex < currentIndex;
+};
+
+export const isRoundBackward = (currentRound: string | null | undefined, nextRound: string) => {
+  if (!currentRound) return false;
+  const ROUNDS_ORDER = ['APTITUDE', 'GROUP_DISCUSSION', 'HR', 'TECHNICAL', 'MANAGERIAL', 'FINAL'];
+  const currentIndex = ROUNDS_ORDER.indexOf(currentRound);
+  const nextIndex = ROUNDS_ORDER.indexOf(nextRound);
+  
+  if (currentIndex === -1 || nextIndex === -1) return false;
+  return nextIndex < currentIndex;
+};
+
+export const formatRound = (round: string) => {
+  return round
+    .replace(/_/g, ' ')
+    .toLowerCase()
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+};
+
+export const formatStage = (status: string, round?: string | null) => {
+  switch (status) {
+    case 'APPLIED':
+      return 'Application Submitted';
+    case 'SHORTLISTED':
+      return round ? `Shortlisted: ${formatRound(round)}` : 'Shortlisted';
+    case 'SELECTED':
+      return 'Selected / Offered';
+    case 'REJECTED':
+      return 'Rejected';
+    case 'OFFER_ACCEPTED':
+      return 'Offer Accepted';
+    case 'OFFER_REJECTED':
+      return 'Offer Declined';
+    case 'WITHDRAWN':
+      return 'Withdrawn';
+    case 'NOT_ELIGIBLE':
+      return 'Not Eligible';
+    default:
+      return status;
+  }
+};
+
+const getPresetReason = (status: string, round: string) => {
+  if (status === 'SHORTLISTED') {
+    switch (round) {
+      case 'APTITUDE':
+        return 'Resume shortlisted';
+      case 'TECHNICAL':
+        return 'Cleared aptitude round';
+      case 'HR':
+        return 'Technical round cleared';
+      case 'MANAGERIAL':
+        return 'HR round cleared';
+      case 'FINAL':
+        return 'Managerial round cleared';
+      default:
+        return 'Process progressed to next round';
+    }
+  }
+  if (status === 'SELECTED') {
+    return 'Excellent overall performance';
+  }
+  if (status === 'REJECTED') {
+    return 'Did not clear the interview round';
+  }
+  return '';
+};
+
 const Applicants: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { applications, loading } = useSelector((state: RootState) => state.company);
@@ -175,92 +252,108 @@ const Applicants: React.FC = () => {
   const [targetRound, setTargetRound] = React.useState<string>('APTITUDE');
   const [reasonText, setReasonText] = React.useState('');
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submissionError, setSubmissionError] = React.useState<{ title: string; message: string; type: 'error'; icon?: string } | null>(null);
 
-  const STATUS_FLOW = ['APPLIED', 'SHORTLISTED', 'SELECTED', 'OFFER_ACCEPTED'];
-  // Note: REJECTED, WITHDRAWN, NOT_ELIGIBLE are terminal or specific states handled separately in logic
+  const validationError = React.useMemo(() => {
+    if (!selectedApp) return null;
 
-  const isBackward = (current: string, next: string) => {
-    if (next === 'REJECTED') return false; // Can always reject unless already rejected or finalized
-    const currentIndex = STATUS_FLOW.indexOf(current);
-    const nextIndex = STATUS_FLOW.indexOf(next);
-    
-    // If next status is not in our primary flow (like REJECTED), we handle it differently
-    if (nextIndex === -1) return false; 
-    if (currentIndex === -1) return false;
+    // 1. Rejected application
+    if (selectedApp.status === 'REJECTED') {
+      return {
+        title: 'Application Closed',
+        message: 'Rejected applications cannot be moved to another hiring stage.',
+        type: 'error',
+        icon: 'XCircle'
+      };
+    }
 
-    return nextIndex < currentIndex;
-  };
+    // 2. Finalized application
+    if (['OFFER_ACCEPTED', 'OFFER_REJECTED', 'WITHDRAWN'].includes(selectedApp.status)) {
+      return {
+        title: 'Application Already Finalized',
+        message: 'This candidate has already been selected or rejected and can no longer move through the pipeline.',
+        type: 'error',
+        icon: 'ShieldAlert'
+      };
+    }
 
-  const toggleExpand = (id: number) => {
+    // 3. Offer Accepted Elsewhere
+    if (selectedApp.student?.isPlaced && selectedApp.status !== 'OFFER_ACCEPTED') {
+      return {
+        title: 'Candidate Already Placed',
+        message: 'This student has accepted another offer and is no longer available for further processing.',
+        type: 'warning',
+        icon: 'Info'
+      };
+    }
+
+    // 4. Eligibility failure
+    const reqCgpa = selectedApp.jobUniversity?.minCgpa || 0;
+    const reqBacklogs = selectedApp.jobUniversity?.maxBacklogs || 0;
+    const candCgpa = selectedApp.student?.cgpa || 0;
+    const candBacklogs = selectedApp.student?.activeBacklogs || 0;
+    const isEligible = candCgpa >= reqCgpa && candBacklogs <= reqBacklogs;
+    if (!isEligible && (targetStatus === 'SHORTLISTED' || targetStatus === 'SELECTED')) {
+      return {
+        title: 'Candidate Not Eligible',
+        message: 'This student does not meet the CGPA or backlog requirements for this position.',
+        type: 'warning',
+        icon: 'Info'
+      };
+    }
+
+    // 5. Invalid status transition
+    if (isBackward(selectedApp.status, targetStatus)) {
+      return {
+        title: 'Invalid Workflow Transition',
+        message: 'Candidates must progress sequentially through Aptitude, Technical, and HR rounds.',
+        type: 'error',
+        icon: 'AlertCircle'
+      };
+    }
+
+    // 6. Invalid round transition
+    if (targetStatus === 'SHORTLISTED' && isRoundBackward(selectedApp.currentRound, targetRound)) {
+      return {
+        title: 'Invalid Workflow Transition',
+        message: 'Candidates must progress sequentially through Aptitude, Technical, and HR rounds.',
+        type: 'error',
+        icon: 'AlertCircle'
+      };
+    }
+
+    // 7. Destructive action warning for REJECTED status
+    if (targetStatus === 'REJECTED') {
+      return {
+        title: 'Confirm Application Closure',
+        message: 'Rejecting this candidate will permanently close their application. This action cannot be undone.',
+        type: 'warning',
+        icon: 'AlertCircle'
+      };
+    }
+
+    return null;
+  }, [selectedApp, targetStatus, targetRound]);
+
+  const toggleExpand = React.useCallback((id: number) => {
     setExpandedAppId(prev => prev === id ? null : id);
-  };
+  }, []);
 
-  const formatStage = (status: string, round?: string | null) => {
-    switch (status) {
-      case 'APPLIED':
-        return 'Application Submitted';
-      case 'SHORTLISTED':
-        return round ? `Shortlisted: ${formatRound(round)}` : 'Shortlisted';
-      case 'SELECTED':
-        return 'Selected / Offered';
-      case 'REJECTED':
-        return 'Rejected';
-      case 'OFFER_ACCEPTED':
-        return 'Offer Accepted';
-      case 'OFFER_REJECTED':
-        return 'Offer Declined';
-      case 'WITHDRAWN':
-        return 'Withdrawn';
-      case 'NOT_ELIGIBLE':
-        return 'Not Eligible';
-      default:
-        return status;
-    }
-  };
-
-  const formatRound = (round: string) => {
-    return round
-      .replace(/_/g, ' ')
-      .toLowerCase()
-      .replace(/\b\w/g, (char) => char.toUpperCase());
-  };
-
-  const getPresetReason = (status: string, round: string) => {
-    if (status === 'SHORTLISTED') {
-      switch (round) {
-        case 'APTITUDE':
-          return 'Resume shortlisted';
-        case 'TECHNICAL':
-          return 'Cleared aptitude round';
-        case 'HR':
-          return 'Technical round cleared';
-        case 'MANAGERIAL':
-          return 'HR round cleared';
-        case 'FINAL':
-          return 'Managerial round cleared';
-        default:
-          return 'Process progressed to next round';
-      }
-    }
-    if (status === 'SELECTED') {
-      return 'Excellent overall performance';
-    }
-    if (status === 'REJECTED') {
-      return 'Did not clear the interview round';
-    }
-    return '';
-  };
-
-  const openUpdateModal = (app: any, newStatus: string) => {
+  const openUpdateModal = React.useCallback((app: any, newStatus: string) => {
+    setSubmissionError(null);
     if (newStatus === app.status) return;
 
     if (isBackward(app.status, newStatus)) {
-      toast.error("Process integrity: Status cannot be moved backward");
+      toast.error("Invalid Workflow Transition", {
+        description: "Candidates must progress sequentially through Aptitude, Technical, and HR rounds."
+      });
       return;
     }
 
     if (['REJECTED', 'OFFER_ACCEPTED', 'OFFER_REJECTED', 'WITHDRAWN'].includes(app.status)) {
-      toast.error("Candidate process is already finalized");
+      toast.error("Application Already Finalized", {
+        description: "This candidate has already been selected or rejected and can no longer move through the pipeline."
+      });
       return;
     }
 
@@ -283,12 +376,25 @@ const Applicants: React.FC = () => {
     }
     
     setIsUpdateModalOpen(true);
-  };
+  }, []);
 
   const submitStatusUpdate = async () => {
     if (!selectedApp) return;
 
+    // Frontend validation: Status cannot be moved backward
+    if (isBackward(selectedApp.status, targetStatus)) {
+      toast.error(`Process integrity error: Cannot move status backward from ${formatStage(selectedApp.status, selectedApp.currentRound)} to ${formatStage(targetStatus, targetRound)}`);
+      return;
+    }
+
+    // Frontend validation: Round cannot be moved backward
+    if (targetStatus === 'SHORTLISTED' && isRoundBackward(selectedApp.currentRound, targetRound)) {
+      toast.error(`Process integrity error: Cannot move interview round backward from ${formatRound(selectedApp.currentRound || '')} to ${formatRound(targetRound)}`);
+      return;
+    }
+
     setIsSubmitting(true);
+    setSubmissionError(null);
     const toastId = toast.loading(`Updating recruitment stage...`);
     try {
       const result = await dispatch(updateJobApplicationStatus({
@@ -320,9 +426,49 @@ const Applicants: React.FC = () => {
         }));
       }
 
+      // Silent background fetch to keep frontend state absolutely synced with DB
+      const params: { status?: string } = {};
+      if (selectedStatus !== 'ALL') {
+        params.status = selectedStatus;
+      }
+      dispatch(fetchJobApplications(params));
+
       setSelectedApp(null);
     } catch (err: any) {
-      toast.error(err || "Update failed", { id: toastId });
+      toast.dismiss(toastId);
+      const rawError = typeof err === 'string' ? err : err?.message || err?.error || "";
+      
+      let title = "Unable to Update Status";
+      let message = "We couldn’t save the latest application status. Please retry in a few moments.";
+      let icon = "AlertCircle";
+
+      if (rawError.toLowerCase().includes("permission") || rawError.toLowerCase().includes("unauthorized") || rawError.toLowerCase().includes("forbidden") || rawError.toLowerCase().includes("access")) {
+        title = "Access Restricted";
+        message = "You do not have permission to modify this application lifecycle.";
+        icon = "ShieldAlert";
+      } else if (rawError.toLowerCase().includes("finalized") || rawError.toLowerCase().includes("terminal") || rawError.toLowerCase().includes("closed")) {
+        title = "Application Already Finalized";
+        message = "This candidate has already been selected or rejected and can no longer move through the pipeline.";
+        icon = "ShieldAlert";
+      } else if (rawError.toLowerCase().includes("eligible") || rawError.toLowerCase().includes("criteria") || rawError.toLowerCase().includes("cgpa") || rawError.toLowerCase().includes("backlog")) {
+        title = "Candidate Not Eligible";
+        message = "This student does not meet the CGPA or backlog requirements for this position.";
+        icon = "Info";
+      } else if (rawError.toLowerCase().includes("transition") || rawError.toLowerCase().includes("sequence") || rawError.toLowerCase().includes("backward")) {
+        title = "Invalid Workflow Transition";
+        message = "Candidates must progress sequentially through Aptitude, Technical, and HR rounds.";
+        icon = "AlertCircle";
+      } else if (rawError.toLowerCase().includes("placed") || rawError.toLowerCase().includes("another offer") || rawError.toLowerCase().includes("accepted")) {
+        title = "Candidate Already Placed";
+        message = "This student has accepted another offer and is no longer available for further processing.";
+        icon = "Info";
+      } else if (rawError) {
+        title = "Hiring Stage Update Failed";
+        message = rawError;
+      }
+
+      setSubmissionError({ title, message, type: 'error', icon });
+      toast.error(title, { description: message });
     } finally {
       setIsSubmitting(false);
     }
@@ -336,26 +482,31 @@ const Applicants: React.FC = () => {
     dispatch(fetchJobApplications(params));
   }, [dispatch, selectedStatus]);
 
-  // Enhanced search to query name, email, department or university dynamically
-  const filteredApplicants = (applications || []).filter((app: any) => {
-    const studentName = `${app.student?.user?.firstname || ''} ${app.student?.user?.lastname || ''}`.toLowerCase();
-    const email = (app.student?.user?.email || '').toLowerCase();
-    const department = (app.student?.department?.name || '').toLowerCase();
-    const university = (app.jobUniversity?.university?.name || '').toLowerCase();
-    
-    const matchesSearch = 
-      studentName.includes(searchTerm.toLowerCase()) ||
-      email.includes(searchTerm.toLowerCase()) ||
-      department.includes(searchTerm.toLowerCase()) ||
-      university.includes(searchTerm.toLowerCase());
+  // Enhanced search to query name, email, department or university dynamically (highly optimized with useMemo)
+  const filteredApplicants = React.useMemo(() => {
+    return (applications || []).filter((app: any) => {
+      const studentName = `${app.student?.user?.firstname || ''} ${app.student?.user?.lastname || ''}`.toLowerCase();
+      const email = (app.student?.user?.email || '').toLowerCase();
+      const department = (app.student?.department?.name || '').toLowerCase();
+      const university = (app.jobUniversity?.university?.name || '').toLowerCase();
       
-    const matchesJob = selectedJob === 'All Jobs' || app.jobUniversity?.job?.title === selectedJob;
-    return matchesSearch && matchesJob;
-  });
+      const matchesSearch = 
+        studentName.includes(searchTerm.toLowerCase()) ||
+        email.includes(searchTerm.toLowerCase()) ||
+        department.includes(searchTerm.toLowerCase()) ||
+        university.includes(searchTerm.toLowerCase());
+        
+      const matchesJob = selectedJob === 'All Jobs' || app.jobUniversity?.job?.title === selectedJob;
+      return matchesSearch && matchesJob;
+    });
+  }, [applications, searchTerm, selectedJob]);
 
-  const uniqueJobs = Array.from(
-    new Set((applications || []).map((app: any) => app.jobUniversity?.job?.title))
-  ).filter(Boolean);
+  // Pre-calculate unique jobs list only when applications change
+  const uniqueJobs = React.useMemo(() => {
+    return Array.from(
+      new Set((applications || []).map((app: any) => app.jobUniversity?.job?.title))
+    ).filter(Boolean);
+  }, [applications]);
 
   // Dynamic statistics calculations
   const stats = React.useMemo(() => {
@@ -367,8 +518,8 @@ const Applicants: React.FC = () => {
     return { total, shortlisted, selected, pending };
   }, [applications]);
 
-  // Resume safer open link
-  const openResume = (url: string, name: string) => {
+  // Resume safer open link (memoized to keep reference stable)
+  const openResume = React.useCallback((url: string, name: string) => {
     if (!url) {
       toast.error("No resume references uploaded by candidate.");
       return;
@@ -376,7 +527,7 @@ const Applicants: React.FC = () => {
     const absoluteUrl = url.startsWith('http') ? url : `http://localhost:5000${url}`;
     toast.success(`Opening resume dossier for ${name}...`);
     window.open(absoluteUrl, '_blank');
-  };
+  }, []);
 
   // Renders premium Initials-based avatar with custom gradient index mapping
   const renderCandidateAvatar = (app: any, size: "sm" | "lg" = "sm") => {
@@ -857,484 +1008,42 @@ const Applicants: React.FC = () => {
           )}
         </div>
 
-      </div>
+      <CandidateDetailsDrawer
+        isOpen={!!selectedCandidateForDrawer}
+        onClose={() => setSelectedCandidateForDrawer(null)}
+        selectedCandidate={selectedCandidateForDrawer}
+        openUpdateModal={openUpdateModal}
+        openResume={openResume}
+        getAvatarGradient={getAvatarGradient}
+        formatStage={formatStage}
+        formatRound={formatRound}
+      />
 
-      {/* Candidate Dossier Detail Sheet Drawer */}
-      <Sheet open={!!selectedCandidateForDrawer} onOpenChange={(open) => {
-        if (!open) setSelectedCandidateForDrawer(null);
-      }}>
-        <SheetContent side="right" className="w-full sm:max-w-md md:max-w-lg p-0 overflow-hidden flex flex-col h-full bg-background border-l border-border shadow-2xl">
-          {selectedCandidateForDrawer && (() => {
-            const app = selectedCandidateForDrawer;
-            const studentName = `${app.student?.user?.firstname || 'Candidate'} ${app.student?.user?.lastname || ''}`;
-            const gradient = getAvatarGradient(studentName);
-            const initials = `${app.student?.user?.firstname?.charAt(0) || 'C'}${app.student?.user?.lastname?.charAt(0) || ''}`.toUpperCase();
-            
-            return (
-              <div className="flex flex-col h-full overflow-hidden relative">
-                
-                {/* Top Ambient mesh glow */}
-                <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
-                
-                {/* Header title */}
-                <div className="flex items-center justify-between p-6 border-b border-border/40 relative z-10 bg-background/50 backdrop-blur-md shrink-0">
-                  <div className="flex items-center gap-2">
-                    <Award size={16} className="text-primary" />
-                    <span className="text-[10px] font-black uppercase tracking-widest text-primary">Candidate Dossier</span>
-                  </div>
-                  <button 
-                    onClick={() => setSelectedCandidateForDrawer(null)}
-                    className="p-2 hover:bg-muted/10 text-muted-foreground hover:text-foreground rounded-full transition-colors cursor-pointer"
-                  >
-                    <X size={18} />
-                  </button>
-                </div>
-
-                {/* Scrollable Dossier Contents */}
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8 relative z-10 pb-24 text-left">
-                  
-                  {/* Visual ID Badge Card */}
-                  <div className="text-center flex flex-col items-center p-6 bg-card border border-border/80 rounded-3xl shadow-sm relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 rounded-full blur-2xl pointer-events-none" />
-                    
-                    <div className="relative mb-4">
-                      <Avatar size="lg" className="size-20 border-4 border-background shadow-xl">
-                        <AvatarFallback className={`bg-gradient-to-tr ${gradient} text-2xl font-black`}>
-                          {initials}
-                        </AvatarFallback>
-                      </Avatar>
-                    </div>
-
-                    <h3 className="text-xl font-black text-foreground tracking-tight">{studentName}</h3>
-                    <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mt-1">
-                      {app.student?.department?.name || 'Department N/A'}
-                    </p>
-
-                    {/* Contact Details */}
-                    <div className="flex flex-col gap-2 mt-5 w-full">
-                      <div className="flex items-center justify-between bg-background border border-border/50 rounded-xl px-4 py-2.5 text-xs font-semibold">
-                        <div className="flex items-center gap-2 text-muted-foreground min-w-0">
-                          <Mail size={14} className="text-primary/70 shrink-0" />
-                          <span className="truncate">{app.student?.user?.email || 'N/A'}</span>
-                        </div>
-                        <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(app.student?.user?.email || '');
-                            toast.success("Email copied successfully!");
-                          }}
-                          className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline shrink-0 cursor-pointer"
-                        >
-                          Copy
-                        </button>
-                      </div>
-                      {app.student?.user?.phone && (
-                        <div className="flex items-center justify-between bg-background border border-border/50 rounded-xl px-4 py-2.5 text-xs font-semibold">
-                          <div className="flex items-center gap-2 text-muted-foreground min-w-0">
-                            <Phone size={14} className="text-primary/70 shrink-0" />
-                            <span className="truncate">{app.student?.user?.phone}</span>
-                          </div>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(app.student?.user?.phone || '');
-                              toast.success("Phone copied successfully!");
-                            }}
-                            className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline shrink-0 cursor-pointer"
-                          >
-                            Copy
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Academic Stats Dashboard */}
-                  <div className="space-y-3">
-                    <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Academic Performance</h4>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-card border border-border/80 rounded-2xl p-4 flex flex-col justify-between shadow-xs">
-                        <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Verified CGPA</span>
-                        <span className="text-2xl font-black text-violet-600 mt-2">{app.student?.cgpa || 'N/A'} <span className="text-xs font-bold text-muted-foreground">/ 10</span></span>
-                      </div>
-                      <div className="bg-card border border-border/80 rounded-2xl p-4 flex flex-col justify-between shadow-xs">
-                        <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider">Active Backlogs</span>
-                        <span className={`text-2xl font-black mt-2 ${app.student?.activeBacklogs > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
-                          {app.student?.activeBacklogs ?? 'N/A'}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Drive Placement Context */}
-                  <div className="bg-card border border-border/80 rounded-3xl p-5 space-y-4 shadow-sm">
-                    <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Drive Details</h4>
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 bg-emerald-500/10 text-emerald-600 rounded-xl mt-0.5 shrink-0">
-                          <Briefcase size={16} />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Job Applied For</p>
-                          <p className="text-sm font-black text-foreground">{app.jobUniversity?.job?.title || 'N/A'}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex items-start gap-3 border-t border-border/40 pt-3">
-                        <div className="p-2 bg-primary/10 text-primary rounded-xl mt-0.5 shrink-0">
-                          <Building2 size={16} />
-                        </div>
-                        <div>
-                          <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Hiring Campus Location</p>
-                          <p className="text-sm font-black text-foreground">{app.jobUniversity?.university?.name || 'Global Drive Platform'}</p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Resume dossier */}
-                  <div className="space-y-3">
-                    <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Candidate CV Attachments</h4>
-                    {app.student?.resumeUrl ? (
-                      <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-3xl p-5 flex items-center justify-between shadow-xs">
-                        <div className="flex items-center gap-3.5 min-w-0">
-                          <div className="p-3 bg-emerald-500/10 text-emerald-600 rounded-2xl shrink-0">
-                            <FileText size={22} />
-                          </div>
-                          <div className="min-w-0">
-                            <p className="text-xs font-extrabold text-foreground truncate max-w-[160px]">{studentName}_Resume.pdf</p>
-                            <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">Verified PDF reference</p>
-                          </div>
-                        </div>
-                        <button
-                          onClick={() => openResume(app.student?.resumeUrl, studentName)}
-                          className="flex items-center gap-1.5 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[9px] uppercase tracking-widest rounded-xl shadow-md shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all shrink-0 cursor-pointer"
-                        >
-                          <ExternalLink size={11} /> View CV
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="bg-rose-500/5 border border-rose-500/20 rounded-3xl p-5 flex items-center gap-3.5 shadow-xs">
-                        <div className="p-3 bg-rose-500/10 text-rose-600 rounded-2xl shrink-0">
-                          <AlertCircle size={22} />
-                        </div>
-                        <div>
-                          <p className="text-xs font-extrabold text-foreground">CV reference missing</p>
-                          <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-wider mt-0.5">Candidate has not synced a CV reference.</p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Vertical timeline path */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between border-b border-border/40 pb-3">
-                      <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Recruitment History Track</h4>
-                      <span className="text-[9px] font-bold text-muted-foreground bg-muted px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                        Stage: {app.status}
-                      </span>
-                    </div>
-                    
-                    <div className="relative pl-5 border-l border-border/60 space-y-6 text-left ml-2">
-                      {app.history && app.history.length > 0 ? (
-                        app.history.map((hist: any, idx: number) => {
-                          const isSelect = hist.status === 'SELECTED' || hist.status === 'OFFER_ACCEPTED';
-                          const isReject = hist.status === 'REJECTED';
-                          const isShortlist = hist.status === 'SHORTLISTED';
-                          return (
-                            <div key={hist.id || idx} className="relative">
-                              <div className={`absolute -left-[29px] top-0.5 w-4.5 h-4.5 rounded-full border-2 bg-background flex items-center justify-center shadow-xs
-                                ${isSelect ? 'border-emerald-500 text-emerald-500 ring-4 ring-emerald-500/10' :
-                                  isReject ? 'border-rose-500 text-rose-500 ring-4 ring-rose-500/10' :
-                                  isShortlist ? 'border-violet-500 text-violet-500 ring-4 ring-violet-500/10' :
-                                  'border-primary text-primary ring-4 ring-primary/10'}`}
-                              >
-                                <div className={`w-1.5 h-1.5 rounded-full 
-                                  ${isSelect ? 'bg-emerald-500' :
-                                    isReject ? 'bg-rose-500' :
-                                    isShortlist ? 'bg-violet-500' :
-                                    'bg-primary'}`} 
-                                />
-                              </div>
-
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <span className={`text-[10px] font-black uppercase tracking-wider
-                                    ${isSelect ? 'text-emerald-600' :
-                                      isReject ? 'text-rose-600' :
-                                      isShortlist ? 'text-violet-600' :
-                                      'text-primary'}`}
-                                  >
-                                    {formatStage(hist.status, hist.round)}
-                                  </span>
-                                  <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest font-mono bg-muted/40 px-1.5 py-0.5 rounded">
-                                    {new Date(hist.createdAt).toLocaleString()}
-                                  </span>
-                                </div>
-                                {hist.reason && (
-                                  <p className="text-xs font-medium text-muted-foreground/80 pl-2 border-l border-border italic bg-muted/5 py-1 px-3 rounded-lg max-w-sm">
-                                    "{hist.reason}"
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })
-                      ) : (
-                        <div className="relative">
-                          <div className="absolute -left-[29px] top-0.5 w-4.5 h-4.5 rounded-full border-2 border-primary bg-background flex items-center justify-center shadow-xs">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primary" />
-                          </div>
-                          <div className="space-y-1">
-                            <span className="text-[10px] font-black uppercase tracking-wider text-primary">
-                              Application Locked
-                            </span>
-                            <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest font-mono block">
-                              {new Date(app.createdAt).toLocaleDateString()}
-                            </span>
-                            <p className="text-xs font-medium text-muted-foreground/70 pl-2 border-l border-border italic bg-muted/5 py-1 px-3 rounded-lg">
-                              Initial application submitted.
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Dossier Float Action Controls Bar */}
-                <div className="absolute bottom-0 inset-x-0 bg-background/90 backdrop-blur-md border-t border-border/40 p-4 flex items-center gap-3 relative z-20 shrink-0">
-                  <button
-                    onClick={() => {
-                      setSelectedCandidateForDrawer(null);
-                      openUpdateModal(app, 'SHORTLISTED');
-                    }}
-                    disabled={['SHORTLISTED', 'SELECTED', 'REJECTED', 'OFFER_ACCEPTED', 'OFFER_REJECTED', 'WITHDRAWN'].includes(app.status)}
-                    className="flex-1 py-3 bg-violet-600 hover:bg-violet-700 text-white font-black text-[9px] uppercase tracking-widest rounded-2xl shadow-lg shadow-violet-500/10 hover:shadow-violet-500/20 transition-all flex items-center justify-center gap-1.5 disabled:opacity-40 cursor-pointer"
-                  >
-                    <Sparkles size={13} /> Shortlist
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedCandidateForDrawer(null);
-                      openUpdateModal(app, 'SELECTED');
-                    }}
-                    disabled={['SELECTED', 'REJECTED', 'OFFER_ACCEPTED', 'OFFER_REJECTED', 'WITHDRAWN'].includes(app.status)}
-                    className="flex-1 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[9px] uppercase tracking-widest rounded-2xl shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5 disabled:opacity-40 cursor-pointer"
-                  >
-                    <CheckCircle2 size={13} /> Select
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedCandidateForDrawer(null);
-                      openUpdateModal(app, 'REJECTED');
-                    }}
-                    disabled={['REJECTED', 'OFFER_ACCEPTED', 'OFFER_REJECTED', 'WITHDRAWN'].includes(app.status)}
-                    className="py-3 px-4 bg-rose-500/10 hover:bg-rose-500 text-rose-600 hover:text-white font-black text-[9px] uppercase tracking-widest rounded-2xl border border-rose-500/10 hover:border-transparent transition-all flex items-center justify-center gap-1.5 disabled:opacity-40 cursor-pointer shrink-0"
-                  >
-                    <XCircle size={13} /> Reject
-                  </button>
-                </div>
-
-              </div>
-            );
-          })()}
-        </SheetContent>
-      </Sheet>
-
-      {/* Premium Glassmorphic Recruitment Status Update Modal */}
-      {isUpdateModalOpen && selectedApp && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="w-full max-w-lg bg-card border border-border/80 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 animate-in zoom-in-95 duration-300 relative overflow-hidden">
-            {/* Modal Ambient Mesh */}
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-            
-            {/* Header */}
-            <div className="flex items-start justify-between relative z-10 text-left">
-              <div className="space-y-1">
-                <span className="text-[10px] font-black text-primary uppercase tracking-widest">Recruitment Stage Update</span>
-                <h3 className="text-lg font-black text-foreground">
-                  {selectedApp.student?.user?.firstname} {selectedApp.student?.user?.lastname}
-                </h3>
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
-                  Current: {formatStage(selectedApp.status, selectedApp.currentRound)}
-                </p>
-              </div>
-              <button 
-                onClick={() => {
-                  setIsUpdateModalOpen(false);
-                  setSelectedApp(null);
-                }}
-                className="p-2 hover:bg-muted/10 text-muted-foreground hover:text-foreground rounded-full transition-colors cursor-pointer"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* Stage Toggle Cards */}
-            <div className="space-y-2 relative z-10 text-left">
-              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block">
-                Target Status
-              </label>
-              <div className="grid grid-cols-3 gap-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTargetStatus('SHORTLISTED');
-                    setTargetRound('APTITUDE');
-                    setReasonText(getPresetReason('SHORTLISTED', 'APTITUDE'));
-                  }}
-                  className={`p-3.5 rounded-2xl border-2 flex flex-col items-center gap-1.5 transition-all text-center cursor-pointer
-                    ${targetStatus === 'SHORTLISTED' 
-                      ? 'border-violet-500 bg-violet-500/5 text-violet-600 shadow-md shadow-violet-500/5' 
-                      : 'border-border bg-card text-muted-foreground hover:border-border/80 hover:text-foreground'}`}
-                >
-                  <Sparkles size={16} />
-                  <span className="text-[10px] font-black uppercase tracking-wider">Shortlist</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTargetStatus('SELECTED');
-                    setTargetRound('');
-                    setReasonText(getPresetReason('SELECTED', ''));
-                  }}
-                  className={`p-3.5 rounded-2xl border-2 flex flex-col items-center gap-1.5 transition-all text-center cursor-pointer
-                    ${targetStatus === 'SELECTED' 
-                      ? 'border-emerald-500 bg-emerald-500/5 text-emerald-600 shadow-md shadow-emerald-500/5' 
-                      : 'border-border bg-card text-muted-foreground hover:border-border/80 hover:text-foreground'}`}
-                >
-                  <CheckCircle2 size={16} />
-                  <span className="text-[10px] font-black uppercase tracking-wider">Select</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setTargetStatus('REJECTED');
-                    setTargetRound('');
-                    setReasonText(getPresetReason('REJECTED', ''));
-                  }}
-                  className={`p-3.5 rounded-2xl border-2 flex flex-col items-center gap-1.5 transition-all text-center cursor-pointer
-                    ${targetStatus === 'REJECTED' 
-                      ? 'border-rose-500 bg-rose-500/5 text-rose-600 shadow-md shadow-rose-500/5' 
-                      : 'border-border bg-card text-muted-foreground hover:border-border/80 hover:text-foreground'}`}
-                >
-                  <XCircle size={16} />
-                  <span className="text-[10px] font-black uppercase tracking-wider">Reject</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Conditional Round Selection Grid */}
-            {targetStatus === 'SHORTLISTED' && (
-              <div className="space-y-2.5 relative z-10 animate-in slide-in-from-top-4 duration-300 text-left">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block">
-                  Select Target Interview Round
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {[
-                    { id: 'APTITUDE', label: 'Aptitude Test' },
-                    { id: 'GROUP_DISCUSSION', label: 'GD Round' },
-                    { id: 'TECHNICAL', label: 'Tech Interview' },
-                    { id: 'HR', label: 'HR Interview' },
-                    { id: 'MANAGERIAL', label: 'Managerial' },
-                    { id: 'FINAL', label: 'Final Round' }
-                  ].map((rnd) => (
-                    <button
-                      key={rnd.id}
-                      type="button"
-                      onClick={() => {
-                        setTargetRound(rnd.id);
-                        setReasonText(getPresetReason('SHORTLISTED', rnd.id));
-                      }}
-                      className={`py-2.5 px-3 rounded-xl border text-[9px] font-black uppercase tracking-wider transition-all text-center cursor-pointer
-                        ${targetRound === rnd.id 
-                          ? 'border-violet-500 bg-violet-500/10 text-violet-600 shadow-sm' 
-                          : 'border-border/60 bg-muted/5 text-muted-foreground hover:border-border hover:bg-muted/10 hover:text-foreground'}`}
-                    >
-                      {rnd.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Quick Preset Comment Badges */}
-            <div className="space-y-2 relative z-10 text-left">
-              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block">
-                Quick Preset Templates
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {(targetStatus === 'SHORTLISTED' 
-                  ? (targetRound === 'APTITUDE' ? ['Resume shortlisted', 'Eligible profile', 'Initial screening cleared']
-                     : targetRound === 'TECHNICAL' ? ['Cleared aptitude test', 'Strong logic skills', 'Technical round scheduled']
-                     : targetRound === 'HR' ? ['Cleared tech interview', 'Excellent code logic', 'Strong problem solver']
-                     : ['Moved to next round', 'Interview scheduled', 'Cleared previous stages'])
-                  : targetStatus === 'SELECTED' 
-                    ? ['Excellent overall performance', 'Outstanding code & comms', 'Perfect fit for team']
-                    : ['Did not clear tech round', 'Tech alignment gaps', 'Placement criteria mismatch']
-                ).map((preset) => (
-                  <button
-                    key={preset}
-                    type="button"
-                    onClick={() => setReasonText(preset)}
-                    className="px-2.5 py-1 text-[9px] font-bold text-muted-foreground hover:text-foreground bg-muted/10 hover:bg-muted/20 border border-border/50 hover:border-border rounded-lg transition-all cursor-pointer"
-                  >
-                    + {preset}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Reason/Remarks Input */}
-            <div className="space-y-2 relative z-10 text-left">
-              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block">
-                Decision Notes / Feedback
-              </label>
-              <textarea
-                value={reasonText}
-                onChange={(e) => setReasonText(e.target.value)}
-                placeholder="Enter a reason, interview feedback, or additional notes..."
-                rows={3}
-                className="w-full saas-textarea p-3.5 bg-muted/5 border border-border/80 rounded-2xl focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-medium text-xs shadow-sm"
-              />
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex items-center justify-end gap-3 pt-2 relative z-10 shrink-0">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsUpdateModalOpen(false);
-                  setSelectedApp(null);
-                }}
-                disabled={isSubmitting}
-                className="px-5 py-3 border border-border/80 text-muted-foreground hover:text-foreground font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-muted/5 transition-all disabled:opacity-50 cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={submitStatusUpdate}
-                disabled={isSubmitting}
-                className="px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/95 font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
-              >
-                {isSubmitting ? (
-                  <div className="flex items-center gap-2">
-                    <svg className="animate-spin h-3.5 w-3.5 text-current" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                    </svg>
-                    <span>Updating...</span>
-                  </div>
-                ) : (
-                  'Confirm Stage Update'
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <StatusUpdateModal
+        isOpen={isUpdateModalOpen}
+        onClose={() => {
+          setIsUpdateModalOpen(false);
+          setSelectedApp(null);
+        }}
+        selectedApp={selectedApp}
+        targetStatus={targetStatus}
+        setTargetStatus={setTargetStatus}
+        targetRound={targetRound}
+        setTargetRound={setTargetRound}
+        reasonText={reasonText}
+        setReasonText={setReasonText}
+        isSubmitting={isSubmitting}
+        submitStatusUpdate={submitStatusUpdate}
+        validationError={validationError}
+        submissionError={submissionError}
+        formatStage={formatStage}
+        formatRound={formatRound}
+        getPresetReason={getPresetReason}
+      />
     </div>
+  </div>
   );
 };
 
 export default Applicants;
+

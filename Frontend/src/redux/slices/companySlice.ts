@@ -125,7 +125,16 @@ const companySlice = createSlice({
         const updated = action.payload?.data || action.payload;
         if (updated && updated.id) {
           state.applications = state.applications.map((app) =>
-            app.id === updated.id ? { ...app, ...updated } : app
+            app.id === updated.id
+              ? { 
+                  ...app, 
+                  status: updated.status,
+                  currentRound: updated.currentRound,
+                  reason: updated.reason ?? app.reason,
+                  updatedAt: updated.updatedAt || new Date().toISOString(),
+                  history: updated.history || app.history
+                } 
+              : app
           );
         }
       })
