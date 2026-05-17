@@ -113,8 +113,8 @@ export default function Dashboard() {
         <SectionCards
           totalPlaced={metrics.totalPlaced}
           avgSalary={metrics.avgSalary}
-          totalStudents={metrics.totalApplicants}
           totalDepartments={metrics.deptStats.length}
+          hideStudents={true}
         />
 
         <UpcomingEventsList events={upcomingEvents.map(e => ({ ...e, status: 'SCHEDULED' }))} />
