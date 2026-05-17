@@ -18,7 +18,7 @@ import { StudentPageLayout } from '@/components/layout/StudentPageLayout';
 
 const InterviewSchedule: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { upcomingEvents = [], loading } = useSelector((state: RootState) => state.notification || {});
+  const { upcomingEvents = [], loading } = useSelector((state: RootState) => state.notification || {}) as { upcomingEvents: any[]; loading: boolean };
 
   useEffect(() => {
     dispatch(fetchUpcomingEvents());
