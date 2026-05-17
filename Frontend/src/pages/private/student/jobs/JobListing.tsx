@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   XCircle,
   AlertTriangle,
+  Zap,
 } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,6 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobs, applyJob, fetchStudentProfile, fetchJobApplications } from '@/redux/thunks/studentThunk';
+import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import { Modal } from '@/components/ui/modal';
@@ -56,9 +58,47 @@ interface JobUniversity {
   };
 }
 
+const getCompanyInitials = (name?: string) => {
+  if (!name) return 'CO';
+  const cleanName = name.trim();
+  const parts = cleanName.split(/\s+/);
+  if (parts.length > 1) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return cleanName.slice(0, 2).toUpperCase();
+};
+
+const formatDate = (dateString?: string) => {
+  if (!dateString) return 'No Deadline';
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return 'No Deadline';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch (e) {
+    return 'No Deadline';
+  }
+};
+
+const getPostedAgo = (dateString?: string) => {
+  if (!dateString) return 'Posted recently';
+  try {
+    const postedDate = new Date(dateString);
+    const today = new Date();
+    const diffTime = Math.abs(today.getTime() - postedDate.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays <= 0) return 'Posted today';
+    if (diffDays === 1) return 'Posted 1 day ago';
+    return `Posted ${diffDays} days ago`;
+  } catch (e) {
+    return 'Posted recently';
+  }
+};
+
 const JobListing = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { jobs, profile, applications = [], loading } = useSelector((state: RootState) => state.student);
+  const { companies: reduxCompanies = [] } = useSelector((state: RootState) => state.company);
   const { user } = useSelector((state: RootState) => state.auth);
   const isApproved = user?.status === 'ACTIVE';
 
@@ -75,6 +115,7 @@ const JobListing = () => {
   useEffect(() => {
     dispatch(fetchJobs({ status: 'APPROVED' }));
     dispatch(fetchJobApplications({}));
+    dispatch(fetchCompanies({ limit: 100 }));
     if (!profile) {
       dispatch(fetchStudentProfile());
     }
@@ -168,6 +209,10 @@ const JobListing = () => {
       });
   };
 
+  const selectedCompanyId = selectedJob?.job?.companyId ?? (selectedJob as any)?.companyId;
+  const selectedFoundCompany = reduxCompanies.find((c: any) => c.id === selectedCompanyId);
+  const selectedCompanyName = selectedJob?.job?.company?.name ?? selectedFoundCompany?.name ?? 'Hiring Partner';
+
   if (loading && (jobs?.length || 0) === 0) {
     return <Loader text="Syncing career opportunities..." fullScreen />;
   }
@@ -214,7 +259,7 @@ const JobListing = () => {
                   className={cn(
                     "px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 whitespace-nowrap",
                     activeTab === tab.id
-                      ? "bg-white dark:bg-[#1e1f26] text-blue-600 dark:text-blue-400 shadow-md border border-slate-200/40 dark:border-white/[0.05]"
+                      ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-md border border-slate-200/40 dark:border-white/[0.05]"
                       : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
                   )}
                 >
@@ -226,11 +271,11 @@ const JobListing = () => {
             <div className="flex items-center gap-3 w-full md:w-auto">
               <div className="relative flex-1 md:w-80 group">
                 <Search
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors w-4 h-4"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors w-4 h-4"
                 />
                 <Input
                   placeholder="Search role or company..."
-                  className="pl-10 h-10 bg-slate-50 dark:bg-[#0f172a]/60 border border-slate-200/60 dark:border-slate-800 rounded-xl text-xs md:text-sm font-semibold focus-visible:ring-blue-500/20 shadow-sm transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  className="pl-10 h-10 bg-slate-50 dark:bg-[#0f172a]/60 border border-slate-200/60 dark:border-slate-800 rounded-xl text-xs md:text-sm font-semibold focus-visible:ring-indigo-500/20 shadow-sm transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -246,6 +291,10 @@ const JobListing = () => {
               const isApplied = appliedJobIds.has(Number(job.id));
               const eligibility = checkEligibility(job);
               
+              const companyId = job.job?.companyId ?? (job as any).companyId;
+              const foundCompany = reduxCompanies.find((c: any) => c.id === companyId);
+              const companyName = job.job?.company?.name ?? foundCompany?.name ?? 'Hiring Partner';
+              
               return (
                 <motion.div
                   key={job.id}
@@ -256,112 +305,130 @@ const JobListing = () => {
                   whileHover={{ y: -4 }}
                   className="group"
                 >
-                  <Card className="h-full border border-slate-200/50 dark:border-white/[0.06] bg-white/70 dark:bg-[#161b22]/30 backdrop-blur-md hover:bg-white dark:hover:bg-[#161b22]/50 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 hover:border-blue-500/20">
-                    <CardContent className="p-0 flex flex-col h-full">
-                      {/* Top Info */}
-                      <div className="p-5 md:p-6 flex-1 flex flex-col space-y-4">
-                        <div className="flex items-start justify-between gap-4">
-                          <div className={cn(
-                            "w-12 h-12 rounded-xl flex items-center justify-center font-bold text-lg text-white shadow-md shrink-0 transition-all duration-500 group-hover:scale-105 group-hover:rotate-1",
-                            isApplied ? "bg-blue-500" : "bg-gradient-to-br from-blue-500 to-indigo-600"
-                          )}>
-                            {job.job?.company?.name?.[0] || job.job?.title?.[0] || 'J'}
+                  <Card className="h-full border border-slate-100 dark:border-white/[0.06] bg-white dark:bg-[#161b22]/30 rounded-[1.25rem] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 hover:border-indigo-500/20">
+                    <CardContent className="p-6 flex flex-col h-full justify-between gap-5">
+                      
+                      {/* Top Row: Logo, Title, Badge */}
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-start gap-4">
+                          {/* Gradient Rounded Square Icon */}
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-emerald-500 flex items-center justify-center font-bold text-lg text-white shadow-md shadow-indigo-500/10 shrink-0">
+                            {getCompanyInitials(companyName)}
                           </div>
-                          <div className="flex flex-col items-end gap-1.5">
-                            {isApplied ? (
-                              <Badge className="bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 text-[9px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-none">
-                                Applied
-                              </Badge>
-                            ) : eligibility.eligible ? (
-                              <Badge className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 text-[9px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-none">
-                                Recommended
-                              </Badge>
-                            ) : (
-                              <Badge className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20 text-[9px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-none">
-                                Ineligible
-                              </Badge>
-                            )}
-                            {job.openings && (
-                              <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                                {job.openings} Openings
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="space-y-3">
-                          <div className="space-y-1">
-                            <h3 className="text-base md:text-lg font-bold text-slate-900 dark:text-white leading-snug group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors tracking-tight line-clamp-1">
+                          
+                          {/* Title & Company */}
+                          <div className="pt-0.5">
+                            <h3 className="text-[17px] font-bold text-slate-800 dark:text-white leading-snug tracking-tight hover:text-indigo-600 transition-colors line-clamp-1">
                               {job.job?.title}
                             </h3>
-                            <div className="flex flex-col gap-0.5">
-                              <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 truncate">
-                                <Building2 size={13} className="text-blue-500 shrink-0" />
-                                {job.job?.company?.name || 'Top Tier Recruiter'}
+                            <div className="flex flex-col gap-0.5 mt-1">
+                              <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 truncate">
+                                <Building2 size={14} className="text-slate-400 shrink-0" />
+                                {companyName}
                               </p>
                               {job.university?.name && (
-                                <p className="text-[10px] font-medium text-slate-400 dark:text-slate-500 flex items-center gap-1.5 truncate pl-0.5">
+                                <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 flex items-center gap-1 truncate">
                                   <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
-                                  {job.university.name} Placement
+                                  {job.university.name} Drive
                                 </p>
                               )}
                             </div>
                           </div>
-
-                          {/* Skills Preview */}
-                          <div className="flex flex-wrap gap-1 min-h-[1.25rem]">
-                            {job.job?.skills?.slice(0, 3).map((skill) => (
-                              <span key={skill.id} className="text-[10px] font-semibold text-blue-600/80 dark:text-blue-400/80 bg-blue-500/5 px-2 py-0.5 rounded-md border border-blue-500/10 whitespace-nowrap">
-                                {skill.name}
-                              </span>
-                            ))}
-                            {(job.job?.skills?.length || 0) > 3 && (
-                              <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 px-1 py-0.5 whitespace-nowrap">
-                                +{job.job.skills!.length - 3} more
-                              </span>
-                            )}
-                          </div>
                         </div>
 
-                        {/* Space efficient Meta Row */}
-                        <div className="grid grid-cols-2 gap-2.5 pt-1">
-                          <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-[#1e293b]/20 rounded-lg border border-slate-100/50 dark:border-white/[0.03]">
-                            <MapPin size={13} className="text-blue-500 shrink-0" />
-                            <span className="text-xs text-slate-700 dark:text-slate-300 font-medium truncate">{job.job?.location}</span>
-                          </div>
-                          <div className="flex items-center gap-2 px-3 py-2 bg-slate-50 dark:bg-[#1e293b]/20 rounded-lg border border-slate-100/50 dark:border-white/[0.03]">
-                            <IndianRupee size={13} className="text-emerald-500 shrink-0" />
-                            <span className="text-xs text-slate-700 dark:text-slate-300 font-bold truncate">{formatSalary(job.salary)}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Footer Actions */}
-                      <div className="px-5 py-3 md:py-4 bg-slate-50/50 dark:bg-slate-900/20 border-t border-slate-100/50 dark:border-white/[0.04] flex items-center justify-between mt-auto">
-                        <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 font-semibold">
-                          <Clock size={13} className="text-indigo-500" />
-                          {new Date(job.postedAt || job.sentAt || (job as any).createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                        </div>
-                        <Button
-                          onClick={() => {
-                            setSelectedJob(job);
-                            setIsModalOpen(true);
-                          }}
-                          className={cn(
-                            "rounded-xl font-semibold text-xs tracking-wide px-4 py-2 h-9 transition-all duration-300 border border-transparent shadow-sm",
-                            isApplied 
-                              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20 dark:border-emerald-500/30 shadow-none hover:bg-emerald-500/20" 
-                              : "bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/10 hover:scale-[1.02]"
-                          )}
-                        >
+                        {/* Top-Right Pill Badge */}
+                        <div>
                           {isApplied ? (
-                            <span className="flex items-center gap-1.5">
-                              <CheckCircle2 size={13} className="text-emerald-500 shrink-0" />
+                            <span className="bg-indigo-600 text-white text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-sm whitespace-nowrap">
                               Applied
                             </span>
-                          ) : 'Apply Now'}
-                        </Button>
+                          ) : eligibility.eligible ? (
+                            <span className="bg-indigo-600 text-white text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-sm whitespace-nowrap">
+                              Eligible
+                            </span>
+                          ) : (
+                            <span className="bg-rose-500 text-white text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-sm whitespace-nowrap">
+                              Ineligible
+                            </span>
+                          )}
+                        </div>
                       </div>
+
+                      {/* Middle row: MapPin, Rupee, Clock */}
+                      <div className="flex items-center gap-x-5 gap-y-2 flex-wrap text-slate-500 dark:text-slate-400 text-[13px] font-medium pt-1">
+                        <div className="flex items-center gap-1.5">
+                          <MapPin size={15} className="text-slate-400 shrink-0" />
+                          <span>{job.job?.location}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-400 font-semibold shrink-0">₹</span>
+                          <span>{formatSalary(job.salary)}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <Clock size={15} className="text-slate-400 shrink-0" />
+                          <span>{formatDate(job.deadline)}</span>
+                        </div>
+                      </div>
+
+                      {/* Skills tags preview (discreet & premium) */}
+                      {job.job?.skills && job.job.skills.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-0.5">
+                          {job.job.skills.slice(0, 3).map((skill) => (
+                            <span key={skill.id} className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-lg">
+                              {skill.name}
+                            </span>
+                          ))}
+                          {job.job.skills.length > 3 && (
+                            <span className="text-[10px] font-bold text-slate-400 px-1 py-0.5">
+                              +{job.job.skills.length - 3} more
+                            </span>
+                          )}
+                        </div>
+                      )}
+
+                      {/* Bottom Row: Posted Ago & Buttons */}
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100 dark:border-slate-800/50">
+                        <div className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                          {getPostedAgo(job.postedAt || job.sentAt || (job as any).createdAt)}
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedJob(job);
+                              setIsModalOpen(true);
+                            }}
+                            className="bg-white dark:bg-[#161b22]/30 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 px-4 h-10 rounded-xl font-bold text-xs md:text-sm shadow-sm transition-all duration-200"
+                          >
+                            Details
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              setSelectedJob(job);
+                              setIsModalOpen(true);
+                            }}
+                            className={cn(
+                              "px-4 h-10 rounded-xl font-bold text-xs md:text-sm flex items-center gap-2 shadow-md transition-all duration-200 text-white",
+                              isApplied
+                                ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/10 hover:shadow-emerald-500/20"
+                                : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/10 hover:shadow-indigo-500/20"
+                            )}
+                          >
+                            {isApplied ? (
+                              <>
+                                <CheckCircle2 size={15} className="shrink-0" />
+                                Applied
+                              </>
+                            ) : (
+                              <>
+                                <Zap size={14} className="fill-white shrink-0" />
+                                Apply Now
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -428,7 +495,7 @@ const JobListing = () => {
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           title={selectedJob?.job.title}
-          subtitle={`${selectedJob?.job?.company?.name || 'Top Tier Recruiter'} • ${selectedJob?.job?.location}`}
+          subtitle={`${selectedCompanyName} • ${selectedJob?.job?.location || 'Remote'}`}
           maxWidth="sm:max-w-lg"
         >
           <div className="space-y-5 py-1">
@@ -436,9 +503,9 @@ const JobListing = () => {
             {/* Quick Specs Grid */}
             <div className="grid grid-cols-3 gap-2.5">
               <div className="p-3 bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-white/[0.04] flex flex-col items-center justify-center text-center">
-                <Calendar className="w-4 h-4 text-blue-500 mb-1" />
+                <Calendar className="w-4 h-4 text-indigo-500 mb-1" />
                 <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Deadline</span>
-                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">{selectedJob?.deadline || 'Open'}</span>
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">{formatDate(selectedJob?.deadline)}</span>
               </div>
               <div className="p-3 bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-white/[0.04] flex flex-col items-center justify-center text-center">
                 <IndianRupee className="w-4 h-4 text-emerald-500 mb-1" />
@@ -575,7 +642,7 @@ const JobListing = () => {
                     ? "bg-amber-500/10 text-amber-600 border-amber-500/20 cursor-not-allowed shadow-none"
                     : !checkEligibility(selectedJob).eligible
                     ? "bg-rose-500/10 text-rose-500 border-rose-500/20 cursor-not-allowed shadow-none"
-                    : "bg-blue-600 hover:bg-blue-700 text-white border-transparent shadow-blue-500/20 hover:shadow-blue-500/30 hover:scale-[1.01] active:scale-[0.99]"
+                    : "bg-indigo-600 hover:bg-indigo-700 text-white border-transparent shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:scale-[1.01] active:scale-[0.99]"
                 )}
                 onClick={handleApply}
                 disabled={isApplying || !selectedJob || appliedJobIds.has(Number(selectedJob.id)) || !checkEligibility(selectedJob).eligible || !isApproved}
