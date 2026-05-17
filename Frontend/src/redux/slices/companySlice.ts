@@ -122,11 +122,12 @@ const companySlice = createSlice({
 
       // ✅ Update Status
       .addCase(updateJobApplicationStatus.fulfilled, (state, action) => {
-        const updated = action.payload;
-
-        state.applications = state.applications.map((app) =>
-          app.id === updated.id ? { ...app, status: updated.status } : app
-        );
+        const updated = action.payload?.data || action.payload;
+        if (updated && updated.id) {
+          state.applications = state.applications.map((app) =>
+            app.id === updated.id ? { ...app, ...updated } : app
+          );
+        }
       })
 
       // ✅ Mail

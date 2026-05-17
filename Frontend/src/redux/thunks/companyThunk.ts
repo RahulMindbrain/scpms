@@ -174,11 +174,11 @@ export const fetchJobApplications = createAsyncThunk(
 
 export const updateJobApplicationStatus = createAsyncThunk(
   "company/updateJobApplicationStatus",
-  async ({ id, status }: any, { rejectWithValue }) => {
+  async ({ id, status, currentRound, reason, remarks }: any, { rejectWithValue }) => {
     try {
       const res = await putAPI<any>(
         `/company/update-job-status/${id}`,
-        { status }
+        { status, currentRound, reason, remarks }
       );
 
       return res.data;
