@@ -57,9 +57,9 @@ const InterviewSchedule: React.FC = () => {
                 Prepare, practice, and ace your upcoming technical and behavioral rounds with confidence.
               </p>
             </div>
-            <div className="hidden lg:block shrink-0">
-              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-white/5 backdrop-blur-2xl border border-white/10 shadow-2xl group-hover:scale-110 transition-transform duration-500">
-                <Video className="h-16 w-16 text-white/40" />
+             <div className="hidden lg:block shrink-0">
+              <div className="flex h-32 w-32 items-center justify-center rounded-[2rem] bg-indigo-500/10 dark:bg-white/5 backdrop-blur-2xl border border-indigo-500/10 dark:border-white/10 shadow-2xl group-hover:scale-110 transition-transform duration-500">
+                <Video className="h-16 w-16 text-indigo-600 dark:text-white/40" />
               </div>
             </div>
           </div>

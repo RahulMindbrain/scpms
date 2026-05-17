@@ -92,7 +92,7 @@ export default function StudentDashboard() {
             </p>
 
             <div className="mt-6 sm:mt-8 flex flex-wrap gap-4">
-              <Link to="/student/jobs" className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/20 px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold text-xs transition-all flex items-center gap-2 hover:scale-[1.02] active:scale-[0.98]">
+              <Link to="/student/jobs" className="student-hero-cta hover:scale-[1.02] active:scale-[0.98]">
                 Browse Jobs <ChevronRight size={14} />
               </Link>
             </div>
