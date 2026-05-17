@@ -27,7 +27,7 @@ const CompanyLayout: React.FC = () => {
         <SidebarInset className="bg-background overflow-y-auto overflow-x-hidden">
           <SiteHeader />
           <main className="relative flex flex-1 flex-col bg-background min-h-0 @container/main">
-            <div className="flex-1 p-4 md:p-8 lg:p-10 w-full mx-auto max-w-7xl">
+            <div className="flex-1 p-4 md:p-6 lg:p-8 w-full mx-auto max-w-[1440px]">
               <WarningBanner 
                 isVisible={!isApproved}
                 role="COMPANY"

@@ -170,9 +170,9 @@
 .student-hero-banner {
   position: relative;
   overflow: hidden;
-  border-radius: 2rem;
-  padding: 3rem;
-  min-height: 280px;
+  border-radius: 1.5rem;
+  padding: 1.75rem;
+  min-height: auto;
   display: flex;
   align-items: center;
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
@@ -180,6 +180,14 @@
   box-shadow: var(--shadow-premium);
   color: white;
   transition: all 0.5s ease;
+}
+
+@media (min-width: 640px) {
+  .student-hero-banner {
+    border-radius: 2rem;
+    padding: 3rem;
+    min-height: 280px;
+  }
 }
 
 .dark .student-hero-banner {
@@ -460,11 +468,23 @@
 
 .student-hero-title {
   margin-top: 1rem;
-  font-size: 1.875rem;
+  font-size: 1.75rem;
   font-weight: 900;
   color: white;
   letter-spacing: -0.02em;
   line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  .student-hero-title {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .student-hero-title {
+    font-size: 3rem;
+  }
 }
 
 .student-hero-title span {
@@ -474,10 +494,17 @@
 .student-hero-description {
   margin-top: 0.75rem;
   max-width: 32rem;
-  font-size: 0.875rem;
-  color: rgba(255, 255, 255, 0.8);
-  line-height: 1.6;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
   font-weight: 500;
+}
+
+@media (min-width: 640px) {
+  .student-hero-description {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
 }
 
 /* ============================================================
@@ -485,13 +512,20 @@
    ============================================================ */
 .saas-card {
   background-color: var(--card);
-  border-radius: 2rem;
+  border-radius: 1.5rem;
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
   overflow: visible;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  padding: 1.75rem;
+  padding: 1.25rem;
   position: relative;
+}
+
+@media (min-width: 640px) {
+  .saas-card {
+    border-radius: 2rem;
+    padding: 1.75rem;
+  }
 }
 
 .saas-card:hover {

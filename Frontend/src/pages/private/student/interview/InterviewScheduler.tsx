@@ -119,10 +119,16 @@ const InterviewSchedule: React.FC = () => {
                     <div key={i} className="flex gap-5 relative group/item">
                       <div className={cn("w-1 rounded-full shrink-0 h-12", i === 0 ? "bg-emerald-500" : i === 1 ? "bg-blue-500" : "bg-indigo-500")} />
                       <div className="min-w-0">
-                        <p className="text-xs md:text-sm font-black text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">{act.company}</p>
+                        <p className="text-xs md:text-sm font-black text-slate-900 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
+                          {typeof act.company === 'object' ? act.company?.name : act.company || 'Corporate Drive'}
+                        </p>
                         <p className="text-[10px] md:text-xs text-slate-500 dark:text-slate-400 font-bold mt-1 truncate">{act.title}</p>
                         <p className="text-[9px] md:text-[10px] text-slate-400 dark:text-slate-600 mt-2 uppercase font-black tracking-widest">
-                          {new Date(act.startTime).toLocaleDateString()} • {new Date(act.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          {act.startTime ? (
+                            <>
+                              {new Date(act.startTime).toLocaleDateString()} • {new Date(act.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </>
+                          ) : 'Date TBA'}
                         </p>
                       </div>
                     </div>
