@@ -258,7 +258,7 @@ const SendJobUniversityRequest = () => {
                       <option value="">Choose a manifest...</option>
                       {companyJobs.map((job: any) => (
                         <option key={job.id} value={job.id}>
-                          {job.title} — ID: {String(job.id).slice(-6).toUpperCase()}
+                          {job.title}
                         </option>
                       ))}
                     </select>
@@ -281,7 +281,7 @@ const SendJobUniversityRequest = () => {
                       </option>
                       {universities.map((uni: any) => (
                         <option key={uni.id} value={uni.id}>
-                          {uni.name} (ID: {String(uni.id).slice(-6).toUpperCase()})
+                          {uni.name}
                         </option>
                       ))}
                     </select>

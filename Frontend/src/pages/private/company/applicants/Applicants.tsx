@@ -14,21 +14,11 @@ import {
   ChevronUp, 
   X, 
   Mail, 
-  Phone, 
-  Download, 
   FileText, 
   ExternalLink, 
   FilterX, 
   Award, 
-  AlertCircle, 
-  ShieldAlert,
-  Info,
   Check, 
-  ChevronRight,
-  TrendingUp,
-  UserCheck,
-  MapPin,
-  IndianRupee,
   Trophy,
   Code2,
   Users
@@ -45,7 +35,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import Loader from '@/components/Loader';
@@ -244,7 +233,6 @@ const Applicants: React.FC = () => {
   const [selectedJob, setSelectedJob] = React.useState('All Jobs');
 
   // Custom states for timeline history, candidate details sheet, and recruitment modal
-  const [expandedAppId, setExpandedAppId] = React.useState<number | null>(null);
   const [selectedCandidateForDrawer, setSelectedCandidateForDrawer] = React.useState<any>(null);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = React.useState(false);
   const [selectedApp, setSelectedApp] = React.useState<any>(null);
@@ -334,10 +322,6 @@ const Applicants: React.FC = () => {
 
     return null;
   }, [selectedApp, targetStatus, targetRound]);
-
-  const toggleExpand = React.useCallback((id: number) => {
-    setExpandedAppId(prev => prev === id ? null : id);
-  }, []);
 
   const openUpdateModal = React.useCallback((app: any, newStatus: string) => {
     setSubmissionError(null);
@@ -1016,7 +1000,6 @@ const Applicants: React.FC = () => {
         openResume={openResume}
         getAvatarGradient={getAvatarGradient}
         formatStage={formatStage}
-        formatRound={formatRound}
       />
 
       <StatusUpdateModal

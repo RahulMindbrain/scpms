@@ -14,7 +14,6 @@ import {
   CheckCircle2,
   TrendingUp,
   ArrowRight,
-  Zap,
   XCircle,
   AlertTriangle,
 } from "lucide-react"

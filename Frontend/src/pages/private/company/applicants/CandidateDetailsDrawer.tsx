@@ -27,7 +27,6 @@ interface CandidateDetailsDrawerProps {
   openResume: (url: string, name: string) => void;
   getAvatarGradient: (name: string) => string;
   formatStage: (status: string, round?: string | null) => string;
-  formatRound: (round: string) => string;
 }
 
 export const CandidateDetailsDrawer: React.FC<CandidateDetailsDrawerProps> = ({
@@ -37,8 +36,7 @@ export const CandidateDetailsDrawer: React.FC<CandidateDetailsDrawerProps> = ({
   openUpdateModal,
   openResume,
   getAvatarGradient,
-  formatStage,
-  formatRound
+  formatStage
 }) => {
   if (!selectedCandidate) return null;
   
