@@ -1,4 +1,4 @@
-import { Bell } from "lucide-react";
+import { Bell, Users, Briefcase, Clock } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +29,6 @@ export function NotificationBell() {
   const apiNotifications = useSelector((state: RootState) => state.notification.items);
   const isLoggedIn = !!userType;
 
-
   useEffect(() => {
     if (isLoggedIn) {
       dispatch(fetchUnreadCount());
@@ -58,17 +57,44 @@ export function NotificationBell() {
 
   const totalUnreadCount = Math.max(unreadCount, apiUnreadCount);
 
+  // Dynamic context inspector to dynamically assign icons & styled badges to notifications inside header preview
+  const getNotificationConfig = (title: string, message: string) => {
+    const text = (title + " " + message).toLowerCase();
+    if (text.includes("applicant") || text.includes("candidate") || text.includes("apply") || text.includes("applied")) {
+      return {
+        icon: Users,
+        color: "text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 border-indigo-100/40 dark:border-indigo-500/20",
+      };
+    }
+    if (text.includes("interview") || text.includes("schedule") || text.includes("slot")) {
+      return {
+        icon: Clock,
+        color: "text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-500/10 border-amber-100/40 dark:border-amber-500/20",
+      };
+    }
+    if (text.includes("job") || text.includes("drive") || text.includes("position")) {
+      return {
+        icon: Briefcase,
+        color: "text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-500/10 border-emerald-100/40 dark:border-emerald-500/20",
+      };
+    }
+    return {
+      icon: Bell,
+      color: "text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 border-blue-100/40 dark:border-blue-500/20",
+    };
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           size="icon"
-          className="relative h-10 w-10 rounded-2xl bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-foreground transition-all duration-300 border border-white/5 hover:border-white/10 active:scale-90"
+          className="relative h-10 w-10 rounded-xl bg-muted/40 hover:bg-muted/70 text-muted-foreground hover:text-foreground transition-all duration-300 border border-border/40 hover:border-border/80 active:scale-95 shadow-sm"
         >
-          <Bell className={cn("h-5 w-5", totalUnreadCount > 0 && "animate-[bell-swing_2s_infinite]")} />
+          <Bell className={cn("h-[18px] w-[18px] transition-transform", totalUnreadCount > 0 && "animate-[bell-swing_2s_infinite]")} />
           {totalUnreadCount > 0 && (
-            <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[9px] font-black text-white border-4 border-[#0f172a] shadow-xl">
+            <span className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-rose-500 text-[9px] font-black text-white border-2 border-background shadow-md animate-in zoom-in duration-300">
               {totalUnreadCount > 9 ? "9+" : totalUnreadCount}
             </span>
           )}
@@ -77,102 +103,105 @@ export function NotificationBell() {
 
       <DropdownMenuContent
         align="end"
-        className="w-[380px] p-0 overflow-hidden rounded-[2rem] border border-slate-200/60 dark:border-white/10 bg-white/95 dark:bg-[#1e1f26]/95 backdrop-blur-2xl shadow-2xl shadow-black/40"
+        className="w-[360px] p-0 overflow-hidden rounded-2xl border border-border bg-card/95 backdrop-blur-xl shadow-2xl animate-in fade-in slide-in-from-top-3 duration-300"
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-white/[0.05] bg-slate-50/50 dark:bg-white/[0.02]">
-          <div className="flex items-center gap-3">
-            <h3 className="font-black text-xs uppercase tracking-[0.2em] text-foreground">Activity Pulse</h3>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-border/60 bg-muted/30">
+          <div className="flex items-center gap-2">
+            <h3 className="font-extrabold text-xs text-foreground tracking-tight">Notifications</h3>
             {totalUnreadCount > 0 && (
-              <span className="rounded-lg bg-primary/10 px-2 py-0.5 text-[9px] font-black text-primary uppercase tracking-widest border border-primary/10">
-                {totalUnreadCount} New
+              <span className="rounded-full bg-rose-500/10 px-2.5 py-0.5 text-[9px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-wider border border-rose-500/10">
+                {totalUnreadCount} unread
               </span>
             )}
           </div>
-          <div className="flex gap-2">
-            {displayedUnreadCount > 0 && (
-              <button
-                className="text-[9px] font-black uppercase tracking-widest text-primary hover:text-primary/70 transition-colors"
-                onClick={() => {
-                  dispatch(markAllNotificationsAsRead());
-                  markAllAsRead();
-                }}
-              >
-                Clear All
-              </button>
-            )}
-          </div>
+          {displayedUnreadCount > 0 && (
+            <button
+              className="text-xs font-semibold text-primary hover:text-primary/80 hover:underline transition-colors cursor-pointer"
+              onClick={() => {
+                dispatch(markAllNotificationsAsRead());
+                markAllAsRead();
+              }}
+            >
+              Clear All
+            </button>
+          )}
         </div>
 
         {/* Notification List */}
-        <div className="max-h-[420px] overflow-y-auto no-scrollbar">
+        <div className="max-h-[380px] overflow-y-auto no-scrollbar">
           {displayedNotifications.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 px-8 text-center group">
-              <div className="h-16 w-16 rounded-[1.5rem] bg-slate-100 dark:bg-white/5 flex items-center justify-center mb-4 transition-transform group-hover:scale-110 duration-500 shadow-inner">
-                <Bell className="h-7 w-7 text-muted-foreground opacity-30" />
+            <div className="flex flex-col items-center justify-center py-16 px-6 text-center group">
+              <div className="h-12 w-12 rounded-xl bg-muted/65 flex items-center justify-center mb-3 transition-transform group-hover:scale-110 duration-500 shadow-inner">
+                <Bell className="h-6 w-6 text-muted-foreground/60 opacity-40 animate-pulse" />
               </div>
-              <p className="text-xs font-black text-foreground uppercase tracking-widest">Feed is Empty</p>
-              <p className="text-[10px] text-muted-foreground mt-1 font-medium">We'll notify you about important events.</p>
+              <p className="text-xs font-bold text-foreground tracking-tight">All caught up!</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5 font-medium max-w-[200px]">You have no new notifications at this time.</p>
             </div>
           ) : (
-            <div className="flex flex-col divide-y divide-slate-100 dark:divide-white/[0.04]">
-              {displayedNotifications.map((notification) => (
-                <div
-                  key={notification.id}
-                  className={cn(
-                    "relative px-6 py-5 flex gap-4 cursor-pointer transition-all duration-300 hover:bg-slate-50 dark:hover:bg-white/[0.03] group",
-                    !notification.read ? "bg-primary/[0.03]" : ""
-                  )}
-                  onClick={async () => {
-                    if (!notification.read) {
-                      await dispatch(markNotificationAsRead(Number(notification.id)));
-                      dispatch(fetchUnreadCount());
-                      markAsRead(String(notification.id));
-                    }
-                    navigate(notificationsPagePath);
-                  }}
-                >
-                  {/* Unread indicator bar */}
-                  {!notification.read && (
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary" />
-                  )}
+            <div className="flex flex-col divide-y divide-border/40">
+              {displayedNotifications.map((notification) => {
+                const config = getNotificationConfig(notification.title, notification.message);
+                const ItemIcon = config.icon;
 
-                  <div className={cn(
-                    "mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border shadow-sm transition-all duration-500 group-hover:scale-110 group-hover:rotate-3",
-                    !notification.read ? "bg-primary/10 text-primary border-primary/20" : "bg-muted/50 text-muted-foreground border-border/50"
-                  )}>
-                    <Bell size={18} strokeWidth={2.5} />
-                  </div>
+                return (
+                  <div
+                    key={notification.id}
+                    className={cn(
+                      "relative p-4 flex gap-3 cursor-pointer transition-all duration-200 hover:bg-muted/40 group",
+                      !notification.read ? "bg-gradient-to-r from-primary/5 via-transparent to-transparent" : ""
+                    )}
+                    onClick={async () => {
+                      if (!notification.read) {
+                        await dispatch(markNotificationAsRead(Number(notification.id)));
+                        dispatch(fetchUnreadCount());
+                        markAsRead(String(notification.id));
+                      }
+                      navigate(notificationsPagePath);
+                    }}
+                  >
+                    {/* Unread dot indicator */}
+                    {!notification.read && (
+                      <div className="absolute left-1.5 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full bg-primary" />
+                    )}
 
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className={cn(
-                        "text-xs truncate transition-colors", 
-                        !notification.read ? "font-black text-foreground" : "font-bold text-muted-foreground"
-                      )}>
-                        {notification.title}
-                      </p>
-                      <span className="text-[9px] font-black text-muted-foreground/40 whitespace-nowrap shrink-0 uppercase tracking-widest">
-                        {notification.timestamp}
-                      </span>
+                    <div className={cn(
+                      "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border shadow-sm transition-all duration-300 group-hover:scale-105",
+                      config.color
+                    )}>
+                      <ItemIcon size={16} strokeWidth={2.2} />
                     </div>
-                    <p className="text-[11px] text-muted-foreground font-medium line-clamp-2 leading-relaxed opacity-80 group-hover:opacity-100 transition-opacity">
-                      {notification.message}
-                    </p>
+
+                    <div className="flex-1 min-w-0 space-y-0.5">
+                      <div className="flex items-center justify-between gap-2">
+                        <p className={cn(
+                          "text-xs truncate transition-colors leading-tight", 
+                          !notification.read ? "font-bold text-foreground" : "font-semibold text-muted-foreground"
+                        )}>
+                          {notification.title}
+                        </p>
+                        <span className="text-[9px] font-semibold text-muted-foreground/50 whitespace-nowrap shrink-0 uppercase">
+                          {notification.timestamp}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-muted-foreground/80 font-medium line-clamp-1 leading-normal group-hover:text-muted-foreground transition-colors">
+                        {notification.message}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
 
         {/* Footer link */}
-        <div className="p-4 bg-slate-50/50 dark:bg-white/[0.02] border-t border-slate-100 dark:border-white/[0.05]">
+        <div className="p-3 bg-muted/20 border-t border-border/50">
           <button
             onClick={() => navigate(notificationsPagePath)}
-            className="w-full py-3 rounded-xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 text-[10px] font-black text-primary uppercase tracking-[0.2em] hover:bg-primary hover:text-white hover:border-primary transition-all shadow-sm"
+            className="w-full py-2.5 rounded-xl bg-primary hover:bg-primary/95 text-white text-xs font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-1.5"
           >
-            View Full Center →
+            Open Full Center
           </button>
         </div>
       </DropdownMenuContent>
