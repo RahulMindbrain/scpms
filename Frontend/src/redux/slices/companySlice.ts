@@ -13,6 +13,7 @@ import {
   updateCompanyJob,
   deleteCompanyJob,
   sendBulkMail,
+  postJob,
 } from "../thunks/companyThunk";
 
 interface CompanyState {
@@ -87,6 +88,20 @@ const companySlice = createSlice({
       })
 
       // ✅ Jobs
+      .addCase(postJob.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(postJob.fulfilled, (state, action) => {
+        state.loading = false;
+        const newJob = action.payload?.data || action.payload;
+        if (newJob && newJob.id) {
+          state.jobs = [newJob, ...state.jobs];
+        }
+      })
+      .addCase(postJob.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
       .addCase(fetchCompanyJobs.fulfilled, (state, action) => {
         state.jobs = action.payload.jobs;
         state.meta = action.payload.meta;
@@ -96,7 +111,7 @@ const companySlice = createSlice({
         state.meta = action.payload.meta;
       })
       .addCase(updateCompanyJob.fulfilled, (state, action) => {
-        const updatedJob = action.payload;
+        const updatedJob = action.payload?.data || action.payload;
         if (updatedJob) {
           state.jobs = state.jobs.map((job) =>
             job.id === updatedJob.id ? updatedJob : job
