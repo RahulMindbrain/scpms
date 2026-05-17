@@ -148,17 +148,21 @@ const JobListing = () => {
     if (!selectedJob) return;
 
     setIsApplying(true);
-    const toastId = toast.loading(`Submitting application...`);
-    try {
-      await dispatch(applyJob(selectedJob.id)).unwrap();
-      await dispatch(fetchJobApplications({}));
-      toast.success("Application submitted!", { id: toastId });
-      setIsModalOpen(false);
-    } catch (error: any) {
-      toast.error(error || "Failed to apply", { id: toastId });
-    } finally {
-      setIsApplying(false);
-    }
+    setIsModalOpen(false);
+    const toastId = toast.loading(`Submitting application for ${selectedJob.job.title}...`);
+    
+    dispatch(applyJob(selectedJob.id))
+      .unwrap()
+      .then(() => {
+        toast.success("Application submitted successfully!", { id: toastId });
+        dispatch(fetchJobApplications({}));
+      })
+      .catch((error: any) => {
+        toast.error(error || "Failed to submit application.", { id: toastId });
+      })
+      .finally(() => {
+        setIsApplying(false);
+      });
   };
 
   if (loading && (jobs?.length || 0) === 0) {
