@@ -3,9 +3,9 @@ import { getAPI, putAPI, postAPI } from "../../apis/api";
 
 export const fetchStudents = createAsyncThunk(
     "student/fetchStudents",
-    async (params: any, { rejectWithValue }) => {
+    async (params: any = {}, { rejectWithValue }) => {
         try {
-            const response = await getAPI<any>("/admin/get-students", params);
+            const response = await getAPI<any>("/admin/get-students", { limit: 50, ...params });
             return response;
         } catch (error: any) {
             return rejectWithValue(error?.message || "Failed to fetch students");
@@ -15,9 +15,9 @@ export const fetchStudents = createAsyncThunk(
 
 export const fetchInactiveStudents = createAsyncThunk(
     "student/fetchInactiveStudents",
-    async (params: any, { rejectWithValue }) => {
+    async (params: any = {}, { rejectWithValue }) => {
         try {
-            const response = await getAPI<any>("/admin/get-students", params);
+            const response = await getAPI<any>("/admin/get-students", { limit: 50, ...params });
             return response;
         } catch (error: any) {
             return rejectWithValue(error?.message || "Failed to fetch inactive students");

@@ -213,7 +213,7 @@ const StudentManagement: React.FC = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: "Total Students", value: students.length, icon: Users, color: "indigo" },
+          { label: "Total Students", value: reduxStudents.length + reduxInactiveStudents.length, icon: Users, color: "indigo" },
           { label: "Verified Students", value: reduxStudents.length, icon: CheckCircle2, color: "emerald" },
           { label: "Pending Verification", value: reduxInactiveStudents.length, icon: UserCheck, color: "amber" },
           { label: "Rejected Applications", value: students.filter((s: any) => s.status === 'rejected').length, icon: XCircle, color: "rose" },

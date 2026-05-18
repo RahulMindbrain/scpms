@@ -43,8 +43,10 @@ const studentSlice = createSlice({
       })
       .addCase(fetchStudents.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.students = action.payload.data.data;
-        state.meta = action.payload.data.meta;
+        const allStudents = action.payload?.data?.data || [];
+        state.students = allStudents.filter((s: any) => s.status === "ACTIVE");
+        state.inactiveStudents = allStudents.filter((s: any) => s.status !== "ACTIVE");
+        state.meta = action.payload?.data?.meta || null;
       })
       .addCase(fetchStudents.rejected, (state, action) => {
         state.loading = false;
@@ -57,8 +59,10 @@ const studentSlice = createSlice({
       })
       .addCase(fetchInactiveStudents.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.inactiveStudents = action.payload.data.data;
-        if (action.payload.data.meta) {
+        const allStudents = action.payload?.data?.data || [];
+        state.students = allStudents.filter((s: any) => s.status === "ACTIVE");
+        state.inactiveStudents = allStudents.filter((s: any) => s.status !== "ACTIVE");
+        if (action.payload?.data?.meta) {
           state.meta = action.payload.data.meta;
         }
       })
