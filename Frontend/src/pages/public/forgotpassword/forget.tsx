@@ -159,7 +159,12 @@ const ForgotPassword: React.FC = () => {
             className="space-y-6"
           >
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">Verification OTP</label>
+              <div className="flex justify-between items-center px-1">
+                <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Verification OTP</label>
+                <span className={`text-[11px] font-bold font-mono tracking-wider ${timer < 60 ? 'text-red-500' : 'text-blue-600 dark:text-blue-400'}`}>
+                  {Math.floor(timer / 60)}:{(timer % 60).toString().padStart(2, '0')}
+                </span>
+              </div>
               <div className="relative group">
                 <ShieldCheck className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors" size={18} />
                 <input
