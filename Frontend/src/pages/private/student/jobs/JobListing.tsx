@@ -7,6 +7,15 @@ import {
   Calendar,
   Building2,
   ChevronLeft,
+  Zap,
+  Sparkles,
+  Brain,
+  CheckCircle2,
+  Upload,
+  ArrowRight,
+  X,
+  Loader2,
+  FileText
 } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -62,7 +71,17 @@ const JobListing = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'applied' | 'eligible'>('all');
   const [selectedJob, setSelectedJob] = useState<JobUniversity | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // Custom states for separate modals
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  
+  // ATS multi-state application flow
+  const [applyStep, setApplyStep] = useState<'resume' | 'loading' | 'report'>('resume');
+  const [selectedResumeOption, setSelectedResumeOption] = useState<'latest' | 'fresh'>('latest');
+  const [loadingStage, setLoadingStage] = useState(0);
+  const [loadingProgress, setLoadingProgress] = useState(0);
+  
   const [isApplying, setIsApplying] = useState(false);
   
   // Pagination State
@@ -84,6 +103,52 @@ const JobListing = () => {
   const formatSalary = (salary: number) => {
     if (!salary) return 'Not disclosed';
     return (salary / 100000).toFixed(1) + ' LPA';
+  };
+
+  const getLogoInitials = (name: string) => {
+    if (!name) return 'Go';
+    if (name.toLowerCase() === 'google') return 'Go';
+    
+    const clean = name.replace(/[^a-zA-Z\s]/g, '').trim();
+    if (!clean) return 'Go';
+    
+    const words = clean.split(/\s+/);
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    if (clean.length >= 2) {
+      return clean[0].toUpperCase() + clean[1].toLowerCase();
+    }
+    return clean[0].toUpperCase();
+  };
+
+  const getCompanyGradient = (companyName: string) => {
+    const name = companyName || 'Google';
+    const charCode = name.charCodeAt(0) + (name.charCodeAt(1) || 0);
+    const gradients = [
+      "from-blue-600 via-indigo-600 to-violet-600",
+      "from-emerald-500 via-teal-600 to-cyan-600",
+      "from-amber-500 via-orange-600 to-rose-600",
+      "from-fuchsia-500 via-purple-600 to-indigo-600",
+      "from-rose-500 via-pink-600 to-purple-600"
+    ];
+    return gradients[charCode % gradients.length];
+  };
+
+  const getRelativeTime = (dateStr: string) => {
+    if (!dateStr) return 'Posted 2 days ago';
+    const posted = new Date(dateStr);
+    const now = new Date();
+    
+    const postedDate = new Date(posted.getFullYear(), posted.getMonth(), posted.getDate());
+    const nowDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    
+    const diffTime = nowDate.getTime() - postedDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays <= 0) return 'Posted today';
+    if (diffDays === 1) return 'Posted 1 day ago';
+    return `Posted ${diffDays} days ago`;
   };
 
   const checkEligibility = (job: JobUniversity | null) => {
@@ -128,7 +193,6 @@ const JobListing = () => {
       if (activeTab === 'applied') return appliedJobIds.has(Number(job.id));
       if (activeTab === 'eligible') return eligibility.eligible && !appliedJobIds.has(Number(job.id));
       
-      // In 'all' tab, we show everything but mark them
       return true;
     });
   }, [jobs, searchQuery, activeTab, appliedJobIds, profile]);
@@ -144,6 +208,57 @@ const JobListing = () => {
     setCurrentPage(1);
   }, [searchQuery, activeTab]);
 
+  // Simulate loading stages for the custom ATS resume scanner
+  useEffect(() => {
+    let interval: any;
+    let timer1: any;
+    let timer2: any;
+    let timer3: any;
+    let timer4: any;
+    let timer5: any;
+    
+    if (applyStep === 'loading') {
+      setLoadingStage(0);
+      setLoadingProgress(0);
+      
+      // Step 1 finishes at 900ms
+      timer1 = setTimeout(() => setLoadingStage(1), 900);
+      
+      // Step 2 finishes at 1800ms
+      timer2 = setTimeout(() => setLoadingStage(2), 1800);
+      
+      // Step 3 finishes at 2700ms
+      timer3 = setTimeout(() => setLoadingStage(3), 2700);
+      
+      // Active loading progress bar for step 4 starts at 2700ms
+      timer4 = setTimeout(() => {
+        interval = setInterval(() => {
+          setLoadingProgress((prev) => {
+            if (prev >= 100) {
+              clearInterval(interval);
+              return 100;
+            }
+            return prev + 5;
+          });
+        }, 80);
+      }, 2750);
+      
+      // Auto-transition to report after progress completes
+      timer5 = setTimeout(() => {
+        setApplyStep('report');
+      }, 4600);
+    }
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      clearTimeout(timer4);
+      clearTimeout(timer5);
+      if (interval) clearInterval(interval);
+    };
+  }, [applyStep]);
+
   const handleApply = async () => {
     if (!selectedJob) return;
 
@@ -153,13 +268,21 @@ const JobListing = () => {
       await dispatch(applyJob(selectedJob.id)).unwrap();
       await dispatch(fetchJobApplications({}));
       toast.success("Application submitted!", { id: toastId });
-      setIsModalOpen(false);
+      setIsDetailsModalOpen(false);
+      setIsApplyModalOpen(false);
     } catch (error: any) {
       toast.error(error || "Failed to apply", { id: toastId });
     } finally {
       setIsApplying(false);
     }
   };
+
+  const checklistItems = [
+    "Extracting Skills",
+    "Reading Experience",
+    "Matching Job Description",
+    "Calculating ATS Score"
+  ];
 
   if (loading && (jobs?.length || 0) === 0) {
     return <Loader text="Syncing career opportunities..." fullScreen />;
@@ -219,8 +342,8 @@ const JobListing = () => {
             <div className="flex items-center gap-4 w-full lg:w-auto">
               <div className="relative flex-1 lg:w-96 group">
                 <Search
-  className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors w-4 h-4 md:w-[18px] md:h-[18px]"
-/>
+                  className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors w-4 h-4 md:w-[18px] md:h-[18px]"
+                />
                 <Input
                   placeholder="Search role or company..."
                   className="pl-12 md:pl-14 h-12 md:h-14 bg-slate-100 dark:bg-white/5 border-none rounded-2xl text-xs md:text-sm font-semibold focus-visible:ring-blue-500/30 shadow-inner transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
@@ -232,11 +355,14 @@ const JobListing = () => {
           </div>
         )}
 
-        {/* ─── Jobs Grid - Less Bulky Rows ─── */}
+        {/* ─── Jobs Grid - Compact & Beautiful Card Design ─── */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           <AnimatePresence mode='popLayout'>
             {paginatedJobs.map((job: JobUniversity, idx) => {
               const isApplied = appliedJobIds.has(Number(job.id));
+              const eligibility = checkEligibility(job);
+              const initials = getLogoInitials(job.job?.company?.name || 'Top Tier');
+              const grad = getCompanyGradient(job.job?.company?.name || 'Google');
               
               return (
                 <motion.div
@@ -248,106 +374,111 @@ const JobListing = () => {
                   whileHover={{ y: -4 }}
                   className="group"
                 >
-                  <Card className="h-full border-none bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-2xl transition-all duration-500 border border-slate-200/60 dark:border-white/[0.08] hover:border-blue-500/30">
-                    <CardContent className="p-0 flex flex-col h-full">
-                      {/* Top Info */}
-                      <div className="p-6 md:p-8 flex-1 space-y-6 md:space-y-8">
-                        <div className="flex items-start justify-between gap-4">
+                  {/* State 1: Job Listing Card */}
+                  <Card className="h-full border-none bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl border border-slate-200/50 dark:border-white/[0.08] hover:border-blue-500/30 transition-all duration-500">
+                    <CardContent className="p-6 flex flex-col h-full space-y-6">
+                      
+                      {/* Top section */}
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex items-center gap-4 min-w-0">
+                          {/* Logo placeholder */}
                           <div className={cn(
-                            "w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center font-black text-xl md:text-2xl text-white shadow-2xl shrink-0 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3",
-                            isApplied ? "bg-blue-500" : "bg-gradient-to-br from-blue-500 to-blue-700"
+                            "w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center font-black text-base md:text-lg text-white shadow-md bg-gradient-to-br shrink-0 transition-transform duration-500 group-hover:scale-105 group-hover:rotate-2",
+                            grad
                           )}>
-                            {job.job?.company?.name?.[0] || job.job?.title?.[0] || 'J'}
+                            {initials}
                           </div>
-                          <div className="flex flex-col items-end gap-3">
-                            {isApplied ? (
-                              <Badge className="bg-blue-500/10 text-blue-500 border-blue-500/20 text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] px-3 md:px-4 py-1 md:py-1.5 rounded-full shadow-sm">
-                                Applied
-                              </Badge>
-                            ) : checkEligibility(job).eligible ? (
-                              <Badge className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] px-3 md:px-4 py-1 md:py-1.5 rounded-full shadow-sm">
-                                Recommended
-                              </Badge>
-                            ) : (
-                              <Badge className="bg-rose-500/10 text-rose-500 border-rose-500/20 text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] px-3 md:px-4 py-1 md:py-1.5 rounded-full shadow-sm">
-                                Ineligible
-                              </Badge>
-                            )}
-                            {job.openings && (
-                              <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                                {job.openings} Openings
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        <div className="space-y-4">
-                          <div className="space-y-2">
-                            <h3 className="text-lg md:text-xl font-black text-slate-900 dark:text-white leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors tracking-tight line-clamp-2">
-                              {job.job?.title}
+                          <div className="min-w-0 space-y-0.5">
+                            <h3 className="text-sm md:text-base font-black text-slate-900 dark:text-white leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
+                              {job.job?.title || "SDE Intern"}
                             </h3>
-                            <div className="flex flex-col gap-1">
-                              <p className="text-[9px] md:text-[10px] font-black text-slate-500 flex items-center gap-2 uppercase tracking-[0.15em] truncate">
-                                <Building2 size={14} className="text-blue-500 shrink-0" />
-                                {job.job?.company?.name || 'Top Tier Recruiter'}
-                              </p>
-                              {job.university?.name && (
-                                <p className="text-[8px] font-bold text-slate-400 flex items-center gap-2 uppercase tracking-[0.1em] truncate pl-0.5">
-                                  <span className="w-1 h-1 rounded-full bg-slate-300"></span>
-                                  {job.university.name} Placement
-                                </p>
-                              )}
-                            </div>
-                          </div>
-
-                          {/* Skills Preview */}
-                          <div className="flex flex-wrap gap-1.5 min-h-[1.5rem]">
-                            {job.job?.skills?.slice(0, 3).map((skill) => (
-                              <span key={skill.id} className="text-[8px] font-bold text-blue-600/70 dark:text-blue-400/60 bg-blue-500/5 px-2 py-0.5 rounded-md border border-blue-500/10 whitespace-nowrap">
-                                {skill.name}
-                              </span>
-                            ))}
-                            {(job.job?.skills?.length || 0) > 3 && (
-                              <span className="text-[8px] font-bold text-slate-400 px-1 py-0.5 whitespace-nowrap">
-                                +{job.job.skills!.length - 3} more
-                              </span>
-                            )}
+                            <p className="text-[10px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest truncate">
+                              {job.job?.company?.name || "Google"}
+                            </p>
                           </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-3 md:gap-4">
-                          <div className="flex items-center gap-2.5 md:gap-3 p-3 md:p-4 bg-slate-100 dark:bg-white/5 rounded-2xl border border-slate-200/50 dark:border-white/5 shadow-inner min-w-0">
-                            <MapPin size={14} className="text-blue-500 shrink-0" />
-                            <span className="text-[9px] md:text-[10px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest truncate">{job.job?.location}</span>
-                          </div>
-                          <div className="flex items-center gap-2.5 md:gap-3 p-3 md:p-4 bg-slate-100 dark:bg-white/5 rounded-2xl border border-slate-200/50 dark:border-white/5 shadow-inner min-w-0">
-                            <IndianRupee size={14} className="text-emerald-500 shrink-0" />
-                            <span className="text-[9px] md:text-[10px] font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest truncate">{formatSalary(job.salary)}</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Footer Actions */}
-                      <div className="px-6 md:px-8 py-4 md:py-6 bg-slate-50 dark:bg-black/20 border-t border-slate-200/60 dark:border-white/[0.05] flex items-center justify-between mt-auto">
-                        <div className="flex items-center gap-2 text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                          <Clock size={14} className="text-indigo-500" />
-                          {new Date(job.postedAt || job.sentAt || (job as any).createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                        </div>
-                        <Button
-                          onClick={() => {
-                            setSelectedJob(job);
-                            setIsModalOpen(true);
-                          }}
-                          className={cn(
-                            "rounded-[1.25rem] font-black text-[9px] md:text-[10px] uppercase tracking-[0.2em] px-6 md:px-8 h-10 md:h-12 transition-all duration-500 border-none shadow-xl",
-                            isApplied 
-                              ? "bg-blue-500/10 text-blue-600 dark:text-blue-400 shadow-none hover:bg-blue-500/20" 
-                              : "bg-blue-600 text-white shadow-blue-500/30 hover:scale-105 hover:shadow-blue-500/50"
+                        {/* Oval Badge */}
+                        <div className="shrink-0">
+                          {isApplied ? (
+                            <Badge className="bg-emerald-500 text-white font-extrabold text-[8px] md:text-[9px] uppercase tracking-[0.15em] px-3.5 py-1 rounded-full shadow-md shadow-emerald-500/10 border-none">
+                              Applied
+                            </Badge>
+                          ) : eligibility.eligible ? (
+                            <Badge className="bg-blue-600 text-white font-extrabold text-[8px] md:text-[9px] uppercase tracking-[0.15em] px-3.5 py-1 rounded-full shadow-md shadow-blue-500/20 border-none">
+                              Eligible
+                            </Badge>
+                          ) : (
+                            <Badge className="bg-rose-500/10 text-rose-500 font-extrabold text-[8px] md:text-[9px] uppercase tracking-[0.15em] px-3.5 py-1 rounded-full border border-rose-500/20">
+                              Ineligible
+                            </Badge>
                           )}
-                        >
-                          {isApplied ? 'Details' : 'Apply Now'}
-                        </Button>
+                        </div>
                       </div>
+
+                      {/* Middle Section: Row of Icons */}
+                      <div className="grid grid-cols-3 gap-2 border-t border-b border-slate-100 dark:border-white/[0.04] py-4">
+                        <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 min-w-0">
+                          <MapPin size={14} className="text-blue-500 shrink-0" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider truncate">
+                            {job.job?.location || "Remote"}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 min-w-0">
+                          <IndianRupee size={14} className="text-emerald-500 shrink-0" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider truncate">
+                            {formatSalary(job.salary)}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 min-w-0">
+                          <Calendar size={14} className="text-indigo-500 shrink-0" />
+                          <span className="text-[10px] font-bold uppercase tracking-wider truncate">
+                            {new Date(job.postedAt || job.sentAt || (job as any).createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Bottom Section */}
+                      <div className="flex items-center justify-between pt-2 mt-auto">
+                        <div className="text-[10px] md:text-[11px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
+                          <Clock size={13} className="text-indigo-500" />
+                          {getRelativeTime(job.postedAt || job.sentAt || (job as any).createdAt)}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedJob(job);
+                              setIsDetailsModalOpen(true);
+                            }}
+                            className="rounded-xl border border-slate-200 dark:border-white/10 px-4 h-9 text-[10px] font-black uppercase tracking-wider hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                          >
+                            Details
+                          </Button>
+                          {isApplied ? (
+                            <Button
+                              disabled
+                              className="bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 rounded-xl px-4 h-9 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 border-none shadow-none cursor-not-allowed"
+                            >
+                              Applied
+                            </Button>
+                          ) : (
+                            <Button
+                              onClick={() => {
+                                setSelectedJob(job);
+                                setApplyStep('resume');
+                                setSelectedResumeOption('latest');
+                                setIsApplyModalOpen(true);
+                              }}
+                              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-4 h-9 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all border-none"
+                            >
+                              <Zap size={11} className="fill-white text-white" />
+                              Apply Now
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+
                     </CardContent>
                   </Card>
                 </motion.div>
@@ -409,18 +540,21 @@ const JobListing = () => {
           </div>
         )}
 
-        {/* ─── Premium Modal ─── */}
+        {/* ─── Premium Details Modal (Original details overlay but styled nicely) ─── */}
         <Modal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
+          isOpen={isDetailsModalOpen}
+          onClose={() => setIsDetailsModalOpen(false)}
           title={selectedJob?.job.title}
           subtitle={`${selectedJob?.job?.company?.name || 'Top Tier Recruiter'} • ${selectedJob?.job?.location}`}
           maxWidth="sm:max-w-lg"
         >
-          <div className="space-y-6 md:space-y-8 py-2 md:py-4">
+          <div className="space-y-6 md:space-y-8 py-2">
             <div className="flex items-center gap-4 md:gap-6">
-              <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl md:rounded-3xl flex items-center justify-center text-white font-black text-2xl md:text-3xl shadow-xl border border-white/10">
-                {selectedJob?.job?.company?.name?.[0] || selectedJob?.job?.title?.[0] || 'J'}
+              <div className={cn(
+                "w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br rounded-2xl md:rounded-3xl flex items-center justify-center text-white font-black text-2xl md:text-3xl shadow-xl border border-white/10",
+                selectedJob && getCompanyGradient(selectedJob.job?.company?.name || 'Google')
+              )}>
+                {selectedJob && getLogoInitials(selectedJob.job?.company?.name || 'Top Tier')}
               </div>
               <div className="space-y-1 min-w-0">
                 <p className="text-[8px] md:text-[10px] font-black text-blue-600 uppercase tracking-widest">Company Overview</p>
@@ -506,9 +640,9 @@ const JobListing = () => {
                 </div>
               </div>
 
-              <div className="space-y-2 md:space-y-3">
+              <div className="space-y-2">
                 <h4 className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Job Description</h4>
-                <div className="bg-slate-50 dark:bg-white/[0.02] p-4 md:p-6 rounded-2xl border border-slate-100 dark:border-white/5 max-h-40 md:max-h-48 overflow-y-auto no-scrollbar">
+                <div className="bg-slate-50 dark:bg-white/[0.02] p-4 rounded-2xl border border-slate-100 dark:border-white/5 max-h-40 overflow-y-auto no-scrollbar">
                   <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium text-xs md:text-sm whitespace-pre-wrap">
                     {selectedJob?.description}
                   </p>
@@ -518,15 +652,444 @@ const JobListing = () => {
 
             <div className="pt-2">
               <Button
-                className="w-full !bg-blue-600 !text-white py-6 md:py-8 rounded-2xl font-black text-sm md:text-base uppercase tracking-widest shadow-xl shadow-blue-500/30 hover:scale-[1.02] active:scale-[0.98] transition-all border-none"
-                onClick={handleApply}
+                className="w-full !bg-blue-600 !text-white py-6 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-500/30 hover:scale-[1.01] active:scale-[0.99] transition-all border-none"
+                onClick={() => {
+                  setIsDetailsModalOpen(false);
+                  setApplyStep('resume');
+                  setSelectedResumeOption('latest');
+                  setIsApplyModalOpen(true);
+                }}
                 disabled={isApplying || !selectedJob || appliedJobIds.has(Number(selectedJob.id)) || !checkEligibility(selectedJob).eligible || !isApproved}
               >
-                {isApplying ? <Loader size="sm" /> : (selectedJob && appliedJobIds.has(Number(selectedJob.id))) ? 'Already Applied' : !isApproved ? 'Account Pending Approval' : (selectedJob && !checkEligibility(selectedJob).eligible) ? 'Not Eligible to Apply' : 'Confirm Application'}
+                {(selectedJob && appliedJobIds.has(Number(selectedJob.id))) ? 'Already Applied' : !isApproved ? 'Account Pending Approval' : (selectedJob && !checkEligibility(selectedJob).eligible) ? 'Not Eligible to Apply' : 'Start Application'}
               </Button>
             </div>
           </div>
         </Modal>
+
+        {/* ─── Customizable Multi-stage Apply & ATS Modal ─── */}
+        <Modal
+          isOpen={isApplyModalOpen}
+          onClose={() => {
+            // Prevent close only during loading
+            if (applyStep !== 'loading') {
+              setIsApplyModalOpen(false);
+            }
+          }}
+          maxWidth={applyStep === 'report' ? "sm:max-w-2xl" : "sm:max-w-lg"}
+          preventOutsideClick={applyStep === 'loading'}
+        >
+          <div className="relative py-2 px-1">
+            {/* Custom Close Button for premium feel */}
+            {applyStep !== 'loading' && (
+              <button
+                onClick={() => setIsApplyModalOpen(false)}
+                className="absolute -right-2 -top-2 w-8 h-8 rounded-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-200 z-50 hover:rotate-90"
+              >
+                <X size={14} />
+              </button>
+            )}
+
+            {/* ─── State 2: Resume Selection Modal (Overlay) ─── */}
+            {applyStep === 'resume' && (
+              <div className="space-y-6">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-[0.25em]">
+                    Application Portal
+                  </span>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none">
+                    {selectedJob?.job.title ? selectedJob.job.title.toUpperCase() : "SDE INTERN"}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5 mt-1.5">
+                    <Building2 size={13} className="text-slate-400 shrink-0" />
+                    {selectedJob?.job?.company?.name || "Google"}
+                    <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                    <MapPin size={13} className="text-slate-400 shrink-0" />
+                    {selectedJob?.job?.location || "Mountain View, CA"}
+                  </p>
+                </div>
+
+                {/* Grid selectable cards */}
+                <div className="grid grid-cols-2 gap-4">
+                  {/* Card A: Compare with Latest Resume */}
+                  <div
+                    onClick={() => setSelectedResumeOption('latest')}
+                    className={cn(
+                      "p-5 rounded-[1.75rem] border-2 cursor-pointer transition-all duration-300 flex flex-col items-center text-center justify-between gap-4 h-full",
+                      selectedResumeOption === 'latest'
+                        ? "border-blue-600 bg-blue-500/[0.03] dark:bg-blue-500/[0.02] shadow-lg shadow-blue-500/5 scale-[1.02]"
+                        : "border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 hover:scale-[1.01]"
+                    )}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <div className={cn(
+                        "w-4.5 h-4.5 rounded-full border flex items-center justify-center transition-all shrink-0",
+                        selectedResumeOption === 'latest'
+                          ? "border-blue-600 bg-blue-600 text-white"
+                          : "border-slate-300 dark:border-white/20"
+                      )}>
+                        {selectedResumeOption === 'latest' && (
+                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                        )}
+                      </div>
+                      <Badge className="bg-blue-500/10 text-blue-500 border-none text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
+                        Latest
+                      </Badge>
+                    </div>
+                    
+                    <div className="flex flex-col items-center gap-2 flex-1 justify-center py-2">
+                      <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-600">
+                        <FileText size={22} />
+                      </div>
+                      <div className="space-y-1">
+                        <h5 className="text-[11px] font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider leading-tight">
+                          Compare with Latest Resume
+                        </h5>
+                        <p className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider truncate max-w-[130px]">
+                          Resume_v4.pdf
+                        </p>
+                      </div>
+                    </div>
+                    
+                    <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold tracking-wider uppercase">
+                      Updated 3 days ago
+                    </span>
+                  </div>
+
+                  {/* Card B: Upload Fresh Resume */}
+                  <div
+                    onClick={() => setSelectedResumeOption('fresh')}
+                    className={cn(
+                      "p-5 rounded-[1.75rem] border-2 border-dashed cursor-pointer transition-all duration-300 flex flex-col items-center text-center justify-between gap-4 h-full",
+                      selectedResumeOption === 'fresh'
+                        ? "border-blue-600 bg-blue-500/[0.03] dark:bg-blue-500/[0.02] shadow-lg shadow-blue-500/5 scale-[1.02]"
+                        : "border-slate-200 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20 hover:scale-[1.01]"
+                    )}
+                  >
+                    <div className="flex items-center justify-start w-full">
+                      <div className={cn(
+                        "w-4.5 h-4.5 rounded-full border flex items-center justify-center transition-all shrink-0",
+                        selectedResumeOption === 'fresh'
+                          ? "border-blue-600 bg-blue-600 text-white"
+                          : "border-slate-300 dark:border-white/20"
+                      )}>
+                        {selectedResumeOption === 'fresh' && (
+                          <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col items-center gap-2 flex-1 justify-center py-2">
+                      <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-500 dark:text-slate-400">
+                        <Upload size={20} />
+                      </div>
+                      <div className="space-y-1">
+                        <h5 className="text-[11px] font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider leading-tight">
+                          Upload Fresh Resume
+                        </h5>
+                        <p className="text-[9px] text-slate-400 dark:text-slate-500 font-medium max-w-[120px] mx-auto leading-tight">
+                          Drag & drop or select PDF/DOCX
+                        </p>
+                      </div>
+                    </div>
+
+                    <span className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold tracking-wider uppercase">
+                      Upload Icon
+                    </span>
+                  </div>
+                </div>
+
+                {/* Bottom link and buttons */}
+                <div className="flex flex-col gap-5 pt-3">
+                  <div className="text-center">
+                    <button
+                      onClick={() => {
+                        toast.success("Redirecting to premium Resume Maker...", {
+                          icon: <Sparkles size={16} className="text-blue-500 animate-pulse" />
+                        });
+                      }}
+                      className="text-[11px] font-black uppercase tracking-wider text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors inline-flex items-center gap-1.5 group"
+                    >
+                      <Sparkles size={12} className="text-blue-500 group-hover:scale-110 transition-transform fill-blue-500/10" />
+                      Or create tailored resume with Resume Maker
+                      <ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-3 border-t border-slate-100 dark:border-white/[0.04] pt-4">
+                    <button
+                      onClick={() => setIsApplyModalOpen(false)}
+                      className="text-[11px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white transition-colors px-4 py-2"
+                    >
+                      Cancel
+                    </button>
+                    <Button
+                      onClick={() => setApplyStep('loading')}
+                      className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 rounded-xl px-6 h-11 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-slate-900/10 transition-all border-none"
+                    >
+                      <Zap size={11} className="fill-current" />
+                      Analyze Now
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* ─── State 3: Loading/Analysis Modal State ─── */}
+            {applyStep === 'loading' && (
+              <div className="space-y-8 py-4 flex flex-col items-center">
+                {/* Pulse brain animation in circularprogress track */}
+                <div className="relative w-28 h-28 flex items-center justify-center">
+                  {/* Spinning outer progress track */}
+                  <div className="absolute inset-0 rounded-full border-4 border-slate-100 dark:border-white/5" />
+                  <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-600 dark:border-t-blue-400 animate-spin" />
+                  
+                  {/* Glowing backdrop */}
+                  <motion.div 
+                    className="absolute w-16 h-16 rounded-full bg-blue-500/10 filter blur-md"
+                    animate={{ scale: [1, 1.2, 1] }}
+                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                  />
+                  
+                  {/* Centered brain/AI icon */}
+                  <motion.div
+                    animate={{ 
+                      scale: [1, 1.12, 1],
+                      filter: [
+                        "drop-shadow(0 0 4px rgba(37, 99, 235, 0.2))",
+                        "drop-shadow(0 0 16px rgba(37, 99, 235, 0.6))",
+                        "drop-shadow(0 0 4px rgba(37, 99, 235, 0.2))"
+                      ]
+                    }}
+                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                    className="relative z-10 w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-xl"
+                  >
+                    <Brain size={30} className="stroke-[1.5]" />
+                  </motion.div>
+                </div>
+
+                <div className="text-center space-y-1">
+                  <h4 className="text-sm md:text-base font-black text-slate-800 dark:text-white uppercase tracking-wider leading-snug max-w-xs mx-auto">
+                    AI is analyzing your resume...
+                  </h4>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest">
+                    This will only take a moment...
+                  </p>
+                </div>
+
+                {/* Checklist showing dynamic progress tracking */}
+                <div className="space-y-4 w-full max-w-xs mt-2 border-t border-slate-100 dark:border-white/[0.04] pt-6">
+                  {checklistItems.map((text, idx) => {
+                    const isCompleted = loadingStage > idx;
+                    const isActive = loadingStage === idx;
+                    
+                    return (
+                      <div key={idx} className="flex flex-col gap-2">
+                        <div className="flex items-center gap-3">
+                          {isCompleted ? (
+                            <div className="w-5.5 h-5.5 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-500 shrink-0 border border-emerald-500/10">
+                              <CheckCircle2 size={14} className="stroke-[2.5]" />
+                            </div>
+                          ) : isActive ? (
+                            <div className="w-5.5 h-5.5 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500 shrink-0 border border-blue-500/10 animate-spin">
+                              <Loader2 size={13} className="stroke-[2.5]" />
+                            </div>
+                          ) : (
+                            <div className="w-5.5 h-5.5 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center text-slate-400 shrink-0 border border-slate-200 dark:border-white/10">
+                              <span className="text-[9px] font-black">{idx + 1}</span>
+                            </div>
+                          )}
+                          <span className={cn(
+                            "text-xs font-semibold transition-all duration-300",
+                            isCompleted && "text-slate-400 dark:text-slate-500 line-through decoration-slate-300 dark:decoration-slate-800",
+                            isActive && "text-blue-600 dark:text-blue-400 font-extrabold tracking-wide",
+                            !isCompleted && !isActive && "text-slate-400 dark:text-slate-650"
+                          )}>
+                            {text}
+                          </span>
+                        </div>
+                        
+                        {/* Dynamic progress bar below the 4th checklist item when active */}
+                        {isActive && idx === 3 && (
+                          <div className="pl-8.5 w-full space-y-1.5">
+                            <div className="h-1.5 w-full bg-slate-100 dark:bg-white/5 rounded-full overflow-hidden">
+                              <div 
+                                className="h-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-100 ease-out" 
+                                style={{ width: `${loadingProgress}%` }}
+                              />
+                            </div>
+                            <div className="flex justify-between items-center text-[8px] font-black tracking-widest text-blue-500">
+                              <span>CALCULATING ATS...</span>
+                              <span>{loadingProgress}%</span>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* ─── State 4: ATS Report & Suggestions Modal State ─── */}
+            {applyStep === 'report' && (
+              <div className="space-y-6">
+                <div className="space-y-1">
+                  <span className="text-[10px] font-black text-amber-500 uppercase tracking-[0.25em]">
+                    ATS Analysis Report
+                  </span>
+                  <h3 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                    {selectedJob?.job.title ? selectedJob.job.title.toUpperCase() : "SDE INTERN"}
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5 mt-0.5">
+                    {selectedJob?.job?.company?.name || "Google"} Match Assessment
+                  </p>
+                </div>
+
+                {/* Score Circular Progress Chart */}
+                <div className="flex flex-col items-center justify-center py-2 text-center">
+                  <div className="relative w-36 h-36 flex items-center justify-center">
+                    {/* Glowing back mesh */}
+                    <div className="absolute inset-0 bg-amber-500/5 dark:bg-amber-500/10 rounded-full filter blur-xl animate-pulse" />
+                    
+                    {/* SVG progress wheel */}
+                    <svg className="w-full h-full transform -rotate-90">
+                      <circle
+                        cx="72"
+                        cy="72"
+                        r="52"
+                        stroke="currentColor"
+                        className="text-slate-100 dark:text-white/5"
+                        strokeWidth="8"
+                        fill="transparent"
+                      />
+                      <motion.circle
+                        cx="72"
+                        cy="72"
+                        r="52"
+                        stroke="#f59e0b" // Amber ATS color
+                        strokeWidth="8"
+                        fill="transparent"
+                        strokeDasharray={326.7}
+                        initial={{ strokeDashoffset: 326.7 }}
+                        animate={{ strokeDashoffset: 326.7 - (326.7 * 38) / 100 }}
+                        transition={{ duration: 1.6, ease: "easeOut" }}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+
+                    {/* Numeric Score */}
+                    <div className="absolute flex flex-col items-center justify-center text-center">
+                      <span className="text-3xl font-black text-slate-950 dark:text-white tracking-tighter leading-none">
+                        38%
+                      </span>
+                      <span className="text-[7.5px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] leading-none mt-1.5">
+                        ATS SCORE
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 bg-amber-500/10 text-amber-600 dark:text-amber-400 font-black text-[9px] uppercase tracking-[0.2em] px-4.5 py-1.5 rounded-full border border-amber-500/20">
+                    Moderate Match
+                  </div>
+                </div>
+
+                {/* Middle Sections: Side-by-side Metric Containers */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Left: Matched Skills */}
+                  <div className="p-4.5 bg-emerald-500/[0.03] dark:bg-emerald-500/[0.01] border border-emerald-500/20 rounded-2xl flex flex-col h-full min-h-[140px]">
+                    <h5 className="text-[9.5px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-[0.2em] mb-3.5 flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-sm" />
+                      Matched Skills
+                    </h5>
+                    <div className="flex flex-wrap gap-1.5">
+                      {["React", "TypeScript", "AWS", "REST APIs"].map((skill, i) => (
+                        <span
+                          key={i}
+                          className="text-[9px] font-extrabold text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full uppercase tracking-wider"
+                        >
+                          {skill}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Right: Missing Keywords */}
+                  <div className="p-4.5 bg-rose-500/[0.03] dark:bg-rose-500/[0.01] border border-rose-500/20 rounded-2xl flex flex-col h-full min-h-[140px]">
+                    <h5 className="text-[9.5px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-[0.2em] mb-3.5 flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-rose-500 shadow-sm" />
+                      Missing Keywords
+                    </h5>
+                    <div className="flex flex-wrap gap-1.5">
+                      {["Docker", "Kubernetes", "CI/CD"].map((keyword, i) => (
+                        <span
+                          key={i}
+                          className="text-[9px] font-extrabold text-rose-600 dark:text-rose-400/80 border border-rose-500/25 px-2.5 py-0.5 rounded-full uppercase tracking-wider bg-rose-500/5"
+                        >
+                          {keyword}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom Section: AI Suggestions alert box */}
+                <div className="p-4.5 bg-slate-50 dark:bg-white/[0.02] border border-slate-200/50 dark:border-white/5 rounded-2xl relative overflow-hidden">
+                  <div className="absolute -right-2 -bottom-2 opacity-5 dark:opacity-10 text-indigo-500 pointer-events-none">
+                    <Sparkles size={64} />
+                  </div>
+                  
+                  <div className="flex items-start gap-3 relative z-10">
+                    <div className="w-7 h-7 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 shrink-0 mt-0.5 border border-amber-500/20">
+                      <Sparkles size={14} className="fill-amber-500/20" />
+                    </div>
+                    <div className="space-y-1.5 flex-1">
+                      <h6 className="text-[10px] font-black text-slate-800 dark:text-[#f8fafc] uppercase tracking-widest">
+                        AI Suggestions
+                      </h6>
+                      <ul className="space-y-1.5 text-slate-650 dark:text-slate-400 font-medium text-[11px] md:text-xs">
+                        <li className="flex items-start gap-2 leading-relaxed">
+                          <span className="text-amber-500 font-bold">•</span>
+                          <span>Integrate keywords like <strong className="text-slate-900 dark:text-white font-extrabold">Docker</strong> and <strong className="text-slate-900 dark:text-white font-extrabold">Kubernetes</strong> into your recent projects.</span>
+                        </li>
+                        <li className="flex items-start gap-2 leading-relaxed">
+                          <span className="text-amber-500 font-bold">•</span>
+                          <span>Tailor your professional summary to highlight <strong className="text-slate-900 dark:text-white font-extrabold">CI/CD</strong> and cloud experience.</span>
+                        </li>
+                        <li className="flex items-start gap-2 leading-relaxed">
+                          <span className="text-amber-500 font-bold">•</span>
+                          <span>Quantify your achievements to showcase impact in scaling <strong className="text-slate-900 dark:text-white font-extrabold">REST APIs</strong>.</span>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Buttons */}
+                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 dark:border-white/[0.04]">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setApplyStep('resume');
+                      setSelectedResumeOption('fresh');
+                    }}
+                    className="rounded-xl border border-slate-200 dark:border-white/10 px-6 h-11 text-[11px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-white/5 transition-all hover:text-slate-950 dark:hover:text-white"
+                  >
+                    Improve Resume
+                  </Button>
+                  <Button
+                    onClick={handleApply}
+                    disabled={isApplying}
+                    className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 rounded-xl px-6 h-11 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all border-none"
+                  >
+                    {isApplying ? <Loader2 size={12} className="animate-spin" /> : "Apply Anyway"}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </Modal>
+
       </div>
     </StudentPageLayout>
   );
