@@ -53,7 +53,8 @@ const StudentProfile = () => {
       department: '',
       year: '',
       passingYear: '',
-      departmentId: ""
+      departmentId: "",
+      university: ''
     },
     phone: '',
     location: '',
@@ -85,7 +86,8 @@ const StudentProfile = () => {
           passingYear: backendProfile.passingYear || '',
           departmentId: backendProfile.departmentId || "",
           activeBacklogs: backendProfile.activeBacklogs || '',
-          department: backendProfile.department?.name || ''
+          department: backendProfile.department?.name || '',
+          university: backendProfile.university?.name || ''
         },
         linkedinUrl: backendProfile.linkedinUrl || '',
         githubUrl: backendProfile.githubUrl || '',
@@ -305,6 +307,10 @@ const StudentProfile = () => {
 
                     <div className="flex flex-wrap items-center gap-3 w-full">
                       <div className="flex items-center gap-2 bg-indigo-600/5 dark:bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-indigo-600/10 dark:border-white/20 text-slate-700 dark:text-white font-bold text-[9px] md:text-xs min-w-0 max-w-full">
+                        <GraduationCap className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-300 shrink-0" />
+                        <span className="truncate">{profile.stats?.university || 'University Not Set'}</span>
+                      </div>
+                      <div className="flex items-center gap-2 bg-indigo-600/5 dark:bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-indigo-600/10 dark:border-white/20 text-slate-700 dark:text-white font-bold text-[9px] md:text-xs min-w-0 max-w-full">
                         <Building2 className="h-3.5 w-3.5 text-indigo-600 dark:text-blue-300 shrink-0" />
                         <span className="truncate">{profile.stats?.department || 'Department Not Set'}</span>
                       </div>
@@ -440,12 +446,13 @@ const StudentProfile = () => {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                     {[
+                      { label: 'University', value: profile.stats?.university || 'N/A', icon: GraduationCap, fullWidth: true },
                       { label: 'Department', value: profile.stats?.department || 'N/A', icon: Building2 },
                       { label: 'CGPA', value: `${profile.stats?.cgpa || '0.0'} / 10`, icon: Award },
                       { label: 'Academic Year', value: profile.stats?.year ? `${profile.stats.year}${profile.stats.year === 1 ? 'st' : profile.stats.year === 2 ? 'nd' : profile.stats.year === 3 ? 'rd' : 'th'} Year` : 'N/A', icon: Calendar },
                       { label: 'Passing Batch', value: profile.stats?.passingYear || 'N/A', icon: CalendarDays },
                     ].map((item, idx) => (
-                      <div key={idx} className="flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-blue-500/30 transition-all group/item">
+                      <div key={idx} className={`flex items-center gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 hover:border-blue-500/30 transition-all group/item ${item.fullWidth ? 'sm:col-span-2' : ''}`}>
                         <div className="h-10 w-10 rounded-xl bg-white dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 group-hover/item:text-blue-500 transition-colors shadow-sm shrink-0">
                           <item.icon className="h-5 w-5" />
                         </div>

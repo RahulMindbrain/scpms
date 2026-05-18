@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Globe, User, FileText, X, Mail, Link as LinkIcon, GraduationCap, Code2, CheckCircle2 } from "lucide-react";
+import { Upload, Globe, User, FileText, X, Mail, Link as LinkIcon, GraduationCap, Code2, CheckCircle2, Building2 } from "lucide-react";
 import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
 import Loader from "@/components/Loader";
 import { toast } from "sonner";
@@ -32,6 +32,7 @@ const profileSchema = z.object({
     year: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(1, "Year must be at least 1").max(5, "Year must be 5 or less")),
     passingYear: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(2000, "Invalid year").max(2100, "Invalid year")),
     activeBacklogs: z.preprocess((val) => (val === "" ? undefined : val), z.coerce.number().min(0, "Cannot be negative").default(0)),
+    university: z.string().optional(),
   }),
   resumeUrl: z.string().url("Invalid Resume URL").or(z.literal("")).nullable(),
 });
@@ -65,6 +66,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
           cgpa: profile.stats?.cgpa ?? profile.cgpa ?? '',
           year: profile.stats?.year ?? profile.year ?? '',
           passingYear: profile.stats?.passingYear ?? profile.passingYear ?? '',
+          university: profile.stats?.university ?? (profile.university?.name || ''),
         },
         linkedinUrl: profile.linkedinUrl || "",
         githubUrl: profile.githubUrl || "",
@@ -236,6 +238,19 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
               {/* ACADEMIC CONTENT */}
               <TabsContent value="academic" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="md:col-span-2 space-y-3">
+                    <Label htmlFor="university" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Affiliated University (Read Only)</Label>
+                    <div className="relative group opacity-80">
+                      <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors" />
+                      <Input
+                        id="university"
+                        className="pl-12 h-13 rounded-2xl border-border/50 bg-muted/40 dark:bg-slate-900/50 focus:ring-0 focus:border-border/50 font-bold"
+                        value={formData.stats?.university || "Not Affiliated"}
+                        readOnly
+                      />
+                    </div>
+                  </div>
+
                   <div className="space-y-3">
                     <Label htmlFor="cgpa" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Current Cumulative GPA</Label>
                     <Input
