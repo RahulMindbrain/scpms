@@ -31,6 +31,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Modal } from '@/components/ui/modal';
+import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import {
   DropdownMenu,
@@ -98,6 +99,42 @@ const AdminJobManagement: React.FC = () => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedJob, setSelectedJob] = useState<any>(null);
 
+  // Rejection Dialog State
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [rejectJobIds, setRejectJobIds] = useState<number[]>([]);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejectCurrentStatuses, setRejectCurrentStatuses] = useState<string[] | undefined>(undefined);
+
+  const handleInitiateReject = (ids: number[], currentStatuses?: string[]) => {
+    if (currentStatuses?.some(curr => isBackward(curr, 'REJECTED'))) {
+      toast.error("Process integrity: Job status cannot be moved backward to Pending");
+      return;
+    }
+    setRejectJobIds(ids);
+    setRejectCurrentStatuses(currentStatuses);
+    setRejectReason('');
+    setIsRejectModalOpen(true);
+  };
+
+  const handleConfirmReject = async () => {
+    if (!rejectReason.trim()) {
+      toast.error("Rejection reason is required");
+      return;
+    }
+    const toastId = toast.loading("Processing rejection...");
+    try {
+      await dispatch(
+        updateJobStatus({ jobIds: rejectJobIds, status: 'REJECTED', reason: rejectReason.trim() }),
+      ).unwrap();
+      toast.success("Job(s) rejected successfully", { id: toastId });
+      setIsRejectModalOpen(false);
+      setIsDetailsModalOpen(false);
+      dispatch(fetchJobs({ status: activeTab, page, limit: PAGE_LIMIT }));
+    } catch (error: any) {
+      toast.error(error || "Failed to reject job(s)", { id: toastId });
+    }
+  };
+
   const handleShowDetails = (job: any) => {
     setSelectedJob(job);
     setIsDetailsModalOpen(true);
@@ -126,17 +163,8 @@ const AdminJobManagement: React.FC = () => {
     }
     const toastId = toast.loading(`Processing ${status.toLowerCase()}...`);
     try {
-      let reason: string | undefined;
-      if (status === "REJECTED") {
-        reason =
-          window.prompt("Rejection reason (required):")?.trim() || undefined;
-        if (!reason) {
-          toast.error("Rejection reason is required", { id: toastId });
-          return;
-        }
-      }
       await dispatch(
-        updateJobStatus({ jobIds: jobUniversityIds, status, reason }),
+        updateJobStatus({ jobIds: jobUniversityIds, status }),
       ).unwrap();
       toast.success(`Job(s) ${status.toLowerCase()} successfully`, { id: toastId });
       dispatch(fetchJobs({ status: activeTab, page, limit: PAGE_LIMIT }));
@@ -448,7 +476,7 @@ const AdminJobManagement: React.FC = () => {
                         <Button
                           variant="outline"
                           className="flex-1 border-rose-500/20 dark:border-rose-500/30 text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 rounded-xl h-10 font-black uppercase tracking-widest text-[9px] active:scale-95 transition-all"
-                          onClick={() => handleStatusUpdate([row.id], 'REJECTED', [row.status])}
+                          onClick={() => handleInitiateReject([row.id], [row.status])}
                           disabled={isBackward(row.status, 'REJECTED')}
                         >
                           Reject
@@ -687,6 +715,46 @@ const AdminJobManagement: React.FC = () => {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Rejection Reason Modal */}
+      <Modal
+        isOpen={isRejectModalOpen}
+        onClose={() => setIsRejectModalOpen(false)}
+        title="Provide Rejection Reason"
+        subtitle="Specify why this job listing is being rejected. This feedback will be shared with the corporate partner."
+        maxWidth="sm:max-w-md"
+        footer={
+          <>
+            <Button
+              variant="outline"
+              onClick={() => setIsRejectModalOpen(false)}
+              className="rounded-xl font-black uppercase tracking-widest text-[10px] h-11 px-6 border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300"
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmReject}
+              className="rounded-xl font-black uppercase tracking-widest text-[10px] h-11 px-6 bg-rose-500 hover:bg-rose-600 text-white shadow-lg shadow-rose-500/20 active:scale-95 transition-all"
+            >
+              Confirm Rejection
+            </Button>
+          </>
+        }
+      >
+        <div className="space-y-4 py-2">
+          <div className="space-y-2">
+            <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">
+              Rejection Reason <span className="text-rose-500">*</span>
+            </label>
+            <Textarea
+              value={rejectReason}
+              onChange={(e) => setRejectReason(e.target.value)}
+              placeholder="e.g., The compensation package does not meet the university's placement benchmarks."
+              className="min-h-[120px] rounded-2xl border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 focus-visible:ring-primary/20 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-600 p-4 text-sm"
+            />
+          </div>
+        </div>
       </Modal>
     </AdminPageLayout>
   );
