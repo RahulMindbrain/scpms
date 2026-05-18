@@ -247,6 +247,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                       value={formData.stats?.cgpa || ""}
                       onChange={(e) => updateStat("cgpa", e.target.value)}
                     />
+                    {errors['stats.cgpa'] && <p className="text-[10px] text-rose-500 font-black uppercase ml-1 tracking-wider">{errors['stats.cgpa']}</p>}
                   </div>
 
                   <div className="space-y-3">
@@ -254,10 +255,11 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                     <Input
                       id="year"
                       type="number"
-                      className="h-13 rounded-2xl border-border/50 bg-background focus:ring-primary/20 focus:border-primary transition-all font-black tabular-nums"
+                      className={`h-13 rounded-2xl border-border/50 bg-background focus:ring-primary/20 focus:border-primary transition-all font-black tabular-nums ${errors['stats.year'] ? 'border-rose-500 bg-rose-500/5' : ''}`}
                       value={formData.stats?.year || ""}
                       onChange={(e) => updateStat("year", e.target.value)}
                     />
+                    {errors['stats.year'] && <p className="text-[10px] text-rose-500 font-black uppercase ml-1 tracking-wider">{errors['stats.year']}</p>}
                   </div>
 
                   <div className="space-y-3">
@@ -265,10 +267,11 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                     <Input
                       id="passingYear"
                       type="number"
-                      className="h-13 rounded-2xl border-border/50 bg-background focus:ring-primary/20 focus:border-primary transition-all font-black tabular-nums"
+                      className={`h-13 rounded-2xl border-border/50 bg-background focus:ring-primary/20 focus:border-primary transition-all font-black tabular-nums ${errors['stats.passingYear'] ? 'border-rose-500 bg-rose-500/5' : ''}`}
                       value={formData.stats?.passingYear || ""}
                       onChange={(e) => updateStat("passingYear", e.target.value)}
                     />
+                    {errors['stats.passingYear'] && <p className="text-[10px] text-rose-500 font-black uppercase ml-1 tracking-wider">{errors['stats.passingYear']}</p>}
                   </div>
 
                   <div className="space-y-3">
@@ -277,10 +280,11 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                       id="activeBacklogs"
                       type="number"
                       placeholder="0"
-                      className="h-13 rounded-2xl border-border/50 bg-background focus:ring-primary/20 focus:border-primary transition-all font-black tabular-nums"
+                      className={`h-13 rounded-2xl border-border/50 bg-background focus:ring-primary/20 focus:border-primary transition-all font-black tabular-nums ${errors['stats.activeBacklogs'] ? 'border-rose-500 bg-rose-500/5' : ''}`}
                       value={formData.stats?.activeBacklogs ?? ""}
                       onChange={(e) => updateStat("activeBacklogs", e.target.value)}
                     />
+                    {errors['stats.activeBacklogs'] && <p className="text-[10px] text-rose-500 font-black uppercase ml-1 tracking-wider">{errors['stats.activeBacklogs']}</p>}
                   </div>
                 </div>
               </TabsContent>
@@ -300,11 +304,12 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                         <Input
                           id={social.id}
                           placeholder={social.placeholder}
-                          className="pl-12 h-13 rounded-2xl border-border/50 bg-background focus:ring-primary/20 focus:border-primary transition-all font-semibold"
+                          className={`pl-12 h-13 rounded-2xl border-border/50 bg-background focus:ring-primary/20 focus:border-primary transition-all font-semibold ${errors[social.id] ? 'border-rose-500 bg-rose-500/5' : ''}`}
                           value={formData[social.id] || ""}
                           onChange={(e) => updateField(social.id, e.target.value)}
                         />
                       </div>
+                      {errors[social.id] && <p className="text-[10px] text-rose-500 font-black uppercase ml-1 tracking-wider">{errors[social.id]}</p>}
                     </div>
                   ))}
                 </div>
@@ -406,6 +411,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                   {formData.resumeUrl ? "Replace PDF" : "Push PDF"}
                 </Button>
               </div>
+              {errors.resumeUrl && <p className="text-[10px] text-rose-500 font-black uppercase ml-1 tracking-wider">{errors.resumeUrl}</p>}
             </div>
           </div>
         </form>

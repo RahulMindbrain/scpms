@@ -1,11 +1,12 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { fetchStudents, fetchInactiveStudents, activateStudents, fetchStudentProfile, createStudentProfile, updateStudentProfile, fetchJobs, applyJob, fetchJobApplications, updateApplicationStatus } from "../thunks/studentThunk";
+import { fetchStudents, fetchInactiveStudents, activateStudents, fetchStudentProfile, createStudentProfile, updateStudentProfile, fetchJobs, applyJob, fetchJobApplications, updateApplicationStatus, fetchJobUniversities } from "../thunks/studentThunk";
 
 interface StudentState {
   students: any[];
   inactiveStudents: any[];
   jobs: any[];
   applications: any[];
+  jobUniversities: any[];
   statusCounts: any[];
   profile: any | null;
   loading: boolean;
@@ -23,6 +24,7 @@ const initialState: StudentState = {
   inactiveStudents: [],
   jobs: [],
   applications: [],
+  jobUniversities: [],
   statusCounts: [],
   profile: null,
   loading: false,
@@ -238,6 +240,28 @@ const studentSlice = createSlice({
         state.loading = false;
       })
       .addCase(updateApplicationStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
+      })
+      // Fetch Job Universities
+      .addCase(fetchJobUniversities.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchJobUniversities.fulfilled, (state, action: PayloadAction<any>) => {
+        state.loading = false;
+        const payload = action.payload;
+        if (payload?.data && Array.isArray(payload.data.data)) {
+          state.jobUniversities = payload.data.data;
+        } else if (payload && Array.isArray(payload.data)) {
+          state.jobUniversities = payload.data;
+        } else if (Array.isArray(payload)) {
+          state.jobUniversities = payload;
+        } else {
+          state.jobUniversities = [];
+        }
+      })
+      .addCase(fetchJobUniversities.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
       });

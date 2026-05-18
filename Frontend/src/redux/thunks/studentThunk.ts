@@ -78,7 +78,7 @@ export const fetchJobs = createAsyncThunk(
     "student/fetchJobs",
     async (params: any, { rejectWithValue }) => {
         try {
-            const response = await getAPI<any>("/job-universities", params);
+            const response = await getAPI<any>("/student/show-all-jobs", params);
             return response;
         } catch (error: any) {
             return rejectWithValue(error?.message || "Failed to fetch jobs");
@@ -118,6 +118,18 @@ export const updateApplicationStatus = createAsyncThunk(
             return response;
         } catch (error: any) {
             return rejectWithValue(error?.message || "Failed to update application status");
+        }
+    }
+);
+
+export const fetchJobUniversities = createAsyncThunk(
+    "student/fetchJobUniversities",
+    async (params: any = {}, { rejectWithValue }) => {
+        try {
+            const response = await getAPI<any>("/job-universities", { limit: 100, status: "APPROVED", ...params });
+            return response;
+        } catch (error: any) {
+            return rejectWithValue(error?.message || "Failed to fetch job universities");
         }
     }
 );

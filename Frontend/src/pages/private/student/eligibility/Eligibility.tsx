@@ -14,7 +14,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
-import { fetchJobApplications, fetchJobs, fetchStudentProfile } from '@/redux/thunks/studentThunk';
+import { fetchJobApplications, fetchStudentProfile, fetchJobUniversities } from '@/redux/thunks/studentThunk';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
@@ -25,13 +25,16 @@ import { StudentPageLayout } from '@/components/layout/StudentPageLayout';
 const Eligibility = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-  const { jobs = [], applications = [], profile, loading } = useSelector((state: RootState) => state.student);
-  
+  const { jobUniversities = [], applications = [], profile, loading } = useSelector((state: RootState) => state.student);
+
+  // jobUniversities from /job-universities already have the correct nested .job structure
+  const normalizedJobs = jobUniversities;
+
   const [activeFilter, setActiveFilter] = useState<'all' | 'eligible' | 'applied'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    dispatch(fetchJobs({ status: 'APPROVED' }));
+    dispatch(fetchJobUniversities({}));
     dispatch(fetchJobApplications({}));
     if (!profile) {
       dispatch(fetchStudentProfile());
@@ -49,13 +52,13 @@ const Eligibility = () => {
 
   const companies = useMemo(
     () =>
-      jobs.map((job: any) => {
+      normalizedJobs.map((ju: any) => {
+        // JobUniversity shape: { id, job: { title, company, eligibleDepartments }, minCgpa, maxBacklogs }
         const jobBranches =
-          job?.departments?.map((d: any) => d?.name).filter(Boolean) ||
-          job?.branches ||
+          ju?.job?.eligibleDepartments?.map((d: any) => d?.name).filter(Boolean) ||
           [];
-        const minCGPA = Number(job?.minCgpa || 0);
-        const maxActiveBacklogs = Number(job?.maxBacklogs ?? Number.MAX_SAFE_INTEGER);
+        const minCGPA = Number(ju?.minCgpa || 0);
+        const maxActiveBacklogs = Number(ju?.maxBacklogs ?? Number.MAX_SAFE_INTEGER);
         
         const branchEligible =
           jobBranches.length === 0 ||
@@ -77,17 +80,17 @@ const Eligibility = () => {
         }
 
         return {
-          id: job.id,
-          name: job?.company?.name || "Company",
-          role: job?.title || "Role",
+          id: ju.id,
+          name: ju?.job?.company?.name || "Company",
+          role: ju?.job?.title || "Role",
           minCGPA,
           branches: jobBranches,
           active,
           reason,
-          applied: appliedJobIds.has(Number(job.id)),
+          applied: appliedJobIds.has(Number(ju.id)),
         };
       }),
-    [jobs, appliedJobIds, studentBacklogs, studentBranch, studentCgpa]
+    [normalizedJobs, appliedJobIds, studentBacklogs, studentBranch, studentCgpa]
   );
 
   const filteredCompanies = companies.filter((company) => {
@@ -105,7 +108,7 @@ const Eligibility = () => {
     ineligible: companies.filter((c) => !c.active).length
   };
 
-  if (loading && jobs.length === 0) {
+  if (loading && jobUniversities.length === 0) {
     return <Loader text="Analyzing eligibility landscape..." fullScreen />;
   }
 
