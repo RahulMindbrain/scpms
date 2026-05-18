@@ -18,6 +18,7 @@ interface ModalProps {
   className?: string;
   maxWidth?: string;
   preventOutsideClick?: boolean;
+  showCloseButton?: boolean;
 }
 
 export const Modal: React.FC<ModalProps> = ({
@@ -30,6 +31,7 @@ export const Modal: React.FC<ModalProps> = ({
   className,
   maxWidth = "sm:max-w-lg",
   preventOutsideClick,
+  showCloseButton = true,
 }) => {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -39,6 +41,7 @@ export const Modal: React.FC<ModalProps> = ({
       e.preventDefault();
     }
   }}
+  showCloseButton={showCloseButton}
   className={cn(
     maxWidth,
     "rounded-[1.5rem] p-0 shadow-2xl",

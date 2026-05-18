@@ -15,11 +15,9 @@ import {
   ArrowRight,
   X,
   Loader2,
-  FileText
-  CheckCircle2,
+  FileText,
   XCircle,
   AlertTriangle,
-  Zap,
 } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -103,6 +101,13 @@ const getPostedAgo = (dateString?: string) => {
     return 'Posted recently';
   }
 };
+
+const checklistItems = [
+  "Parsing resume text structure",
+  "Extracting key skills & experiences",
+  "Matching qualifications against job description",
+  "Synthesizing final ATS match report"
+];
 
 const JobListing = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -307,7 +312,8 @@ const JobListing = () => {
     if (!selectedJob) return;
 
     setIsApplying(true);
-    setIsModalOpen(false);
+    setIsDetailsModalOpen(false);
+    setIsApplyModalOpen(false);
     const toastId = toast.loading(`Submitting application for ${selectedJob.job.title}...`);
     
     dispatch(applyJob(selectedJob.id))
@@ -511,21 +517,24 @@ const JobListing = () => {
                             variant="outline"
                             onClick={() => {
                               setSelectedJob(job);
-                              setIsModalOpen(true);
+                              setIsDetailsModalOpen(true);
                             }}
                             className="bg-white dark:bg-[#161b22]/30 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 px-4 h-10 rounded-xl font-bold text-xs md:text-sm shadow-sm transition-all duration-200"
                           >
                             Details
                           </Button>
                           <Button
+                            disabled={isApplied}
                             onClick={() => {
+                              if (isApplied) return;
                               setSelectedJob(job);
-                              setIsModalOpen(true);
+                              setApplyStep('resume');
+                              setIsApplyModalOpen(true);
                             }}
                             className={cn(
                               "px-4 h-10 rounded-xl font-bold text-xs md:text-sm flex items-center gap-2 shadow-md transition-all duration-200 text-white",
                               isApplied
-                                ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/10 hover:shadow-emerald-500/20"
+                                ? "bg-emerald-600/70 dark:bg-emerald-600/40 cursor-not-allowed opacity-80 shadow-none"
                                 : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/10 hover:shadow-indigo-500/20"
                             )}
                           >
@@ -790,19 +799,11 @@ const JobListing = () => {
               setIsApplyModalOpen(false);
             }
           }}
+          showCloseButton={applyStep !== 'loading'}
           maxWidth={applyStep === 'report' ? "sm:max-w-2xl" : "sm:max-w-lg"}
           preventOutsideClick={applyStep === 'loading'}
         >
           <div className="relative py-2 px-1">
-            {/* Custom Close Button for premium feel */}
-            {applyStep !== 'loading' && (
-              <button
-                onClick={() => setIsApplyModalOpen(false)}
-                className="absolute -right-2 -top-2 w-8 h-8 rounded-full bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all duration-200 z-50 hover:rotate-90"
-              >
-                <X size={14} />
-              </button>
-            )}
 
             {/* ─── State 2: Resume Selection Modal (Overlay) ─── */}
             {applyStep === 'resume' && (
