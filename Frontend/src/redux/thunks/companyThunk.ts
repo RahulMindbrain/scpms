@@ -90,8 +90,8 @@ export const postJob = createAsyncThunk(
   "company/postJob",
   async (data: any, { rejectWithValue }) => {
     try {
-      await postAPI("/company/post-job", data);
-      return { success: true };
+      const res = await postAPI<any>("/company/post-job", data);
+      return res.data;
     } catch (error: any) {
       return rejectWithValue(error?.message);
     }
@@ -174,11 +174,11 @@ export const fetchJobApplications = createAsyncThunk(
 
 export const updateJobApplicationStatus = createAsyncThunk(
   "company/updateJobApplicationStatus",
-  async ({ id, status }: any, { rejectWithValue }) => {
+  async ({ id, status, currentRound, reason, remarks }: any, { rejectWithValue }) => {
     try {
       const res = await putAPI<any>(
         `/company/update-job-status/${id}`,
-        { status }
+        { status, currentRound, reason, remarks }
       );
 
       return res.data;

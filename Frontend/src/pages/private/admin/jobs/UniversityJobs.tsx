@@ -12,7 +12,6 @@ import {
   Building,
   UserCheck,
   ExternalLink,
-  Calendar,
   Users,
   ArrowUpDown
 } from 'lucide-react';
@@ -206,89 +205,90 @@ const UniversityJobs: React.FC = () => {
               onClick={() => handleShowDetails(row)}
             >
               {/* Top Section */}
-              <div className="flex items-start justify-between mb-6">
+              <div className="flex items-start justify-between mb-5">
                 <div className="flex items-center gap-4">
-                  <div className="size-14 bg-primary/5 dark:bg-primary/10 rounded-2xl flex items-center justify-center text-primary dark:text-primary/70 font-black text-xl border border-primary/10 group-hover:scale-105 transition-transform">
+                  <div className="size-12 bg-primary/5 dark:bg-primary/10 rounded-[1.25rem] flex items-center justify-center text-primary dark:text-primary/70 font-black text-lg border border-primary/10 group-hover:scale-105 transition-transform">
                     {row.job?.title?.[0] || 'J'}
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-lg font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors truncate tracking-tight leading-tight">
+                    <h3 className="text-base font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors truncate tracking-tight leading-tight">
                       {row.job?.title}
                     </h3>
-                    <p className="text-[11px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-1.5 flex items-center gap-1.5">
-                      <Building2 size={11} className="text-primary/60 dark:text-primary/40" />
+                    <p className="text-[10px] text-slate-400 dark:text-slate-500 font-black uppercase tracking-widest mt-1 flex items-center gap-1.5">
+                      <Building2 size={10} className="text-primary/60 dark:text-primary/40" />
                       {(row as any).displayCompany?.name || 'Unknown Company'}
                     </p>
                   </div>
                 </div>
-                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-transparent font-black text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-lg">
+                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-transparent font-black text-[8px] uppercase tracking-widest px-2.5 py-1 rounded-md">
                   Active
                 </Badge>
               </div>
 
-              {/* Info Pills Section */}
-              <div className="grid grid-cols-2 gap-2 mb-6">
-                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-100/50 dark:border-slate-700/50 text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                  <MapPin size={12} className="text-slate-300 dark:text-slate-600" />
-                  <span className="truncate">{row.job?.location || 'Remote'}</span>
+              {/* Sleek Middle Section: Details with visual consistency */}
+              <div className="flex items-center flex-wrap gap-3 text-[11px] font-bold text-slate-500 dark:text-slate-400 mb-4 px-1">
+                <div className="flex items-center gap-1">
+                  <MapPin size={12} className="text-slate-400" />
+                  <span>{row.job?.location || 'Remote'}</span>
                 </div>
-                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/10 text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
-                  <IndianRupee size={12} />
-                  <span className="truncate">{(row.salary / 100000).toFixed(1)} LPA</span>
+                <div className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                <div className="flex items-center gap-1">
+                  <IndianRupee size={12} className="text-emerald-500" />
+                  <span className="text-emerald-600 dark:text-emerald-400 font-black">{(row.salary / 100000).toFixed(1)} LPA</span>
                 </div>
-                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/10 text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">
-                  <Calendar size={12} className="text-blue-500 dark:text-blue-400" />
-                  <span className="truncate">{new Date(row.approvedAt).toLocaleDateString()}</span>
-                </div>
-                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/10 text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest">
-                  <Users size={12} className="text-amber-500 dark:text-amber-400" />
-                  <span className="truncate">{row.openings} Open</span>
+                <div className="h-1 w-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                <div className="flex items-center gap-1">
+                  <Users size={12} className="text-amber-500" />
+                  <span>{row.openings} Open</span>
                 </div>
               </div>
 
-              {/* Eligibility Section */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="p-4 rounded-3xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/30 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-16 h-16 bg-blue-100/50 dark:bg-blue-800/20 rounded-full -mr-8 -mt-8" />
-                  <p className="text-[9px] font-black text-blue-400 dark:text-blue-500 uppercase tracking-widest mb-1">Min. CGPA</p>
-                  <p className="text-2xl font-black text-blue-600 dark:text-blue-400 tracking-tight">{row.minCgpa}</p>
+              {/* Dynamic Compact Specs Banner */}
+              <div className="flex items-center gap-2 p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-850/80 mb-4 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+                <div className="flex-1 flex items-center justify-center gap-1.5 border-r border-slate-200/80 dark:border-slate-800">
+                  <Target size={12} className="text-blue-500" />
+                  <span>Min. CGPA: <strong className="text-blue-600 dark:text-blue-400 font-black">{row.minCgpa}</strong></span>
                 </div>
-                <div className="p-4 rounded-3xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 relative overflow-hidden">
-                  <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Max Backlogs</p>
-                  <p className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{row.maxBacklogs}</p>
+                <div className="flex-1 flex items-center justify-center gap-1.5">
+                  <Clock size={12} className="text-amber-500" />
+                  <span>Backlogs: <strong className="text-amber-600 dark:text-amber-400 font-black">{row.maxBacklogs} Max</strong></span>
                 </div>
               </div>
 
               {/* Description */}
-              <p className="text-[13px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 mb-6 font-medium px-1">
+              <p className="text-[12px] text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-2 mb-4 font-medium px-1">
                 {row.description || "Premium job listing with high growth potential and competitive benefits package."}
               </p>
 
-              {/* Dept Tags */}
-              <div className="flex flex-wrap gap-2 mb-8 mt-auto">
-                {(row.job?.eligibleDepartments || []).slice(0, 2).map((d: any, idx: number) => (
-                  <Badge 
-                    key={d.id || idx} 
-                    variant="outline" 
-                    className="bg-primary/5 dark:bg-primary/10 border-transparent text-primary/70 dark:text-primary/50 font-black text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-xl"
-                  >
-                    {typeof d === 'object' ? (d.name || `Dept #${d.id}`) : d}
-                  </Badge>
-                ))}
-                {(row.job?.eligibleDepartments || []).length > 2 && (
-                   <Badge variant="outline" className="bg-slate-50 dark:bg-slate-800 border-transparent text-slate-300 dark:text-slate-600 font-black text-[9px] uppercase tracking-widest px-3 py-1.5 rounded-xl">
-                     +{(row.job?.eligibleDepartments || []).length - 2}
-                   </Badge>
-                )}
-              </div>
+              {/* Footer Section: Departments & Sleek CTA Link */}
+              <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100 dark:border-slate-800/60">
+                {/* Dept Tags */}
+                <div className="flex flex-wrap gap-1.5">
+                  {(row.job?.eligibleDepartments || []).slice(0, 1).map((d: any, idx: number) => {
+                    const deptName = typeof d === 'object' ? (d.name || `Dept #${d.id}`) : d;
+                    return (
+                      <Badge 
+                        key={d.id || idx} 
+                        variant="outline" 
+                        className="bg-primary/5 dark:bg-primary/10 border-transparent text-primary/70 dark:text-primary/50 font-black text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-md"
+                      >
+                        {deptName}
+                      </Badge>
+                    );
+                  })}
+                  {(row.job?.eligibleDepartments || []).length > 1 && (
+                     <Badge variant="outline" className="bg-slate-50 dark:bg-slate-800 border-transparent text-slate-400 dark:text-slate-505 font-black text-[8px] uppercase tracking-widest px-2 py-0.5 rounded-md">
+                       +{(row.job?.eligibleDepartments || []).length - 1} More
+                     </Badge>
+                  )}
+                </div>
 
-              {/* Bottom CTA */}
-              <Button 
-                className="w-full bg-slate-900 dark:bg-slate-100 dark:text-slate-900 hover:bg-primary dark:hover:bg-primary dark:hover:text-white text-white rounded-[1.5rem] h-14 font-black uppercase tracking-widest text-[11px] transition-all duration-300 flex items-center justify-center gap-3 group/btn shadow-xl shadow-slate-900/5 dark:shadow-none hover:shadow-primary/30 active:scale-[0.98]"
-              >
-                View Full Details
-                <ExternalLink size={18} className="transition-transform group-hover/btn:scale-110" />
-              </Button>
+                {/* Sleek CTA Text Link */}
+                <span className="text-[10px] font-black uppercase tracking-widest text-primary group-hover:text-primary/80 transition-colors flex items-center gap-1">
+                  Details
+                  <ExternalLink size={11} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-350" />
+                </span>
+              </div>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -335,7 +335,6 @@ const UniversityJobs: React.FC = () => {
                 <Badge className="px-4 py-1.5 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] bg-emerald-500 text-white">
                   {selectedJob.status}
                 </Badge>
-                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Job ID: #{selectedJob.id}</span>
               </div>
             </div>
 

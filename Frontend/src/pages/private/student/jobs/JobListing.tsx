@@ -16,6 +16,10 @@ import {
   X,
   Loader2,
   FileText
+  CheckCircle2,
+  XCircle,
+  AlertTriangle,
+  Zap,
 } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -24,6 +28,7 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobs, applyJob, fetchStudentProfile, fetchJobApplications } from '@/redux/thunks/studentThunk';
+import { fetchCompanies } from '@/redux/thunks/companyThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import { Modal } from '@/components/ui/modal';
@@ -62,9 +67,47 @@ interface JobUniversity {
   };
 }
 
+const getCompanyInitials = (name?: string) => {
+  if (!name) return 'CO';
+  const cleanName = name.trim();
+  const parts = cleanName.split(/\s+/);
+  if (parts.length > 1) {
+    return (parts[0][0] + parts[1][0]).toUpperCase();
+  }
+  return cleanName.slice(0, 2).toUpperCase();
+};
+
+const formatDate = (dateString?: string) => {
+  if (!dateString) return 'No Deadline';
+  try {
+    const d = new Date(dateString);
+    if (isNaN(d.getTime())) return 'No Deadline';
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  } catch (e) {
+    return 'No Deadline';
+  }
+};
+
+const getPostedAgo = (dateString?: string) => {
+  if (!dateString) return 'Posted recently';
+  try {
+    const postedDate = new Date(dateString);
+    const today = new Date();
+    const diffTime = Math.abs(today.getTime() - postedDate.getTime());
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays <= 0) return 'Posted today';
+    if (diffDays === 1) return 'Posted 1 day ago';
+    return `Posted ${diffDays} days ago`;
+  } catch (e) {
+    return 'Posted recently';
+  }
+};
+
 const JobListing = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { jobs, profile, applications = [], loading } = useSelector((state: RootState) => state.student);
+  const { companies: reduxCompanies = [] } = useSelector((state: RootState) => state.company);
   const { user } = useSelector((state: RootState) => state.auth);
   const isApproved = user?.status === 'ACTIVE';
 
@@ -91,6 +134,7 @@ const JobListing = () => {
   useEffect(() => {
     dispatch(fetchJobs({ status: 'APPROVED' }));
     dispatch(fetchJobApplications({}));
+    dispatch(fetchCompanies({ limit: 100 }));
     if (!profile) {
       dispatch(fetchStudentProfile());
     }
@@ -263,26 +307,26 @@ const JobListing = () => {
     if (!selectedJob) return;
 
     setIsApplying(true);
-    const toastId = toast.loading(`Submitting application...`);
-    try {
-      await dispatch(applyJob(selectedJob.id)).unwrap();
-      await dispatch(fetchJobApplications({}));
-      toast.success("Application submitted!", { id: toastId });
-      setIsDetailsModalOpen(false);
-      setIsApplyModalOpen(false);
-    } catch (error: any) {
-      toast.error(error || "Failed to apply", { id: toastId });
-    } finally {
-      setIsApplying(false);
-    }
+    setIsModalOpen(false);
+    const toastId = toast.loading(`Submitting application for ${selectedJob.job.title}...`);
+    
+    dispatch(applyJob(selectedJob.id))
+      .unwrap()
+      .then(() => {
+        toast.success("Application submitted successfully!", { id: toastId });
+        dispatch(fetchJobApplications({}));
+      })
+      .catch((error: any) => {
+        toast.error(error || "Failed to submit application.", { id: toastId });
+      })
+      .finally(() => {
+        setIsApplying(false);
+      });
   };
 
-  const checklistItems = [
-    "Extracting Skills",
-    "Reading Experience",
-    "Matching Job Description",
-    "Calculating ATS Score"
-  ];
+  const selectedCompanyId = selectedJob?.job?.companyId ?? (selectedJob as any)?.companyId;
+  const selectedFoundCompany = reduxCompanies.find((c: any) => c.id === selectedCompanyId);
+  const selectedCompanyName = selectedJob?.job?.company?.name ?? selectedFoundCompany?.name ?? 'Hiring Partner';
 
   if (loading && (jobs?.length || 0) === 0) {
     return <Loader text="Syncing career opportunities..." fullScreen />;
@@ -290,7 +334,7 @@ const JobListing = () => {
 
   return (
     <StudentPageLayout>
-      <div className="space-y-8 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
+      <div className="space-y-6 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
         
         {/* Adaptive Hero Banner */}
         <div className="student-hero-banner group">
@@ -317,8 +361,8 @@ const JobListing = () => {
 
         {/* ─── Compact Controls Bar ─── */}
         {(jobs?.length || 0) > 0 && (
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 md:gap-6 bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl p-4 md:p-6 rounded-[2rem] border border-slate-200/60 dark:border-white/[0.08] shadow-sm">
-            <div className="flex items-center gap-1.5 md:gap-2 bg-slate-100 dark:bg-white/5 p-1 md:p-1.5 rounded-2xl border border-slate-200 dark:border-white/[0.05] overflow-x-auto no-scrollbar w-full lg:w-fit">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/70 dark:bg-[#161b22]/30 backdrop-blur-xl p-4 rounded-2xl border border-slate-200/50 dark:border-white/[0.06] shadow-sm">
+            <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-[#0f172a]/60 p-1 rounded-xl border border-slate-200/10 dark:border-white/[0.02] overflow-x-auto no-scrollbar w-full md:w-auto">
               {[
                 { id: 'all', label: 'All Jobs' },
                 { id: 'eligible', label: 'Recommended' },
@@ -328,9 +372,9 @@ const JobListing = () => {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as any)}
                   className={cn(
-                    "px-4 md:px-6 py-2.5 md:py-3 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-[0.15em] transition-all duration-300 whitespace-nowrap",
+                    "px-4 py-2 rounded-lg text-xs font-semibold tracking-wide transition-all duration-300 whitespace-nowrap",
                     activeTab === tab.id
-                      ? "bg-white dark:bg-[#1e1f26] text-blue-600 dark:text-blue-400 shadow-xl border border-slate-200/50 dark:border-white/10 scale-105"
+                      ? "bg-white dark:bg-[#1e1f26] text-indigo-600 dark:text-indigo-400 shadow-md border border-slate-200/40 dark:border-white/[0.05]"
                       : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
                   )}
                 >
@@ -339,14 +383,14 @@ const JobListing = () => {
               ))}
             </div>
             
-            <div className="flex items-center gap-4 w-full lg:w-auto">
-              <div className="relative flex-1 lg:w-96 group">
+            <div className="flex items-center gap-3 w-full md:w-auto">
+              <div className="relative flex-1 md:w-80 group">
                 <Search
-                  className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors w-4 h-4 md:w-[18px] md:h-[18px]"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors w-4 h-4"
                 />
                 <Input
                   placeholder="Search role or company..."
-                  className="pl-12 md:pl-14 h-12 md:h-14 bg-slate-100 dark:bg-white/5 border-none rounded-2xl text-xs md:text-sm font-semibold focus-visible:ring-blue-500/30 shadow-inner transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                  className="pl-10 h-10 bg-slate-50 dark:bg-[#0f172a]/60 border border-slate-200/60 dark:border-slate-800 rounded-xl text-xs md:text-sm font-semibold focus-visible:ring-indigo-500/20 shadow-sm transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -361,8 +405,10 @@ const JobListing = () => {
             {paginatedJobs.map((job: JobUniversity, idx) => {
               const isApplied = appliedJobIds.has(Number(job.id));
               const eligibility = checkEligibility(job);
-              const initials = getLogoInitials(job.job?.company?.name || 'Top Tier');
-              const grad = getCompanyGradient(job.job?.company?.name || 'Google');
+              
+              const companyId = job.job?.companyId ?? (job as any).companyId;
+              const foundCompany = reduxCompanies.find((c: any) => c.id === companyId);
+              const companyName = job.job?.company?.name ?? foundCompany?.name ?? 'Hiring Partner';
               
               return (
                 <motion.div
@@ -374,108 +420,127 @@ const JobListing = () => {
                   whileHover={{ y: -4 }}
                   className="group"
                 >
-                  {/* State 1: Job Listing Card */}
-                  <Card className="h-full border-none bg-white/80 dark:bg-[#161b22]/40 backdrop-blur-xl rounded-[2rem] overflow-hidden shadow-sm hover:shadow-xl border border-slate-200/50 dark:border-white/[0.08] hover:border-blue-500/30 transition-all duration-500">
-                    <CardContent className="p-6 flex flex-col h-full space-y-6">
+                  <Card className="h-full border border-slate-100 dark:border-white/[0.06] bg-white dark:bg-[#161b22]/30 rounded-[1.25rem] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 hover:border-indigo-500/20">
+                    <CardContent className="p-6 flex flex-col h-full justify-between gap-5">
                       
-                      {/* Top section */}
+                      {/* Top Row: Logo, Title, Badge */}
                       <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-center gap-4 min-w-0">
-                          {/* Logo placeholder */}
-                          <div className={cn(
-                            "w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center font-black text-base md:text-lg text-white shadow-md bg-gradient-to-br shrink-0 transition-transform duration-500 group-hover:scale-105 group-hover:rotate-2",
-                            grad
-                          )}>
-                            {initials}
+                        <div className="flex items-start gap-4">
+                          {/* Gradient Rounded Square Icon */}
+                          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-emerald-500 flex items-center justify-center font-bold text-lg text-white shadow-md shadow-indigo-500/10 shrink-0">
+                            {getCompanyInitials(companyName)}
                           </div>
-                          <div className="min-w-0 space-y-0.5">
-                            <h3 className="text-sm md:text-base font-black text-slate-900 dark:text-white leading-tight group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
-                              {job.job?.title || "SDE Intern"}
+                          
+                          {/* Title & Company */}
+                          <div className="pt-0.5">
+                            <h3 className="text-[17px] font-bold text-slate-800 dark:text-white leading-snug tracking-tight hover:text-indigo-600 transition-colors line-clamp-1">
+                              {job.job?.title}
                             </h3>
-                            <p className="text-[10px] md:text-[11px] font-black text-slate-400 uppercase tracking-widest truncate">
-                              {job.job?.company?.name || "Google"}
-                            </p>
+                            <div className="flex flex-col gap-0.5 mt-1">
+                              <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 truncate">
+                                <Building2 size={14} className="text-slate-400 shrink-0" />
+                                {companyName}
+                              </p>
+                              {job.university?.name && (
+                                <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 flex items-center gap-1 truncate">
+                                  <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
+                                  {job.university.name} Drive
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </div>
 
-                        {/* Oval Badge */}
-                        <div className="shrink-0">
+                        {/* Top-Right Pill Badge */}
+                        <div>
                           {isApplied ? (
-                            <Badge className="bg-emerald-500 text-white font-extrabold text-[8px] md:text-[9px] uppercase tracking-[0.15em] px-3.5 py-1 rounded-full shadow-md shadow-emerald-500/10 border-none">
+                            <span className="bg-indigo-600 text-white text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-sm whitespace-nowrap">
                               Applied
-                            </Badge>
+                            </span>
                           ) : eligibility.eligible ? (
-                            <Badge className="bg-blue-600 text-white font-extrabold text-[8px] md:text-[9px] uppercase tracking-[0.15em] px-3.5 py-1 rounded-full shadow-md shadow-blue-500/20 border-none">
+                            <span className="bg-indigo-600 text-white text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-sm whitespace-nowrap">
                               Eligible
-                            </Badge>
+                            </span>
                           ) : (
-                            <Badge className="bg-rose-500/10 text-rose-500 font-extrabold text-[8px] md:text-[9px] uppercase tracking-[0.15em] px-3.5 py-1 rounded-full border border-rose-500/20">
+                            <span className="bg-rose-500 text-white text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-sm whitespace-nowrap">
                               Ineligible
-                            </Badge>
+                            </span>
                           )}
                         </div>
                       </div>
 
-                      {/* Middle Section: Row of Icons */}
-                      <div className="grid grid-cols-3 gap-2 border-t border-b border-slate-100 dark:border-white/[0.04] py-4">
-                        <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 min-w-0">
-                          <MapPin size={14} className="text-blue-500 shrink-0" />
-                          <span className="text-[10px] font-bold uppercase tracking-wider truncate">
-                            {job.job?.location || "Remote"}
-                          </span>
+                      {/* Middle row: MapPin, Rupee, Clock */}
+                      <div className="flex items-center gap-x-5 gap-y-2 flex-wrap text-slate-500 dark:text-slate-400 text-[13px] font-medium pt-1">
+                        <div className="flex items-center gap-1.5">
+                          <MapPin size={15} className="text-slate-400 shrink-0" />
+                          <span>{job.job?.location}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 min-w-0">
-                          <IndianRupee size={14} className="text-emerald-500 shrink-0" />
-                          <span className="text-[10px] font-bold uppercase tracking-wider truncate">
-                            {formatSalary(job.salary)}
-                          </span>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-400 font-semibold shrink-0">₹</span>
+                          <span>{formatSalary(job.salary)}</span>
                         </div>
-                        <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400 min-w-0">
-                          <Calendar size={14} className="text-indigo-500 shrink-0" />
-                          <span className="text-[10px] font-bold uppercase tracking-wider truncate">
-                            {new Date(job.postedAt || job.sentAt || (job as any).createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
-                          </span>
+                        <div className="flex items-center gap-1.5">
+                          <Clock size={15} className="text-slate-400 shrink-0" />
+                          <span>{formatDate(job.deadline)}</span>
                         </div>
                       </div>
 
-                      {/* Bottom Section */}
-                      <div className="flex items-center justify-between pt-2 mt-auto">
-                        <div className="text-[10px] md:text-[11px] font-black text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                          <Clock size={13} className="text-indigo-500" />
-                          {getRelativeTime(job.postedAt || job.sentAt || (job as any).createdAt)}
+                      {/* Skills tags preview (discreet & premium) */}
+                      {job.job?.skills && job.job.skills.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 pt-0.5">
+                          {job.job.skills.slice(0, 3).map((skill) => (
+                            <span key={skill.id} className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-white/5 px-2.5 py-1 rounded-lg">
+                              {skill.name}
+                            </span>
+                          ))}
+                          {job.job.skills.length > 3 && (
+                            <span className="text-[10px] font-bold text-slate-400 px-1 py-0.5">
+                              +{job.job.skills.length - 3} more
+                            </span>
+                          )}
                         </div>
-                        <div className="flex items-center gap-2">
+                      )}
+
+                      {/* Bottom Row: Posted Ago & Buttons */}
+                      <div className="flex items-center justify-between mt-auto pt-4 border-t border-slate-100 dark:border-slate-800/50">
+                        <div className="text-xs text-slate-400 dark:text-slate-500 font-medium">
+                          {getPostedAgo(job.postedAt || job.sentAt || (job as any).createdAt)}
+                        </div>
+                        <div className="flex items-center gap-3">
                           <Button
                             variant="outline"
                             onClick={() => {
                               setSelectedJob(job);
-                              setIsDetailsModalOpen(true);
+                              setIsModalOpen(true);
                             }}
-                            className="rounded-xl border border-slate-200 dark:border-white/10 px-4 h-9 text-[10px] font-black uppercase tracking-wider hover:bg-slate-50 dark:hover:bg-white/5 transition-all text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                            className="bg-white dark:bg-[#161b22]/30 hover:bg-slate-50 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 px-4 h-10 rounded-xl font-bold text-xs md:text-sm shadow-sm transition-all duration-200"
                           >
                             Details
                           </Button>
-                          {isApplied ? (
-                            <Button
-                              disabled
-                              className="bg-slate-100 dark:bg-white/5 text-slate-400 dark:text-slate-500 rounded-xl px-4 h-9 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 border-none shadow-none cursor-not-allowed"
-                            >
-                              Applied
-                            </Button>
-                          ) : (
-                            <Button
-                              onClick={() => {
-                                setSelectedJob(job);
-                                setApplyStep('resume');
-                                setSelectedResumeOption('latest');
-                                setIsApplyModalOpen(true);
-                              }}
-                              className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl px-4 h-9 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-blue-500/20 hover:scale-105 active:scale-95 transition-all border-none"
-                            >
-                              <Zap size={11} className="fill-white text-white" />
-                              Apply Now
-                            </Button>
-                          )}
+                          <Button
+                            onClick={() => {
+                              setSelectedJob(job);
+                              setIsModalOpen(true);
+                            }}
+                            className={cn(
+                              "px-4 h-10 rounded-xl font-bold text-xs md:text-sm flex items-center gap-2 shadow-md transition-all duration-200 text-white",
+                              isApplied
+                                ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-500/10 hover:shadow-emerald-500/20"
+                                : "bg-indigo-600 hover:bg-indigo-700 shadow-indigo-500/10 hover:shadow-indigo-500/20"
+                            )}
+                          >
+                            {isApplied ? (
+                              <>
+                                <CheckCircle2 size={15} className="shrink-0" />
+                                Applied
+                              </>
+                            ) : (
+                              <>
+                                <Zap size={14} className="fill-white shrink-0" />
+                                Apply Now
+                              </>
+                            )}
+                          </Button>
                         </div>
                       </div>
 
@@ -489,27 +554,27 @@ const JobListing = () => {
 
         {/* ─── Pagination ─── */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2 md:gap-3 pt-6 pb-12">
+          <div className="flex items-center justify-center gap-2 pt-6 pb-12">
             <Button
               variant="outline"
               size="icon"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              className="rounded-xl border-2 border-slate-200 dark:border-white/10 w-10 h-10 md:w-12 md:h-12 hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+              className="rounded-xl border border-slate-200 dark:border-white/10 w-9 h-9 hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
             >
-              <ChevronLeft size={18} />
+              <ChevronLeft size={16} />
             </Button>
             
-            <div className="flex items-center gap-1.5 md:gap-2">
+            <div className="flex items-center gap-1">
               {[...Array(totalPages)].map((_, idx) => (
                 <button
                   key={idx}
                   onClick={() => setCurrentPage(idx + 1)}
                   className={cn(
-                    "w-10 h-10 md:w-12 md:h-12 rounded-xl text-[10px] md:text-xs font-black transition-all shadow-sm",
+                    "w-9 h-9 rounded-xl text-xs font-semibold transition-all shadow-sm",
                     currentPage === idx + 1
-                    ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
-                    : "bg-white dark:bg-[#1e1f26] text-slate-600 dark:text-slate-400 border-2 border-slate-200 dark:border-white/10 hover:border-indigo-500/50"
+                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20"
+                    : "bg-white dark:bg-[#1e1f26] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:border-indigo-500/50"
                   )}
                 >
                   {idx + 1}
@@ -522,21 +587,21 @@ const JobListing = () => {
               size="icon"
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              className="rounded-xl border-2 border-slate-200 dark:border-white/10 w-10 h-10 md:w-12 md:h-12 hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
+              className="rounded-xl border border-slate-200 dark:border-white/10 w-9 h-9 hover:bg-indigo-600 hover:text-white transition-all shadow-sm"
             >
-              <ChevronRight size={18} />
+              <ChevronRight size={16} />
             </Button>
           </div>
         )}
 
         {/* Empty State */}
         {filteredJobs.length === 0 && !loading && (
-          <div className="flex flex-col items-center justify-center py-20 md:py-32 text-center px-4">
-            <div className="w-20 h-20 md:w-24 md:h-24 bg-slate-100 dark:bg-white/5 rounded-[2.5rem] flex items-center justify-center mb-6 border-2 border-slate-200 dark:border-white/5 text-slate-300 dark:text-slate-700">
-              <Search size={40} />
+          <div className="flex flex-col items-center justify-center py-20 text-center px-4">
+            <div className="w-16 h-16 bg-slate-100 dark:bg-white/5 rounded-2xl flex items-center justify-center mb-5 border border-slate-200 dark:border-white/5 text-slate-300 dark:text-slate-700">
+              <Search size={32} />
             </div>
-            <h3 className="text-xl md:text-2xl font-black text-slate-900 dark:text-white tracking-tight">No matching opportunities</h3>
-            <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 mt-2 font-medium">Try broadening your search or switching tabs.</p>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">No matching opportunities</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">Try broadening your search or switching tabs.</p>
           </div>
         )}
 
@@ -545,123 +610,172 @@ const JobListing = () => {
           isOpen={isDetailsModalOpen}
           onClose={() => setIsDetailsModalOpen(false)}
           title={selectedJob?.job.title}
-          subtitle={`${selectedJob?.job?.company?.name || 'Top Tier Recruiter'} • ${selectedJob?.job?.location}`}
+          subtitle={`${selectedCompanyName} • ${selectedJob?.job?.location || 'Remote'}`}
           maxWidth="sm:max-w-lg"
         >
-          <div className="space-y-6 md:space-y-8 py-2">
-            <div className="flex items-center gap-4 md:gap-6">
-              <div className={cn(
-                "w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br rounded-2xl md:rounded-3xl flex items-center justify-center text-white font-black text-2xl md:text-3xl shadow-xl border border-white/10",
-                selectedJob && getCompanyGradient(selectedJob.job?.company?.name || 'Google')
-              )}>
-                {selectedJob && getLogoInitials(selectedJob.job?.company?.name || 'Top Tier')}
+          <div className="space-y-5 py-1">
+            
+            {/* Quick Specs Grid */}
+            <div className="grid grid-cols-3 gap-2.5">
+              <div className="p-3 bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-white/[0.04] flex flex-col items-center justify-center text-center">
+                <Calendar className="w-4 h-4 text-indigo-500 mb-1" />
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Deadline</span>
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">{formatDate(selectedJob?.deadline)}</span>
               </div>
-              <div className="space-y-1 min-w-0">
-                <p className="text-[8px] md:text-[10px] font-black text-blue-600 uppercase tracking-widest">Company Overview</p>
-                <h4 className="text-lg md:text-xl font-black text-slate-900 dark:text-white truncate">{selectedJob?.job?.company?.name || 'Top Tier Recruiter'}</h4>
-                <div className="flex items-center gap-2 text-slate-500 font-bold text-xs md:text-sm">
-                  <MapPin size={12} className="text-blue-500" />
-                  <span className="truncate">{selectedJob?.job?.location}</span>
-                </div>
+              <div className="p-3 bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-white/[0.04] flex flex-col items-center justify-center text-center">
+                <IndianRupee className="w-4 h-4 text-emerald-500 mb-1" />
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Expected CTC</span>
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">{selectedJob?.salary ? formatSalary(selectedJob.salary) : 'Competitive'}</span>
               </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 md:gap-4">
-              <div className="p-4 md:p-5 bg-slate-50 dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/5">
-                <div className="flex items-center gap-2 mb-1.5 md:mb-2">
-                  <Calendar className="w-3.5 h-3.5 md:w-4 md:h-4 text-blue-600" />
-                  <span className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Deadline</span>
-                </div>
-                <p className="text-xs md:text-sm font-black text-slate-900 dark:text-slate-100">{selectedJob?.deadline || 'Open'}</p>
-              </div>
-              <div className="p-4 md:p-5 bg-slate-50 dark:bg-white/[0.03] rounded-2xl border border-slate-100 dark:border-white/5">
-                <div className="flex items-center gap-2 mb-1.5 md:mb-2">
-                  <IndianRupee className="w-3.5 h-3.5 md:w-4 md:h-4 text-emerald-600" />
-                  <span className="text-[8px] md:text-[9px] font-black text-slate-400 uppercase tracking-widest">Expected CTC</span>
-                </div>
-                <p className="text-xs md:text-sm font-black text-slate-900 dark:text-slate-100">{selectedJob?.salary ? formatSalary(selectedJob.salary) : 'Competitive'}</p>
+              <div className="p-3 bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-white/[0.04] flex flex-col items-center justify-center text-center">
+                <Building2 className="w-4 h-4 text-indigo-500 mb-1" />
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Openings</span>
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 mt-0.5">{selectedJob?.openings ? `${selectedJob.openings} Seats` : 'Multiple'}</span>
               </div>
             </div>
 
-            <div className="space-y-4">
-              {/* Eligibility Section */}
-              <div className="space-y-2">
-                <h4 className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Eligibility Criteria</h4>
-                <div className="grid grid-cols-1 gap-2">
-                  {selectedJob && (
-                    <>
-                      <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/[0.02] rounded-xl border border-slate-100 dark:border-white/5">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Minimum CGPA</span>
-                        <span className={cn(
-                          "text-xs font-black",
-                          profile?.cgpa >= (selectedJob.minCgpa || 0) ? "text-emerald-500" : "text-rose-500"
-                        )}>
-                          {selectedJob.minCgpa || 'N/A'}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-white/[0.02] rounded-xl border border-slate-100 dark:border-white/5">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Max Backlogs</span>
-                        <span className={cn(
-                          "text-xs font-black",
-                          profile?.activeBacklogs <= (selectedJob.maxBacklogs ?? 99) ? "text-emerald-500" : "text-rose-500"
-                        )}>
-                          {selectedJob.maxBacklogs ?? 'No limit'}
-                        </span>
-                      </div>
-                    </>
-                  )}
-                </div>
-                {selectedJob && !checkEligibility(selectedJob).eligible && (
-                  <div className="p-3 bg-rose-500/5 border border-rose-500/20 rounded-xl mt-2">
-                    <p className="text-[9px] font-bold text-rose-500 uppercase tracking-wider mb-1">Ineligibility Reasons:</p>
-                    <ul className="space-y-1">
-                      {checkEligibility(selectedJob).reasons.map((reason, i) => (
-                        <li key={i} className="text-[10px] text-rose-600 dark:text-rose-400 font-medium flex items-center gap-1.5">
-                          <span className="w-1 h-1 rounded-full bg-rose-400"></span>
-                          {reason}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+            {/* Eligibility Report Section */}
+            <div className="space-y-2.5">
+              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/[0.04] pb-2">
+                <h4 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Eligibility Status</h4>
+                {selectedJob && (
+                  <span className={cn(
+                    "text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-none border",
+                    checkEligibility(selectedJob).eligible 
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" 
+                      : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
+                  )}>
+                    {checkEligibility(selectedJob).eligible ? (
+                      <>
+                        <CheckCircle2 size={10} className="text-emerald-500" />
+                        Eligible to Apply
+                      </>
+                    ) : (
+                      <>
+                        <XCircle size={10} className="text-rose-500" />
+                        Ineligible
+                      </>
+                    )}
+                  </span>
                 )}
               </div>
 
-              <div className="space-y-2">
-                <h4 className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Required Skills</h4>
-                <div className="flex flex-wrap gap-2">
-                  {selectedJob?.job?.skills?.map((skill) => (
-                    <Badge key={skill.id} variant="secondary" className="bg-slate-100 dark:bg-white/5 text-slate-600 dark:text-slate-400 border-none px-3 py-1 text-[10px] font-bold">
-                      {skill.name}
-                    </Badge>
-                  ))}
-                  {(!selectedJob?.job?.skills || selectedJob.job.skills.length === 0) && (
-                    <span className="text-xs text-slate-400 italic">No specific skills listed</span>
-                  )}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 bg-slate-50/50 dark:bg-slate-900/10 rounded-xl border border-slate-100 dark:border-white/[0.03] flex flex-col justify-between">
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Academic CGPA</span>
+                  <div className="flex items-baseline justify-between mt-1.5">
+                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                      {profile?.cgpa ?? '0.0'}
+                    </span>
+                    <span className="text-[10px] font-semibold text-slate-400">
+                      Req: {selectedJob?.minCgpa || '0.0'}
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-200 dark:bg-slate-800 h-1 rounded-full mt-2 overflow-hidden">
+                    <div 
+                      className={cn(
+                        "h-full rounded-full transition-all duration-300",
+                        (profile?.cgpa || 0) >= (selectedJob?.minCgpa || 0) ? "bg-emerald-500" : "bg-rose-500"
+                      )}
+                      style={{ width: `${Math.min(100, ((profile?.cgpa || 0) / 10) * 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="p-3 bg-slate-50/50 dark:bg-slate-900/10 rounded-xl border border-slate-100 dark:border-white/[0.03] flex flex-col justify-between">
+                  <span className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Active Backlogs</span>
+                  <div className="flex items-baseline justify-between mt-1.5">
+                    <span className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                      {profile?.activeBacklogs ?? '0'}
+                    </span>
+                    <span className="text-[10px] font-semibold text-slate-400">
+                      Max: {selectedJob?.maxBacklogs ?? 'None'}
+                    </span>
+                  </div>
+                  <div className="w-full bg-slate-200 dark:bg-slate-800 h-1 rounded-full mt-2 overflow-hidden">
+                    <div 
+                      className={cn(
+                        "h-full rounded-full transition-all duration-300",
+                        (profile?.activeBacklogs ?? 0) <= (selectedJob?.maxBacklogs ?? 99) ? "bg-emerald-500" : "bg-rose-500"
+                      )}
+                      style={{ width: `${(profile?.activeBacklogs ?? 0) === 0 ? 100 : Math.max(0, 100 - ((profile?.activeBacklogs ?? 0) * 20))}%` }}
+                    />
+                  </div>
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <h4 className="text-[8px] md:text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Job Description</h4>
-                <div className="bg-slate-50 dark:bg-white/[0.02] p-4 rounded-2xl border border-slate-100 dark:border-white/5 max-h-40 overflow-y-auto no-scrollbar">
-                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium text-xs md:text-sm whitespace-pre-wrap">
-                    {selectedJob?.description}
+              {selectedJob && !checkEligibility(selectedJob).eligible && (
+                <div className="p-3 bg-rose-50/60 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/30 rounded-xl">
+                  <p className="text-[10px] font-bold text-rose-600 dark:text-rose-400 uppercase tracking-wider mb-1 flex items-center gap-1">
+                    <AlertTriangle size={11} className="text-rose-500" /> Ineligibility Reasons
                   </p>
+                  <ul className="space-y-1">
+                    {checkEligibility(selectedJob).reasons.map((reason, i) => (
+                      <li key={i} className="text-xs text-rose-600 dark:text-rose-400 font-medium flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-rose-500"></span>
+                        {reason}
+                      </li>
+                    ))}
+                  </ul>
                 </div>
+              )}
+            </div>
+
+            {/* Required Skills */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Required Skills</h4>
+              <div className="flex flex-wrap gap-1.5">
+                {selectedJob?.job?.skills?.map((skill) => (
+                  <Badge key={skill.id} variant="secondary" className="bg-slate-100/80 dark:bg-white/5 text-slate-600 dark:text-slate-400 border-none px-2.5 py-1 text-xs font-semibold rounded-lg shadow-none">
+                    {skill.name}
+                  </Badge>
+                ))}
+                {(!selectedJob?.job?.skills || selectedJob.job.skills.length === 0) && (
+                  <span className="text-xs text-slate-400 italic">No specific skills listed</span>
+                )}
               </div>
             </div>
 
+            {/* Job Description */}
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">Job Description</h4>
+              <div className="bg-slate-50/50 dark:bg-slate-900/10 p-4 rounded-xl border border-slate-100 dark:border-white/5 max-h-36 overflow-y-auto custom-scrollbar">
+                <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-xs md:text-sm whitespace-pre-wrap font-medium">
+                  {selectedJob?.description}
+                </p>
+              </div>
+            </div>
+
+            {/* Action Button */}
             <div className="pt-2">
               <Button
-                className="w-full !bg-blue-600 !text-white py-6 rounded-2xl font-black text-sm uppercase tracking-widest shadow-xl shadow-blue-500/30 hover:scale-[1.01] active:scale-[0.99] transition-all border-none"
-                onClick={() => {
-                  setIsDetailsModalOpen(false);
-                  setApplyStep('resume');
-                  setSelectedResumeOption('latest');
-                  setIsApplyModalOpen(true);
-                }}
+                className={cn(
+                  "w-full h-11 md:h-12 text-xs md:text-sm font-semibold tracking-wider uppercase rounded-xl transition-all duration-300 border shadow-md",
+                  appliedJobIds.has(Number(selectedJob?.id))
+                    ? "bg-emerald-500/10 dark:bg-emerald-500/20 border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 cursor-not-allowed shadow-none"
+                    : !isApproved 
+                    ? "bg-amber-500/10 text-amber-600 border-amber-500/20 cursor-not-allowed shadow-none"
+                    : !checkEligibility(selectedJob).eligible
+                    ? "bg-rose-500/10 text-rose-500 border-rose-500/20 cursor-not-allowed shadow-none"
+                    : "bg-indigo-600 hover:bg-indigo-700 text-white border-transparent shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:scale-[1.01] active:scale-[0.99]"
+                )}
+                onClick={handleApply}
                 disabled={isApplying || !selectedJob || appliedJobIds.has(Number(selectedJob.id)) || !checkEligibility(selectedJob).eligible || !isApproved}
               >
-                {(selectedJob && appliedJobIds.has(Number(selectedJob.id))) ? 'Already Applied' : !isApproved ? 'Account Pending Approval' : (selectedJob && !checkEligibility(selectedJob).eligible) ? 'Not Eligible to Apply' : 'Start Application'}
+                {isApplying ? (
+                  <Loader size="sm" />
+                ) : (selectedJob && appliedJobIds.has(Number(selectedJob.id))) ? (
+                  <span className="flex items-center justify-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+                    <CheckCircle2 size={15} className="text-emerald-500 shrink-0" />
+                    Already Applied
+                  </span>
+                ) : !isApproved ? (
+                  'Account Pending Approval'
+                ) : (selectedJob && !checkEligibility(selectedJob).eligible) ? (
+                  'Not Eligible to Apply'
+                ) : (
+                  'Confirm Application'
+                )}
               </Button>
             </div>
           </div>

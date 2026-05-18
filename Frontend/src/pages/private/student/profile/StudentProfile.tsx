@@ -282,52 +282,52 @@ const StudentProfile = () => {
             <div className="student-hero-texture"></div>
             <div className="student-hero-overlay"></div>
 
-            <div className="relative z-10">
-              <div className="flex flex-col md:flex-row md:items-end gap-6 md:gap-10">
-                {/* Initials Badge - Refined sizing */}
-                <div className="h-20 w-20 md:h-32 md:w-32 rounded-[2rem] bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center shadow-2xl shrink-0 group-hover:scale-105 transition-transform duration-500">
-                  <span className="text-3xl md:text-5xl font-black text-white tracking-tighter">
+            <div className="relative z-10 w-full">
+              <div className="flex flex-col md:flex-row md:items-end gap-6 md:gap-10 w-full">
+                {/* Initials Badge - Refined sizing and contrast */}
+                <div className="h-20 w-20 md:h-32 md:w-32 rounded-[2rem] bg-indigo-600/10 dark:bg-white/20 backdrop-blur-xl border border-indigo-500/20 dark:border-white/30 flex items-center justify-center shadow-2xl shrink-0 group-hover:scale-105 transition-transform duration-500">
+                  <span className="text-3xl md:text-5xl font-black text-indigo-600 dark:text-white tracking-tighter">
                     {profile.name ? profile.name.split(' ').filter(Boolean).map((n: string) => n[0]).join('') : 'ST'}
                   </span>
                 </div>
 
-                <div className="flex-1 min-w-0 space-y-4">
-                  <div className="space-y-2">
+                <div className="flex-1 min-w-0 space-y-4 w-full">
+                  <div className="space-y-2 w-full">
                     <div className="flex flex-wrap items-center gap-4">
-                      <h1 className="hero-title !mt-0 !text-2xl md:!text-4xl drop-shadow-lg text-white">
+                      <h1 className="student-hero-title !mt-0 !text-2xl md:!text-4xl drop-shadow-sm text-slate-900 dark:text-white break-words">
                         {profile.name}
                       </h1>
-                      <div className="inline-flex items-center gap-1.5 bg-emerald-500 text-white px-2.5 py-1 rounded-full text-[9px] font-black shadow-lg shadow-emerald-500/20 uppercase tracking-widest">
+                      <div className="inline-flex items-center gap-1.5 bg-emerald-500 text-white px-2.5 py-1 rounded-full text-[9px] font-black shadow-lg shadow-emerald-500/20 uppercase tracking-widest shrink-0">
                         <CheckCircle className="h-2.5 w-2.5" />
                         Verified
                       </div>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
-                      <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-white font-bold text-[9px] md:text-xs">
-                        <Building2 className="h-3.5 w-3.5 text-blue-300" />
-                        {profile.stats?.department || 'Department Not Set'}
+                    <div className="flex flex-wrap items-center gap-3 w-full">
+                      <div className="flex items-center gap-2 bg-indigo-600/5 dark:bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-indigo-600/10 dark:border-white/20 text-slate-700 dark:text-white font-bold text-[9px] md:text-xs min-w-0 max-w-full">
+                        <Building2 className="h-3.5 w-3.5 text-indigo-600 dark:text-blue-300 shrink-0" />
+                        <span className="truncate">{profile.stats?.department || 'Department Not Set'}</span>
                       </div>
-                      <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-white font-bold text-[9px] md:text-xs">
-                        <Calendar className="h-3.5 w-3.5 text-indigo-200" />
-                        Batch {profile.stats?.passingYear || '20xx'}
+                      <div className="flex items-center gap-2 bg-indigo-600/5 dark:bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-indigo-600/10 dark:border-white/20 text-slate-700 dark:text-white font-bold text-[9px] md:text-xs min-w-0 max-w-full">
+                        <Calendar className="h-3.5 w-3.5 text-indigo-600 dark:text-indigo-200 shrink-0" />
+                        <span className="truncate">Batch {profile.stats?.passingYear || '20xx'}</span>
                       </div>
-                      <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-white font-bold text-[9px] md:text-xs">
-                        <Mail className="h-3.5 w-3.5 text-amber-200" />
-                        {profile.email}
+                      <div className="flex items-center gap-2 bg-indigo-600/5 dark:bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-indigo-600/10 dark:border-white/20 text-slate-700 dark:text-white font-bold text-[9px] md:text-xs min-w-0 max-w-full">
+                        <Mail className="h-3.5 w-3.5 text-indigo-600 dark:text-amber-200 shrink-0" />
+                        <span className="truncate">{profile.email}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-6 md:gap-10 pt-2">
+                  <div className="flex flex-wrap items-center gap-6 md:gap-10 pt-2 w-full">
                     {profile.location && (
-                      <div className="flex items-center gap-3 group/loc cursor-pointer">
-                        <div className="p-2 rounded-xl bg-white/10 text-white border border-white/20 group-hover/loc:bg-white/20 transition-all">
+                      <div className="flex items-center gap-3 group/loc cursor-pointer min-w-0 max-w-full">
+                        <div className="p-2 rounded-xl bg-indigo-600/5 dark:bg-white/10 text-indigo-600 dark:text-white border border-indigo-600/10 dark:border-white/20 group-hover/loc:bg-indigo-600/10 dark:group-hover/loc:bg-white/20 transition-all shrink-0">
                           <MapPin className="h-4 w-4" />
                         </div>
-                        <div className="space-y-0.5">
-                          <p className="text-[8px] font-black uppercase tracking-[0.2em] text-white/60">Location</p>
-                          <p className="text-xs md:text-sm font-bold text-white tracking-wide">{profile.location}</p>
+                        <div className="space-y-0.5 min-w-0">
+                          <p className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-white/60">Location</p>
+                          <p className="text-xs md:text-sm font-bold text-slate-800 dark:text-white tracking-wide truncate">{profile.location}</p>
                         </div>
                       </div>
                     )}
@@ -338,7 +338,7 @@ const StudentProfile = () => {
                   <Button
                     onClick={() => isApproved && setShowProfileEditDialog(true)}
                     disabled={!isApproved}
-                    className="w-full md:w-auto bg-white/20 hover:bg-white/30 backdrop-blur-xl text-white border border-white/30 rounded-2xl px-6 h-11 md:h-12 font-bold shadow-2xl transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-2 text-xs md:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full md:w-auto bg-indigo-600 hover:bg-indigo-700 dark:bg-white/20 dark:hover:bg-white/30 backdrop-blur-xl text-white border border-indigo-500/20 dark:border-white/30 rounded-2xl px-6 h-11 md:h-12 font-bold shadow-2xl transition-all hover:scale-[1.05] active:scale-[0.95] flex items-center justify-center gap-2 text-xs md:text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Edit3 className="h-4 w-4" />
                     Edit Profile

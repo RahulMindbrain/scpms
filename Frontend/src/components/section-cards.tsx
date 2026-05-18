@@ -6,8 +6,9 @@ import { Users, TrendingUp, GraduationCap, Building2 } from "lucide-react"
 interface SectionCardsProps {
   totalPlaced: number;
   avgSalary: number;
-  totalStudents: number;
+  totalStudents?: number;
   totalDepartments: number;
+  hideStudents?: boolean;
 }
 
 const cards = [
@@ -57,12 +58,19 @@ const cards = [
   },
 ]
 
-export function SectionCards({ totalPlaced, avgSalary, totalStudents, totalDepartments }: SectionCardsProps) {
+export function SectionCards({ 
+  totalPlaced, 
+  avgSalary, 
+  totalStudents = 0, 
+  totalDepartments, 
+  hideStudents = false 
+}: SectionCardsProps) {
   const values = { totalPlaced, avgSalary, totalStudents, totalDepartments }
+  const activeCards = hideStudents ? cards.filter(c => c.key !== "totalStudents") : cards;
 
   return (
-    <div className="grid grid-cols-1 gap-6 @xl/main:grid-cols-2 @5xl/main:grid-cols-4">
-      {cards.map(({ label, sub, footer, icon: Icon, iconBg, key, format }) => {
+    <div className={`grid grid-cols-1 gap-6 @xl/main:grid-cols-2 ${hideStudents ? "@5xl/main:grid-cols-3" : "@5xl/main:grid-cols-4"}`}>
+      {activeCards.map(({ label, sub, footer, icon: Icon, iconBg, key, format }) => {
         const glowClass = 
           key === "totalPlaced" ? "stat-glow-indigo" :
           key === "avgSalary" ? "stat-glow-emerald" :

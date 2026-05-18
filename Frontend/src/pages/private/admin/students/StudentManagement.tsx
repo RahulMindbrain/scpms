@@ -66,6 +66,10 @@ const StudentManagement: React.FC = () => {
       return {
         id: s.id,
         name: s.firstname ? `${s.firstname} ${s.lastname || ''}` : 'Unknown',
+        email: s.email || '',
+        cgpa: s.student?.cgpa !== undefined && s.student?.cgpa !== null ? s.student.cgpa : 'N/A',
+        passingYear: s.student?.passingYear || 'N/A',
+        year: s.student?.year || 'N/A',
         dept: departmentName,
         deptId: s.student?.department?.id || null,
         verified: isVerified,
@@ -213,7 +217,7 @@ const StudentManagement: React.FC = () => {
       {/* Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
-          { label: "Total Students", value: students.length, icon: Users, color: "indigo" },
+          { label: "Total Students", value: reduxStudents.length + reduxInactiveStudents.length, icon: Users, color: "indigo" },
           { label: "Verified Students", value: reduxStudents.length, icon: CheckCircle2, color: "emerald" },
           { label: "Pending Verification", value: reduxInactiveStudents.length, icon: UserCheck, color: "amber" },
           { label: "Rejected Applications", value: students.filter((s: any) => s.status === 'rejected').length, icon: XCircle, color: "rose" },
@@ -286,7 +290,10 @@ const StudentManagement: React.FC = () => {
         <Table className="saas-table">
           <TableHeader>
             <TableRow>
-              <TableHead className="pl-8">Student Identity</TableHead>
+              <TableHead className="pl-8">Student Info</TableHead>
+              <TableHead>Department & Year</TableHead>
+              <TableHead className="text-center">CGPA</TableHead>
+              <TableHead className="text-center">Passing Year</TableHead>
               <TableHead className="text-center">Verification Status</TableHead>
             </TableRow>
           </TableHeader>
@@ -296,10 +303,24 @@ const StudentManagement: React.FC = () => {
                 <TableCell className="py-6 pl-8">
                   <div className="flex flex-col">
                     <span className="font-bold text-base text-foreground tracking-tight">{student.name}</span>
-                    <span className="text-xs text-muted-foreground font-medium">{student.dept || "Department Not Assigned"}</span>
+                    <span className="text-xs text-muted-foreground font-medium">{student.email}</span>
                   </div>
                 </TableCell>
-                <TableCell className="text-center">
+                <TableCell className="py-6">
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-sm text-foreground">{student.dept || "Department Not Assigned"}</span>
+                    <span className="text-xs text-muted-foreground font-medium">Year {student.year}</span>
+                  </div>
+                </TableCell>
+                <TableCell className="py-6 text-center">
+                  <span className="font-bold text-sm bg-primary/5 text-primary px-3 py-1 rounded-lg border border-primary/10">
+                    {student.cgpa}
+                  </span>
+                </TableCell>
+                <TableCell className="py-6 text-center text-sm font-semibold text-muted-foreground">
+                  {student.passingYear}
+                </TableCell>
+                <TableCell className="py-6 text-center">
                   <div className="flex items-center justify-center gap-3">
                     {student.status === 'pending' ? (
                       <>

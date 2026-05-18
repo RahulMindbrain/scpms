@@ -391,7 +391,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                 </div>
 
                 <div className="flex-1">
-                   <p className="text-sm font-black text-foreground mb-0.5">{formData.resumeUrl ? 'Document Synced' : 'Awaiting Document'}</p>
+                   <p className="text-sm font-black text-foreground mb-0.5">{formData.resumeUrl ? 'PDF Synced' : 'Awaiting Document'}</p>
                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{formData.resumeUrl ? 'Cloud reference active' : 'PDF format required (Max 10MB)'}</p>
                 </div>
 
@@ -403,7 +403,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                   disabled={isUploading}
                 >
                   {isUploading ? <Loader size="sm" /> : <Upload className="size-3.5" />}
-                  {formData.resumeUrl ? "Replace Asset" : "Push Document"}
+                  {formData.resumeUrl ? "Replace PDF" : "Push PDF"}
                 </Button>
               </div>
             </div>

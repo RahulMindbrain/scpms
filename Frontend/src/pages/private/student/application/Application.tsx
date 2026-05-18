@@ -19,6 +19,15 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent } from "@/components/ui/card";
 import {StudentPageLayout} from '@/components/layout/StudentPageLayout';
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from '@/components/ui/pagination';
 type Status = 'APPLIED' | 'SHORTLISTED' | 'SELECTED' | 'REJECTED' | 'OFFER_ACCEPTED' | 'OFFER_REJECTED' | 'WITHDRAWN' | 'NOT_ELIGIBLE';
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bgColor: string; icon: any; shadow: string; accent: string }> = {
@@ -136,7 +145,7 @@ const ApplicationCard = ({
 }) => {
   const status = app.status as Status;
   const isSelected = status === 'SELECTED';
-  const isRejected = status === 'REJECTED';
+  const isRejected = ['REJECTED', 'OFFER_REJECTED', 'WITHDRAWN', 'NOT_ELIGIBLE'].includes(status);
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.APPLIED;
 
   return (
@@ -311,8 +320,34 @@ const ApplicationCard = ({
                           <h4 className="text-[9px] font-black uppercase tracking-widest">Final Outcome</h4>
                         </div>
                         <p className="text-[11px] text-rose-800/80 dark:text-rose-200/60 leading-relaxed font-medium">
-                          {app.reason || "The process for this role has been finalized. Your profile remains in our talent network."}
+                          {status === 'OFFER_REJECTED' 
+                            ? "You have declined the job offer for this position." 
+                            : status === 'WITHDRAWN'
+                            ? "This application has been withdrawn."
+                            : status === 'NOT_ELIGIBLE'
+                            ? `You were not eligible for this position: ${app.reason || "does not meet requirements"}.`
+                            : app.reason || "The process for this role has been finalized. Your profile remains in our talent network."
+                          }
                         </p>
+                      </div>
+                    ) : status === 'OFFER_ACCEPTED' ? (
+                      <div className="p-5 rounded-3xl bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10 h-full">
+                        <div className="flex items-center gap-2 mb-3 text-emerald-600 dark:text-emerald-400">
+                          <ShieldCheck size={14} className="text-emerald-500" />
+                          <h4 className="text-[9px] font-black uppercase tracking-widest text-emerald-600 dark:text-emerald-400">Offer Accepted</h4>
+                        </div>
+                        <p className="text-[11px] text-emerald-800/80 dark:text-emerald-200/60 leading-relaxed font-medium">
+                          Amazing! You have accepted the job offer for this position. The hiring team at {app.jobUniversity?.job?.company?.name} has been notified and will reach out to you shortly with onboarding details.
+                        </p>
+                        <div className="mt-6 flex items-center gap-3 p-3 rounded-2xl bg-white dark:bg-[#1e1f26] border border-emerald-100 dark:border-white/5">
+                          <div className="w-8 h-8 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+                            <Sparkles size={14} />
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[9px] font-black uppercase text-slate-400">Status</span>
+                            <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400">Placed 🎉</span>
+                          </div>
+                        </div>
                       </div>
                     ) : isSelected ? (
                       <div className="p-5 rounded-3xl bg-emerald-50 dark:bg-emerald-500/5 border border-emerald-100 dark:border-emerald-500/10">
@@ -408,7 +443,7 @@ const ApplicationStatus = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { id: routeApplicationId } = useParams<{ id?: string }>();
-  const { applications = [], loading } = useSelector((state: RootState) => state.student);
+  const { applications = [], loading, meta, statusCounts = [] } = useSelector((state: RootState) => state.student);
   const { user } = useSelector((state: RootState) => state.auth);
   const isApproved = user?.status === 'ACTIVE';
 
@@ -416,10 +451,22 @@ const ApplicationStatus = () => {
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [updatingId, setUpdatingId] = useState<number | null>(null);
+  const [page, setPage] = useState(1);
 
+  // Sync applications from the server based on filters and current page
   useEffect(() => {
-    dispatch(fetchJobApplications({}));
-  }, [dispatch]);
+    let statusParam: string | undefined = undefined;
+    if (activeFilter === "Shortlisted") statusParam = "SHORTLISTED";
+    else if (activeFilter === "Selected") statusParam = "SELECTED";
+    else if (activeFilter === "Rejected") statusParam = "REJECTED";
+
+    dispatch(fetchJobApplications({ page, limit: 10, status: statusParam }));
+  }, [dispatch, page, activeFilter]);
+
+  // Reset page when activeFilter changes to avoid overflow errors
+  useEffect(() => {
+    setPage(1);
+  }, [activeFilter, searchQuery]);
 
   useEffect(() => {
     if (routeApplicationId && applications.length > 0) {
@@ -436,23 +483,46 @@ const ApplicationStatus = () => {
       if (!matchesSearch) return false;
 
       if (activeFilter === "All") return true;
-      if (activeFilter === "Active") return !['SELECTED', 'REJECTED'].includes(app.status);
+      if (activeFilter === "Active") return !['SELECTED', 'REJECTED', 'OFFER_ACCEPTED', 'OFFER_REJECTED', 'WITHDRAWN', 'NOT_ELIGIBLE'].includes(app.status);
       if (activeFilter === "Shortlisted") return app.status === 'SHORTLISTED';
-      if (activeFilter === "Rejected") return app.status === 'REJECTED';
-      if (activeFilter === "Selected") return app.status === 'SELECTED';
+      if (activeFilter === "Rejected") return app.status === 'REJECTED' || app.status === 'OFFER_REJECTED';
+      if (activeFilter === "Selected") return app.status === 'SELECTED' || app.status === 'OFFER_ACCEPTED';
 
       return true;
     });
   }, [applications, searchQuery, activeFilter]);
 
   const stats = useMemo(() => {
-    const total = applications.length;
-    const active = applications.filter((a: any) => !['SELECTED', 'REJECTED'].includes(a.status)).length;
-    const shortlisted = applications.filter((a: any) => a.status === 'SHORTLISTED').length;
-    const selected = applications.filter((a: any) => a.status === 'SELECTED').length;
+    let total = meta?.total || applications.length;
+    let active = 0;
+    let shortlisted = 0;
+    let selected = 0;
+
+    if (statusCounts && statusCounts.length > 0) {
+      statusCounts.forEach((item: any) => {
+        const count = item._count?.status || 0;
+        const status = item.status;
+
+        if (status === 'SHORTLISTED') {
+          shortlisted += count;
+        }
+        if (status === 'SELECTED' || status === 'OFFER_ACCEPTED') {
+          selected += count;
+        }
+        if (!['SELECTED', 'REJECTED', 'OFFER_ACCEPTED', 'OFFER_REJECTED', 'WITHDRAWN', 'NOT_ELIGIBLE'].includes(status)) {
+          active += count;
+        }
+      });
+      total = statusCounts.reduce((sum: number, item: any) => sum + (item._count?.status || 0), 0);
+    } else {
+      total = applications.length;
+      active = applications.filter((a: any) => !['SELECTED', 'REJECTED', 'OFFER_ACCEPTED', 'OFFER_REJECTED', 'WITHDRAWN', 'NOT_ELIGIBLE'].includes(a.status)).length;
+      shortlisted = applications.filter((a: any) => a.status === 'SHORTLISTED').length;
+      selected = applications.filter((a: any) => a.status === 'SELECTED' || a.status === 'OFFER_ACCEPTED').length;
+    }
 
     return { total, active, shortlisted, selected };
-  }, [applications]);
+  }, [applications, statusCounts, meta]);
 
   const handleApplicationAction = async (id: number, action: "ACCEPT" | "REJECT") => {
     const loadingText = action === "ACCEPT" ? "Accepting offer..." : "Rejecting offer...";
@@ -466,9 +536,6 @@ const ApplicationStatus = () => {
         toast.info("You have already accepted this offer.");
         return;
       }
-      // Note: Logic to update old one to WITHDRAWN and new one to OFFER_ACCEPTED
-      // would normally be handled here or in the backend. 
-      // Since backend changes are prohibited, we proceed with the accept call.
       console.log(`Switching offer from application ${existingAccepted.id} to ${id}`);
     }
 
@@ -477,7 +544,13 @@ const ApplicationStatus = () => {
     try {
       setUpdatingId(id);
       await dispatch(updateApplicationStatus({ id, action })).unwrap();
-      await dispatch(fetchJobApplications({})).unwrap();
+      
+      let statusParam: string | undefined = undefined;
+      if (activeFilter === "Shortlisted") statusParam = "SHORTLISTED";
+      else if (activeFilter === "Selected") statusParam = "SELECTED";
+      else if (activeFilter === "Rejected") statusParam = "REJECTED";
+
+      await dispatch(fetchJobApplications({ page, limit: 10, status: statusParam })).unwrap();
       toast.success(successText, { id: toastId });
     } catch (err: any) {
       toast.error(err?.message || "Failed to update application status", { id: toastId });
@@ -626,6 +699,72 @@ const ApplicationStatus = () => {
             </AnimatePresence>
           </div>
         </div>
+
+        {/* Pagination Controls */}
+        {meta && meta.totalPages > 1 && (
+          <div className="mt-12 flex justify-center">
+            <Pagination>
+              <PaginationContent className="rounded-2xl border border-slate-200/60 dark:border-white/[0.08] bg-white/80 dark:bg-[#161b22]/40 p-1 shadow-sm backdrop-blur-xl">
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (page > 1) setPage(page - 1);
+                    }}
+                    href="#"
+                    className={`rounded-xl ${page === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
+                  />
+                </PaginationItem>
+
+                {[...Array(meta.totalPages)].map((_, i) => {
+                  const pageNumber = i + 1;
+                  if (
+                    pageNumber === 1 ||
+                    pageNumber === meta.totalPages ||
+                    (pageNumber >= page - 1 && pageNumber <= page + 1)
+                  ) {
+                    return (
+                      <PaginationItem key={pageNumber}>
+                        <PaginationLink
+                          href="#"
+                          isActive={page === pageNumber}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setPage(pageNumber);
+                          }}
+                          className={`rounded-xl ${page === pageNumber ? "bg-blue-600 text-white font-bold" : "cursor-pointer hover:bg-slate-100 dark:hover:bg-white/10"}`}
+                        >
+                          {pageNumber}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  } else if (
+                    pageNumber === page - 2 ||
+                    pageNumber === page + 2
+                  ) {
+                    return (
+                      <PaginationItem key={pageNumber}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    );
+                  }
+                  return null;
+                })}
+
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (page < meta.totalPages) setPage(page + 1);
+                    }}
+                    href="#"
+                    className={`rounded-xl ${page === meta.totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}`}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
 
         {/* ─── Premium Footer Banner ─── */}
         <div className="group relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] bg-white/40 dark:bg-[#161b22]/40 border border-slate-200/60 dark:border-white/[0.08] p-6 md:p-8 flex flex-col md:flex-row items-center gap-6 md:gap-8 backdrop-blur-xl shadow-sm">

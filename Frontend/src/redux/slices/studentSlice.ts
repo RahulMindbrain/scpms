@@ -43,8 +43,10 @@ const studentSlice = createSlice({
       })
       .addCase(fetchStudents.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.students = action.payload.data.data;
-        state.meta = action.payload.data.meta;
+        const allStudents = action.payload?.data?.data || [];
+        state.students = allStudents.filter((s: any) => s.status === "ACTIVE");
+        state.inactiveStudents = allStudents.filter((s: any) => s.status !== "ACTIVE");
+        state.meta = action.payload?.data?.meta || null;
       })
       .addCase(fetchStudents.rejected, (state, action) => {
         state.loading = false;
@@ -57,8 +59,10 @@ const studentSlice = createSlice({
       })
       .addCase(fetchInactiveStudents.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.inactiveStudents = action.payload.data.data;
-        if (action.payload.data.meta) {
+        const allStudents = action.payload?.data?.data || [];
+        state.students = allStudents.filter((s: any) => s.status === "ACTIVE");
+        state.inactiveStudents = allStudents.filter((s: any) => s.status !== "ACTIVE");
+        if (action.payload?.data?.meta) {
           state.meta = action.payload.data.meta;
         }
       })
@@ -148,15 +152,60 @@ const studentSlice = createSlice({
         state.error = action.payload as string;
       })
       // Apply Job
-      .addCase(applyJob.pending, (state) => {
+      .addCase(applyJob.pending, (state, action: any) => {
         state.loading = true;
+        const jobUniversityId = action.meta.arg;
+        if (jobUniversityId) {
+          const exists = state.applications.some(
+            (app: any) => Number(app.jobUniversityId || app.jobUniversity?.id) === Number(jobUniversityId)
+          );
+          if (!exists) {
+            state.applications.unshift({
+              id: `temp-${jobUniversityId}-${Date.now()}`,
+              status: "APPLIED",
+              jobUniversityId: jobUniversityId,
+              jobUniversity: {
+                id: jobUniversityId,
+              },
+              createdAt: new Date().toISOString(),
+              isOptimistic: true,
+            });
+          }
+        }
       })
-      .addCase(applyJob.fulfilled, (state) => {
+      .addCase(applyJob.fulfilled, (state, action: any) => {
         state.loading = false;
+        const newApp = action.payload?.data;
+        const jobUniversityId = action.meta.arg;
+        
+        // Remove the optimistic placeholder if it exists
+        if (jobUniversityId) {
+          state.applications = state.applications.filter(
+            (app: any) => !(app.isOptimistic && Number(app.jobUniversityId || app.jobUniversity?.id) === Number(jobUniversityId))
+          );
+        }
+
+        // Add the real application from the backend
+        if (newApp) {
+          const exists = state.applications.some(
+            (app: any) => Number(app.id) === Number(newApp.id)
+          );
+          if (!exists) {
+            state.applications.unshift(newApp);
+          }
+        }
       })
-      .addCase(applyJob.rejected, (state, action) => {
+      .addCase(applyJob.rejected, (state, action: any) => {
         state.loading = false;
         state.error = action.payload as string;
+        
+        // Rollback optimistic update
+        const jobUniversityId = action.meta.arg;
+        if (jobUniversityId) {
+          state.applications = state.applications.filter(
+            (app: any) => !(app.isOptimistic && Number(app.jobUniversityId || app.jobUniversity?.id) === Number(jobUniversityId))
+          );
+        }
       })
       // Fetch Job Applications
       .addCase(fetchJobApplications.pending, (state) => {
