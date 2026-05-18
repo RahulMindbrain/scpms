@@ -85,7 +85,7 @@ const getPostedAgo = (dateString?: string) => {
     const today = new Date();
     const diffTime = Math.abs(today.getTime() - postedDate.getTime());
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-    
+
     if (diffDays <= 0) return 'Posted today';
     if (diffDays === 1) return 'Posted 1 day ago';
     return `Posted ${diffDays} days ago`;
@@ -120,7 +120,7 @@ const JobListing = () => {
   const [selectedJob, setSelectedJob] = useState<JobUniversity | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isApplying, setIsApplying] = useState(false);
-  
+
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
@@ -145,7 +145,7 @@ const JobListing = () => {
 
   const checkEligibility = (job: JobUniversity | null) => {
     if (!job || !profile) return { eligible: true, reasons: [] };
-    
+
     const reasons: string[] = [];
     const studentCgpa = profile.cgpa ?? 0;
     const studentBacklogs = profile.activeBacklogs ?? 0;
@@ -157,12 +157,12 @@ const JobListing = () => {
     if (job.maxBacklogs !== undefined && studentBacklogs > job.maxBacklogs) {
       reasons.push(`Maximum backlogs allowed: ${job.maxBacklogs} (Your backlogs: ${studentBacklogs})`);
     }
-    
+
     const eligibleDeptIds = job.job.eligibleDepartments?.map((d: any) => d.id) || [];
     if (eligibleDeptIds.length > 0 && !eligibleDeptIds.includes(studentDeptId)) {
       reasons.push(`Your department is not eligible for this role`);
     }
-    
+
     return {
       eligible: reasons.length === 0,
       reasons
@@ -172,19 +172,19 @@ const JobListing = () => {
   const filteredJobs = useMemo(() => {
     return (normalizedJobs || []).filter((job: any) => {
       if (!job?.job) return false;
-      
+
       const matchesSearch =
         job.job.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         job.job.company?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         job.university?.name?.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       if (!matchesSearch) return false;
 
       const eligibility = checkEligibility(job);
-      
+
       if (activeTab === 'applied') return appliedJobIds.has(Number(job.id));
       if (activeTab === 'eligible') return eligibility.eligible && !appliedJobIds.has(Number(job.id));
-      
+
       // In 'all' tab, we show everything but mark them
       return true;
     });
@@ -207,7 +207,7 @@ const JobListing = () => {
     setIsApplying(true);
     setIsModalOpen(false);
     const toastId = toast.loading(`Submitting application for ${selectedJob.job.title}...`);
-    
+
     dispatch(applyJob(selectedJob.id))
       .unwrap()
       .then(() => {
@@ -231,7 +231,7 @@ const JobListing = () => {
   return (
     <StudentPageLayout>
       <div className="space-y-6 student-hero-animate fade-in slide-in-from-bottom-2 duration-500">
-        
+
         {/* Adaptive Hero Banner */}
         <div className="student-hero-banner group">
           <div className="student-hero-mesh">
@@ -241,7 +241,7 @@ const JobListing = () => {
 
           <div className="student-hero-texture"></div>
           <div className="student-hero-overlay"></div>
-          
+
           <div className="relative z-10 w-full">
             <div className="student-hero-badge">
               <span>Career Opportunities</span>
@@ -278,7 +278,7 @@ const JobListing = () => {
                 </button>
               ))}
             </div>
-            
+
             <div className="flex items-center gap-3 w-full md:w-auto">
               <div className="relative flex-1 md:w-80 group">
                 <Search
@@ -301,9 +301,9 @@ const JobListing = () => {
             {paginatedJobs.map((job: JobUniversity, idx) => {
               const isApplied = appliedJobIds.has(Number(job.id));
               const eligibility = checkEligibility(job);
-              
+
               const companyName = job.job?.company?.name ?? 'Hiring Partner';
-              
+
               return (
                 <motion.div
                   key={job.id}
@@ -316,29 +316,29 @@ const JobListing = () => {
                 >
                   <Card className="h-full border border-slate-100 dark:border-white/[0.06] bg-white dark:bg-[#161b22]/30 rounded-[1.25rem] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all duration-300 hover:border-indigo-500/20">
                     <CardContent className="p-6 flex flex-col h-full justify-between gap-5">
-                      
+
                       {/* Top Row: Logo, Title, Badge */}
                       <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-start gap-4">
+                        <div className="flex items-start gap-4 flex-1 min-w-0">
                           {/* Gradient Rounded Square Icon */}
                           <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-emerald-500 flex items-center justify-center font-bold text-lg text-white shadow-md shadow-indigo-500/10 shrink-0">
                             {getCompanyInitials(companyName)}
                           </div>
-                          
+
                           {/* Title & Company */}
-                          <div className="pt-0.5">
-                            <h3 className="text-[17px] font-bold text-slate-800 dark:text-white leading-snug tracking-tight hover:text-indigo-600 transition-colors line-clamp-1">
+                          <div className="pt-0.5 min-w-0 flex-1">
+                            <h3 className="text-[17px] font-bold text-slate-800 dark:text-white leading-snug tracking-tight hover:text-indigo-600 transition-colors truncate">
                               {job.job?.title}
                             </h3>
                             <div className="flex flex-col gap-0.5 mt-1">
                               <p className="text-sm font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1.5 truncate">
                                 <Building2 size={14} className="text-slate-400 shrink-0" />
-                                {companyName}
+                                <span className="truncate">{companyName}</span>
                               </p>
                               {job.university?.name && (
                                 <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 flex items-center gap-1 truncate">
-                                  <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700"></span>
-                                  {job.university.name} Drive
+                                  <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700 shrink-0"></span>
+                                  <span className="truncate">{job.university.name} Drive</span>
                                 </p>
                               )}
                             </div>
@@ -346,7 +346,7 @@ const JobListing = () => {
                         </div>
 
                         {/* Top-Right Pill Badge */}
-                        <div>
+                        <div className="shrink-0 mt-1">
                           {isApplied ? (
                             <span className="bg-indigo-600 text-white text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-sm whitespace-nowrap">
                               Applied
@@ -458,7 +458,7 @@ const JobListing = () => {
             >
               <ChevronLeft size={16} />
             </Button>
-            
+
             <div className="flex items-center gap-1">
               {[...Array(totalPages)].map((_, idx) => (
                 <button
@@ -467,8 +467,8 @@ const JobListing = () => {
                   className={cn(
                     "w-9 h-9 rounded-xl text-xs font-semibold transition-all shadow-sm",
                     currentPage === idx + 1
-                    ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20"
-                    : "bg-white dark:bg-[#1e1f26] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:border-indigo-500/50"
+                      ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/20"
+                      : "bg-white dark:bg-[#1e1f26] text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-white/10 hover:border-indigo-500/50"
                   )}
                 >
                   {idx + 1}
@@ -508,7 +508,7 @@ const JobListing = () => {
           maxWidth="sm:max-w-lg"
         >
           <div className="space-y-5 py-1">
-            
+
             {/* Quick Specs Grid */}
             <div className="grid grid-cols-3 gap-2.5">
               <div className="p-3 bg-slate-50 dark:bg-slate-900/30 rounded-xl border border-slate-100 dark:border-white/[0.04] flex flex-col items-center justify-center text-center">
@@ -535,8 +535,8 @@ const JobListing = () => {
                 {selectedJob && (
                   <span className={cn(
                     "text-[10px] font-semibold px-2 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-none border",
-                    checkEligibility(selectedJob).eligible 
-                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20" 
+                    checkEligibility(selectedJob).eligible
+                      ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20"
                       : "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
                   )}>
                     {checkEligibility(selectedJob).eligible ? (
@@ -566,7 +566,7 @@ const JobListing = () => {
                     </span>
                   </div>
                   <div className="w-full bg-slate-200 dark:bg-slate-800 h-1 rounded-full mt-2 overflow-hidden">
-                    <div 
+                    <div
                       className={cn(
                         "h-full rounded-full transition-all duration-300",
                         (profile?.cgpa || 0) >= (selectedJob?.minCgpa || 0) ? "bg-emerald-500" : "bg-rose-500"
@@ -587,7 +587,7 @@ const JobListing = () => {
                     </span>
                   </div>
                   <div className="w-full bg-slate-200 dark:bg-slate-800 h-1 rounded-full mt-2 overflow-hidden">
-                    <div 
+                    <div
                       className={cn(
                         "h-full rounded-full transition-all duration-300",
                         (profile?.activeBacklogs ?? 0) <= (selectedJob?.maxBacklogs ?? 99) ? "bg-emerald-500" : "bg-rose-500"
@@ -647,11 +647,11 @@ const JobListing = () => {
                   "w-full h-11 md:h-12 text-xs md:text-sm font-semibold tracking-wider uppercase rounded-xl transition-all duration-300 border shadow-md",
                   appliedJobIds.has(Number(selectedJob?.id))
                     ? "bg-emerald-500/10 dark:bg-emerald-500/20 border-emerald-500/20 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 cursor-not-allowed shadow-none"
-                    : !isApproved 
-                    ? "bg-amber-500/10 text-amber-600 border-amber-500/20 cursor-not-allowed shadow-none"
-                    : !checkEligibility(selectedJob).eligible
-                    ? "bg-rose-500/10 text-rose-500 border-rose-500/20 cursor-not-allowed shadow-none"
-                    : "bg-indigo-600 hover:bg-indigo-700 text-white border-transparent shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:scale-[1.01] active:scale-[0.99]"
+                    : !isApproved
+                      ? "bg-amber-500/10 text-amber-600 border-amber-500/20 cursor-not-allowed shadow-none"
+                      : !checkEligibility(selectedJob).eligible
+                        ? "bg-rose-500/10 text-rose-500 border-rose-500/20 cursor-not-allowed shadow-none"
+                        : "bg-indigo-600 hover:bg-indigo-700 text-white border-transparent shadow-indigo-500/20 hover:shadow-indigo-500/30 hover:scale-[1.01] active:scale-[0.99]"
                 )}
                 onClick={handleApply}
                 disabled={isApplying || !selectedJob || appliedJobIds.has(Number(selectedJob.id)) || !checkEligibility(selectedJob).eligible || !isApproved}
