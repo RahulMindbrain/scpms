@@ -44,7 +44,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             icon: <LayoutDashboard />,
           },
           { title: "Students", url: "/admin/students", icon: <Users /> },
-          { title: "Companies", url: "/admin/companies", icon: <Building2 /> },
+          // { title: "Companies", url: "/admin/companies", icon: <Building2 /> },
+          { title: "Company Requests", url: "/admin/company-requests", icon: <Building2 /> },
           {
             title: "Placement Drives",
             url: "/admin/drives",
@@ -152,22 +153,22 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             url: "/superadmin/dashboard",
             icon: <LayoutDashboard />,
           },
-            { title: "Admins", url: "/superadmin/admins", icon: <ShieldCheck /> },
+          { title: "Admins", url: "/superadmin/admins", icon: <ShieldCheck /> },
           {
             title: "Universities",
             url: "/superadmin/universities",
             icon: <Building2 />,
           },
-        
+
           {
             title: "Companies",
             url: "/superadmin/companies",
             icon: <Briefcase />,
           },
-          
+
         ],
         secondary: [
-      
+
         ],
       }
     }
