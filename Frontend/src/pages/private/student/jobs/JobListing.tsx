@@ -18,8 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchJobs, applyJob, fetchStudentProfile, fetchJobApplications } from '@/redux/thunks/studentThunk';
-import { fetchCompanies } from '@/redux/thunks/companyThunk';
+import { fetchJobs, applyJob, fetchStudentProfile, fetchJobApplications, fetchJobUniversities } from '@/redux/thunks/studentThunk';
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import { Modal } from '@/components/ui/modal';
@@ -97,10 +96,24 @@ const getPostedAgo = (dateString?: string) => {
 
 const JobListing = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { jobs, profile, applications = [], loading } = useSelector((state: RootState) => state.student);
-  const { companies: reduxCompanies = [] } = useSelector((state: RootState) => state.company);
+  const { jobs = [], jobUniversities = [], profile, applications = [], loading } = useSelector((state: RootState) => state.student);
   const { user } = useSelector((state: RootState) => state.auth);
   const isApproved = user?.status === 'ACTIVE';
+
+  // Enrich jobUniversities with full company object from show-all-jobs
+  // job-universities only has companyId; show-all-jobs has the full company { name, ... }
+  const normalizedJobs = useMemo(() => {
+    return jobUniversities.map((ju: any) => {
+      const matchedJob = jobs.find((j: any) => j.id === ju.jobId || j.id === ju.job?.id);
+      return {
+        ...ju,
+        job: {
+          ...ju.job,
+          company: matchedJob?.company ?? ju.job?.company ?? null,
+        },
+      };
+    });
+  }, [jobUniversities, jobs]);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'applied' | 'eligible'>('all');
@@ -113,9 +126,9 @@ const JobListing = () => {
   const itemsPerPage = 6;
 
   useEffect(() => {
-    dispatch(fetchJobs({ status: 'APPROVED' }));
+    dispatch(fetchJobs({}));
+    dispatch(fetchJobUniversities({}));
     dispatch(fetchJobApplications({}));
-    dispatch(fetchCompanies({ limit: 100 }));
     if (!profile) {
       dispatch(fetchStudentProfile());
     }
@@ -157,7 +170,7 @@ const JobListing = () => {
   };
 
   const filteredJobs = useMemo(() => {
-    return (jobs || []).filter((job: any) => {
+    return (normalizedJobs || []).filter((job: any) => {
       if (!job?.job) return false;
       
       const matchesSearch =
@@ -175,7 +188,7 @@ const JobListing = () => {
       // In 'all' tab, we show everything but mark them
       return true;
     });
-  }, [jobs, searchQuery, activeTab, appliedJobIds, profile]);
+  }, [normalizedJobs, searchQuery, activeTab, appliedJobIds, profile]);
 
   // Paginated data
   const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
@@ -209,11 +222,9 @@ const JobListing = () => {
       });
   };
 
-  const selectedCompanyId = selectedJob?.job?.companyId ?? (selectedJob as any)?.companyId;
-  const selectedFoundCompany = reduxCompanies.find((c: any) => c.id === selectedCompanyId);
-  const selectedCompanyName = selectedJob?.job?.company?.name ?? selectedFoundCompany?.name ?? 'Hiring Partner';
+  const selectedCompanyName = selectedJob?.job?.company?.name ?? 'Hiring Partner';
 
-  if (loading && (jobs?.length || 0) === 0) {
+  if (loading && (jobUniversities?.length || 0) === 0) {
     return <Loader text="Syncing career opportunities..." fullScreen />;
   }
 
@@ -245,7 +256,7 @@ const JobListing = () => {
         </div>
 
         {/* ─── Compact Controls Bar ─── */}
-        {(jobs?.length || 0) > 0 && (
+        {(jobUniversities?.length || 0) > 0 && (
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white/70 dark:bg-[#161b22]/30 backdrop-blur-xl p-4 rounded-2xl border border-slate-200/50 dark:border-white/[0.06] shadow-sm">
             <div className="flex items-center gap-1 bg-slate-100/80 dark:bg-[#0f172a]/60 p-1 rounded-xl border border-slate-200/10 dark:border-white/[0.02] overflow-x-auto no-scrollbar w-full md:w-auto">
               {[
@@ -291,9 +302,7 @@ const JobListing = () => {
               const isApplied = appliedJobIds.has(Number(job.id));
               const eligibility = checkEligibility(job);
               
-              const companyId = job.job?.companyId ?? (job as any).companyId;
-              const foundCompany = reduxCompanies.find((c: any) => c.id === companyId);
-              const companyName = job.job?.company?.name ?? foundCompany?.name ?? 'Hiring Partner';
+              const companyName = job.job?.company?.name ?? 'Hiring Partner';
               
               return (
                 <motion.div
