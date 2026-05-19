@@ -257,6 +257,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                       id="cgpa"
                       type="number"
                       step="0.01"
+                      min="0"
+                      max="10"
                       placeholder="0.00"
                       className={`h-13 rounded-2xl border-border/50 bg-background focus:ring-primary/20 focus:border-primary transition-all font-black tabular-nums ${errors['stats.cgpa'] ? 'border-rose-500 bg-rose-500/5' : ''}`}
                       value={formData.stats?.cgpa || ""}
@@ -270,6 +272,8 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                     <Input
                       id="year"
                       type="number"
+                      min="1"
+                      max="5"
                       className={`h-13 rounded-2xl border-border/50 bg-background focus:ring-primary/20 focus:border-primary transition-all font-black tabular-nums ${errors['stats.year'] ? 'border-rose-500 bg-rose-500/5' : ''}`}
                       value={formData.stats?.year || ""}
                       onChange={(e) => updateStat("year", e.target.value)}
@@ -282,6 +286,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                     <Input
                       id="passingYear"
                       type="number"
+                      min="2000"
                       className={`h-13 rounded-2xl border-border/50 bg-background focus:ring-primary/20 focus:border-primary transition-all font-black tabular-nums ${errors['stats.passingYear'] ? 'border-rose-500 bg-rose-500/5' : ''}`}
                       value={formData.stats?.passingYear || ""}
                       onChange={(e) => updateStat("passingYear", e.target.value)}
@@ -294,6 +299,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                     <Input
                       id="activeBacklogs"
                       type="number"
+                      min="0"
                       placeholder="0"
                       className={`h-13 rounded-2xl border-border/50 bg-background focus:ring-primary/20 focus:border-primary transition-all font-black tabular-nums ${errors['stats.activeBacklogs'] ? 'border-rose-500 bg-rose-500/5' : ''}`}
                       value={formData.stats?.activeBacklogs ?? ""}
