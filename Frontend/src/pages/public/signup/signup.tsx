@@ -382,45 +382,51 @@ useEffect(() => {
                           </div>
                         </div>
 
-                        <div className="space-y-2">
-                          <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
-                            Current Year
-                          </label>
-                          <div className="relative group">
-                            <CalendarClock
-                              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
-                              size={18}
-                            />
-                            <input
-                              name="year"
-                              value={form.year}
-                              onChange={handleChange}
-                              required
-                              placeholder="Year (e.g. 4)"
-                              className={inputClasses(false)}
-                            />
-                          </div>
-                        </div>
+                      <div className="space-y-2">
+  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
+    Current Year
+  </label>
+  <div className="relative group">
+    <CalendarClock
+      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+      size={18}
+    />
+    <input
+      type="number"
+      name="year"
+      value={form.year}
+      onChange={handleChange}
+      required
+      min="1"
+      max="10"
+      placeholder="Year (e.g. 4)"
+      className={inputClasses(false)}
+    />
+  </div>
+</div>
 
-                        <div className="space-y-2">
-                          <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
-                            Passing Year
-                          </label>
-                          <div className="relative group">
-                            <Calendar
-                              className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
-                              size={18}
-                            />
-                            <input
-                              name="passingYear"
-                              value={form.passingYear}
-                              onChange={handleChange}
-                              required
-                              placeholder="2026"
-                              className={inputClasses(false)}
-                            />
-                          </div>
-                        </div>
+<div className="space-y-2">
+  <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider ml-1">
+    Passing Year
+  </label>
+  <div className="relative group">
+    <Calendar
+      className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-600 transition-colors"
+      size={18}
+    />
+    <input
+      type="number"
+      name="passingYear"
+      value={form.passingYear}
+      onChange={handleChange}
+      required
+      min="2000"
+      max="2100"
+      placeholder="2026"
+      className={inputClasses(false)}
+    />
+  </div>
+</div>
                       </>
                     )}
 
