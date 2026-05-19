@@ -98,7 +98,7 @@ export const fetchAdminCompanyRequests = createAsyncThunk(
 export const updateAdminCompanyRequestStatus = createAsyncThunk(
   "admin/updateCompanyRequestStatus",
   async (
-    payload: { ids: number[]; status: "APPROVED" | "REJECTED" },
+    payload: { ids: number[]; status: "APPROVED" | "REJECTED"; reason?: string },
     { rejectWithValue }
   ) => {
     try {

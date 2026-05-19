@@ -14,6 +14,15 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge.tsx';
 import { Button } from '@/components/ui/button.tsx';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { fetchAdminCompanyRequests, updateAdminCompanyRequestStatus } from '@/redux/thunks/superadmin/companyUniversityThunk';
@@ -57,6 +66,9 @@ const CompanyRequests: React.FC = () => {
   const [filter, setFilter] = useState<'All' | 'PENDING' | 'APPROVED' | 'REJECTED'>('All');
   const [searchTerm, setSearchTerm] = useState('');
   const [processingId, setProcessingId] = useState<number | null>(null);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [rejectReason, setRejectReason] = useState('');
+  const [rejectingRequestId, setRejectingRequestId] = useState<number | null>(null);
 
   useEffect(() => {
     dispatch(fetchAdminCompanyRequests());
@@ -85,16 +97,21 @@ const CompanyRequests: React.FC = () => {
     });
   }, [sortedRequests, searchTerm, filter]);
 
-  const handleUpdateStatus = async (id: number, status: 'APPROVED' | 'REJECTED') => {
+  const handleUpdateStatus = async (id: number, status: 'APPROVED' | 'REJECTED', reason?: string) => {
     try {
       setProcessingId(id);
       await dispatch(
-        updateAdminCompanyRequestStatus({ ids: [id], status })
+        updateAdminCompanyRequestStatus({ ids: [id], status, reason })
       ).unwrap();
       
       toast.success(
         `Affiliation request ${status === 'APPROVED' ? 'approved' : 'rejected'} successfully.`
       );
+      if (status === 'REJECTED') {
+        setIsRejectModalOpen(false);
+        setRejectReason('');
+        setRejectingRequestId(null);
+      }
       dispatch(fetchAdminCompanyRequests());
     } catch (err: any) {
       toast.error(err || `Failed to ${status.toLowerCase()} request.`);
@@ -277,7 +294,10 @@ const CompanyRequests: React.FC = () => {
                   {request.status === 'PENDING' ? (
                     <>
                       <Button
-                        onClick={() => handleUpdateStatus(request.id, 'REJECTED')}
+                        onClick={() => {
+                          setRejectingRequestId(request.id);
+                          setIsRejectModalOpen(true);
+                        }}
                         disabled={processingId === request.id}
                         variant="outline"
                         className="flex-1 h-10 border-rose-500/20 hover:bg-rose-500/10 hover:text-rose-500 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all text-muted-foreground"
@@ -326,6 +346,43 @@ const CompanyRequests: React.FC = () => {
           </div>
         )}
       </div>
+
+      <Dialog open={isRejectModalOpen} onOpenChange={setIsRejectModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Reject Affiliation Request</DialogTitle>
+            <DialogDescription>
+              Please provide a reason for rejecting this company's affiliation request. This will be visible to the company.
+            </DialogDescription>
+          </DialogHeader>
+          <Textarea
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+            placeholder="Enter reason for rejection..."
+            className="min-h-[100px]"
+          />
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setIsRejectModalOpen(false);
+                setRejectReason('');
+                setRejectingRequestId(null);
+              }}
+              disabled={processingId === rejectingRequestId}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => rejectingRequestId && handleUpdateStatus(rejectingRequestId, 'REJECTED', rejectReason)}
+              disabled={!rejectReason.trim() || processingId === rejectingRequestId}
+            >
+              Reject Request
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminPageLayout>
   );
 };
