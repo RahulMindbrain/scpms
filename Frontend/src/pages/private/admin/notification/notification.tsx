@@ -135,7 +135,7 @@ const AdminNotificationPage = () => {
   return (
     <AdminPageLayout>
       <PageHeader
-        title="Intelligence Feed"
+        title="Notifications Feed"
         description="Unified log of system-wide events, placement milestones, and tactical alerts."
         badge="Live Signals"
         icon={Bell}
