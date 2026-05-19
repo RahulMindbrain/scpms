@@ -37,9 +37,14 @@ export const updateJobUniversityStatusController = async (
   try {
     const user = res.locals.user;
 
-    const { ids, status } = req.body;
+    const { ids, status, reason } = req.body;
 
-    const result = await updateJobUniversityStatusService(ids, status, user.id);
+    const result = await updateJobUniversityStatusService(
+      ids,
+      status,
+      user.id,
+      reason,
+    );
 
     return res.status(200).json({
       message: "Status updated",
