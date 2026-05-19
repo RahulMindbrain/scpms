@@ -7,7 +7,15 @@ import {
   Sparkles,
   ArrowUpRight,
   RefreshCw,
+  Info,
 } from "lucide-react";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
@@ -101,17 +109,23 @@ const UniversityRequest = () => {
         );
       case "REJECTED":
         return (
-          <div className="flex flex-col items-center gap-1.5">
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-destructive/10 border border-destructive/20 text-destructive text-[10px] font-black uppercase tracking-wider">
-              <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
-              Rejected
-            </div>
-            {req.reason && (
-              <span className="text-[10px] text-destructive/80 font-semibold max-w-[150px] text-center" title={req.reason}>
-                Reason: {req.reason}
-              </span>
-            )}
-          </div>
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400 text-[10px] font-black uppercase tracking-wider cursor-help hover:bg-rose-500/20 transition-colors">
+                  <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                  Rejected
+                  {req.reason && <Info size={12} className="ml-0.5 opacity-70" />}
+                </div>
+              </TooltipTrigger>
+              {req.reason && (
+                <TooltipContent side="top" align="center" className="max-w-[250px] bg-rose-600 text-white border-rose-500/20 shadow-xl shadow-rose-500/20 p-3">
+              
+                  <p className="text-xs font-medium leading-relaxed">{req.reason}</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         );
       default:
         return (
