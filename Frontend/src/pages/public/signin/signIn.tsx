@@ -190,11 +190,11 @@ const SignIn: React.FC = () => {
         </motion.div>
 
         {/* Subtle Bottom Link */}
-        <div className="absolute bottom-12 text-center w-full px-6">
+        {/* <div className="absolute bottom-12 text-center w-full px-6">
           <p className="text-[10px] text-slate-400 dark:text-slate-600 font-medium uppercase tracking-[0.15em]">
             Secure Enterprise Gateway • AES-256 Encryption
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );
