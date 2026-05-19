@@ -394,15 +394,21 @@ const AdminJobManagement: React.FC = () => {
                   </DropdownMenu>
                 </div>
 
-                {/* Job Title & University Header */}
+                {/* Job Title & Company Header */}
                 <div className="mb-4">
                   <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-50 group-hover:text-primary transition-colors truncate tracking-tight">
                     {row.job?.title ?? '—'}
                   </h3>
-                  <p className="text-[10px] text-slate-400 dark:text-slate-555 font-bold uppercase tracking-wider mt-1 flex items-center gap-1.5 truncate">
-                    <Building size={11} className="text-slate-350 dark:text-slate-650 shrink-0" />
-                    <span className="truncate">{row.university?.name}</span>
-                  </p>
+                  <div className="flex flex-col gap-1 mt-1.5">
+                    <p className="text-[10px] text-slate-400 dark:text-slate-555 font-bold uppercase tracking-wider flex items-center gap-1.5 truncate">
+                      <Building2 size={11} className="text-primary/70 shrink-0" />
+                      <span className="truncate text-slate-600 dark:text-slate-300">{row.displayCompany?.name ?? 'Unknown Company'}</span>
+                    </p>
+                    <p className="text-[10px] text-slate-400 dark:text-slate-555 font-bold uppercase tracking-wider flex items-center gap-1.5 truncate">
+                      <Building size={11} className="text-slate-350 dark:text-slate-650 shrink-0" />
+                      <span className="truncate">{row.university?.name}</span>
+                    </p>
+                  </div>
                 </div>
 
                 {/* SaaS Metrics Info Grid */}
