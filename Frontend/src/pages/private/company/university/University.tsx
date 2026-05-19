@@ -90,8 +90,8 @@ const UniversityRequest = () => {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
+  const getStatusBadge = (req: any) => {
+    switch (req.status) {
       case "APPROVED":
         return (
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider">
@@ -101,9 +101,16 @@ const UniversityRequest = () => {
         );
       case "REJECTED":
         return (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-destructive/10 border border-destructive/20 text-destructive text-[10px] font-black uppercase tracking-wider">
-            <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
-            Rejected
+          <div className="flex flex-col items-center gap-1.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-destructive/10 border border-destructive/20 text-destructive text-[10px] font-black uppercase tracking-wider">
+              <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
+              Rejected
+            </div>
+            {req.reason && (
+              <span className="text-[10px] text-destructive/80 font-semibold max-w-[150px] text-center" title={req.reason}>
+                Reason: {req.reason}
+              </span>
+            )}
           </div>
         );
       default:
@@ -229,7 +236,7 @@ const UniversityRequest = () => {
                           </td>
                           <td className="text-center">
                             {req ? (
-                              getStatusBadge(req.status)
+                              getStatusBadge(req)
                             ) : (
                               <span className="text-[10px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">
                                 Not Connected
