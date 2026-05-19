@@ -345,7 +345,7 @@ const AdminJobManagement: React.FC = () => {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6">
         {loading ? (
           <div className="col-span-full py-32 flex justify-center">
             <Loader text="Retrieving job listings..." />
@@ -359,14 +359,14 @@ const AdminJobManagement: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                whileHover={{ y: -6, transition: { duration: 0.2 } }}
-                className="group relative bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/60 dark:border-slate-800/80 shadow-[0_4px_25px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_45px_rgba(37,99,235,0.08)] p-6 flex flex-col transition-all duration-300 overflow-hidden h-[560px]"
+                whileHover={{ y: -4, transition: { duration: 0.2 } }}
+                className="group relative bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 shadow-[0_2px_12px_rgba(0,0,0,0.015)] hover:shadow-[0_12px_32px_rgba(37,99,235,0.06)] p-4 sm:p-5 flex flex-col transition-all duration-300 overflow-hidden h-full"
               >
                 {/* Status Badge & Actions Header */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
                     <span className={cn(
-                      "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[9px] font-bold uppercase tracking-wider",
+                      "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider",
                       row.status === 'PENDING' ? "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400" :
                       row.status === 'APPROVED' ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" :
                       "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-450"
@@ -382,12 +382,12 @@ const AdminJobManagement: React.FC = () => {
 
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="size-8 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 shrink-0">
-                        <MoreVertical className="size-4 text-slate-400 dark:text-slate-500" />
+                      <Button variant="ghost" size="icon" className="size-7 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 shrink-0">
+                        <MoreVertical className="size-3.5 text-slate-400 dark:text-slate-500" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="rounded-2xl border-slate-100 dark:border-slate-800 shadow-2xl p-1.5 bg-white dark:bg-slate-900">
-                      <DropdownMenuItem className="text-[10px] font-black uppercase tracking-widest text-rose-500 cursor-pointer p-2.5 rounded-xl hover:bg-rose-50 dark:hover:bg-rose-500/10">
+                    <DropdownMenuContent align="end" className="rounded-xl border-slate-100 dark:border-slate-800 shadow-2xl p-1 bg-white dark:bg-slate-900">
+                      <DropdownMenuItem className="text-[10px] font-black uppercase tracking-widest text-rose-500 cursor-pointer p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10">
                         Delete Record
                       </DropdownMenuItem>
                     </DropdownMenuContent>
@@ -395,92 +395,100 @@ const AdminJobManagement: React.FC = () => {
                 </div>
 
                 {/* Job Title & Company Header */}
-                <div className="mb-4">
-                  <h3 className="text-base font-extrabold text-slate-850 dark:text-slate-50 group-hover:text-primary transition-colors truncate tracking-tight">
+                <div className="mb-3">
+                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-50 group-hover:text-primary transition-colors line-clamp-1 tracking-tight" title={row.job?.title ?? '—'}>
                     {row.job?.title ?? '—'}
                   </h3>
-                  <div className="flex flex-col gap-1 mt-1.5">
-                    <p className="text-[10px] text-slate-400 dark:text-slate-555 font-bold uppercase tracking-wider flex items-center gap-1.5 truncate">
-                      <Building2 size={11} className="text-primary/70 shrink-0" />
-                      <span className="truncate text-slate-600 dark:text-slate-300">{row.displayCompany?.name ?? 'Unknown Company'}</span>
-                    </p>
-                    <p className="text-[10px] text-slate-400 dark:text-slate-555 font-bold uppercase tracking-wider flex items-center gap-1.5 truncate">
-                      <Building size={11} className="text-slate-350 dark:text-slate-650 shrink-0" />
-                      <span className="truncate">{row.university?.name}</span>
-                    </p>
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-1 text-xs">
+                    <span className="font-semibold text-slate-700 dark:text-slate-300 truncate max-w-[150px]" title={row.displayCompany?.name}>
+                      {row.displayCompany?.name ?? 'Unknown Company'}
+                    </span>
+                    <span className="text-slate-300 dark:text-slate-700">•</span>
+                    <span className="text-slate-500 dark:text-slate-400 text-[11px] truncate max-w-[150px]" title={row.university?.name}>
+                      {row.university?.name}
+                    </span>
                   </div>
                 </div>
 
-                {/* SaaS Metrics Info Grid */}
-                <div className="grid grid-cols-2 gap-2 mb-4">
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/50 text-[10px] font-bold text-slate-500 dark:text-slate-400 truncate">
-                    <MapPin className="size-3.5 text-slate-400 shrink-0" />
-                    <span className="truncate">{row.job?.location || 'Remote'}</span>
+                {/* Key Info Row */}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 mb-3 text-[11px] font-semibold text-slate-650 dark:text-slate-350">
+                  <div className="flex items-center gap-1 bg-slate-50 dark:bg-slate-800/40 px-2 py-0.5 rounded border border-slate-100 dark:border-slate-800/60">
+                    <MapPin className="size-3 text-slate-400 shrink-0" />
+                    <span>{row.job?.location || 'Remote'}</span>
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-500/[0.04] border border-emerald-500/10 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 truncate">
-                    <IndianRupee className="size-3.5 text-emerald-500 shrink-0" />
-                    <span className="truncate">{(row.salary / 100000).toFixed(1)} LPA</span>
+                  <div className="flex items-center gap-1 bg-emerald-50/50 dark:bg-emerald-950/20 px-2 py-0.5 rounded border border-emerald-100/50 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400">
+                    <IndianRupee className="size-3 shrink-0" />
+                    <span>{(row.salary / 100000).toFixed(1)} LPA</span>
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-blue-50 dark:bg-blue-500/[0.04] border border-blue-500/10 text-[10px] font-bold text-blue-600 dark:text-blue-400 truncate">
-                    <Calendar className="size-3.5 text-blue-500 shrink-0" />
-                    <span className="truncate">{new Date(row.sentAt).toLocaleDateString()}</span>
+                  <div className="flex items-center gap-1 bg-blue-50/50 dark:bg-blue-950/20 px-2 py-0.5 rounded border border-blue-100/50 dark:border-blue-900/30 text-blue-700 dark:text-blue-400">
+                    <Users className="size-3 shrink-0" />
+                    <span>{row.openings} Openings</span>
                   </div>
-                  <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-50 dark:bg-amber-500/[0.04] border border-amber-500/10 text-[10px] font-bold text-amber-600 dark:text-amber-400 truncate">
-                    <Users className="size-3.5 text-amber-500 shrink-0" />
-                    <span className="truncate">{row.openings} Openings</span>
+                  <div className="flex items-center gap-1 text-slate-450 dark:text-slate-500 ml-auto text-[10px] font-normal">
+                    <Calendar className="size-3 shrink-0" />
+                    <span>{new Date(row.sentAt).toLocaleDateString()}</span>
                   </div>
                 </div>
 
                 {/* Eligibility Indicators */}
-                <div className="grid grid-cols-2 gap-2.5 mb-4">
-                  <div className="p-3 rounded-xl bg-slate-50/50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <div className="min-w-0">
-                      <p className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Min. CGPA</p>
-                      <p className="text-base font-black text-slate-800 dark:text-slate-100 tracking-tight mt-0.5">{row.minCgpa}</p>
+                <div className="flex items-center gap-4 mb-3 bg-slate-50/50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-800/60 rounded-xl p-2 px-3">
+                  <div className="flex items-center gap-2">
+                    <Target className="size-3.5 text-slate-400 shrink-0" />
+                    <div>
+                      <span className="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-wider block leading-none">Min CGPA</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">{row.minCgpa}</span>
                     </div>
-                    <Target className="size-4 text-slate-350 shrink-0" />
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-50/50 dark:bg-slate-800/20 border border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                    <div className="min-w-0">
-                      <p className="text-[8px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Max Backlogs</p>
-                      <p className="text-base font-black text-slate-800 dark:text-slate-100 tracking-tight mt-0.5">{row.maxBacklogs}</p>
+                  <div className="h-6 w-px bg-slate-200 dark:bg-slate-700/60" />
+                  <div className="flex items-center gap-2">
+                    <XCircle className="size-3.5 text-slate-400 shrink-0" />
+                    <div>
+                      <span className="text-[9px] text-slate-400 dark:text-slate-500 uppercase tracking-wider block leading-none">Max Backlogs</span>
+                      <span className="font-bold text-slate-800 dark:text-slate-200 text-xs">{row.maxBacklogs}</span>
                     </div>
-                    <XCircle className="size-4 text-slate-350 shrink-0" />
                   </div>
                 </div>
 
                 {/* Brief Notes / Description */}
-                <div className="mb-4 flex-grow overflow-hidden">
-                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed font-medium line-clamp-3">
+                <div className="mb-3">
+                  <p className="text-xs text-slate-550 dark:text-slate-400 leading-relaxed font-medium line-clamp-2" title={row.description}>
                     {row.description || "Exciting opportunity to join a high-growth team focused on innovation and scale. Looking for passionate candidates."}
                   </p>
                 </div>
 
                 {/* Department Tags */}
-                <div className="flex flex-wrap gap-1.5 mb-5 mt-auto">
+                <div className="flex flex-wrap gap-1 mb-3 mt-auto">
                   {(Array.isArray(row.job?.eligibleDepartments) ? row.job.eligibleDepartments : []).slice(0, 2).map((dept: any, idx: number) => (
                     <Badge
                       key={dept.id || idx}
                       variant="outline"
-                      className="bg-primary/[0.03] dark:bg-primary/[0.06] border-transparent text-primary/70 dark:text-primary/50 font-bold text-[9px] uppercase tracking-wider px-2.5 py-1 rounded-lg"
+                      className="bg-slate-100/50 dark:bg-slate-800/50 border-slate-200/60 dark:border-slate-700/60 text-slate-600 dark:text-slate-400 font-semibold text-[9px] tracking-wide px-2 py-0.5 rounded"
                     >
                       {typeof dept === 'object' ? (dept.name || `Dept #${dept.id}`) : dept}
                     </Badge>
                   ))}
                   {(row.job?.eligibleDepartments?.length ?? 0) > 2 && (
-                    <Badge variant="outline" className="bg-slate-50 dark:bg-slate-800 border-transparent text-slate-400 dark:text-slate-500 font-bold text-[9px] uppercase tracking-wider px-2.5 py-1 rounded-lg">
+                    <Badge variant="outline" className="bg-slate-100/30 dark:bg-slate-800/30 border-slate-200/40 dark:border-slate-700/40 text-slate-400 dark:text-slate-500 font-semibold text-[9px] tracking-wide px-2 py-0.5 rounded">
                       +{(row.job?.eligibleDepartments?.length ?? 0) - 2}
                     </Badge>
                   )}
                 </div>
 
                 {/* CTA Action Buttons */}
-                <div className="mt-auto pt-3 border-t border-slate-100 dark:border-slate-800/80">
+                <div className="pt-2.5 border-t border-slate-100 dark:border-slate-800/80">
                   {row.status === 'PENDING' ? (
-                    <div className="flex flex-col gap-2">
-                      <div className="flex gap-2">
+                    <div className="flex items-center justify-between gap-2">
+                      <Button
+                        variant="link"
+                        className="text-[10px] font-bold text-primary hover:text-primary/80 transition-colors h-8 p-0 flex items-center gap-0.5 shrink-0"
+                        onClick={() => handleShowDetails(row)}
+                      >
+                        Review details
+                        <ArrowUpRight size={11} className="shrink-0" />
+                      </Button>
+                      <div className="flex gap-1.5 ml-auto">
                         <Button
-                          className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl h-9.5 font-bold uppercase tracking-wider text-[9px] active:scale-95 transition-all shadow-md shadow-emerald-500/10"
+                          className="bg-emerald-500 hover:bg-emerald-600 text-white rounded-lg h-8 px-3.5 font-bold uppercase tracking-wider text-[9px] active:scale-95 transition-all shadow-sm shadow-emerald-500/10"
                           onClick={() => handleStatusUpdate([row.id], 'APPROVED', [row.status])}
                           disabled={isBackward(row.status, 'APPROVED')}
                         >
@@ -488,25 +496,17 @@ const AdminJobManagement: React.FC = () => {
                         </Button>
                         <Button
                           variant="outline"
-                          className="flex-1 border-rose-250 dark:border-rose-800/30 text-rose-600 dark:text-rose-450 hover:bg-rose-500/5 rounded-xl h-9.5 font-bold uppercase tracking-wider text-[9px] active:scale-95 transition-all"
+                          className="border-rose-200 dark:border-rose-800/30 text-rose-600 dark:text-rose-450 hover:bg-rose-500/5 rounded-lg h-8 px-3.5 font-bold uppercase tracking-wider text-[9px] active:scale-95 transition-all"
                           onClick={() => handleInitiateReject([row.id], [row.status])}
                           disabled={isBackward(row.status, 'REJECTED')}
                         >
                           Reject
                         </Button>
                       </div>
-                      <Button
-                        variant="link"
-                        className="w-full text-[9px] font-bold uppercase tracking-wider text-primary hover:text-primary/80 transition-colors h-7 p-0 flex items-center justify-center gap-1 mt-1"
-                        onClick={() => handleShowDetails(row)}
-                      >
-                        Review & Preview Details
-                        <ArrowUpRight size={11} />
-                      </Button>
                     </div>
                   ) : (
-                    <div className="flex items-center justify-between gap-3">
-                      <Badge variant="outline" className={cn("px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest border-2", 
+                    <div className="flex items-center justify-between gap-3 h-8">
+                      <Badge variant="outline" className={cn("px-2.5 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border", 
                         row.status === 'APPROVED' ? "border-emerald-500/15 bg-emerald-500/5 text-emerald-600" : "border-rose-500/15 bg-rose-500/5 text-rose-600")}>
                         {row.status}
                       </Badge>
@@ -516,7 +516,7 @@ const AdminJobManagement: React.FC = () => {
                         onClick={() => handleShowDetails(row)}
                       >
                         View Specifications
-                        <ExternalLink size={11} className="opacity-60" />
+                        <ExternalLink size={11} className="opacity-60 shrink-0" />
                       </Button>
                     </div>
                   )}
