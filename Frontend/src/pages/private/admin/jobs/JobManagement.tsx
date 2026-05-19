@@ -604,7 +604,7 @@ const AdminJobManagement: React.FC = () => {
                 </div>
                 <div>
                   <h2 className="text-2xl font-black tracking-tight">{selectedJob.job?.title}</h2>
-                  <p className="text-primary font-bold uppercase tracking-widest text-xs mt-1">
+                  <p className=" bg-white/10  font-bold uppercase tracking-widest text-xs mt-1">
                     {selectedJob.displayCompany?.name} • {selectedJob.university?.name}
                   </p>
                 </div>
@@ -617,7 +617,7 @@ const AdminJobManagement: React.FC = () => {
                 )}>
                   {selectedJob.status}
                 </Badge>
-                <span className="text-[10px] font-bold text-white/40 uppercase tracking-widest">Job ID: #{selectedJob.id}</span>
+              
               </div>
             </div>
 
