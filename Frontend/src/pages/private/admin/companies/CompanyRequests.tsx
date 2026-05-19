@@ -86,10 +86,10 @@ const CompanyRequests: React.FC = () => {
     return sortedRequests.filter((req) => {
       const matchesSearch = req.company?.name
         ?.toLowerCase()
-        .includes(searchTerm.toLowerCase()) || 
+        .includes(searchTerm.toLowerCase()) ||
         req.company?.user?.email
-        ?.toLowerCase()
-        .includes(searchTerm.toLowerCase());
+          ?.toLowerCase()
+          .includes(searchTerm.toLowerCase());
 
       const matchesFilter = filter === 'All' || req.status === filter;
 
@@ -103,7 +103,7 @@ const CompanyRequests: React.FC = () => {
       await dispatch(
         updateAdminCompanyRequestStatus({ ids: [id], status, reason })
       ).unwrap();
-      
+
       toast.success(
         `Affiliation request ${status === 'APPROVED' ? 'approved' : 'rejected'} successfully.`
       );
@@ -239,98 +239,98 @@ const CompanyRequests: React.FC = () => {
                     </p>
                   </div>
 
-                {/* Info block */}
-                <div className="space-y-3.5 mb-6">
-                  <div className="flex items-center justify-between text-xs py-2 border-b border-border/40">
-                    <span className="text-muted-foreground font-semibold flex items-center gap-1.5">
-                      <Calendar className="size-3.5" />
-                      Received
-                    </span>
-                    <span className="font-bold text-foreground">
-                      {new Date(request.createdAt).toLocaleDateString(undefined, {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between text-xs py-2 border-b border-border/40">
-                    <span className="text-muted-foreground font-semibold flex items-center gap-1.5">
-                      <Clock className="size-3.5" />
-                      Status
-                    </span>
-                    <Badge
-                      variant="outline"
-                      className={cn(
-                        "text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5",
-                        request.status === 'APPROVED' && "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
-                        request.status === 'PENDING' && "bg-amber-500/10 text-amber-500 border-amber-500/20",
-                        request.status === 'REJECTED' && "bg-rose-500/10 text-rose-500 border-rose-500/20"
-                      )}
-                    >
-                      {request.status}
-                    </Badge>
-                  </div>
-                  {request.approvedAt && (
-                    <div className="flex items-center justify-between text-xs py-2">
-                      <span className="text-muted-foreground font-semibold">Approved At</span>
+                  {/* Info block */}
+                  <div className="space-y-3.5 mb-6">
+                    <div className="flex items-center justify-between text-xs py-2 border-b border-border/40">
+                      <span className="text-muted-foreground font-semibold flex items-center gap-1.5">
+                        <Calendar className="size-3.5" />
+                        Received
+                      </span>
                       <span className="font-bold text-foreground">
-                        {new Date(request.approvedAt).toLocaleDateString()}
+                        {new Date(request.createdAt).toLocaleDateString(undefined, {
+                          year: 'numeric',
+                          month: 'short',
+                          day: 'numeric'
+                        })}
                       </span>
                     </div>
-                  )}
-                  {request.rejectedAt && (
-                    <div className="flex items-center justify-between text-xs py-2">
-                      <span className="text-muted-foreground font-semibold">Rejected At</span>
-                      <span className="font-bold text-foreground">
-                        {new Date(request.rejectedAt).toLocaleDateString()}
+                    <div className="flex items-center justify-between text-xs py-2 border-b border-border/40">
+                      <span className="text-muted-foreground font-semibold flex items-center gap-1.5">
+                        <Clock className="size-3.5" />
+                        Status
                       </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Actions bottom bar */}
-                <div className="mt-auto pt-5 border-t border-border flex items-center gap-3">
-                  {request.status === 'PENDING' ? (
-                    <>
-                      <Button
-                        onClick={() => {
-                          setRejectingRequestId(request.id);
-                          setIsRejectModalOpen(true);
-                        }}
-                        disabled={processingId === request.id}
+                      <Badge
                         variant="outline"
-                        className="flex-1 h-10 border-rose-500/20 hover:bg-rose-500/10 hover:text-rose-500 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all text-muted-foreground"
-                        id={`decline-request-btn-${request.id}`}
+                        className={cn(
+                          "text-[9px] font-black uppercase tracking-widest px-2.5 py-0.5",
+                          request.status === 'APPROVED' && "bg-emerald-500/10 text-emerald-500 border-emerald-500/20",
+                          request.status === 'PENDING' && "bg-amber-500/10 text-amber-500 border-amber-500/20",
+                          request.status === 'REJECTED' && "bg-rose-500/10 text-rose-500 border-rose-500/20"
+                        )}
                       >
-                        <X className="size-4 text-rose-500" />
-                        Decline
-                      </Button>
-                      <Button
-                        onClick={() => handleUpdateStatus(request.id, 'APPROVED')}
-                        disabled={processingId === request.id}
-                        className="flex-1 h-10 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/15 active:scale-95 transition-all"
-                        id={`approve-request-btn-${request.id}`}
-                      >
-                        <Check className="size-4" />
-                        Accept
-                      </Button>
-                    </>
-                  ) : request.status === 'APPROVED' ? (
-                    <div className="w-full flex items-center justify-center py-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-wider gap-2">
-                      <CheckCircle2 className="size-4 text-emerald-500" />
-                      Active Academic Partner
+                        {request.status}
+                      </Badge>
                     </div>
-                  ) : (
-                    <div className="w-full flex items-center justify-center py-2.5 rounded-xl bg-rose-500/5 border border-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-wider gap-2">
-                      <XCircle className="size-4 text-rose-500" />
-                      Affiliation Declined
-                    </div>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
+                    {request.approvedAt && (
+                      <div className="flex items-center justify-between text-xs py-2">
+                        <span className="text-muted-foreground font-semibold">Approved At</span>
+                        <span className="font-bold text-foreground">
+                          {new Date(request.approvedAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    )}
+                    {request.rejectedAt && (
+                      <div className="flex items-center justify-between text-xs py-2">
+                        <span className="text-muted-foreground font-semibold">Rejected At</span>
+                        <span className="font-bold text-foreground">
+                          {new Date(request.rejectedAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Actions bottom bar */}
+                  <div className="mt-auto pt-5 border-t border-border flex items-center gap-3">
+                    {request.status === 'PENDING' ? (
+                      <>
+                        <Button
+                          onClick={() => {
+                            setRejectingRequestId(request.id);
+                            setIsRejectModalOpen(true);
+                          }}
+                          disabled={processingId === request.id}
+                          variant="outline"
+                          className="flex-1 h-10 border-rose-500/20 hover:bg-rose-500/10 hover:text-rose-500 font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 active:scale-95 transition-all text-muted-foreground"
+                          id={`decline-request-btn-${request.id}`}
+                        >
+                          <X className="size-4 text-rose-500" />
+                          Decline
+                        </Button>
+                        <Button
+                          onClick={() => handleUpdateStatus(request.id, 'APPROVED')}
+                          disabled={processingId === request.id}
+                          className="flex-1 h-10 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-xs flex items-center justify-center gap-1.5 shadow-lg shadow-emerald-500/15 active:scale-95 transition-all"
+                          id={`approve-request-btn-${request.id}`}
+                        >
+                          <Check className="size-4" />
+                          Accept
+                        </Button>
+                      </>
+                    ) : request.status === 'APPROVED' ? (
+                      <div className="w-full flex items-center justify-center py-2.5 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase tracking-wider gap-2">
+                        <CheckCircle2 className="size-4 text-emerald-500" />
+                        Active Academic Partner
+                      </div>
+                    ) : (
+                      <div className="w-full flex items-center justify-center py-2.5 rounded-xl bg-rose-500/5 border border-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-wider gap-2">
+                        <XCircle className="size-4 text-rose-500" />
+                        Affiliation Declined
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
           </AnimatePresence>
         </div>
 
@@ -374,8 +374,11 @@ const CompanyRequests: React.FC = () => {
               Cancel
             </Button>
             <Button
-              variant="destructive"
-              onClick={() => rejectingRequestId && handleUpdateStatus(rejectingRequestId, 'REJECTED', rejectReason)}
+              className="bg-rose-500 hover:bg-rose-600 text-white shadow-md disabled:opacity-50"
+              onClick={() =>
+                rejectingRequestId &&
+                handleUpdateStatus(rejectingRequestId, 'REJECTED', rejectReason)
+              }
               disabled={!rejectReason.trim() || processingId === rejectingRequestId}
             >
               Reject Request
