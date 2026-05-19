@@ -327,39 +327,57 @@ export const updateCompanyUniversityStatus = async (
   status: "APPROVED" | "REJECTED",
   adminId: number,
   universityId?: number,
+  reason?: string,
 ) => {
   const now = new Date();
 
   await prisma.companyUniversity.updateMany({
     where: {
-      id: { in: ids },
+      id: {
+        in: ids,
+      },
+
       status: "PENDING",
-      ...(universityId && { universityId }),
+
+      ...(universityId && {
+        universityId,
+      }),
     },
 
     data: {
       status,
+
       approvedBy: adminId,
 
       ...(status === "APPROVED" && {
         approvedAt: now,
+        rejectedAt: null,
+        reason: null,
       }),
 
       ...(status === "REJECTED" && {
         rejectedAt: now,
+        approvedAt: null,
+
+        ...(reason !== undefined && {
+          reason,
+        }),
       }),
     },
   });
 
   return prisma.companyUniversity.findMany({
     where: {
-      id: { in: ids },
+      id: {
+        in: ids,
+      },
     },
 
     include: {
       company: {
         select: {
           id: true,
+
           name: true,
 
           user: {

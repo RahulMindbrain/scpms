@@ -414,7 +414,8 @@ export const updateCompanyRequestsController = async (
   res: Response,
 ) => {
   try {
-    const { ids, status } = req.body;
+    const { ids, status, reason } = req.body;
+
     const user = res.locals.user;
 
     if (!user || !user.id) {
@@ -429,7 +430,16 @@ export const updateCompanyRequestsController = async (
       return sendError(res, 400, "Invalid status");
     }
 
-    const data = await updateCompanyRequestsService(ids, status, user.id);
+    if (status === "REJECTED" && !reason?.trim()) {
+      return sendError(res, 400, "Rejection reason is required");
+    }
+
+    const data = await updateCompanyRequestsService(
+      ids,
+      status,
+      user.id,
+      reason,
+    );
 
     return sendSuccess(res, 200, "Requests updated", data);
   } catch (error: any) {

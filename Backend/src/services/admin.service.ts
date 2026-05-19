@@ -685,6 +685,7 @@ export const updateCompanyRequestsService = async (
   ids: number[],
   status: "APPROVED" | "REJECTED",
   adminId: number,
+  reason?: string,
 ) => {
   const admin = await getUniversityByAdminId(adminId);
 
@@ -697,6 +698,7 @@ export const updateCompanyRequestsService = async (
   const validRequests = await getPendingCompanyRequestsByIds(ids, universityId);
 
   const validIds = new Set(validRequests.map((r) => r.id));
+
   const invalidIds = ids.filter((id) => !validIds.has(id));
 
   if (invalidIds.length) {
@@ -709,5 +711,7 @@ export const updateCompanyRequestsService = async (
     validRequests.map((r) => r.id),
     status,
     admin.id,
+    universityId,
+    reason,
   );
 };
