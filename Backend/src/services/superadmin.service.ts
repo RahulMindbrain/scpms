@@ -19,6 +19,7 @@ import {
   createCompanyUniversityRequest,
   getCompanyRequestsForUniversity,
   updateCompanyUniversityStatus,
+  countSuperAdmins,
 } from "../repository/superadmin.repository";
 
 import { normalizeEmails, normalizeName } from "../utils/normalize.utils";
@@ -41,6 +42,12 @@ export const createSuperAdminService = async (data: {
   email: string;
   password: string;
 }) => {
+  const superAdminCount = await countSuperAdmins();
+
+  if (superAdminCount >= 1) {
+    throw new Error("Super admin already exists");
+  }
+
   const firstname = normalizeName(data.firstname);
   const lastname = data.lastname ? normalizeName(data.lastname) : undefined;
 

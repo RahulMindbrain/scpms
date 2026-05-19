@@ -12,6 +12,14 @@ export const getUsersByIds = async (ids: number[]) => {
   });
 };
 
+export const countSuperAdmins = async () => {
+  return prisma.user.count({
+    where: {
+      role: Role.SUPER_ADMIN,
+    },
+  });
+};
+
 export const getAdminsWithUniversity = async (params?: { status?: Status }) => {
   return prisma.admin.findMany({
     where: {
