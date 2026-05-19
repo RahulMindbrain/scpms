@@ -10,7 +10,6 @@ import {
   Check,
   X,
   Mail,
-  SlidersHorizontal,
   LayoutGrid
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge.tsx';

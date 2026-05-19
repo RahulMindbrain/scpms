@@ -103,7 +103,6 @@ const AdminJobManagement: React.FC = () => {
   const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
   const [rejectJobIds, setRejectJobIds] = useState<number[]>([]);
   const [rejectReason, setRejectReason] = useState('');
-  const [rejectCurrentStatuses, setRejectCurrentStatuses] = useState<string[] | undefined>(undefined);
 
   const handleInitiateReject = (ids: number[], currentStatuses?: string[]) => {
     if (currentStatuses?.some(curr => isBackward(curr, 'REJECTED'))) {
@@ -111,7 +110,6 @@ const AdminJobManagement: React.FC = () => {
       return;
     }
     setRejectJobIds(ids);
-    setRejectCurrentStatuses(currentStatuses);
     setRejectReason('');
     setIsRejectModalOpen(true);
   };
