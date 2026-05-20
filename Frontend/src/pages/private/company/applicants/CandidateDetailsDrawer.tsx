@@ -14,9 +14,9 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import {
-  Sheet,
-  SheetContent,
-} from "@/components/ui/sheet";
+  Dialog,
+  DialogContent,
+} from "@/components/ui/dialog";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface CandidateDetailsDrawerProps {
@@ -46,9 +46,9 @@ export const CandidateDetailsDrawer: React.FC<CandidateDetailsDrawerProps> = ({
   const initials = `${app.student?.user?.firstname?.charAt(0) || 'C'}${app.student?.user?.lastname?.charAt(0) || ''}`.toUpperCase();
 
   return (
-    <Sheet open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
-      <SheetContent side="right" className="w-full sm:max-w-md md:max-w-lg p-0 overflow-hidden flex flex-col h-full bg-background border-l border-border shadow-2xl">
-        <div className="flex flex-col h-full overflow-hidden relative">
+    <Dialog open={isOpen} onOpenChange={(open) => { if (!open) onClose(); }}>
+<DialogContent className="w-full max-w-3xl p-0 overflow-hidden flex flex-col h-[90vh] rounded-2xl [&>button]:hidden">
+        <div className="flex flex-col h-full relative">
           
           {/* Top Ambient mesh glow */}
           <div className="absolute top-0 inset-x-0 h-40 bg-gradient-to-b from-primary/5 to-transparent pointer-events-none" />
@@ -59,16 +59,14 @@ export const CandidateDetailsDrawer: React.FC<CandidateDetailsDrawerProps> = ({
               <Award size={16} className="text-primary" />
               <span className="text-[10px] font-black uppercase tracking-widest text-primary">Candidate Dossier</span>
             </div>
-            <button 
-              onClick={onClose}
-              className="p-2 hover:bg-muted/10 text-muted-foreground hover:text-foreground rounded-full transition-colors cursor-pointer"
-            >
-              <X size={18} />
-            </button>
+          
+  <button onClick={onClose}>
+    <X size={18} />
+  </button>
           </div>
 
           {/* Scrollable Dossier Contents */}
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8 relative z-10 pb-24 text-left">
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-8 text-left">
             
             {/* Visual ID Badge Card */}
             <div className="text-center flex flex-col items-center p-6 bg-card border border-border/80 rounded-3xl shadow-sm relative overflow-hidden group">
@@ -168,7 +166,7 @@ export const CandidateDetailsDrawer: React.FC<CandidateDetailsDrawerProps> = ({
             </div>
 
             {/* Resume dossier */}
-            <div className="space-y-3">
+            {/* <div className="space-y-3">
               <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">Documents & Verification</h4>
               <div className="bg-card border border-border/80 rounded-3xl p-4 flex items-center justify-between shadow-xs">
                 <div className="flex items-center gap-3">
@@ -187,10 +185,10 @@ export const CandidateDetailsDrawer: React.FC<CandidateDetailsDrawerProps> = ({
                   <ExternalLink size={15} />
                 </button>
               </div>
-            </div>
+            </div> */}
 
             {/* Process Timeline History */}
-            <div className="space-y-3">
+            {/* <div className="space-y-3">
               <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest ml-1">recruitment Pipeline history</h4>
               
               <div className="bg-card border border-border/80 rounded-3xl p-6 shadow-sm relative">
@@ -263,11 +261,11 @@ export const CandidateDetailsDrawer: React.FC<CandidateDetailsDrawerProps> = ({
                   )}
                 </div>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Dossier Float Action Controls Bar */}
-          <div className="absolute bottom-0 inset-x-0 bg-background/90 backdrop-blur-md border-t border-border/40 p-4 flex items-center gap-3 relative z-20 shrink-0">
+          <div className="shrink-0 bg-background/95 backdrop-blur-md border-t border-border/40 p-4 flex items-center gap-3 backdrop-blur-md border-t border-border/40 p-4 flex items-center gap-3 relative z-20 shrink-0">
             <button
               onClick={() => {
                 onClose();
@@ -301,7 +299,7 @@ export const CandidateDetailsDrawer: React.FC<CandidateDetailsDrawerProps> = ({
           </div>
 
         </div>
-      </SheetContent>
-    </Sheet>
+      </DialogContent>
+    </Dialog>
   );
 };
