@@ -419,7 +419,7 @@ const JobListing = () => {
                   setGlobalAtsFileName('');
                   setIsGlobalAtsModalOpen(true);
                 }}
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs md:text-sm px-4 h-10 rounded-xl shadow-md flex items-center gap-2 transition-all duration-300 hover:scale-[1.02] cursor-pointer shrink-0"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs md:text-sm px-4 h-10 rounded-xl shadow-md flex flex-wrap items-center gap-2 transition-all duration-300 hover:scale-[1.02] cursor-pointer shrink-0"
               >
                 <Sparkles size={14} className="fill-white" />
                 ATS Checker

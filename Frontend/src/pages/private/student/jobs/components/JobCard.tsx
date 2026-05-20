@@ -75,14 +75,14 @@ export const JobCard: React.FC<JobCardProps> = ({
           
           {/* Top Row: Logo, Title, Badge */}
           <div className="flex items-start justify-between gap-4">
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-4 min-w-0">
               {/* Gradient Rounded Square Icon */}
               <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-emerald-500 flex items-center justify-center font-bold text-lg text-white shadow-md shadow-indigo-500/10 shrink-0">
                 {getCompanyInitials(companyName)}
               </div>
               
               {/* Title & Company */}
-              <div className="pt-0.5">
+              <div className="pt-0.5 min-w-0">
                 <h3 className="text-[17px] font-bold text-slate-800 dark:text-white leading-snug tracking-tight hover:text-indigo-600 transition-colors line-clamp-1">
                   {job.job?.title}
                 </h3>
@@ -102,7 +102,7 @@ export const JobCard: React.FC<JobCardProps> = ({
             </div>
 
             {/* Top-Right Pill Badge */}
-            <div>
+            <div className="flex-shrink-0">
               {isApplied ? (
                 <span className="bg-indigo-600 text-white text-[11px] font-bold px-3.5 py-1.5 rounded-full shadow-sm whitespace-nowrap">
                   Applied
