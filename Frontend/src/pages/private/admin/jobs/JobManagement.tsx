@@ -268,7 +268,7 @@ const AdminJobManagement: React.FC = () => {
 
       {/* Tabs & Filters Bar */}
       <div className="flex flex-col xl:flex-row items-center justify-between gap-6 pb-8">
-        <div className="flex bg-slate-100/80 dark:bg-slate-800/50 p-1.5 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 w-full xl:w-auto overflow-x-auto scrollbar-hide shadow-inner">
+        <div className="flex bg-slate-100/80 dark:bg-slate-800/50 p-1.5 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 w-full xl:w-auto overflow-visible scrollbar-hide shadow-inner">
           {(['PENDING', 'APPROVED', 'REJECTED'] as const).map((tab) => {
             const config = STATUS_STYLES[tab];
             const isActive = activeTab === tab;
@@ -289,25 +289,14 @@ const AdminJobManagement: React.FC = () => {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto">
-          <div className="flex flex-wrap items-center gap-2 p-1.5 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm w-full xl:w-auto">
-            <Select value={sortBy} onValueChange={setSortBy}>
-              <SelectTrigger className="flex-1 sm:w-[130px] h-9 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all text-slate-900 dark:text-slate-100">
-                <ArrowUpDown className="size-3 mr-2 text-slate-400" />
-                <SelectValue placeholder="Sort" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl border-slate-200 dark:border-slate-700 shadow-xl bg-white dark:bg-slate-900">
-                <SelectItem value="newest" className="text-[10px] font-bold uppercase tracking-widest">Newest First</SelectItem>
-                <SelectItem value="oldest" className="text-[10px] font-bold uppercase tracking-widest">Oldest First</SelectItem>
-                <SelectItem value="salary-high" className="text-[10px] font-bold uppercase tracking-widest">Salary: High</SelectItem>
-              </SelectContent>
-            </Select>
+<div className="relative z-40 flex flex-wrap items-center gap-2 p-1.5 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm w-full xl:w-auto">
 
             <Select value={filterDepartment} onValueChange={setFilterDepartment}>
-              <SelectTrigger className="flex-1 sm:w-[130px] h-9 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all text-slate-900 dark:text-slate-100">
+              <SelectTrigger className="w-[150px] h-9 rounded-xl sm:w-[130px] h-9 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all text-slate-900 dark:text-slate-100">
                 <Filter className="size-3 mr-2 text-slate-400" />
                 <SelectValue placeholder="Dept" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-slate-200 dark:border-slate-700 shadow-xl bg-white dark:bg-slate-900">
+              <SelectContent className="z-50 rounded-xl border-slate-200 dark:border-slate-700 shadow-xl bg-white dark:bg-slate-900">
                 <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Depts</SelectItem>
                 {departments.map((dept) => (
                   <SelectItem key={dept} value={dept} className="text-[10px] font-bold uppercase tracking-widest">{dept}</SelectItem>
@@ -316,11 +305,11 @@ const AdminJobManagement: React.FC = () => {
             </Select>
 
             <Select value={filterLocation} onValueChange={setFilterLocation}>
-              <SelectTrigger className="flex-1 sm:w-[130px] h-9 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all text-slate-900 dark:text-slate-100">
+              <SelectTrigger className="w-[150px] h-9 rounded-xl sm:w-[130px] h-9 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all text-slate-900 dark:text-slate-100">
                 <MapPin className="size-3 mr-2 text-slate-400" />
                 <SelectValue placeholder="Loc" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-slate-200 dark:border-slate-700 shadow-xl bg-white dark:bg-slate-900">
+              <SelectContent className=" w-[150px] h-9 rounded-xl z-50 rounded-xl border-slate-200 dark:border-slate-700 shadow-xl bg-white dark:bg-slate-900">
                 <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Locations</SelectItem>
                 {locations.map(loc => (
                   <SelectItem key={loc} value={loc || 'Remote'} className="text-[10px] font-bold uppercase tracking-widest">{loc || 'Remote'}</SelectItem>
@@ -329,12 +318,12 @@ const AdminJobManagement: React.FC = () => {
             </Select>
 
             <Select value={filterCompany} onValueChange={setFilterCompany}>
-              <SelectTrigger className="flex-1 sm:w-[130px] h-9 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all text-slate-900 dark:text-slate-100">
+              <SelectTrigger className="w-[150px] h-9 rounded-xl sm:w-[130px] h-9 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 shadow-sm text-[9px] font-black uppercase tracking-widest hover:border-primary/30 transition-all text-slate-900 dark:text-slate-100">
                 <Building2 className="size-3 mr-2 text-slate-400" />
-                <SelectValue placeholder="Brand" />
+                <SelectValue placeholder="Company" />
               </SelectTrigger>
-              <SelectContent className="rounded-xl border-slate-200 dark:border-slate-700 shadow-xl bg-white dark:bg-slate-900">
-                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Brands</SelectItem>
+              <SelectContent className="z-50 rounded-xl border-slate-200 dark:border-slate-700 shadow-xl bg-white dark:bg-slate-900">
+                <SelectItem value="all" className="text-[10px] font-bold uppercase tracking-widest">All Jobs</SelectItem>
                 {reduxCompanies.map((company: any) => (
                   <SelectItem key={company.id} value={company.id.toString()} className="text-[10px] font-bold uppercase tracking-widest">{company.name}</SelectItem>
                 ))}
@@ -368,13 +357,13 @@ const AdminJobManagement: React.FC = () => {
                     <span className={cn(
                       "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider",
                       row.status === 'PENDING' ? "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400" :
-                      row.status === 'APPROVED' ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" :
-                      "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-450"
+                        row.status === 'APPROVED' ? "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" :
+                          "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-450"
                     )}>
                       <span className={cn(
                         "size-1.5 rounded-full shrink-0",
                         row.status === 'PENDING' ? "bg-amber-500 animate-pulse" :
-                        row.status === 'APPROVED' ? "bg-emerald-500" : "bg-rose-500"
+                          row.status === 'APPROVED' ? "bg-emerald-500" : "bg-rose-500"
                       )} />
                       {row.status === 'PENDING' ? 'Pending Review' : row.status}
                     </span>
@@ -386,7 +375,7 @@ const AdminJobManagement: React.FC = () => {
                         <MoreVertical className="size-3.5 text-slate-400 dark:text-slate-500" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="rounded-xl border-slate-100 dark:border-slate-800 shadow-2xl p-1 bg-white dark:bg-slate-900">
+                    <DropdownMenuContent align="end" className=" z-50 rounded-xl border-slate-100 dark:border-slate-800 shadow-2xl p-1 bg-white dark:bg-slate-900">
                       <DropdownMenuItem className="text-[10px] font-black uppercase tracking-widest text-rose-500 cursor-pointer p-2 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-500/10">
                         Delete Record
                       </DropdownMenuItem>
@@ -506,11 +495,11 @@ const AdminJobManagement: React.FC = () => {
                     </div>
                   ) : (
                     <div className="flex items-center justify-between gap-3 h-8">
-                      <Badge variant="outline" className={cn("px-2.5 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border", 
+                      <Badge variant="outline" className={cn("px-2.5 py-0.5 rounded text-[9px] font-black uppercase tracking-widest border",
                         row.status === 'APPROVED' ? "border-emerald-500/15 bg-emerald-500/5 text-emerald-600" : "border-rose-500/15 bg-rose-500/5 text-rose-600")}>
                         {row.status}
                       </Badge>
-                      <Button 
+                      <Button
                         variant="ghost"
                         className="text-[9px] font-bold uppercase tracking-wider text-slate-500 hover:text-primary transition-colors flex items-center gap-1 px-3 h-8 rounded-lg"
                         onClick={() => handleShowDetails(row)}
@@ -617,7 +606,7 @@ const AdminJobManagement: React.FC = () => {
                 )}>
                   {selectedJob.status}
                 </Badge>
-              
+
               </div>
             </div>
 
