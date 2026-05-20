@@ -13,7 +13,6 @@ import {
   Info,
   Calendar,
   Trophy,
-  Users
 } from 'lucide-react';
 import Loader from '@/components/Loader';
 import { Badge } from '@/components/ui/badge';

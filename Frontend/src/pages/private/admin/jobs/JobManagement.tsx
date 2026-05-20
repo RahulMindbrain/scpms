@@ -10,7 +10,6 @@ import {
   Clock,
   ExternalLink,
   Filter,
-  ArrowUpDown,
   MoreVertical,
   ChevronLeft,
   ChevronRight,
@@ -88,7 +87,7 @@ const AdminJobManagement: React.FC = () => {
   const [page, setPage] = useState(1);
   const PAGE_LIMIT = 10;
   const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState<string>('newest');
+  const [sortBy ] = useState<string>('newest');
   const [filterDepartment, setFilterDepartment] = useState<string>('all');
   const [filterLocation, setFilterLocation] = useState<string>('all');
   const [searchParams] = useSearchParams();
