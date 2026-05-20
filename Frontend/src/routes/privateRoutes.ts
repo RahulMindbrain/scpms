@@ -10,6 +10,7 @@ import InterviewScheduler from "@/pages/private/student/interview/InterviewSched
 import AdminDashboard from "@/pages/private/admin/dashboard/AdminDashboard";
 import StudentManagement from "@/pages/private/admin/students/StudentManagement";
 import CompanyManagement from "@/pages/private/admin/companies/CompanyManagement";
+import CompanyRequests from "@/pages/private/admin/companies/CompanyRequests";
 import PlacementDriveManagement from "@/pages/private/admin/drives/PlacementDriveManagement";
 import Report from "@/pages/private/admin/report/report"
 import AdminNotificationPage from "@/pages/private/admin/notification/notification";
@@ -52,6 +53,10 @@ export const PrivateRoutes: RouteOptions<any>[] = [
     {
         path: "/admin/companies",
         component: CompanyManagement,
+    },
+    {
+        path: "/admin/company-requests",
+        component: CompanyRequests,
     },
     {
         path: "/admin/drives",

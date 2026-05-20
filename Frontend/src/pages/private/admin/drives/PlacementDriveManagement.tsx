@@ -13,7 +13,6 @@ import {
   Info,
   Calendar,
   Trophy,
-  Users
 } from 'lucide-react';
 import Loader from '@/components/Loader';
 import { Badge } from '@/components/ui/badge';
@@ -385,12 +384,12 @@ const PlacementDriveManagement: React.FC = () => {
                                         </p>
                                         <p className="text-xs md:text-sm font-bold text-foreground">{job.minCgpa ?? 'No'} CGPA</p>
                                       </div>
-                                      <div className="space-y-1">
+                                      {/* <div className="space-y-1">
                                         <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
                                           <Users className="size-2.5 md:size-3 text-violet-500" /> Applicants
                                         </p>
                                         <p className="text-xs md:text-sm font-bold text-foreground">{job._count?.applications || 0} Applied</p>
-                                      </div>
+                                      </div> */}
                                       <div className="space-y-1">
                                         <p className="text-[8px] md:text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
                                           <Calendar className="size-2.5 md:size-3 text-amber-500" /> Posted

@@ -77,3 +77,36 @@ export const sendJobToUniversity = createAsyncThunk(
     }
   }
 )
+
+// FETCH ADMIN COMPANY REQUESTS
+export const fetchAdminCompanyRequests = createAsyncThunk(
+  "admin/fetchCompanyRequests",
+  async (status: string | undefined, { rejectWithValue }) => {
+    try {
+      const url = status 
+        ? `/admin/university/company-requests?status=${status}`
+        : "/admin/university/company-requests";
+      const response = await getAPI<any>(url)
+      return response.data
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to fetch company requests")
+    }
+  }
+)
+
+// UPDATE ADMIN COMPANY REQUEST STATUS
+export const updateAdminCompanyRequestStatus = createAsyncThunk(
+  "admin/updateCompanyRequestStatus",
+  async (
+    payload: { ids: number[]; status: "APPROVED" | "REJECTED"; reason?: string },
+    { rejectWithValue }
+  ) => {
+    try {
+      const response = await putAPI<any>("/admin/university/company-requests", payload)
+      return response.data
+    } catch (error: any) {
+      return rejectWithValue(error.message || "Failed to update company request status")
+    }
+  }
+)
+

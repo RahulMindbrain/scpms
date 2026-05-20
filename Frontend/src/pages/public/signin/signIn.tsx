@@ -144,7 +144,7 @@ const SignIn: React.FC = () => {
               <div className="flex justify-between items-center px-1">
                 <label className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Password</label>
                 <Link to="/Forgot" className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors">
-                  Forgot?
+                  Forgot Password?
                 </Link>
               </div>
               <div className="relative group">
@@ -182,7 +182,7 @@ const SignIn: React.FC = () => {
               <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                 Don't have an account?{" "}
                 <Link to="/signup" className="text-blue-600 hover:text-blue-700 transition-colors font-bold">
-                  Create an Identity
+                  Create an Account
                 </Link>
               </p>
             </div>
@@ -190,11 +190,11 @@ const SignIn: React.FC = () => {
         </motion.div>
 
         {/* Subtle Bottom Link */}
-        <div className="absolute bottom-12 text-center w-full px-6">
+        {/* <div className="absolute bottom-12 text-center w-full px-6">
           <p className="text-[10px] text-slate-400 dark:text-slate-600 font-medium uppercase tracking-[0.15em]">
             Secure Enterprise Gateway • AES-256 Encryption
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

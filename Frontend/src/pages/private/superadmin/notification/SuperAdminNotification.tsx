@@ -262,7 +262,7 @@ const NotificationPage = () => {
   return (
     <AdminPageLayout>
       <PageHeader
-        title="Intelligence Feed"
+        title="Notifications Feed"
         description="Monitor system-wide signals, placement drives, and administrative updates in real-time."
         badge="Signals Live"
         icon={Bell}

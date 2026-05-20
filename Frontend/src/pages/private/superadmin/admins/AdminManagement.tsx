@@ -227,7 +227,7 @@ const AdminManagement = () => {
                                 onClick={() => void handleActivate([admin.user.id])}
                                 disabled={isSubmitting}
                               >
-                                <CheckCircle className="w-3.5 h-3.5" /> Authorize
+                                <CheckCircle className="w-3.5 h-3.5" /> Active
                               </Button>
                               <Button
                                 variant="ghost"
@@ -236,7 +236,7 @@ const AdminManagement = () => {
                                 onClick={() => void handleStatusChange([admin.user.id], false)}
                                 disabled={isSubmitting}
                               >
-                                <XCircle className="w-3.5 h-3.5" /> Terminate
+                                <XCircle className="w-3.5 h-3.5" /> Reject
                               </Button>
                             </>
                           ) : (
@@ -247,7 +247,7 @@ const AdminManagement = () => {
                               onClick={() => void handleStatusChange([admin.user.id], false)}
                               disabled={isSubmitting}
                             >
-                              <XCircle className="w-3.5 h-3.5" /> Deactivate
+                              <XCircle className="w-3.5 h-3.5" /> Delete
                             </Button>
                           )}
 

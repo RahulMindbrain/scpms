@@ -426,7 +426,7 @@ const SendJobUniversityRequest = () => {
               {loading ? (
                 <><Loader size="sm" /> Sending...</>
               ) : (
-                <>Transmit Request <Rocket size={14} /></>
+                <>Job Request <Rocket size={14} /></>
               )}
             </button>
           </div>

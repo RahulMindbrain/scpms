@@ -429,7 +429,7 @@ const ApplicationsManagement: React.FC = () => {
             <div className="size-20 bg-muted/30 rounded-[2.5rem] flex items-center justify-center mx-auto mb-6">
               <Users className="size-10 text-muted-foreground/30" />
             </div>
-            <h3 className="text-xl font-bold text-foreground mb-2">No Active Pipeline</h3>
+            <h3 className="text-xl font-bold text-foreground mb-2">No Active Application</h3>
             <p className="text-muted-foreground text-sm max-w-xs mx-auto">
               Please select or create an interview schedule to monitor recruitment applications.
             </p>

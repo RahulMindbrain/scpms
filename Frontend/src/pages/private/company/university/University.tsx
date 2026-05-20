@@ -7,7 +7,15 @@ import {
   Sparkles,
   ArrowUpRight,
   RefreshCw,
+  Info,
 } from "lucide-react";
+
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
@@ -90,8 +98,8 @@ const UniversityRequest = () => {
     }
   };
 
-  const getStatusBadge = (status: string) => {
-    switch (status) {
+  const getStatusBadge = (req: any) => {
+    switch (req.status) {
       case "APPROVED":
         return (
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-wider">
@@ -101,10 +109,23 @@ const UniversityRequest = () => {
         );
       case "REJECTED":
         return (
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-destructive/10 border border-destructive/20 text-destructive text-[10px] font-black uppercase tracking-wider">
-            <div className="w-1.5 h-1.5 rounded-full bg-destructive" />
-            Rejected
-          </div>
+          <TooltipProvider delayDuration={100}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 dark:text-rose-400 text-[10px] font-black uppercase tracking-wider cursor-help hover:bg-rose-500/20 transition-colors">
+                  <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                  Rejected
+                  {req.reason && <Info size={12} className="ml-0.5 opacity-70" />}
+                </div>
+              </TooltipTrigger>
+              {req.reason && (
+                <TooltipContent side="top" align="center" className="max-w-[250px] bg-rose-600 text-white border-rose-500/20 shadow-xl shadow-rose-500/20 p-3">
+              
+                  <p className="text-xs font-medium leading-relaxed">{req.reason}</p>
+                </TooltipContent>
+              )}
+            </Tooltip>
+          </TooltipProvider>
         );
       default:
         return (
@@ -229,7 +250,7 @@ const UniversityRequest = () => {
                           </td>
                           <td className="text-center">
                             {req ? (
-                              getStatusBadge(req.status)
+                              getStatusBadge(req)
                             ) : (
                               <span className="text-[10px] font-black text-muted-foreground/30 uppercase tracking-[0.2em]">
                                 Not Connected
