@@ -159,7 +159,7 @@ const CompanyRequests: React.FC = () => {
             { label: "Total Requests", value: sortedRequests.length, icon: Building2, color: "indigo", bg: "bg-indigo-500/10", text: "text-indigo-500" },
             { label: "Pending Review", value: pendingCount, icon: Clock, color: "amber", bg: "bg-amber-500/10", text: "text-amber-500", animate: pendingCount > 0 },
             { label: "Approved Partners", value: approvedCount, icon: CheckCircle2, color: "emerald", bg: "bg-emerald-500/10", text: "text-emerald-500" },
-            { label: "Declined Requests", value: rejectedCount, icon: XCircle, color: "rose", bg: "bg-rose-500/10", text: "text-rose-500" },
+            { label: "Rejected Requests", value: rejectedCount, icon: XCircle, color: "rose", bg: "bg-rose-500/10", text: "text-rose-500" },
           ].map((stat, idx) => (
             <div key={idx} className={cn("premium-stat-card group transition-all duration-500", `stat-glow-${stat.color}`)}>
               <div className="flex items-center justify-between mb-4">
@@ -188,7 +188,7 @@ const CompanyRequests: React.FC = () => {
                 )}
                 id={`filter-btn-${opt.toLowerCase()}`}
               >
-                {opt === 'PENDING' ? 'Pending' : opt === 'APPROVED' ? 'Approved' : opt === 'REJECTED' ? 'Declined' : 'All'}
+                {opt === 'PENDING' ? 'Pending' : opt === 'APPROVED' ? 'Approved' : opt === 'REJECTED' ? 'Rejected' : 'All'}
               </button>
             ))}
           </div>
@@ -304,7 +304,7 @@ const CompanyRequests: React.FC = () => {
                           id={`decline-request-btn-${request.id}`}
                         >
                           <X className="size-4 text-rose-500" />
-                          Decline
+                          Rejected
                         </Button>
                         <Button
                           onClick={() => handleUpdateStatus(request.id, 'APPROVED')}
@@ -324,7 +324,7 @@ const CompanyRequests: React.FC = () => {
                     ) : (
                       <div className="w-full flex items-center justify-center py-2.5 rounded-xl bg-rose-500/5 border border-rose-500/10 text-rose-500 text-[10px] font-black uppercase tracking-wider gap-2">
                         <XCircle className="size-4 text-rose-500" />
-                        Affiliation Declined
+                        Affiliation Rejected
                       </div>
                     )}
                   </div>
