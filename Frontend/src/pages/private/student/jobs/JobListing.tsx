@@ -135,6 +135,7 @@ const JobListing = () => {
   // ATS multi-state application flow
   const [applyStep, setApplyStep] = useState<'resume' | 'loading' | 'report' | 'optimize-loading' | 'optimized'>('resume');
   const [selectedResumeOption, setSelectedResumeOption] = useState<'latest' | 'fresh'>('latest');
+  const [uploadedResumeUrl, setUploadedResumeUrl] = useState<string>('');
   const [loadingStage, setLoadingStage] = useState(0);
   const [loadingProgress, setLoadingProgress] = useState(0);
   
@@ -226,6 +227,7 @@ const JobListing = () => {
       setApplyStep('resume');
       setLoadingStage(0);
       setLoadingProgress(0);
+      setUploadedResumeUrl('');
       dispatch(resetAtsState());
     }
   }, [isApplyModalOpen, dispatch]);
@@ -267,7 +269,7 @@ const JobListing = () => {
       }, 2750);
       
       // Perform real API call
-      const resumeUrl = profile?.resumeUrl || '';
+      const resumeUrl = selectedResumeOption === 'latest' ? (profile?.resumeUrl || '') : uploadedResumeUrl;
       const jobDescription = selectedJob?.description || '';
 
       if (resumeUrl && jobDescription) {
@@ -307,7 +309,7 @@ const JobListing = () => {
       clearTimeout(timer6);
       if (interval) clearInterval(interval);
     };
-  }, [applyStep, profile, selectedJob, dispatch]);
+  }, [applyStep, profile, selectedJob, dispatch, selectedResumeOption, uploadedResumeUrl]);
 
 
 
@@ -525,6 +527,8 @@ const JobListing = () => {
           setApplyStep={setApplyStep}
           selectedResumeOption={selectedResumeOption}
           setSelectedResumeOption={setSelectedResumeOption}
+          uploadedResumeUrl={uploadedResumeUrl}
+          setUploadedResumeUrl={setUploadedResumeUrl}
           loadingStage={loadingStage}
           loadingProgress={loadingProgress}
           isApplying={isApplying}

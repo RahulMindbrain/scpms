@@ -14,6 +14,7 @@ import type { AppDispatch } from '@/redux/store/store';
 import { optimizeResume } from '@/redux/thunks/atsThunk';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
 
 interface JobUniversity {
   id: number;
@@ -52,6 +53,8 @@ interface JobApplyModalProps {
   setApplyStep: (step: 'resume' | 'loading' | 'report' | 'optimize-loading' | 'optimized') => void;
   selectedResumeOption: 'latest' | 'fresh';
   setSelectedResumeOption: (option: 'latest' | 'fresh') => void;
+  uploadedResumeUrl: string;
+  setUploadedResumeUrl: (url: string) => void;
   loadingStage: number;
   loadingProgress: number;
   isApplying: boolean;
@@ -76,6 +79,8 @@ export const JobApplyModal: React.FC<JobApplyModalProps> = ({
   setApplyStep,
   selectedResumeOption,
   setSelectedResumeOption,
+  uploadedResumeUrl,
+  setUploadedResumeUrl,
   loadingStage,
   loadingProgress,
   isApplying,
@@ -85,6 +90,11 @@ export const JobApplyModal: React.FC<JobApplyModalProps> = ({
   const dispatch = useDispatch<AppDispatch>();
   const { profile } = useSelector((state: RootState) => state.student);
   const { result, optimizedResume } = useSelector((state: RootState) => state.ats);
+  const { upload, isUploading } = useCloudinaryUpload();
+
+  // local states for fresh upload
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [fileName, setFileName] = useState('');
 
   // local states for optimize-loading checklist & copy buttons
   const [optStage, setOptStage] = useState(0);
@@ -118,6 +128,8 @@ const handleDownloadMarkdown = (resume: any) => {
       setOptStage(0);
       setOptProgress(0);
       setCopiedField(null);
+      setSelectedFile(null);
+      setFileName('');
     }
   }, [isOpen]);
 
@@ -163,12 +175,49 @@ ${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **
 `;
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.type !== "application/pdf") {
+        toast.error("Only PDF files are supported");
+        return;
+      }
+      setSelectedFile(file);
+      setFileName(file.name);
+    }
+  };
+
+  const handleAnalyzeClick = async () => {
+    if (selectedResumeOption === 'fresh') {
+      if (!selectedFile) {
+        toast.error("Please select a resume file");
+        return;
+      }
+      try {
+        const uploadedUrl = await upload(selectedFile, "resumes");
+        if (!uploadedUrl) {
+          return;
+        }
+        setUploadedResumeUrl(uploadedUrl);
+        setApplyStep('loading');
+      } catch (err: any) {
+        toast.error(err?.message || "Failed to upload resume");
+      }
+    } else {
+      if (!profile?.resumeUrl) {
+        toast.error("No profile resume found. Please upload a new one.");
+        return;
+      }
+      setApplyStep('loading');
+    }
+  };
+
   const handleOptimizeResume = async () => {
-    const resumeUrl = profile?.resumeUrl || '';
+    const resumeUrl = selectedResumeOption === 'latest' ? (profile?.resumeUrl || '') : (uploadedResumeUrl || profile?.resumeUrl || '');
     const jobDescription = selectedJob?.description || '';
 
     if (!resumeUrl) {
-      toast.error("No resume found in your profile to optimize.");
+      toast.error("No resume found to optimize.");
       return;
     }
 
@@ -234,13 +283,13 @@ ${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **
     <Modal
       isOpen={isOpen}
       onClose={() => {
-        if (applyStep !== 'loading' && applyStep !== 'optimize-loading') {
+        if (applyStep !== 'loading' && applyStep !== 'optimize-loading' && !isUploading) {
           onClose();
         }
       }}
-      showCloseButton={applyStep !== 'loading' && applyStep !== 'optimize-loading'}
+      showCloseButton={applyStep !== 'loading' && applyStep !== 'optimize-loading' && !isUploading}
       maxWidth={(applyStep === 'report' || applyStep === 'optimized') ? "sm:max-w-2xl" : "sm:max-w-lg"}
-      preventOutsideClick={applyStep === 'loading' || applyStep === 'optimize-loading'}
+      preventOutsideClick={applyStep === 'loading' || applyStep === 'optimize-loading' || isUploading}
     >
       <div className="relative py-2 px-1">
 
@@ -353,6 +402,31 @@ ${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **
               </div>
             </div>
 
+            {/* Upload Zone (Visible if 'fresh' is selected) */}
+            {selectedResumeOption === 'fresh' && (
+              <div className="relative group rounded-3xl border-2 border-dashed border-slate-250 dark:border-white/10 hover:border-blue-500 dark:hover:border-blue-400 transition-all p-5 flex flex-col items-center justify-center gap-3.5 bg-slate-50/50 dark:bg-slate-950/20">
+                <input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={handleFileChange}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                />
+                
+                <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center text-blue-600 shrink-0">
+                  <Upload size={22} />
+                </div>
+                
+                <div className="space-y-1">
+                  <p className="text-xs font-bold text-slate-800 dark:text-[#f8fafc]">
+                    {selectedFile ? selectedFile.name : "Choose file or drag here"}
+                  </p>
+                  <p className="text-[9px] text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider">
+                    {selectedFile ? `${(selectedFile.size / (1024 * 1024)).toFixed(2)} MB` : "PDF format up to 10MB"}
+                  </p>
+                </div>
+              </div>
+            )}
+
             {/* Bottom link and buttons */}
             <div className="flex flex-col gap-5 pt-3">
               <div className="text-center">
@@ -378,11 +452,16 @@ ${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **
                   Cancel
                 </button>
                 <Button
-                  onClick={() => setApplyStep('loading')}
-                  className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 rounded-xl px-6 h-11 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-slate-900/10 transition-all border-none"
+                  onClick={handleAnalyzeClick}
+                  disabled={isUploading}
+                  className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 rounded-xl px-6 h-11 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-slate-900/10 transition-all border-none cursor-pointer"
                 >
-                  <Zap size={11} className="fill-current" />
-                  Analyze Now
+                  {isUploading ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <Zap size={11} className="fill-current" />
+                  )}
+                  {isUploading ? "Uploading..." : "Analyze Now"}
                 </Button>
               </div>
             </div>
