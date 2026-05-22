@@ -12,6 +12,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import type { AppDispatch } from '@/redux/store/store';
 import { optimizeResume } from '@/redux/thunks/atsThunk';
+import { updateStudentProfile } from '@/redux/thunks/studentThunk';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
@@ -199,6 +200,16 @@ ${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **
           return;
         }
         setUploadedResumeUrl(uploadedUrl);
+        
+        // Sync with student profile on the backend
+        try {
+          await dispatch(updateStudentProfile({ resumeUrl: uploadedUrl })).unwrap();
+          toast.success("Resume synced to profile successfully!");
+        } catch (profileError) {
+          console.error("Failed to sync resume to student profile:", profileError);
+          toast.warning("Application will proceed, but failed to set as default profile resume.");
+        }
+
         setApplyStep('loading');
       } catch (err: any) {
         toast.error(err?.message || "Failed to upload resume");
