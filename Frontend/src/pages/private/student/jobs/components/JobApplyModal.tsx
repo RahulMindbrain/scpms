@@ -59,6 +59,15 @@ interface JobApplyModalProps {
   checklistItems: string[];
 }
 
+const ensureArray = (val: any): any[] => {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'string') {
+    return val.split(',').map(s => s.trim()).filter(Boolean);
+  }
+  return [];
+};
+
 export const JobApplyModal: React.FC<JobApplyModalProps> = ({
   isOpen,
   onClose,
@@ -130,27 +139,27 @@ ${resume.linkedin ? `LinkedIn: ${resume.linkedin} | ` : ''}${resume.github ? `Gi
 ${resume.summary}
 
 ## Technical Skills
-${resume.skills?.join(', ')}
+${ensureArray(resume.skills).join(', ')}
 
-${resume.frameworks?.length ? `### Frameworks & Libraries\n${resume.frameworks.join(', ')}\n` : ''}
-${resume.cloud?.length ? `### Cloud & DevOps\n${resume.cloud.join(', ')}\n` : ''}
-${resume.languages ? `### Languages\n${resume.languages}\n` : ''}
+${ensureArray(resume.frameworks).length ? `### Frameworks & Libraries\n${ensureArray(resume.frameworks).join(', ')}\n` : ''}
+${ensureArray(resume.cloud).length ? `### Cloud & DevOps\n${ensureArray(resume.cloud).join(', ')}\n` : ''}
+${resume.languages ? `### Languages\n${Array.isArray(resume.languages) ? resume.languages.join(', ') : resume.languages}\n` : ''}
 
 ## Projects
-${resume.projects?.map((p: any) => `### ${p.name}
+${Array.isArray(resume.projects) ? resume.projects.map((p: any) => `### ${p.name}
 *Tech Stack: ${p.techStack || 'N/A'}*
-${p.highlights?.map((h: any) => `- ${h}`).join('\n')}
-`).join('\n')}
+${ensureArray(p.highlights)?.map((h: any) => `- ${h}`).join('\n')}
+`).join('\n') : ''}
 
 ## Education
-${resume.education?.map((e: any) => `### ${e.degree} in ${e.field}
+${Array.isArray(resume.education) ? resume.education.map((e: any) => `### ${e.degree} in ${e.field}
 *${e.university} (${e.year})*
-`).join('\n')}
+`).join('\n') : ''}
 
 ${resume.certifications ? `## Certifications\n${resume.certifications}\n` : ''}
 
 ## Key Achievements
-${resume.achievements?.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).join('\n')}
+${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).join('\n') : ''}
 `;
   };
 
@@ -865,11 +874,11 @@ ${resume.achievements?.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Frameworks & Languages */}
-                  {optimizedResume.frameworks?.length > 0 && (
+                  {ensureArray(optimizedResume.frameworks).length > 0 && (
                     <div className="space-y-1.5 p-3 rounded-xl bg-slate-100/30 dark:bg-white/[0.01] border border-slate-200/40 dark:border-white/[0.03]">
                       <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Frameworks & Libraries</span>
                       <div className="flex flex-wrap gap-1.5">
-                        {optimizedResume.frameworks.map((f, idx) => (
+                        {ensureArray(optimizedResume.frameworks).map((f, idx) => (
                           <Badge key={idx} className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/15 border-none text-[8.5px] uppercase font-bold py-0.5 px-2 rounded-md tracking-wider">
                             {f}
                           </Badge>
@@ -879,11 +888,11 @@ ${resume.achievements?.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).
                   )}
 
                   {/* Cloud & Infrastructures */}
-                  {optimizedResume.cloud?.length > 0 && (
+                  {ensureArray(optimizedResume.cloud).length > 0 && (
                     <div className="space-y-1.5 p-3 rounded-xl bg-slate-100/30 dark:bg-white/[0.01] border border-slate-200/40 dark:border-white/[0.03]">
                       <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider">Cloud & DevOps</span>
                       <div className="flex flex-wrap gap-1.5">
-                        {optimizedResume.cloud.map((c, idx) => (
+                        {ensureArray(optimizedResume.cloud).map((c, idx) => (
                           <Badge key={idx} className="bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/15 border-none text-[8.5px] uppercase font-bold py-0.5 px-2 rounded-md tracking-wider">
                             {c}
                           </Badge>
@@ -894,11 +903,11 @@ ${resume.achievements?.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).
                 </div>
 
                 {/* Core skills list */}
-                {optimizedResume.skills?.length > 0 && (
+                {ensureArray(optimizedResume.skills).length > 0 && (
                   <div className="space-y-1.5 p-3 rounded-xl bg-slate-100/30 dark:bg-white/[0.01] border border-slate-200/40 dark:border-white/[0.03]">
                     <span className="text-[9px] font-black uppercase text-slate-400 tracking-wider">All Technical Competencies</span>
                     <div className="flex flex-wrap gap-1.5">
-                      {optimizedResume.skills.map((s, idx) => (
+                      {ensureArray(optimizedResume.skills).map((s, idx) => (
                         <Badge key={idx} className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15 border-none text-[8.5px] uppercase font-bold py-0.5 px-2 rounded-md tracking-wider">
                           {s}
                         </Badge>
@@ -916,7 +925,7 @@ ${resume.achievements?.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).
               </div>
 
               {/* Tailored Projects */}
-              {optimizedResume.projects?.length > 0 && (
+              {Array.isArray(optimizedResume.projects) && optimizedResume.projects.length > 0 && (
                 <div className="space-y-5 border-t border-slate-200/50 dark:border-white/[0.04] pt-5">
                   <h4 className="text-[10px] font-black tracking-widest text-indigo-600 dark:text-indigo-400 uppercase flex items-center gap-2">
                     <Briefcase size={12} className="stroke-[2.5]" />
@@ -940,7 +949,8 @@ ${resume.achievements?.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).
                           
                           <button
                             onClick={() => {
-                              const projText = `Project: ${proj.name}\nTech Stack: ${proj.techStack || 'N/A'}\nHighlights:\n${proj.highlights.map(h => `- ${h}`).join('\n')}`;
+                              const projHighlights = ensureArray(proj.highlights);
+                              const projText = `Project: ${proj.name}\nTech Stack: ${proj.techStack || 'N/A'}\nHighlights:\n${projHighlights.map(h => `- ${h}`).join('\n')}`;
                               handleCopyText(projText, `proj-${pIdx}`);
                             }}
                             className="opacity-0 group-hover/proj:opacity-100 transition-opacity p-1.5 rounded-lg bg-slate-200/50 dark:bg-white/10 hover:bg-slate-250 dark:hover:bg-white/15 text-slate-500 hover:text-slate-800 dark:text-slate-455 dark:hover:text-white shrink-0 cursor-pointer"
@@ -950,7 +960,7 @@ ${resume.achievements?.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).
                         </div>
 
                         <ul className="space-y-1.5 pl-4 text-slate-655 dark:text-slate-350 text-[11px] md:text-xs leading-relaxed font-semibold list-disc marker:text-indigo-500">
-                          {proj.highlights?.map((highlight, hIdx) => (
+                          {ensureArray(proj.highlights)?.map((highlight, hIdx) => (
                             <li key={hIdx}>{highlight}</li>
                           ))}
                         </ul>
@@ -961,7 +971,7 @@ ${resume.achievements?.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).
               )}
 
               {/* Education */}
-              {optimizedResume.education?.length > 0 && (
+              {Array.isArray(optimizedResume.education) && optimizedResume.education.length > 0 && (
                 <div className="space-y-4 border-t border-slate-200/50 dark:border-white/[0.04] pt-5">
                   <h4 className="text-[10px] font-black tracking-widest text-indigo-600 dark:text-indigo-400 uppercase flex items-center gap-2">
                     <GraduationCap size={12} className="stroke-[2.5]" />
@@ -1002,7 +1012,7 @@ ${resume.achievements?.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).
               )}
 
               {/* Achievements Stats Grid */}
-              {optimizedResume.achievements?.length > 0 && (
+              {Array.isArray(optimizedResume.achievements) && optimizedResume.achievements.length > 0 && (
                 <div className="space-y-3.5 border-t border-slate-200/50 dark:border-white/[0.04] pt-5">
                   <h4 className="text-[10px] font-black tracking-widest text-indigo-600 dark:text-indigo-400 uppercase flex items-center gap-2">
                     <Award size={12} className="stroke-[2.5]" />

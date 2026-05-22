@@ -52,6 +52,12 @@ export const Modal: React.FC<ModalProps> = ({
     className
   )}
 >
+        {/* Render a visually hidden title if no title is provided to meet screen reader accessibility requirements */}
+        {!title && (
+          <DialogTitle className="sr-only">
+            {subtitle || "Modal Dialog"}
+          </DialogTitle>
+        )}
         {(title || subtitle) && (
        <DialogHeader className="p-7 pb-4 space-y-1 border-b border-slate-100 dark:border-white/10 sticky top-0 bg-white dark:bg-[#1e1f26] z-10">
             {title && (
