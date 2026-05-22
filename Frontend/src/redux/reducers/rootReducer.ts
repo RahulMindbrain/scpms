@@ -12,6 +12,7 @@ import notificationReducer from "@/redux/slices/notificationSlice";
 import skillReducer from "@/redux/slices/skillSlice";
 import superAdminReducer from "@/redux/slices/superAdminSlice";
 import companyUniversityReducer from "@/redux/slices/companyUniversitySlice";
+import atsReducer from "@/redux/slices/atsSlice";
 const rootReducer = combineReducers({
     auth: authReducer,
     student: studentReducer,
@@ -25,6 +26,7 @@ const rootReducer = combineReducers({
     skill: skillReducer,
     superAdmin: superAdminReducer,
     companyUniversity: companyUniversityReducer,
+    ats: atsReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

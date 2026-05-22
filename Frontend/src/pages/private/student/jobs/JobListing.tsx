@@ -22,6 +22,8 @@ import { JobCard } from './components/JobCard';
 import { JobDetailsModal } from './components/JobDetailsModal';
 import { JobApplyModal } from './components/JobApplyModal';
 import { GlobalAtsModal } from './components/GlobalAtsModal';
+import { analyzeJdMatch } from '@/redux/thunks/atsThunk';
+import { resetAtsState } from '@/redux/slices/atsSlice';
 
 interface JobUniversity {
   id: number;
@@ -96,12 +98,7 @@ const checklistItems = [
   "Synthesizing final ATS match report"
 ];
 
-const globalChecklistItems = [
-  "Reading resume file metadata & formatting",
-  "Extracting work experience & technical skills",
-  "Measuring keyword density & semantic richness",
-  "Synthesizing final ATS score and actionable tips"
-];
+
 
 const JobListing = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -134,13 +131,9 @@ const JobListing = () => {
 
   // Global ATS Checker state
   const [isGlobalAtsModalOpen, setIsGlobalAtsModalOpen] = useState(false);
-  const [globalAtsStep, setGlobalAtsStep] = useState<'upload' | 'scanning' | 'report'>('upload');
-  const [globalAtsProgress, setGlobalAtsProgress] = useState(0);
-  const [globalAtsStage, setGlobalAtsStage] = useState(0);
-  const [globalAtsFileName, setGlobalAtsFileName] = useState<string>('');
   
   // ATS multi-state application flow
-  const [applyStep, setApplyStep] = useState<'resume' | 'loading' | 'report'>('resume');
+  const [applyStep, setApplyStep] = useState<'resume' | 'loading' | 'report' | 'optimize-loading' | 'optimized'>('resume');
   const [selectedResumeOption, setSelectedResumeOption] = useState<'latest' | 'fresh'>('latest');
   const [loadingStage, setLoadingStage] = useState(0);
   const [loadingProgress, setLoadingProgress] = useState(0);
@@ -227,7 +220,17 @@ const JobListing = () => {
     setCurrentPage(1);
   }, [searchQuery, activeTab]);
 
-  // Simulate loading stages for the custom ATS resume scanner
+  // Reset ATS state when the modal closes
+  useEffect(() => {
+    if (!isApplyModalOpen) {
+      setApplyStep('resume');
+      setLoadingStage(0);
+      setLoadingProgress(0);
+      dispatch(resetAtsState());
+    }
+  }, [isApplyModalOpen, dispatch]);
+
+  // Handle loading stages and trigger real API call for the custom ATS resume scanner
   useEffect(() => {
     let interval: any;
     let timer1: any;
@@ -235,6 +238,7 @@ const JobListing = () => {
     let timer3: any;
     let timer4: any;
     let timer5: any;
+    let timer6: any;
     
     if (applyStep === 'loading') {
       setLoadingStage(0);
@@ -253,19 +257,45 @@ const JobListing = () => {
       timer4 = setTimeout(() => {
         interval = setInterval(() => {
           setLoadingProgress((prev) => {
-            if (prev >= 100) {
+            if (prev >= 95) {
               clearInterval(interval);
-              return 100;
+              return 95;
             }
             return prev + 5;
           });
         }, 80);
       }, 2750);
       
-      // Auto-transition to report after progress completes
-      timer5 = setTimeout(() => {
-        setApplyStep('report');
-      }, 4600);
+      // Perform real API call
+      const resumeUrl = profile?.resumeUrl || '';
+      const jobDescription = selectedJob?.description || '';
+
+      if (resumeUrl && jobDescription) {
+        dispatch(analyzeJdMatch({ resumeUrl, jobDescription }))
+          .unwrap()
+          .then(() => {
+            // Succeeded! Complete progress
+            setLoadingStage(4);
+            setLoadingProgress(100);
+            timer5 = setTimeout(() => {
+              setApplyStep('report');
+            }, 600);
+          })
+          .catch((err: any) => {
+            console.error("ATS Analyzer error during apply:", err);
+            toast.error(err || "Failed to analyze resume match");
+            setApplyStep('resume');
+          });
+      } else {
+        // Fallback to simulation
+        timer5 = setTimeout(() => {
+          setLoadingStage(4);
+          setLoadingProgress(100);
+          timer6 = setTimeout(() => {
+            setApplyStep('report');
+          }, 600);
+        }, 4600);
+      }
     }
 
     return () => {
@@ -274,53 +304,12 @@ const JobListing = () => {
       clearTimeout(timer3);
       clearTimeout(timer4);
       clearTimeout(timer5);
+      clearTimeout(timer6);
       if (interval) clearInterval(interval);
     };
-  }, [applyStep]);
+  }, [applyStep, profile, selectedJob, dispatch]);
 
-  // Simulate loading stages for the Global ATS Resume Scanner
-  useEffect(() => {
-    let interval: any;
-    let timer1: any;
-    let timer2: any;
-    let timer3: any;
-    let timer4: any;
-    let timer5: any;
-    
-    if (globalAtsStep === 'scanning') {
-      setGlobalAtsStage(0);
-      setGlobalAtsProgress(0);
-      
-      timer1 = setTimeout(() => setGlobalAtsStage(1), 900);
-      timer2 = setTimeout(() => setGlobalAtsStage(2), 1800);
-      timer3 = setTimeout(() => setGlobalAtsStage(3), 2700);
-      
-      timer4 = setTimeout(() => {
-        interval = setInterval(() => {
-          setGlobalAtsProgress((prev) => {
-            if (prev >= 100) {
-              clearInterval(interval);
-              return 100;
-            }
-            return prev + 5;
-          });
-        }, 80);
-      }, 2750);
-      
-      timer5 = setTimeout(() => {
-        setGlobalAtsStep('report');
-      }, 4600);
-    }
 
-    return () => {
-      clearTimeout(timer1);
-      clearTimeout(timer2);
-      clearTimeout(timer3);
-      clearTimeout(timer4);
-      clearTimeout(timer5);
-      if (interval) clearInterval(interval);
-    };
-  }, [globalAtsStep]);
 
   const handleApply = async () => {
     if (!selectedJob) return;
@@ -414,11 +403,7 @@ const JobListing = () => {
                 />
               </div>
               <Button
-                onClick={() => {
-                  setGlobalAtsStep('upload');
-                  setGlobalAtsFileName('');
-                  setIsGlobalAtsModalOpen(true);
-                }}
+                onClick={() => setIsGlobalAtsModalOpen(true)}
                 className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs md:text-sm px-4 h-10 rounded-xl shadow-md flex flex-wrap items-center gap-2 transition-all duration-300 hover:scale-[1.02] cursor-pointer shrink-0"
               >
                 <Sparkles size={14} className="fill-white" />
@@ -550,13 +535,6 @@ const JobListing = () => {
         <GlobalAtsModal
           isOpen={isGlobalAtsModalOpen}
           onClose={() => setIsGlobalAtsModalOpen(false)}
-          globalAtsStep={globalAtsStep}
-          setGlobalAtsStep={setGlobalAtsStep}
-          globalAtsFileName={globalAtsFileName}
-          setGlobalAtsFileName={setGlobalAtsFileName}
-          globalAtsStage={globalAtsStage}
-          globalAtsProgress={globalAtsProgress}
-          globalChecklistItems={globalChecklistItems}
         />
       </div>
     </StudentPageLayout>

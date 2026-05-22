@@ -5,6 +5,7 @@ import axios, { type AxiosRequestConfig, type AxiosError } from "axios"
 // const BASE_URL = "https://scpms.onrender.com"
 const BASE_URL = "https://scpms-production.up.railway.app"
 
+
 const api = axios.create({
   baseURL: BASE_URL,
   withCredentials: true, // send httpOnly auth cookie on every request

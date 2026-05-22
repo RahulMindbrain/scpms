@@ -181,9 +181,9 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto custom-scrollbar">
-          <div className="p-10 pt-8 space-y-10">
+          <div className="p-6 space-y-6">
             <Tabs defaultValue="personal" className="w-full">
-              <TabsList className="flex items-center gap-2 mb-10 bg-muted/50 p-1.5 rounded-2xl w-fit">
+              <TabsList className="flex gap-6 border-b mb-6 bg-transparent p-0">
                 {[
                   { value: "personal", label: "Identity", icon: User },
                   { value: "academic", label: "Records", icon: GraduationCap },
@@ -193,7 +193,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                   <TabsTrigger 
                     key={tab.value}
                     value={tab.value} 
-                    className="flex items-center gap-2 px-5 py-2.5 rounded-xl transition-all duration-300 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-xl data-[state=active]:shadow-primary/10 font-bold text-xs uppercase tracking-widest text-muted-foreground"
+                    className="pb-2 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary text-muted-foreground rounded-none bg-transparent shadow-nonetransition-all duration-300 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-xl data-[state=active]:shadow-primary/10 font-bold text-xs uppercase tracking-widest text-muted-foreground"
                   >
                     <tab.icon className="size-4" />
                     {tab.label}
@@ -205,7 +205,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
               <TabsContent value="personal" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
-                    <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Legal Full Name</Label>
+                    <Label htmlFor="name" className="text-xs font-semibold text-muted-foreground text-muted-foreground ml-1">Legal Full Name</Label>
                     <div className="relative group">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input
@@ -219,7 +219,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                   </div>
 
                   <div className="space-y-3">
-                    <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Institutional Email</Label>
+                    <Label htmlFor="email" className="text-xs font-semibold text-muted-foreground text-muted-foreground ml-1">Institutional Email</Label>
                     <div className="relative group">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                       <Input
@@ -239,7 +239,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
               <TabsContent value="academic" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="md:col-span-2 space-y-3">
-                    <Label htmlFor="university" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Affiliated University (Read Only)</Label>
+                    <Label htmlFor="university" className="text-xs font-semibold text-muted-foreground text-muted-foreground ml-1">Affiliated University (Read Only)</Label>
                     <div className="relative group opacity-80">
                       <Building2 className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground transition-colors" />
                       <Input
@@ -252,7 +252,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                   </div>
 
                   <div className="space-y-3">
-                    <Label htmlFor="cgpa" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Current Cumulative GPA</Label>
+                    <Label htmlFor="cgpa" className="text-xs font-semibold text-muted-foreground text-muted-foreground ml-1">Current Cumulative GPA</Label>
                     <Input
                       id="cgpa"
                       type="number"
@@ -268,7 +268,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                   </div>
 
                   <div className="space-y-3">
-                    <Label htmlFor="year" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Current Year of Study</Label>
+                    <Label htmlFor="year" className="text-xs font-semibold text-muted-foreground text-muted-foreground ml-1">Current Year of Study</Label>
                     <Input
                       id="year"
                       type="number"
@@ -282,7 +282,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                   </div>
 
                   <div className="space-y-3">
-                    <Label htmlFor="passingYear" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Graduation Batch (Year)</Label>
+                    <Label htmlFor="passingYear" className="text-xs font-semibold text-muted-foreground text-muted-foreground ml-1">Graduation Batch (Year)</Label>
                     <Input
                       id="passingYear"
                       type="number"
@@ -295,7 +295,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                   </div>
 
                   <div className="space-y-3">
-                    <Label htmlFor="activeBacklogs" className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Active Backlogs Count</Label>
+                    <Label htmlFor="activeBacklogs" className="text-xs font-semibold text-muted-foreground text-muted-foreground ml-1">Active Backlogs Count</Label>
                     <Input
                       id="activeBacklogs"
                       type="number"
@@ -319,7 +319,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                     { id: "portfolioUrl", label: "Personal Website URL", icon: Globe, placeholder: "https://yourportfolio.com" }
                   ].map((social) => (
                     <div key={social.id} className="space-y-3">
-                      <Label htmlFor={social.id} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">{social.label}</Label>
+                      <Label htmlFor={social.id} className="text-xs font-semibold text-muted-foreground text-muted-foreground ml-1">{social.label}</Label>
                       <div className="relative group">
                         <social.icon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                         <Input
@@ -340,7 +340,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
               <TabsContent value="skills" className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-500">
                 <div className="space-y-6">
                   <div className="space-y-3">
-                    <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Stack Expansion</Label>
+                    <Label className="text-xs font-semibold text-muted-foreground text-muted-foreground ml-1">Stack Expansion</Label>
                     <select
                       className="flex h-13 w-full rounded-2xl border border-border/50 bg-background px-4 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer shadow-sm hover:border-primary/30"
                       value=""
@@ -375,7 +375,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
                     ) : (
                       <div className="w-full flex flex-col items-center justify-center py-6 opacity-40">
                          <Code2 className="size-10 mb-2" />
-                         <p className="text-[10px] font-black uppercase tracking-widest">No abilities indexed yet</p>
+                         <p className="text-xs font-semibold text-muted-foreground">No abilities indexed yet</p>
                       </div>
                     )}
                   </div>
@@ -387,7 +387,7 @@ const ProfileEditDialog = ({ isOpen, onClose, profile, onSave, isLoading, isAppr
 
             {/* RESUME SECTION */}
             <div className="space-y-4">
-              <Label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground ml-1">Carrier-Grade Resume (PDF Only, Max 10MB)</Label>
+              <Label className="text-xs font-semibold text-muted-foreground text-muted-foreground ml-1">Carrier-Grade Resume (PDF Only, Max 10MB)</Label>
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-6 rounded-3xl bg-primary/[0.03] border border-primary/10">
                 <input
                   type="file"

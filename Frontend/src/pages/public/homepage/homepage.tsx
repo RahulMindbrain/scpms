@@ -114,32 +114,32 @@ const HomePage: React.FC = () => {
                       </div>
                       <span className="text-xs font-bold whitespace-nowrap">Dashboard</span>
                     </Link>
-                      <button
-                        onClick={handleLogout}
-                        className={`p-2 rounded-lg transition-all ${scrolled ? 'text-slate-400 dark:text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10' : 'text-slate-700 dark:text-slate-300 hover:text-white hover:bg-white/10'}`}
-                        title="Logout"
-                      >
-                        <LogOut size={18} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 md:hidden">
-                <ModeToggle />
-                <button className={`p-2 ${scrolled || isMenuOpen ? 'text-slate-900 dark:text-white' : 'text-slate-950 dark:text-white'}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                  {isMenuOpen ? <X /> : <Menu />}
-                </button>
+                    <button
+                      onClick={handleLogout}
+                      className={`p-2 rounded-lg transition-all ${scrolled ? 'text-slate-400 dark:text-slate-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10' : 'text-slate-700 dark:text-slate-300 hover:text-white hover:bg-white/10'}`}
+                      title="Logout"
+                    >
+                      <LogOut size={18} />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
+
+            <div className="flex items-center gap-2 md:hidden">
+              <ModeToggle />
+              <button className={`p-2 ${scrolled || isMenuOpen ? 'text-slate-900 dark:text-white' : 'text-slate-950 dark:text-white'}`} onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                {isMenuOpen ? <X /> : <Menu />}
+              </button>
+            </div>
           </div>
+        </div>
 
         {/* Mobile Navigation Menu */}
         <div className={`md:hidden fixed inset-0 z-[60] bg-white dark:bg-[#02040a] transition-all duration-300 ease-in-out ${isMenuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'}`}>
           <div className="h-[100dvh] flex flex-col justify-between p-4 bg-gradient-to-b from-white dark:from-[#02040a] via-blue-50 dark:via-blue-900/10 to-white dark:to-[#02040a] relative overflow-hidden">
             {/* Dedicated Close Button */}
-            <button 
+            <button
               onClick={() => setIsMenuOpen(false)}
               className="absolute top-6 right-6 p-3 rounded-2xl bg-white dark:bg-[#0b0f1a] shadow-xl border border-slate-100 dark:border-white/10 text-slate-900 dark:text-white active:scale-95 transition-all z-50"
             >
@@ -236,9 +236,9 @@ const HomePage: React.FC = () => {
           {/* Light Mode Mesh */}
           <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-400/10 dark:bg-blue-600/20 blur-[120px] animate-pulse"></div>
           <div className="absolute bottom-[10%] right-[-5%] w-[30%] h-[30%] rounded-full bg-indigo-400/10 dark:bg-indigo-600/20 blur-[100px] animate-pulse" style={{ animationDelay: '1s' }}></div>
-          
+
           <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.15] dark:opacity-20 brightness-100"></div>
-          
+
           {/* Light Mode Grid */}
           <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
         </div>
@@ -265,7 +265,7 @@ const HomePage: React.FC = () => {
                   onClick={() => navigate(isAuthenticated ? getDashboardLink() : '/login')}
                   className="w-full xs:w-auto group relative px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-950 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-xl shadow-blue-500/10 hover:shadow-blue-500/20"
                 >
-                  {isAuthenticated ? 'Go to Dashboard' : 'Get Started Now'} 
+                  {isAuthenticated ? 'Go to Dashboard' : 'Get Started Now'}
                   <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
                 </button>
                 <button
@@ -281,14 +281,14 @@ const HomePage: React.FC = () => {
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-[2.5rem] blur opacity-20 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
                 <div className="relative bg-white dark:bg-slate-900 rounded-[2.5rem] overflow-hidden border border-slate-200 dark:border-white/10 shadow-2xl">
-                  <img 
-                    src={heroImg} 
-                    alt="Campus Placement Success" 
+                  <img
+                    src={heroImg}
+                    alt="Campus Placement Success"
                     className="w-full h-auto object-cover transform transition-transform duration-700 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-900/20 dark:from-slate-900/60 via-transparent to-transparent"></div>
                 </div>
-                
+
                 {/* Floating Stats Card */}
                 <div className="absolute -bottom-6 -left-6 bg-white dark:bg-slate-900 p-6 rounded-2xl shadow-2xl border border-slate-100 dark:border-white/10 animate-bounce-slow">
                   <div className="flex items-center gap-4">
@@ -394,9 +394,9 @@ const HomePage: React.FC = () => {
                 </div>
                 <div className="flex-1 relative group">
                   <div className="absolute -inset-4 bg-gradient-to-r from-blue-500 to-indigo-600 opacity-20 blur-2xl group-hover:opacity-30 transition-opacity"></div>
-                  <img 
-                    src={dashboardImg} 
-                    alt="Analytics Dashboard" 
+                  <img
+                    src={dashboardImg}
+                    alt="Analytics Dashboard"
                     className="relative rounded-2xl shadow-2xl border border-slate-100 dark:border-white/10 transform transition-all duration-500 group-hover:scale-[1.02] group-hover:rotate-1"
                   />
                 </div>
@@ -418,32 +418,32 @@ const HomePage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-8">
-           <PortalCard
-  icon={Users}
-  iconColor="bg-blue-600"
-  title="Admin"
-  desc="Manage drives, approve profiles, monitor analytics, and orchestrate the entire placement lifecycle."
-  buttonText="Admin Portal"
-  navigateTo="/login?role=admin"
-/>
+            <PortalCard
+              icon={Users}
+              iconColor="bg-blue-600"
+              title="Admin"
+              desc="Manage drives, approve profiles, monitor analytics, and orchestrate the entire placement lifecycle."
+              buttonText="Admin Portal"
+              navigateTo="/login?role=admin"
+            />
 
-<PortalCard
-  icon={GraduationCap}
-  iconColor="bg-gradient-to-br from-teal-500 to-emerald-500"
-  title="Students"
-  desc="Build your portfolio, track eligibility, apply to drives, and follow your application status in real time."
-  buttonText="Student Portal"
-  navigateTo="/login?role=student"
-/>
+            <PortalCard
+              icon={GraduationCap}
+              iconColor="bg-gradient-to-br from-teal-500 to-emerald-500"
+              title="Students"
+              desc="Build your portfolio, track eligibility, apply to drives, and follow your application status in real time."
+              buttonText="Student Portal"
+              navigateTo="/login?role=student"
+            />
 
-<PortalCard
-  icon={Building2}
-  iconColor="bg-indigo-700"
-  title="Companies"
-  desc="Post job descriptions, filter candidates by criteria, schedule interviews, and update selection results."
-  buttonText="Company Portal"
-  navigateTo="/login?role=company"
-/>
+            <PortalCard
+              icon={Building2}
+              iconColor="bg-indigo-700"
+              title="Companies"
+              desc="Post job descriptions, filter candidates by criteria, schedule interviews, and update selection results."
+              buttonText="Company Portal"
+              navigateTo="/login?role=company"
+            />
           </div>
         </div>
       </section>
@@ -466,12 +466,12 @@ const HomePage: React.FC = () => {
 
             <div className="flex-1 w-full relative group">
               <div className="absolute -inset-4 bg-gradient-to-r from-indigo-500 to-teal-500 opacity-20 blur-2xl group-hover:opacity-30 transition-opacity"></div>
-              <img 
-                src={partnersImg} 
-                alt="Corporate Partnerships" 
+              <img
+                src={partnersImg}
+                alt="Corporate Partnerships"
                 className="relative rounded-[2.5rem] shadow-2xl border border-slate-100 dark:border-white/10 transform transition-all duration-700 group-hover:scale-105"
               />
-              
+
               <div className="absolute -top-12 -right-8 hidden md:block">
                 <div className="bg-[#1e293b] rounded-2xl p-6 text-center text-white shadow-2xl animate-float">
                   <div className="text-3xl font-black text-blue-400 mb-1">₹24 LPA</div>
@@ -501,7 +501,7 @@ const HomePage: React.FC = () => {
             to="/signup"
             className="group relative bg-slate-900 dark:bg-white text-white dark:text-slate-950 px-10 py-5 rounded-2xl font-extrabold text-lg inline-flex items-center gap-2 transition-all hover:scale-105 active:scale-95 shadow-2xl shadow-blue-500/10"
           >
-            Get Started Now 
+            Get Started Now
             <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
