@@ -88,7 +88,21 @@ export const JobApplyModal: React.FC<JobApplyModalProps> = ({
     "Re-writing projects & enhancing achievements",
     "Generating final print-ready layout"
   ];
+const handleDownloadMarkdown = (resume: any) => {
+  const content = getResumeMarkdown(resume);
 
+  const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${resume.fullName || "resume"}_optimized.md`;
+  document.body.appendChild(a);
+  a.click();
+
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+};
   // Reset local state when modal closes/opens
   useEffect(() => {
     if (!isOpen) {
@@ -770,13 +784,12 @@ ${resume.achievements?.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).
                 </p>
               </div>
               
-              <Button
-                onClick={() => handleCopyText(getResumeMarkdown(optimizedResume), 'markdown')}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 h-10 shrink-0 shadow-md shadow-indigo-500/10 border-none transition-all cursor-pointer"
-              >
-                {copiedField === 'markdown' ? <Check size={13} /> : <Copy size={13} />}
-                {copiedField === 'markdown' ? "Copied Full Resume!" : "Copy Full Markdown"}
-              </Button>
+            <Button
+  onClick={() => handleDownloadMarkdown(optimizedResume)}
+  className="bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2 h-10 shrink-0 shadow-md shadow-indigo-500/10 border-none transition-all cursor-pointer"
+>
+  Download Resume
+</Button>
             </div>
 
             {/* Resume Sheet Preview */}
