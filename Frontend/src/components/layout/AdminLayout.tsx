@@ -27,7 +27,7 @@ const AdminLayout: React.FC = () => {
         <SidebarInset className="bg-background overflow-y-auto overflow-x-hidden">
           <SiteHeader />
           <main className="relative flex flex-1 flex-col bg-background min-h-0 @container/main">
-            <div className="flex-1 p-4 md:p-6 lg:p-8 w-full mx-auto max-w-[1440px]">
+            <div className="flex-1 p-4 md:p-5 lg:p-6 w-full mx-auto max-w-[1440px]">
               <WarningBanner 
                 isVisible={!isApproved}
                 role="ADMIN"

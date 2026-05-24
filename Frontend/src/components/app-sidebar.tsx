@@ -192,46 +192,26 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       } as React.CSSProperties}
       {...props}
     >
-      <SidebarHeader className="flex h-16 shrink-0 items-center justify-between overflow-hidden border-b border-slate-100/80 dark:border-slate-900/80 px-4 group-data-[collapsible=icon]:px-0">
-        <div className="flex w-full items-center justify-between gap-3 transition-all duration-300 group-data-[collapsible=icon]:justify-center">
-          
-          {/* Logo & Portal Info (Expanded) */}
-          <div className="flex items-center gap-3 group-data-[collapsible=icon]:hidden">
-            <div className="flex aspect-square size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 shadow-md shadow-indigo-500/25 dark:shadow-indigo-500/10">
-              <GraduationCap className="size-5 text-white" />
-            </div>
-            <div className="flex flex-col leading-tight transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 overflow-hidden whitespace-nowrap">
-              <span className="text-[15px] font-bold tracking-tight text-slate-800 dark:text-slate-100">
-                SCPMS
-              </span>
-              <span className="text-[9.5px] font-bold tracking-[0.12em] text-slate-400 dark:text-slate-500 uppercase">
-                {role} Portal
-              </span>
-            </div>
+      <SidebarHeader className="flex h-16 shrink-0 items-center overflow-hidden border-b border-slate-100/80 dark:border-slate-900/80 px-4 group-data-[collapsible=icon]:px-0">
+        <div className="flex w-full items-center justify-start gap-3 group-data-[collapsible=icon]:justify-center transition-all duration-300">
+          <div className="flex aspect-square size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 shadow-md shadow-indigo-500/25 dark:shadow-indigo-500/10">
+            <GraduationCap className="size-5 text-white" />
           </div>
-          
-          {/* Standard Trigger (Expanded) */}
-          <SidebarTrigger className="h-8 w-8 rounded-lg text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-all duration-300 group-data-[collapsible=icon]:hidden shrink-0" />
-          
-          {/* Brand & Toggle Hover Swap (Collapsed) */}
-          <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center relative size-10 group/logo-trigger">
-            {/* Brand Logo (Default) */}
-            <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 shadow-md shadow-indigo-500/25 dark:shadow-indigo-500/10 transition-all duration-300 group-hover/logo-trigger:scale-0 group-hover/logo-trigger:opacity-0">
-              <GraduationCap className="size-5 text-white" />
-            </div>
-            {/* Collapse Trigger (Hover) */}
-            <div className="absolute inset-0 flex items-center justify-center opacity-0 scale-75 group-hover/logo-trigger:opacity-100 group-hover/logo-trigger:scale-100 transition-all duration-300">
-              <SidebarTrigger className="h-9 w-9 rounded-xl text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-all duration-300" />
-            </div>
+          <div className="flex flex-col leading-tight transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 overflow-hidden whitespace-nowrap">
+            <span className="text-[15px] font-bold tracking-tight text-slate-800 dark:text-slate-100">
+              SCPMS
+            </span>
+            <span className="text-[9.5px] font-bold tracking-[0.12em] text-slate-400 dark:text-slate-500 uppercase">
+              {role} Portal
+            </span>
           </div>
-
         </div>
       </SidebarHeader>
 
       {/* ── Navigation ── */}
-      <SidebarContent className="no-scrollbar gap-2 px-2 py-4">
+      <SidebarContent className="no-scrollbar gap-0.5 px-2 py-2">
         <NavMain items={navigation.main} />
-        <SidebarSeparator className="mx-3 my-2 bg-slate-100 dark:bg-slate-900/60 opacity-80" />
+        <SidebarSeparator className="mx-3 my-1 bg-slate-100 dark:bg-slate-900/60 opacity-80" />
         <NavSecondary items={navigation.secondary} />
       </SidebarContent>
 

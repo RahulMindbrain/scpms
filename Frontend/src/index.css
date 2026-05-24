@@ -453,13 +453,22 @@
   border-radius: 9999px;
   border: 1px solid rgba(79, 70, 229, 0.15);
   background: rgba(79, 70, 229, 0.05);
-  padding: 0.35rem 0.85rem;
-  font-size: 10px;
+  padding: 0.2rem 0.6rem;
+  font-size: 9px;
   font-weight: 700;
   color: #4f46e5;
   backdrop-filter: blur(8px);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .student-hero-badge {
+    padding: 0.35rem 0.85rem;
+    font-size: 10px;
+    margin-bottom: 1.25rem;
+  }
 }
 
 .dark .student-hero-badge {
@@ -469,9 +478,9 @@
 }
 
 .student-hero-title {
-  margin-top: 1rem;
-  font-size: 1.75rem;
-  font-weight: 900;
+  margin-top: 0.5rem;
+  font-size: 1.35rem;
+  font-weight: 800;
   color: #0f172a;
   letter-spacing: -0.02em;
   line-height: 1.2;
@@ -479,13 +488,14 @@
 
 @media (min-width: 640px) {
   .student-hero-title {
-    font-size: 2.5rem;
+    font-size: 2rem;
+    margin-top: 1rem;
   }
 }
 
 @media (min-width: 1024px) {
   .student-hero-title {
-    font-size: 3rem;
+    font-size: 2.25rem;
   }
 }
 
@@ -502,11 +512,11 @@
 }
 
 .student-hero-description {
-  margin-top: 0.75rem;
-  max-width: 32rem;
+  margin-top: 0.5rem;
+  max-width: 28rem;
   font-size: 0.85rem;
   color: #475569;
-  line-height: 1.5;
+  line-height: 1.4;
   font-weight: 500;
 }
 
@@ -517,7 +527,9 @@
 @media (min-width: 640px) {
   .student-hero-description {
     font-size: 0.95rem;
-    line-height: 1.6;
+    line-height: 1.5;
+    margin-top: 0.75rem;
+    max-width: 32rem;
   }
 }
 
@@ -557,38 +569,38 @@
    ============================================================ */
 .saas-card {
   background-color: var(--card);
-  border-radius: 1.5rem;
+  border-radius: 0.75rem;
   border: 1px solid var(--border);
   box-shadow: var(--shadow-sm);
   overflow: visible;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   padding: 1.25rem;
   position: relative;
 }
 
 @media (min-width: 640px) {
   .saas-card {
-    border-radius: 2rem;
-    padding: 1.75rem;
+    border-radius: 0.85rem;
+    padding: 1.5rem;
   }
 }
 
 .saas-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-premium);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
   border-color: var(--primary);
 }
 
 .dark .saas-card {
-  background: rgba(30, 41, 59, 0.5);
-  border-color: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(20px);
+  background: rgba(30, 41, 59, 0.35);
+  border-color: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
 }
 
 
 .saas-table-container {
-  overflow: hidden;
-  border-radius: 1rem;
+  overflow-x: auto;
+  border-radius: 0.75rem;
   border: 1px solid var(--border);
   background-color: var(--card);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);

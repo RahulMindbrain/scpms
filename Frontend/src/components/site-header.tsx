@@ -1,3 +1,4 @@
+import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useLocation } from "react-router-dom"
 import { NotificationBell } from "@/components/notification-bell"
 import { ModeToggle } from "@/components/mode-toggle"
@@ -60,7 +61,13 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background/80 shadow-sm backdrop-blur-2xl transition-all duration-300">
-      <div className="flex w-full items-center gap-4 px-4 sm:px-8">
+      <div className="flex w-full items-center gap-4 px-4 sm:px-6">
+        {/* Sidebar toggle (ChatGPT style - always visible in page header) */}
+        <div className="flex items-center gap-2">
+          <SidebarTrigger className="h-9 w-9 rounded-lg text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-all duration-200 shrink-0" />
+          <div className="mx-1.5 hidden h-5 w-[1px] bg-slate-200 dark:bg-slate-800/80 sm:block" />
+        </div>
+
         {/* Page title area */}
         <div className="flex animate-in flex-col duration-500 fade-in slide-in-from-left-4">
           <h1 className="text-[16px] sm:text-[18px] leading-tight font-bold tracking-tight text-foreground truncate max-w-[150px] sm:max-w-[300px] md:max-w-none">
