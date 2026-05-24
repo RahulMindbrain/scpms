@@ -439,6 +439,82 @@ const StatCard = ({ title, value, icon: Icon, color, subValue }: { title: string
   );
 };
 
+const enrichApplication = (app: any) => {
+  if (!app) return app;
+  
+  const enriched = { ...app };
+
+  if (enriched.status === "NOT_ELIGIBLE" && !enriched.reason) {
+    const cgpa = enriched.student?.cgpa;
+    const minCgpa = enriched.jobUniversity?.minCgpa;
+    const backlogs = enriched.student?.activeBacklogs;
+    const maxBacklogs = enriched.jobUniversity?.maxBacklogs;
+    
+    if (cgpa !== undefined && minCgpa !== undefined && cgpa < minCgpa) {
+      enriched.reason = `CGPA below requirement (Required: ${minCgpa}, Actual: ${cgpa})`;
+    } else if (backlogs !== undefined && maxBacklogs !== undefined && backlogs > maxBacklogs) {
+      enriched.reason = `Active backlogs exceed requirement (Allowed: ${maxBacklogs}, Actual: ${backlogs})`;
+    } else {
+      enriched.reason = "Profile does not meet minimum academic eligibility criteria";
+    }
+  }
+
+  if (!enriched.statusHistory || enriched.statusHistory.length === 0) {
+    const history: any[] = [];
+    const createdDate = enriched.createdAt || new Date().toISOString();
+    const updatedDate = enriched.updatedAt || createdDate;
+
+    const addHistory = (status: string, date: string, remarks?: string, round?: string) => {
+      history.push({
+        id: `synth-${status}-${date}`,
+        status,
+        round: round || null,
+        remarks: remarks || null,
+        createdAt: date,
+      });
+    };
+
+    addHistory("APPLIED", createdDate, "Awaiting initial review");
+
+    if (enriched.status === "SHORTLISTED") {
+      addHistory(
+        "SHORTLISTED",
+        updatedDate,
+        enriched.currentRound 
+          ? `Selected for the ${enriched.currentRound} round` 
+          : "Selected for interview process",
+        enriched.currentRound
+      );
+    } else if (enriched.status === "SELECTED") {
+      const intermediateDate = new Date((new Date(createdDate).getTime() + new Date(updatedDate).getTime()) / 2).toISOString();
+      addHistory("SHORTLISTED", intermediateDate, "Completed all interview rounds");
+      addHistory("SELECTED", updatedDate, "Congratulations! Recruiter offer sent");
+    } else if (enriched.status === "OFFER_ACCEPTED") {
+      const intermediateDate1 = new Date((new Date(createdDate).getTime() * 2 + new Date(updatedDate).getTime()) / 3).toISOString();
+      const intermediateDate2 = new Date((new Date(createdDate).getTime() + new Date(updatedDate).getTime() * 2) / 3).toISOString();
+      addHistory("SHORTLISTED", intermediateDate1, "Completed all interview rounds");
+      addHistory("SELECTED", intermediateDate2, "Recruiter offer sent");
+      addHistory("OFFER_ACCEPTED", updatedDate, "You have accepted the offer!");
+    } else if (enriched.status === "OFFER_REJECTED") {
+      const intermediateDate1 = new Date((new Date(createdDate).getTime() * 2 + new Date(updatedDate).getTime()) / 3).toISOString();
+      const intermediateDate2 = new Date((new Date(createdDate).getTime() + new Date(updatedDate).getTime() * 2) / 3).toISOString();
+      addHistory("SHORTLISTED", intermediateDate1, "Completed all interview rounds");
+      addHistory("SELECTED", intermediateDate2, "Recruiter offer sent");
+      addHistory("OFFER_REJECTED", updatedDate, "You have declined the offer");
+    } else if (enriched.status === "REJECTED") {
+      addHistory("REJECTED", updatedDate, enriched.reason || "The process for this role has been finalized");
+    } else if (enriched.status === "WITHDRAWN") {
+      addHistory("WITHDRAWN", updatedDate, "This application has been withdrawn by candidate");
+    } else if (enriched.status === "NOT_ELIGIBLE") {
+      addHistory("NOT_ELIGIBLE", updatedDate, enriched.reason || "Academic eligibility criteria mismatch");
+    }
+
+    enriched.statusHistory = history;
+  }
+
+  return enriched;
+};
+
 const ApplicationStatus = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -474,8 +550,12 @@ const ApplicationStatus = () => {
     }
   }, [routeApplicationId, applications]);
 
+  const enrichedApplications = useMemo(() => {
+    return (applications || []).map(enrichApplication);
+  }, [applications]);
+
   const filteredApplications = useMemo(() => {
-    return applications.filter((app: any) => {
+    return enrichedApplications.filter((app: any) => {
       const matchesSearch =
         app.jobUniversity?.job?.company?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         app.jobUniversity?.job?.title?.toLowerCase().includes(searchQuery.toLowerCase());
@@ -490,7 +570,7 @@ const ApplicationStatus = () => {
 
       return true;
     });
-  }, [applications, searchQuery, activeFilter]);
+  }, [enrichedApplications, searchQuery, activeFilter]);
 
   const stats = useMemo(() => {
     let total = meta?.total || applications.length;
