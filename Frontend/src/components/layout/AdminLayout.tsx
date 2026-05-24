@@ -23,7 +23,7 @@ const AdminLayout: React.FC = () => {
           } as React.CSSProperties
         }
       >
-        <AppSidebar variant="inset" />
+        <AppSidebar variant="sidebar" />
         <SidebarInset className="bg-background overflow-y-auto overflow-x-hidden">
           <SiteHeader />
           <main className="relative flex flex-1 flex-col bg-background min-h-0 @container/main">

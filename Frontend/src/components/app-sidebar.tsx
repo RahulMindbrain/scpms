@@ -27,6 +27,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarSeparator,
+  SidebarTrigger,
 } from "@/components/ui/sidebar"
 import useAuth from "@/redux/hooks/useAuth"
 
@@ -184,34 +185,58 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar
       collapsible="icon"
-      className="border-r border-sidebar-border bg-sidebar transition-all duration-300"
+      className="border-r border-slate-100/80 dark:border-slate-900/80 bg-white/80 dark:bg-[#0c101d]/90 backdrop-blur-xl shadow-[1px_0_12px_rgba(0,0,0,0.015)] transition-all duration-300 ease-in-out"
+      style={{
+        "--sidebar": "transparent",
+        ...props.style,
+      } as React.CSSProperties}
       {...props}
     >
-      <SidebarHeader className="flex h-16 shrink-0 items-center overflow-hidden border-b border-sidebar-border/50 px-4">
-        <div className="flex w-full items-center justify-start gap-4 group-data-[collapsible=icon]:justify-center">
-          <div className="flex aspect-square size-10 shrink-0 items-center justify-center rounded-2xl bg-primary shadow-lg shadow-primary/20">
-            <GraduationCap className="size-6 text-primary-foreground" />
+      <SidebarHeader className="flex h-16 shrink-0 items-center justify-between overflow-hidden border-b border-slate-100/80 dark:border-slate-900/80 px-4 group-data-[collapsible=icon]:px-0">
+        <div className="flex w-full items-center justify-between gap-3 transition-all duration-300 group-data-[collapsible=icon]:justify-center">
+          
+          {/* Logo & Portal Info (Expanded) */}
+          <div className="flex items-center gap-3 group-data-[collapsible=icon]:hidden">
+            <div className="flex aspect-square size-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 shadow-md shadow-indigo-500/25 dark:shadow-indigo-500/10">
+              <GraduationCap className="size-5 text-white" />
+            </div>
+            <div className="flex flex-col leading-tight transition-all duration-300 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 overflow-hidden whitespace-nowrap">
+              <span className="text-[15px] font-bold tracking-tight text-slate-800 dark:text-slate-100">
+                SCPMS
+              </span>
+              <span className="text-[9.5px] font-bold tracking-[0.12em] text-slate-400 dark:text-slate-500 uppercase">
+                {role} Portal
+              </span>
+            </div>
           </div>
-          <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden animate-in fade-in slide-in-from-left-2">
-            <span className="text-[16px] font-black tracking-tight text-foreground">
-              SCPMS
-            </span>
-            <span className="text-[10px] font-bold tracking-widest text-muted-foreground uppercase opacity-70">
-              {role} Portal
-            </span>
+          
+          {/* Standard Trigger (Expanded) */}
+          <SidebarTrigger className="h-8 w-8 rounded-lg text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-all duration-300 group-data-[collapsible=icon]:hidden shrink-0" />
+          
+          {/* Brand & Toggle Hover Swap (Collapsed) */}
+          <div className="hidden group-data-[collapsible=icon]:flex items-center justify-center relative size-10 group/logo-trigger">
+            {/* Brand Logo (Default) */}
+            <div className="flex aspect-square size-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 via-indigo-600 to-violet-600 shadow-md shadow-indigo-500/25 dark:shadow-indigo-500/10 transition-all duration-300 group-hover/logo-trigger:scale-0 group-hover/logo-trigger:opacity-0">
+              <GraduationCap className="size-5 text-white" />
+            </div>
+            {/* Collapse Trigger (Hover) */}
+            <div className="absolute inset-0 flex items-center justify-center opacity-0 scale-75 group-hover/logo-trigger:opacity-100 group-hover/logo-trigger:scale-100 transition-all duration-300">
+              <SidebarTrigger className="h-9 w-9 rounded-xl text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-700 dark:hover:text-slate-200 transition-all duration-300" />
+            </div>
           </div>
+
         </div>
       </SidebarHeader>
 
       {/* ── Navigation ── */}
-      <SidebarContent className="no-scrollbar gap-1 px-1 py-4">
+      <SidebarContent className="no-scrollbar gap-2 px-2 py-4">
         <NavMain items={navigation.main} />
-        <SidebarSeparator className="my-2 opacity-50" />
+        <SidebarSeparator className="mx-3 my-2 bg-slate-100 dark:bg-slate-900/60 opacity-80" />
         <NavSecondary items={navigation.secondary} />
       </SidebarContent>
 
       {/* ── Footer / User ── */}
-      <SidebarFooter className="border-t border-sidebar-border/30 p-2">
+      <SidebarFooter className="border-t border-slate-100/80 dark:border-zinc-800/80 p-2 bg-slate-50/20 dark:bg-zinc-950/20">
         <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>

@@ -1,4 +1,3 @@
-import { SidebarTrigger } from "@/components/ui/sidebar"
 import { useLocation } from "react-router-dom"
 import { NotificationBell } from "@/components/notification-bell"
 import { ModeToggle } from "@/components/mode-toggle"
@@ -62,12 +61,6 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 flex h-16 shrink-0 items-center gap-2 border-b border-border bg-background/80 shadow-sm backdrop-blur-2xl transition-all duration-300">
       <div className="flex w-full items-center gap-4 px-4 sm:px-8">
-        {/* Sidebar toggle */}
-        <div className="flex items-center gap-2">
-          <SidebarTrigger className="h-10 w-10 rounded-xl text-muted-foreground transition-all duration-300 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-blue-500/10" />
-          <div className="mx-1 hidden h-6 w-[1px] bg-border sm:block" />
-        </div>
-
         {/* Page title area */}
         <div className="flex animate-in flex-col duration-500 fade-in slide-in-from-left-4">
           <h1 className="text-[16px] sm:text-[18px] leading-tight font-bold tracking-tight text-foreground truncate max-w-[150px] sm:max-w-[300px] md:max-w-none">

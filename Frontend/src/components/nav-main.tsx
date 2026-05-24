@@ -16,14 +16,15 @@ export function NavMain({
     title: string
     url: string
     icon?: React.ReactNode
+    badge?: number | string
   }[]
 }) {
   const location = useLocation()
 
   return (
     <SidebarGroup>
-      <SidebarGroupLabel className="text-[10px] font-bold uppercase tracking-widest text-slate-400 px-2 mb-2 group-data-[collapsible=icon]:hidden">
-        Navigation
+      <SidebarGroupLabel className="text-[10.5px] font-bold uppercase tracking-[0.15em] text-slate-400/80 dark:text-slate-500/80 px-3 mb-2 select-none group-data-[collapsible=icon]:hidden">
+        Main
       </SidebarGroupLabel>
       <SidebarMenu className="gap-1 px-1 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center">
         {items.map((item) => {
@@ -37,22 +38,35 @@ export function NavMain({
                 className={`
                   h-10 transition-all duration-200 rounded-xl border-none relative group/btn
                   ${isActive
-                    ? "bg-indigo-50 text-indigo-600 font-bold dark:bg-indigo-600 dark:text-white"
-                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5"
+                    ? "bg-indigo-50/70 text-indigo-600 font-semibold dark:bg-indigo-950/40 dark:text-indigo-300"
+                    : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/50 hover:text-slate-900 dark:hover:text-slate-100 hover:translate-x-1 group-data-[collapsible=icon]:hover:translate-x-0"
                   }
                   group-data-[collapsible=icon]:size-10 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center
                 `}
               >
-                  <NavLink to={item.url} className="flex items-center w-full gap-3 px-2 relative cursor-pointer group/link group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0">
-                    <span className={`size-4.5 flex items-center justify-center shrink-0 transition-colors duration-200 ${isActive ? "text-indigo-600 dark:text-white" : "text-slate-400 group-hover/link:text-slate-600 dark:group-hover/link:text-slate-300"}`}>
-                      {item.icon}
+                <NavLink to={item.url} className="flex items-center w-full gap-3 pl-3 pr-2.5 relative cursor-pointer group/link group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:p-0">
+                  <span className={`size-5 flex items-center justify-center shrink-0 transition-all duration-200 [&>svg]:size-5 ${isActive ? "text-indigo-600 dark:text-indigo-400 scale-105" : "text-slate-400 dark:text-slate-500 group-hover/link:text-slate-700 dark:group-hover/link:text-slate-300"}`}>
+                    {item.icon}
+                  </span>
+                  <span className={`text-[13.5px] font-medium tracking-tight group-data-[collapsible=icon]:hidden whitespace-nowrap transition-all duration-200 ${isActive ? "text-indigo-600 dark:text-indigo-300 font-semibold" : "text-slate-600 dark:text-slate-400 group-hover/link:text-slate-900 dark:group-hover/link:text-slate-100"}`}>
+                    {item.title}
+                  </span>
+                  
+                  {item.badge !== undefined && (
+                    <span className={`ml-auto flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-bold tracking-tight transition-all duration-200 group-data-[collapsible=icon]:hidden ${
+                      isActive 
+                        ? "bg-indigo-600 text-white dark:bg-indigo-500 dark:text-slate-950" 
+                        : "bg-slate-100 text-slate-600 dark:bg-slate-900/60 dark:text-slate-400 group-hover/link:bg-indigo-50 group-hover/link:text-indigo-600 dark:group-hover/link:bg-indigo-950/50 dark:group-hover/link:text-indigo-400"
+                    }`}>
+                      {item.badge}
                     </span>
-                  <span className="text-[14px] group-data-[collapsible=icon]:hidden whitespace-nowrap tracking-tight">{item.title}</span>
+                  )}
                   
                   {isActive && (
                     <motion.div 
                       layoutId="sidebar-active-indicator"
-                      className="absolute right-0 w-1 h-5 bg-indigo-500 rounded-l-full group-data-[collapsible=icon]:hidden"
+                      className="absolute left-0 w-[3.5px] h-5 bg-indigo-600 dark:bg-indigo-500 rounded-r-full group-data-[collapsible=icon]:hidden"
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
                     />
                   )}
                 </NavLink>
@@ -62,7 +76,5 @@ export function NavMain({
         })}
       </SidebarMenu>
     </SidebarGroup>
-
-
   )
 }
