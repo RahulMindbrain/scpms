@@ -12,7 +12,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import type { AppDispatch } from '@/redux/store/store';
 import { optimizeResume } from '@/redux/thunks/atsThunk';
-import { updateStudentProfile } from '@/redux/thunks/studentThunk';
+import { updateStudentProfile, applyJob } from '@/redux/thunks/studentThunk';
+import { setOptimizedResume } from '@/redux/slices/atsSlice';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
@@ -260,7 +261,7 @@ ${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **
     }, 2750);
 
     try {
-      await dispatch(optimizeResume({ resumeUrl, jobDescription })).unwrap();
+      const res = await dispatch(applyJob({ jobUniversityId: selectedJob.id, optimizeResume: true })).unwrap();
       
       // Stop timers
       clearTimeout(timer1);
@@ -271,6 +272,13 @@ ${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **
 
       setOptStage(4);
       setOptProgress(100);
+
+      const optRes = res?.data?.optimizedResume?.optimizedResume || res?.data?.optimizedResume;
+      if (optRes) {
+        dispatch(setOptimizedResume(optRes));
+      } else {
+        throw new Error("Optimized resume not returned by the server");
+      }
 
       setTimeout(() => {
         setApplyStep('optimized');
@@ -765,7 +773,7 @@ ${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **
                   Improve Resume
                 </Button>
                 <Button
-                  onClick={handleApply}
+                  onClick={() => handleApply(true)}
                   disabled={isApplying}
                   className="bg-slate-900 hover:bg-slate-800 dark:bg-slate-100 dark:hover:bg-white text-white dark:text-slate-900 rounded-xl px-6 h-11 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md transition-all border-none cursor-pointer"
                 >
@@ -1144,7 +1152,7 @@ ${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **
                   Close
                 </Button>
                 <Button
-                  onClick={handleApply}
+                  onClick={() => handleApply(true)}
                   disabled={isApplying}
                   className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl px-6 h-11 text-[11px] font-black uppercase tracking-wider flex items-center gap-1.5 shadow-md shadow-blue-500/10 hover:scale-[1.02] transition-all border-none cursor-pointer"
                 >

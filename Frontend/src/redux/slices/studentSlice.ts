@@ -156,7 +156,8 @@ const studentSlice = createSlice({
       // Apply Job
       .addCase(applyJob.pending, (state, action: any) => {
         state.loading = true;
-        const jobUniversityId = action.meta.arg;
+        const arg = action.meta.arg;
+        const jobUniversityId = typeof arg === "number" ? arg : arg?.jobUniversityId;
         if (jobUniversityId) {
           const exists = state.applications.some(
             (app: any) => Number(app.jobUniversityId || app.jobUniversity?.id) === Number(jobUniversityId)
@@ -178,7 +179,8 @@ const studentSlice = createSlice({
       .addCase(applyJob.fulfilled, (state, action: any) => {
         state.loading = false;
         const newApp = action.payload?.data;
-        const jobUniversityId = action.meta.arg;
+        const arg = action.meta.arg;
+        const jobUniversityId = typeof arg === "number" ? arg : arg?.jobUniversityId;
         
         // Remove the optimistic placeholder if it exists
         if (jobUniversityId) {
@@ -188,7 +190,7 @@ const studentSlice = createSlice({
         }
 
         // Add the real application from the backend
-        if (newApp) {
+        if (newApp && newApp.id) {
           const exists = state.applications.some(
             (app: any) => Number(app.id) === Number(newApp.id)
           );
@@ -202,7 +204,8 @@ const studentSlice = createSlice({
         state.error = action.payload as string;
         
         // Rollback optimistic update
-        const jobUniversityId = action.meta.arg;
+        const arg = action.meta.arg;
+        const jobUniversityId = typeof arg === "number" ? arg : arg?.jobUniversityId;
         if (jobUniversityId) {
           state.applications = state.applications.filter(
             (app: any) => !(app.isOptimistic && Number(app.jobUniversityId || app.jobUniversity?.id) === Number(jobUniversityId))

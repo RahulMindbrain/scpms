@@ -23,7 +23,7 @@ import { JobDetailsModal } from './components/JobDetailsModal';
 import { JobApplyModal } from './components/JobApplyModal';
 import { GlobalAtsModal } from './components/GlobalAtsModal';
 import { analyzeJdMatch } from '@/redux/thunks/atsThunk';
-import { resetAtsState } from '@/redux/slices/atsSlice';
+import { resetAtsState, setAtsResult, setOptimizedResume } from '@/redux/slices/atsSlice';
 
 interface JobUniversity {
   id: number;
@@ -313,25 +313,52 @@ const JobListing = () => {
 
 
 
-  const handleApply = async () => {
+  const handleApply = async (skipOpt: boolean | any = false) => {
     if (!selectedJob) return;
 
     setIsApplying(true);
-    setIsDetailsModalOpen(false);
-    setIsApplyModalOpen(false);
     const toastId = toast.loading(`Submitting application for ${selectedJob.job.title}...`);
 
-    dispatch(applyJob(selectedJob.id))
+    const isExplicitSkip = typeof skipOpt === 'boolean' ? skipOpt : false;
+
+    // Skip optimization if explicitly requested, or if the user is already on the report or optimized screen
+    const shouldSkip = isExplicitSkip || applyStep === 'report' || applyStep === 'optimized';
+
+    dispatch(applyJob({ 
+      jobUniversityId: selectedJob.id, 
+      skipOptimization: shouldSkip 
+    }))
       .unwrap()
-      .then(() => {
-        toast.success("Application submitted successfully!", { id: toastId });
-        dispatch(fetchJobApplications({}));
+      .then((res: any) => {
+        setIsApplying(false);
+        
+        if (res?.data?.requiresOptimization) {
+          toast.dismiss(toastId);
+          if (res.data.atsResult) {
+            dispatch(setAtsResult(res.data.atsResult));
+          }
+          setApplyStep('report');
+          setIsApplyModalOpen(true);
+          setIsDetailsModalOpen(false);
+        } else if (res?.data?.requiresResumeUpdate) {
+          toast.dismiss(toastId);
+          const optRes = res.data.optimizedResume?.optimizedResume || res.data.optimizedResume;
+          if (optRes) {
+            dispatch(setOptimizedResume(optRes));
+          }
+          setApplyStep('optimized');
+          setIsApplyModalOpen(true);
+          setIsDetailsModalOpen(false);
+        } else {
+          toast.success("Application submitted successfully!", { id: toastId });
+          setIsDetailsModalOpen(false);
+          setIsApplyModalOpen(false);
+          dispatch(fetchJobApplications({}));
+        }
       })
       .catch((error: any) => {
-        toast.error(error || "Failed to submit application.", { id: toastId });
-      })
-      .finally(() => {
         setIsApplying(false);
+        toast.error(error || "Failed to submit application.", { id: toastId });
       });
   };
 

@@ -28,6 +28,12 @@ const atsSlice = createSlice({
             state.optimizing = false;
             state.error = null;
         },
+        setOptimizedResume: (state, action: PayloadAction<OptimizedResumeResult | null>) => {
+            state.optimizedResume = action.payload;
+        },
+        setAtsResult: (state, action: PayloadAction<AtsAnalysisResult | null>) => {
+            state.result = action.payload;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -60,5 +66,5 @@ const atsSlice = createSlice({
     },
 });
 
-export const { resetAtsState } = atsSlice.actions;
+export const { resetAtsState, setOptimizedResume, setAtsResult } = atsSlice.actions;
 export default atsSlice.reducer;

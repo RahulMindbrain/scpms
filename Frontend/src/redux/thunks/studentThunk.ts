@@ -88,9 +88,13 @@ export const fetchJobs = createAsyncThunk(
 
 export const applyJob = createAsyncThunk(
     "student/applyJob",
-    async (jobUniversityId: number, { rejectWithValue }) => {
+    async (
+        arg: number | { jobUniversityId: number; skipOptimization?: boolean; optimizeResume?: boolean },
+        { rejectWithValue }
+    ) => {
         try {
-            const response = await postAPI<any>("/student/apply-job", { jobUniversityId });
+            const payload = typeof arg === "number" ? { jobUniversityId: arg } : arg;
+            const response = await postAPI<any>("/student/apply-job", payload);
             return response;
         } catch (error: any) {
             return rejectWithValue(error?.message || "Failed to apply for job");
