@@ -27,7 +27,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarSeparator,
-  SidebarTrigger,
+
 } from "@/components/ui/sidebar"
 import useAuth from "@/redux/hooks/useAuth"
 

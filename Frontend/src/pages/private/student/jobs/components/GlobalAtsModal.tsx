@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
-  Upload, Brain, CheckCircle2, Loader2, Sparkles, FileText, X, AlertCircle, AlertTriangle,
-  Copy, Check, ExternalLink, Briefcase, GraduationCap, Phone, Mail, Link, Code, 
+  Upload, Brain, CheckCircle2, Loader2, Sparkles, AlertCircle,
+  Copy, Check, Briefcase, GraduationCap, Phone, Mail, Link, Code, 
   Award, ChevronLeft, ListChecks, User, MapPin, ArrowRight
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -15,7 +15,8 @@ import type { AppDispatch } from '@/redux/store/store';
 import { useCloudinaryUpload } from '@/hooks/useCloudinaryUpload';
 import { analyzeJdMatch, optimizeResume } from '@/redux/thunks/atsThunk';
 import { resetAtsState } from '@/redux/slices/atsSlice';
-import { postAPI } from '@/apis/api';
+import { updateStudentProfile } from '@/redux/thunks/studentThunk';
+
 import { toast } from 'sonner';
 
 interface GlobalAtsModalProps {
@@ -191,6 +192,16 @@ const handleDownloadMarkdown = (resume: any) => {
           throw new Error("Failed to upload resume to Cloudinary. Ensure it's a PDF under 10MB.");
         }
         resumeUrl = uploadedUrl;
+
+        // Sync with student profile on the backend
+        try {
+          await dispatch(updateStudentProfile({ resumeUrl: uploadedUrl })).unwrap();
+          toast.success("Resume synced to profile successfully!");
+          localStorage.removeItem('ai_tailored_resume');
+        } catch (profileError) {
+          console.error("Failed to sync resume to student profile:", profileError);
+          toast.warning("Analysis will proceed, but failed to set as default profile resume.");
+        }
       }
 
       setAnalyzedResumeUrl(resumeUrl);
@@ -309,7 +320,7 @@ ${resume.achievements?.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).
     }, 2750);
 
     try {
-      await dispatch(optimizeResume({ resumeUrl, jobDescription })).unwrap();
+      const response = await dispatch(optimizeResume({ resumeUrl, jobDescription })).unwrap();
       
       // Stop timers
       clearTimeout(timer1);
@@ -320,6 +331,10 @@ ${resume.achievements?.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).
 
       setOptStage(4);
       setOptProgress(100);
+
+      if (response) {
+        localStorage.setItem('ai_tailored_resume', JSON.stringify(response));
+      }
 
       setTimeout(() => {
         setStep('optimized');

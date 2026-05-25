@@ -6,8 +6,6 @@ import {
   Phone, 
   Briefcase, 
   Building2, 
-  Download, 
-  ExternalLink, 
   Sparkles, 
   CheckCircle2, 
   XCircle 
@@ -34,9 +32,7 @@ export const CandidateDetailsDrawer: React.FC<CandidateDetailsDrawerProps> = ({
   onClose,
   selectedCandidate,
   openUpdateModal,
-  openResume,
   getAvatarGradient,
-  formatStage
 }) => {
   if (!selectedCandidate) return null;
   

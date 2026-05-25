@@ -1,10 +1,11 @@
-import{
-Mail, GraduationCap,
+import {
+  Mail, GraduationCap,
   Code2, Edit3, ExternalLink, Plus, Trash2,
   Briefcase, FileText, Building2,
   CheckCircle, Globe, MapPin,
   Award, Layers, Cpu, Rocket,
-  Calendar, CalendarDays
+  Calendar, CalendarDays,
+  Sparkles, Copy, Check, Link, ListChecks, User, X, Phone
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import {
@@ -12,6 +13,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import ProjectModal from './modal/ProjectModal';
 import { toast } from 'sonner';
@@ -30,6 +32,50 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { StudentPageLayout } from '@/components/layout/StudentPageLayout';
 
+const ensureArray = (val: any): any[] => {
+  if (!val) return [];
+  if (Array.isArray(val)) return val;
+  if (typeof val === 'string') {
+    return val.split(',').map(s => s.trim()).filter(Boolean);
+  }
+  return [];
+};
+
+const getResumeMarkdown = (resume: any) => {
+  if (!resume) return '';
+  return `# ${resume.fullName}
+${resume.targetRole} | ${resume.location}
+Phone: ${resume.phone} | Email: ${resume.email}
+${resume.linkedin ? `LinkedIn: ${resume.linkedin} | ` : ''}${resume.github ? `GitHub: ${resume.github}` : ''}
+
+## Professional Summary
+${resume.summary}
+
+## Technical Skills
+${ensureArray(resume.skills).join(', ')}
+
+${ensureArray(resume.frameworks).length ? `### Frameworks & Libraries\n${ensureArray(resume.frameworks).join(', ')}\n` : ''}
+${ensureArray(resume.cloud).length ? `### Cloud & DevOps\n${ensureArray(resume.cloud).join(', ')}\n` : ''}
+${resume.languages ? `### Languages\n${Array.isArray(resume.languages) ? resume.languages.join(', ') : resume.languages}\n` : ''}
+
+## Projects
+${Array.isArray(resume.projects) ? resume.projects.map((p: any) => `### ${p.name}
+*Tech Stack: ${p.techStack || 'N/A'}*
+${ensureArray(p.highlights)?.map((h: any) => `- ${h}`).join('\n')}
+`).join('\n') : ''}
+
+## Education
+${Array.isArray(resume.education) ? resume.education.map((e: any) => `### ${e.degree} in ${e.field}
+*${e.university} (${e.year})*
+`).join('\n') : ''}
+
+${resume.certifications ? `## Certifications\n${resume.certifications}\n` : ''}
+
+## Key Achievements
+${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **${a.label}**: ${a.value || 'Yes'}`).join('\n') : ''}
+`;
+};
+
 const StudentProfile = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { profile: backendProfile, loading: backendLoading } = useSelector((state: RootState) => state.student);
@@ -43,6 +89,9 @@ const StudentProfile = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewName, setPreviewName] = useState<string>('');
   const [isPdfPreview, setIsPdfPreview] = useState(false);
+  const [aiTailoredResume, setAiTailoredResume] = useState<any>(null);
+  const [showAiResumeDialog, setShowAiResumeDialog] = useState(false);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const [profile, setProfile] = useState<any>({
     name: user ? `${user.firstname} ${user.lastname}` : 'Student Name',
@@ -71,6 +120,18 @@ const StudentProfile = () => {
   useEffect(() => {
     dispatch(fetchStudentProfile());
   }, [dispatch]);
+
+  // Load AI-Tailored Resume from localStorage
+  useEffect(() => {
+    const savedAiResume = localStorage.getItem('ai_tailored_resume');
+    if (savedAiResume) {
+      try {
+        setAiTailoredResume(JSON.parse(savedAiResume));
+      } catch (e) {
+        console.error("Failed to parse saved AI tailored resume:", e);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (backendProfile) {
@@ -111,6 +172,13 @@ const StudentProfile = () => {
       const yearInt = parseInt(updatedProfile.stats?.year);
       const passingYearInt = parseInt(updatedProfile.stats?.passingYear);
       const cgpaFloat = parseFloat(updatedProfile.stats?.cgpa);
+      const newResumeUrl = cleanUrl(updatedProfile.resumeUrl);
+
+      // If the resume has been changed, clear the old AI-tailored resume
+      if (newResumeUrl && newResumeUrl !== profile.resumeUrl) {
+        localStorage.removeItem('ai_tailored_resume');
+        setAiTailoredResume(null);
+      }
 
       const commonPayload: any = {
         year: isNaN(yearInt) ? undefined : yearInt,
@@ -120,7 +188,7 @@ const StudentProfile = () => {
         linkedinUrl: cleanUrl(updatedProfile.linkedinUrl),
         githubUrl: cleanUrl(updatedProfile.githubUrl),
         portfolioUrl: cleanUrl(updatedProfile.portfolioUrl),
-        resumeUrl: cleanUrl(updatedProfile.resumeUrl),
+        resumeUrl: newResumeUrl,
       };
 
       const backendSkillIds = backendProfile?.skills?.map((s: any) => s.id) || [];
@@ -676,36 +744,89 @@ const StudentProfile = () => {
               </Card>
             </motion.div>
 
-            {/* Resume Card */}
+            {/* Resume & AI-Tailored Resume Card */}
             <motion.div variants={itemVariants}>
               <Card className="rounded-2xl border-none shadow-sm bg-gradient-to-br from-slate-900 to-slate-800 text-white overflow-hidden relative group">
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
-                <CardContent className="p-4 sm:p-4 sm:p-4 sm:p-6 md:p-8 relative z-10">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-2 md:p-2.5 rounded-xl bg-white/10 backdrop-blur-md text-white">
-                      <FileText className="h-5 w-5 md:h-6 md:w-6" />
+                <CardContent className="p-4 sm:p-4 sm:p-4 sm:p-6 md:p-8 relative z-10 space-y-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="p-2 md:p-2.5 rounded-xl bg-white/10 backdrop-blur-md text-white">
+                        <FileText className="h-5 w-5 md:h-6 md:w-6" />
+                      </div>
+                      <h3 className="text-lg md:text-xl font-bold">Resume</h3>
                     </div>
-                    <h3 className="text-lg md:text-xl font-bold">Resume</h3>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm group-hover:bg-white/10 transition-all">
-                    <div className="flex items-center gap-4 min-w-0 w-full sm:w-auto">
-                      <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-                        <FileText className="h-5 w-5 text-indigo-400" />
+                  {aiTailoredResume ? (
+                    /* AI-Tailored Resume Row */
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 backdrop-blur-sm group-hover:bg-indigo-500/15 transition-all animate-in duration-300">
+                      <div className="flex items-center gap-4 min-w-0 w-full sm:w-auto">
+                        <div className="h-10 w-10 rounded-xl bg-indigo-500/20 flex items-center justify-center shrink-0 border border-indigo-500/30">
+                          <Sparkles className="h-5 w-5 text-indigo-300 animate-pulse" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-bold truncate">{aiTailoredResume.fullName}_AI_Tailored.md</p>
+                            <Badge className="bg-indigo-500/25 text-indigo-300 border-none text-[8.5px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
+                              ATS Optimized
+                            </Badge>
+                          </div>
+                          <p className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">
+                            Optimized for: {aiTailoredResume.targetRole}
+                          </p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-bold truncate">{profile.name}_Resume.pdf</p>
-                        <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{profile.resumeUrl ? 'PDF Document • Ready' : 'No document uploaded'}</p>
+                      <div className="flex items-center gap-2.5 w-full sm:w-auto shrink-0">
+                        <Button
+                          onClick={() => {
+                            setShowAiResumeDialog(true);
+                          }}
+                          className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl px-4 h-9 text-xs font-black shadow-lg shadow-indigo-500/25 transition-transform active:scale-95 border-none"
+                        >
+                          View Details
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            const content = getResumeMarkdown(aiTailoredResume);
+                            const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+                            const url = URL.createObjectURL(blob);
+                            const a = document.createElement("a");
+                            a.href = url;
+                            a.download = `${aiTailoredResume.fullName || "resume"}_optimized.md`;
+                            document.body.appendChild(a);
+                            a.click();
+                            document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                            toast.success("AI-Tailored Resume downloaded!");
+                          }}
+                          className="w-full sm:w-auto bg-white text-slate-900 hover:bg-slate-100 rounded-xl px-4 h-9 text-xs font-black shadow-lg shadow-white/5 transition-transform active:scale-95 border-none"
+                        >
+                          Download
+                        </Button>
                       </div>
                     </div>
-                    <Button
-                      onClick={() => profile.resumeUrl && openFile(profile.resumeUrl, `${profile.name}_Resume`)}
-                      disabled={!profile.resumeUrl}
-                      className="w-full sm:w-auto bg-white text-slate-900 hover:bg-slate-100 rounded-xl px-4 h-9 text-xs font-black shadow-lg shadow-white/5 transition-transform active:scale-95 shrink-0"
-                    >
-                      View Resume
-                    </Button>
-                  </div>
+                  ) : (
+                    /* Standard Resume Row */
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm group-hover:bg-white/8 transition-all">
+                      <div className="flex items-center gap-4 min-w-0 w-full sm:w-auto">
+                        <div className="h-10 w-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+                          <FileText className="h-5 w-5 text-indigo-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-bold truncate">{profile.name}_Resume.pdf</p>
+                          <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">{profile.resumeUrl ? 'PDF Document • Ready' : 'No document uploaded'}</p>
+                        </div>
+                      </div>
+                      <Button
+                        onClick={() => profile.resumeUrl && openFile(profile.resumeUrl, `${profile.name}_Resume`)}
+                        disabled={!profile.resumeUrl}
+                        className="w-full sm:w-auto bg-white text-slate-900 hover:bg-slate-100 rounded-xl px-4 h-9 text-xs font-black shadow-lg shadow-white/5 transition-transform active:scale-95 shrink-0 border-none"
+                      >
+                        View Resume
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </motion.div>
@@ -821,6 +942,300 @@ const StudentProfile = () => {
           isLoading={backendLoading}
           isApproved={isApproved}
         />
+
+        {/* AI-Tailored Resume Preview Dialog */}
+        <Dialog open={showAiResumeDialog} onOpenChange={setShowAiResumeDialog}>
+          <DialogContent className="max-w-3xl h-[85vh] p-0 overflow-hidden flex flex-col bg-white dark:bg-slate-950 border-none shadow-[0_32px_64px_-12px_rgba(0,0,0,0.2)] rounded-[2rem]">
+            <DialogHeader className="p-8 pb-4 bg-gradient-to-br from-[#f8faff] to-[#ffffff] dark:from-slate-900 dark:to-slate-950 border-b border-border/50 shrink-0">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <div className="size-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 shadow-inner">
+                    <Sparkles className="h-6 w-6 animate-pulse" />
+                  </div>
+                  <div>
+                    <DialogTitle className="text-xl font-black text-foreground tracking-tight flex items-center gap-2">
+                      AI-Tailored Resume Preview
+                      <Badge className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-none text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full">
+                        ATS Optimized
+                      </Badge>
+                    </DialogTitle>
+                    <p className="text-xs text-muted-foreground font-semibold">
+                      This profile is dynamically tailored using advanced AI suggestions.
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  className="rounded-xl border-slate-200 dark:border-slate-800"
+                  onClick={() => setShowAiResumeDialog(false)}
+                >
+                  <X className="size-4" />
+                </Button>
+              </div>
+            </DialogHeader>
+
+            <div className="flex-1 overflow-y-auto p-8 space-y-6 custom-scrollbar bg-slate-50/50 dark:bg-slate-950/20">
+              {aiTailoredResume && (
+                <div className="bg-white dark:bg-[#111217] rounded-[2rem] border border-slate-200/60 dark:border-white/[0.05] p-6 md:p-8 space-y-6 shadow-sm">
+                  {/* Paper Accent Bar */}
+                  <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 rounded-full mb-6" />
+
+                  {/* Name & Contact Info */}
+                  <div className="text-center space-y-3">
+                    <div className="space-y-1">
+                      <h2 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white uppercase">
+                        {aiTailoredResume.fullName}
+                      </h2>
+                      <div className="inline-flex items-center gap-1.5 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-3.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">
+                        <Briefcase size={10} className="fill-current" strokeWidth={2.5} />
+                        {aiTailoredResume.targetRole}
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2.5 max-w-lg mx-auto text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+                      <span className="flex items-center justify-center gap-1.5">
+                        <Phone size={11} className="text-indigo-500 shrink-0" />
+                        {aiTailoredResume.phone}
+                      </span>
+                      <span className="flex items-center justify-center gap-1.5 truncate">
+                        <Mail size={11} className="text-indigo-500 shrink-0" />
+                        {aiTailoredResume.email}
+                      </span>
+                      <span className="flex items-center justify-center gap-1.5">
+                        <MapPin size={11} className="text-indigo-500 shrink-0" />
+                        {aiTailoredResume.location}
+                      </span>
+                      {aiTailoredResume.linkedin && (
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Link size={11} className="text-indigo-500 shrink-0" />
+                          LinkedIn
+                        </span>
+                      )}
+                      {aiTailoredResume.github && (
+                        <span className="flex items-center justify-center gap-1.5">
+                          <Code2 size={11} className="text-indigo-500 shrink-0" />
+                          GitHub
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Summary */}
+                  <div className="space-y-2 border-t border-slate-200/50 dark:border-white/[0.04] pt-5 relative group/summary">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-[10px] font-black tracking-widest text-indigo-600 dark:text-indigo-400 uppercase flex items-center gap-2">
+                        <User size={12} className="stroke-[2.5]" />
+                        Professional Summary
+                      </h4>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(aiTailoredResume.summary);
+                          setCopiedField('summary');
+                          toast.success("Copied to clipboard!");
+                          setTimeout(() => setCopiedField(null), 2000);
+                        }}
+                        className="opacity-0 group-hover/summary:opacity-100 transition-opacity p-1.5 rounded-lg bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/15 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white shrink-0 cursor-pointer"
+                      >
+                        {copiedField === 'summary' ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
+                      </button>
+                    </div>
+                    <p className="text-xs md:text-sm text-slate-600 dark:text-slate-355 leading-relaxed font-medium bg-indigo-500/[0.02] border-l-2 border-indigo-500 pl-3 py-1.5 rounded-r-lg">
+                      {aiTailoredResume.summary}
+                    </p>
+                  </div>
+
+                  {/* Skills */}
+                  <div className="space-y-4 border-t border-slate-200/50 dark:border-white/[0.04] pt-5">
+                    <h4 className="text-[10px] font-black tracking-widest text-indigo-600 dark:text-indigo-400 uppercase flex items-center gap-2">
+                      <ListChecks size={12} className="stroke-[2.5]" />
+                      Tailored Skills & Technologies
+                    </h4>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {ensureArray(aiTailoredResume.frameworks).length > 0 && (
+                        <div className="space-y-1.5 p-3 rounded-xl bg-slate-100/30 dark:bg-white/[0.01] border border-slate-200/40 dark:border-white/[0.03]">
+                          <span className="text-[9px] font-black uppercase text-slate-450 tracking-wider">Frameworks & Libraries</span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {ensureArray(aiTailoredResume.frameworks).map((f: string, idx: number) => (
+                              <Badge key={idx} className="bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-500/15 border-none text-[8.5px] uppercase font-bold py-0.5 px-2 rounded-md tracking-wider">
+                                {f}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {ensureArray(aiTailoredResume.cloud).length > 0 && (
+                        <div className="space-y-1.5 p-3 rounded-xl bg-slate-100/30 dark:bg-white/[0.01] border border-slate-200/40 dark:border-white/[0.03]">
+                          <span className="text-[9px] font-black uppercase text-slate-455 tracking-wider">Cloud & DevOps</span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {ensureArray(aiTailoredResume.cloud).map((c: string, idx: number) => (
+                              <Badge key={idx} className="bg-purple-500/10 text-purple-600 dark:text-purple-400 hover:bg-purple-500/15 border-none text-[8.5px] uppercase font-bold py-0.5 px-2 rounded-md tracking-wider">
+                                {c}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {ensureArray(aiTailoredResume.skills).length > 0 && (
+                      <div className="space-y-1.5 p-3 rounded-xl bg-slate-100/30 dark:bg-white/[0.01] border border-slate-200/40 dark:border-white/[0.03]">
+                        <span className="text-[9px] font-black uppercase text-slate-450 tracking-wider">All Technical Competencies</span>
+                        <div className="flex flex-wrap gap-1.5">
+                          {ensureArray(aiTailoredResume.skills).map((s: string, idx: number) => (
+                            <Badge key={idx} className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/15 border-none text-[8.5px] uppercase font-bold py-0.5 px-2 rounded-md tracking-wider">
+                              {s}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {aiTailoredResume.languages && (
+                      <div className="space-y-1">
+                        <span className="text-[9px] font-black uppercase text-slate-450 tracking-wider">Languages & Core Competencies</span>
+                        <p className="text-xs text-slate-655 dark:text-slate-350 leading-relaxed font-semibold">
+                          {aiTailoredResume.languages}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Projects */}
+                  {Array.isArray(aiTailoredResume.projects) && aiTailoredResume.projects.length > 0 && (
+                    <div className="space-y-5 border-t border-slate-200/50 dark:border-white/[0.04] pt-5">
+                      <h4 className="text-[10px] font-black tracking-widest text-indigo-600 dark:text-indigo-400 uppercase flex items-center gap-2">
+                        <Briefcase size={12} className="stroke-[2.5]" />
+                        Optimized Projects
+                      </h4>
+
+                      <div className="space-y-5">
+                        {aiTailoredResume.projects.map((proj: any, pIdx: number) => (
+                          <div key={pIdx} className="space-y-2 group/proj relative p-4 rounded-2xl border border-slate-200/50 dark:border-white/[0.03] bg-slate-50/50 dark:bg-white/[0.01] hover:shadow-sm transition-all duration-300">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="space-y-1">
+                                <h5 className="text-xs font-black uppercase tracking-wide text-slate-800 dark:text-white leading-tight">
+                                  {proj.name}
+                                </h5>
+                                {proj.techStack && (
+                                  <span className="text-[9px] font-black text-indigo-500/90 tracking-wider uppercase">
+                                    Tech Stack: {proj.techStack}
+                                  </span>
+                                )}
+                              </div>
+                              <button
+                                onClick={() => {
+                                  const projHighlights = ensureArray(proj.highlights);
+                                  const projText = `Project: ${proj.name}\nTech Stack: ${proj.techStack || 'N/A'}\nHighlights:\n${projHighlights.map(h => `- ${h}`).join('\n')}`;
+                                  navigator.clipboard.writeText(projText);
+                                  setCopiedField(`proj-${pIdx}`);
+                                  toast.success("Copied to clipboard!");
+                                  setTimeout(() => setCopiedField(null), 2000);
+                                }}
+                                className="opacity-0 group-hover/proj:opacity-100 transition-opacity p-1.5 rounded-lg bg-slate-200/50 dark:bg-white/10 hover:bg-slate-250 dark:hover:bg-white/15 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white shrink-0 cursor-pointer"
+                              >
+                                {copiedField === `proj-${pIdx}` ? <Check size={11} className="text-emerald-500" /> : <Copy size={11} />}
+                              </button>
+                            </div>
+
+                            <ul className="space-y-1.5 pl-4 text-slate-655 dark:text-slate-350 text-[11px] md:text-xs leading-relaxed font-semibold list-disc marker:text-indigo-500">
+                              {ensureArray(proj.highlights)?.map((highlight: string, hIdx: number) => (
+                                <li key={hIdx}>{highlight}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Education */}
+                  {Array.isArray(aiTailoredResume.education) && aiTailoredResume.education.length > 0 && (
+                    <div className="space-y-4 border-t border-slate-200/50 dark:border-white/[0.04] pt-5">
+                      <h4 className="text-[10px] font-black tracking-widest text-indigo-600 dark:text-indigo-400 uppercase flex items-center gap-2">
+                        <GraduationCap size={12} className="stroke-[2.5]" />
+                        Education
+                      </h4>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {aiTailoredResume.education.map((edu: any, eIdx: number) => (
+                          <div key={eIdx} className="p-3 rounded-xl border border-slate-200/30 dark:border-white/[0.02] bg-slate-100/30 dark:bg-white/[0.01] space-y-1 flex flex-col justify-between">
+                            <div className="space-y-0.5">
+                              <h6 className="text-[10px] font-black text-slate-800 dark:text-white uppercase leading-tight">
+                                {edu.degree} - {edu.field}
+                              </h6>
+                              <p className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase truncate tracking-wide max-w-[220px]">
+                                {edu.university}
+                              </p>
+                            </div>
+                            <span className="text-[9px] font-black text-indigo-500 uppercase tracking-widest">
+                              {edu.year}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Achievements */}
+                  {Array.isArray(aiTailoredResume.achievements) && aiTailoredResume.achievements.length > 0 && (
+                    <div className="space-y-3.5 border-t border-slate-200/50 dark:border-white/[0.04] pt-5">
+                      <h4 className="text-[10px] font-black tracking-widest text-indigo-600 dark:text-indigo-400 uppercase flex items-center gap-2">
+                        <Award size={12} className="stroke-[2.5]" />
+                        Key Metrics & Impact
+                      </h4>
+
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                        {aiTailoredResume.achievements.map((ach: any, aIdx: number) => (
+                          <div key={aIdx} className="p-3.5 rounded-2xl border border-indigo-500/20 bg-indigo-500/[0.02] text-center space-y-1">
+                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider block truncate">
+                              {ach.label}
+                            </span>
+                            <h4 className="text-lg font-black text-indigo-600 dark:text-indigo-400 tracking-tight leading-none">
+                              {ach.value || "95%+"}
+                            </h4>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <DialogFooter className="p-8 bg-gradient-to-t from-muted/30 to-transparent border-t border-border/50 shrink-0 gap-3 justify-end flex items-center">
+              <Button
+                type="button"
+                variant="ghost"
+                className="rounded-xl h-12 px-6 font-bold text-xs uppercase tracking-wider text-muted-foreground hover:bg-muted"
+                onClick={() => setShowAiResumeDialog(false)}
+              >
+                Close Preview
+              </Button>
+              <Button
+                onClick={() => {
+                  const content = getResumeMarkdown(aiTailoredResume);
+                  const blob = new Blob([content], { type: "text/markdown;charset=utf-8" });
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `${aiTailoredResume.fullName || "resume"}_optimized.md`;
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                  URL.revokeObjectURL(url);
+                  toast.success("AI-Tailored Resume downloaded!");
+                }}
+                className="rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white h-12 px-8 font-bold text-xs uppercase tracking-wider border-none"
+              >
+                Download Markdown
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
 
         {/* Document Preview Dialog */}
         <Dialog

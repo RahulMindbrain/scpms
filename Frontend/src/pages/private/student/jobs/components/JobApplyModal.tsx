@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Building2, MapPin, FileText, Upload, Sparkles, ArrowRight, Zap, Brain, 
-  CheckCircle2, Loader2, Copy, Check, ExternalLink, Briefcase, GraduationCap, 
+  CheckCircle2, Loader2, Copy, Check, Briefcase, GraduationCap, 
   Phone, Mail, Link, Code, Award, ChevronLeft, User, ListChecks
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -11,7 +11,7 @@ import { Modal } from '@/components/ui/modal';
 import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import type { AppDispatch } from '@/redux/store/store';
-import { optimizeResume } from '@/redux/thunks/atsThunk';
+
 import { updateStudentProfile, applyJob } from '@/redux/thunks/studentThunk';
 import { setOptimizedResume } from '@/redux/slices/atsSlice';
 import { toast } from 'sonner';
@@ -206,6 +206,7 @@ ${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **
         try {
           await dispatch(updateStudentProfile({ resumeUrl: uploadedUrl })).unwrap();
           toast.success("Resume synced to profile successfully!");
+          localStorage.removeItem('ai_tailored_resume');
         } catch (profileError) {
           console.error("Failed to sync resume to student profile:", profileError);
           toast.warning("Application will proceed, but failed to set as default profile resume.");
@@ -276,6 +277,7 @@ ${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **
       const optRes = res?.data?.optimizedResume?.optimizedResume || res?.data?.optimizedResume;
       if (optRes) {
         dispatch(setOptimizedResume(optRes));
+        localStorage.setItem('ai_tailored_resume', JSON.stringify(optRes));
       } else {
         throw new Error("Optimized resume not returned by the server");
       }

@@ -16,7 +16,7 @@ import Loader from '@/components/Loader';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { StudentPageLayout } from '@/components/layout/StudentPageLayout';
-import { Modal } from '@/components/ui/modal';
+
 
 import { JobCard } from './components/JobCard';
 import { JobDetailsModal } from './components/JobDetailsModal';
