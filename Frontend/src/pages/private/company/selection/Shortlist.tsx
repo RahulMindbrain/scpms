@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Search, GraduationCap, ArrowUpRight } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchApplications } from '@/redux/thunks/applicationThunk';
+import { fetchJobApplications } from '@/redux/thunks/companyThunk';
 import type { RootState, AppDispatch } from '@/redux/store/store';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -9,14 +9,14 @@ import Loader from '@/components/Loader';
 
 const Shortlist: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const { applications, loading } = useSelector((state: RootState) => state.application);
+  const { applications, loading } = useSelector((state: RootState) => state.company);
   const safeApplications = Array.isArray(applications) ? applications : [];
 
   const [search, setSearch] = useState("");
   const [branchFilter, setBranchFilter] = useState("All");
 
   useEffect(() => {
-    dispatch(fetchApplications(1));
+    dispatch(fetchJobApplications({}));
   }, [dispatch]);
 
 
@@ -25,7 +25,9 @@ const Shortlist: React.FC = () => {
     ?.filter((app: any) => app.status === "SHORTLISTED")
     ?.map((app: any) => ({
       ...app,
-      branch: app.department?.name || "Other",
+      name: `${app.student?.user?.firstname || ''} ${app.student?.user?.lastname || ''}`.trim() || "Candidate",
+      branch: app.student?.department?.name || "Other",
+      email: app.student?.user?.email || "",
     }))
     ?.filter((item: any) => {
       return (
@@ -39,7 +41,7 @@ const Shortlist: React.FC = () => {
     new Set(
       safeApplications
         .filter((app: any) => app.status === "SHORTLISTED")
-        .map((app: any) => app.department?.name)
+        .map((app: any) => app.student?.department?.name)
         .filter(Boolean)
     )
   );
