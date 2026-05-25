@@ -30,9 +30,6 @@ const CHECKLIST_ITEMS = [
   "Measuring keyword density & semantic richness",
   "Synthesizing final ATS score and actionable tips"
 ];
-
-const ANALYZE_ENDPOINT = '/integration/analyze-jd-match';
-
 export const GlobalAtsModal: React.FC<GlobalAtsModalProps> = ({
   isOpen,
   onClose,

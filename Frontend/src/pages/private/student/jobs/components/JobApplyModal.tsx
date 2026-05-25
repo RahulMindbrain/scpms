@@ -60,7 +60,7 @@ interface JobApplyModalProps {
   loadingStage: number;
   loadingProgress: number;
   isApplying: boolean;
-  handleApply: () => void;
+  handleApply: (skipOptimization?: boolean) => void;
   checklistItems: string[];
 }
 
@@ -96,7 +96,6 @@ export const JobApplyModal: React.FC<JobApplyModalProps> = ({
 
   // local states for fresh upload
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [fileName, setFileName] = useState('');
 
   // local states for optimize-loading checklist & copy buttons
   const [optStage, setOptStage] = useState(0);
@@ -131,7 +130,6 @@ const handleDownloadMarkdown = (resume: any) => {
       setOptProgress(0);
       setCopiedField(null);
       setSelectedFile(null);
-      setFileName('');
     }
   }, [isOpen]);
 
@@ -185,7 +183,6 @@ ${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **
         return;
       }
       setSelectedFile(file);
-      setFileName(file.name);
     }
   };
 
@@ -226,8 +223,12 @@ ${Array.isArray(resume.achievements) ? resume.achievements.map((a: any) => `- **
   };
 
   const handleOptimizeResume = async () => {
+    if (!selectedJob) {
+      toast.error("No job selected.");
+      return;
+    }
     const resumeUrl = selectedResumeOption === 'latest' ? (profile?.resumeUrl || '') : (uploadedResumeUrl || profile?.resumeUrl || '');
-    const jobDescription = selectedJob?.description || '';
+    const jobDescription = selectedJob.description || '';
 
     if (!resumeUrl) {
       toast.error("No resume found to optimize.");
