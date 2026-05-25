@@ -45,6 +45,9 @@ export const createUserService = async (data: any) => {
 
   const hashedPassword = await hashPassword(password);
 
+  // =========================
+  // ADMIN FLOW
+  // =========================
   if (role === Role.ADMIN) {
     return prisma.$transaction(async (tx) => {
       return createAdminWithUniversity(
@@ -60,14 +63,9 @@ export const createUserService = async (data: any) => {
     });
   }
 
-  const user = await createUser({
-    firstname,
-    lastname,
-    email,
-    password: hashedPassword,
-    role,
-  });
-
+  // =========================
+  // STUDENT FLOW
+  // =========================
   if (role === Role.STUDENT) {
     if (!student?.universityId || !student?.departmentId) {
       throw new Error("University and department are required");
@@ -93,31 +91,64 @@ export const createUserService = async (data: any) => {
       throw new Error("Invalid departmentId");
     }
 
-    const studentProfile = await createStudent(user.id, student);
+    return prisma.$transaction(async () => {
+      const user = await createUser({
+        firstname,
+        lastname,
+        email,
+        password: hashedPassword,
+        role,
+      });
 
-    return {
-      user,
-      student: studentProfile,
-    };
+      const studentProfile = await createStudent(user.id, student);
+
+      return {
+        user,
+        student: studentProfile,
+      };
+    });
   }
 
+  // =========================
+  // COMPANY FLOW
+  // =========================
   if (role === Role.COMPANY) {
     if (!company?.name) {
       throw new Error("Company details are required");
     }
-    const companyProfile = await createCompany(
-      user.id,
-      company.name,
-      company.description,
-    );
 
-    return {
-      user,
-      company: companyProfile,
-    };
+    return prisma.$transaction(async () => {
+      const user = await createUser({
+        firstname,
+        lastname,
+        email,
+        password: hashedPassword,
+        role,
+      });
+
+      const companyProfile = await createCompany(
+        user.id,
+        company.name,
+        company.description,
+      );
+
+      return {
+        user,
+        company: companyProfile,
+      };
+    });
   }
 
-  return user;
+  // =========================
+  // DEFAULT USER FLOW
+  // =========================
+  return createUser({
+    firstname,
+    lastname,
+    email,
+    password: hashedPassword,
+    role,
+  });
 };
 
 export const getUserService = async (userId: number) => {
