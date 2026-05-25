@@ -73,6 +73,26 @@ export const createUserService = async (data: any) => {
       throw new Error("University and department are required");
     }
 
+    const universityExists = await prisma.university.findUnique({
+      where: {
+        id: student.universityId,
+      },
+    });
+
+    if (!universityExists) {
+      throw new Error("Invalid universityId");
+    }
+
+    const departmentExists = await prisma.department.findUnique({
+      where: {
+        id: student.departmentId,
+      },
+    });
+
+    if (!departmentExists) {
+      throw new Error("Invalid departmentId");
+    }
+
     const studentProfile = await createStudent(user.id, student);
 
     return {

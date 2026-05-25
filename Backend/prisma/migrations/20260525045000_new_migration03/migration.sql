@@ -5,13 +5,16 @@ CREATE TYPE "Status" AS ENUM ('ACTIVE', 'INACTIVE');
 CREATE TYPE "Role" AS ENUM ('STUDENT', 'COMPANY', 'ADMIN', 'SUPER_ADMIN');
 
 -- CreateEnum
+CREATE TYPE "InterviewRound" AS ENUM ('APTITUDE', 'GROUP_DISCUSSION', 'HR', 'TECHNICAL', 'MANAGERIAL', 'FINAL');
+
+-- CreateEnum
 CREATE TYPE "CompanyApprovalStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
 -- CreateEnum
 CREATE TYPE "JobStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
 -- CreateEnum
-CREATE TYPE "ApplicationStatus" AS ENUM ('APPLIED', 'SHORTLISTED', 'REJECTED', 'SELECTED', 'WITHDRAWN', 'NOT_ELIGIBLE');
+CREATE TYPE "ApplicationStatus" AS ENUM ('APPLIED', 'SHORTLISTED', 'REJECTED', 'SELECTED', 'WITHDRAWN', 'NOT_ELIGIBLE', 'OFFER_ACCEPTED', 'OFFER_REJECTED');
 
 -- CreateEnum
 CREATE TYPE "ScheduleStatus" AS ENUM ('SCHEDULED', 'ONGOING', 'COMPLETED', 'CANCELLED');
@@ -20,7 +23,7 @@ CREATE TYPE "ScheduleStatus" AS ENUM ('SCHEDULED', 'ONGOING', 'COMPLETED', 'CANC
 CREATE TYPE "ScheduleMode" AS ENUM ('ONLINE', 'OFFLINE', 'HYBRID');
 
 -- CreateEnum
-CREATE TYPE "NotificationType" AS ENUM ('APPLICATION_SUBMITTED', 'APPLICATION_SELECTED', 'APPLICATION_REJECTED', 'APPLICATION_WITHDRAWN', 'JOB_POSTED', 'JOB_UPDATED', 'JOB_ALERT', 'SCHEDULE_CREATED', 'SCHEDULE_UPDATED', 'SCHEDULE_APPROVED', 'OFFER_ACCEPTED', 'OFFER_REJECTED', 'SYSTEM');
+CREATE TYPE "NotificationType" AS ENUM ('APPLICATION_SUBMITTED', 'APPLICATION_SHORTLISTED', 'APPLICATION_SELECTED', 'APPLICATION_REJECTED', 'APPLICATION_WITHDRAWN', 'JOB_POSTED', 'JOB_UPDATED', 'JOB_ALERT', 'SCHEDULE_CREATED', 'SCHEDULE_UPDATED', 'SCHEDULE_APPROVED', 'OFFER_ACCEPTED', 'OFFER_REJECTED', 'SYSTEM');
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -162,7 +165,7 @@ CREATE TABLE "Job" (
     "title" TEXT NOT NULL,
     "location" TEXT NOT NULL,
     "companyId" INTEGER NOT NULL,
-    "interviewScheduleId" INTEGER,
+    "isDeleted" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "Job_pkey" PRIMARY KEY ("id")
@@ -174,6 +177,7 @@ CREATE TABLE "Application" (
     "studentId" INTEGER NOT NULL,
     "jobUniversityId" INTEGER NOT NULL,
     "status" "ApplicationStatus" NOT NULL DEFAULT 'APPLIED',
+    "currentRound" "InterviewRound",
     "reason" TEXT,
     "isAccepted" BOOLEAN NOT NULL DEFAULT false,
     "acceptedAt" TIMESTAMP(3),
@@ -181,6 +185,19 @@ CREATE TABLE "Application" (
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "Application_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "ApplicationStatusHistory" (
+    "id" SERIAL NOT NULL,
+    "applicationId" INTEGER NOT NULL,
+    "status" "ApplicationStatus" NOT NULL,
+    "round" "InterviewRound",
+    "reason" TEXT,
+    "createdBy" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "ApplicationStatusHistory_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -207,11 +224,14 @@ CREATE TABLE "JobUniversity" (
     "status" "JobStatus" NOT NULL DEFAULT 'PENDING',
     "approvedAt" TIMESTAMP(3),
     "rejectedAt" TIMESTAMP(3),
+    "rejectionReason" TEXT,
+    "rejectionCount" INTEGER NOT NULL DEFAULT 0,
     "salary" DOUBLE PRECISION NOT NULL,
     "description" TEXT,
     "minCgpa" DOUBLE PRECISION,
     "maxBacklogs" INTEGER,
     "openings" INTEGER,
+    "interviewScheduleId" INTEGER,
 
     CONSTRAINT "JobUniversity_pkey" PRIMARY KEY ("id")
 );
@@ -345,9 +365,6 @@ CREATE UNIQUE INDEX "Department_name_key" ON "Department"("name");
 CREATE INDEX "Job_companyId_idx" ON "Job"("companyId");
 
 -- CreateIndex
-CREATE INDEX "Job_interviewScheduleId_idx" ON "Job"("interviewScheduleId");
-
--- CreateIndex
 CREATE INDEX "Application_studentId_idx" ON "Application"("studentId");
 
 -- CreateIndex
@@ -355,6 +372,9 @@ CREATE INDEX "Application_jobUniversityId_idx" ON "Application"("jobUniversityId
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Application_studentId_jobUniversityId_key" ON "Application"("studentId", "jobUniversityId");
+
+-- CreateIndex
+CREATE INDEX "ApplicationStatusHistory_applicationId_idx" ON "ApplicationStatusHistory"("applicationId");
 
 -- CreateIndex
 CREATE INDEX "CompanyUniversity_companyId_idx" ON "CompanyUniversity"("companyId");
@@ -379,6 +399,9 @@ CREATE INDEX "JobUniversity_jobId_idx" ON "JobUniversity"("jobId");
 
 -- CreateIndex
 CREATE INDEX "JobUniversity_status_idx" ON "JobUniversity"("status");
+
+-- CreateIndex
+CREATE INDEX "JobUniversity_interviewScheduleId_idx" ON "JobUniversity"("interviewScheduleId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "JobUniversity_jobId_universityId_key" ON "JobUniversity"("jobId", "universityId");
@@ -459,13 +482,13 @@ ALTER TABLE "Admin" ADD CONSTRAINT "Admin_universityId_fkey" FOREIGN KEY ("unive
 ALTER TABLE "Job" ADD CONSTRAINT "Job_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Job" ADD CONSTRAINT "Job_interviewScheduleId_fkey" FOREIGN KEY ("interviewScheduleId") REFERENCES "InterviewSchedule"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE "Application" ADD CONSTRAINT "Application_studentId_fkey" FOREIGN KEY ("studentId") REFERENCES "Student"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Application" ADD CONSTRAINT "Application_jobUniversityId_fkey" FOREIGN KEY ("jobUniversityId") REFERENCES "JobUniversity"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "ApplicationStatusHistory" ADD CONSTRAINT "ApplicationStatusHistory_applicationId_fkey" FOREIGN KEY ("applicationId") REFERENCES "Application"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "CompanyUniversity" ADD CONSTRAINT "CompanyUniversity_companyId_fkey" FOREIGN KEY ("companyId") REFERENCES "Company"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -481,6 +504,9 @@ ALTER TABLE "JobUniversity" ADD CONSTRAINT "JobUniversity_jobId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "JobUniversity" ADD CONSTRAINT "JobUniversity_universityId_fkey" FOREIGN KEY ("universityId") REFERENCES "University"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "JobUniversity" ADD CONSTRAINT "JobUniversity_interviewScheduleId_fkey" FOREIGN KEY ("interviewScheduleId") REFERENCES "InterviewSchedule"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Token" ADD CONSTRAINT "Token_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
