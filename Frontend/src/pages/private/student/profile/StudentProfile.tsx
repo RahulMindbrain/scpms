@@ -964,15 +964,7 @@ const StudentProfile = () => {
                     </p>
                   </div>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  className="rounded-xl border-slate-200 dark:border-slate-800"
-                  onClick={() => setShowAiResumeDialog(false)}
-                >
-                  <X className="size-4" />
-                </Button>
+
               </div>
             </DialogHeader>
 
