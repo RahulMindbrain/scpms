@@ -6,7 +6,7 @@ export const allowedStatusTransitions: Record<
 > = {
   APPLIED: ["SHORTLISTED", "REJECTED"],
 
-  SHORTLISTED: ["SELECTED", "REJECTED"],
+ SHORTLISTED: ["SHORTLISTED", "SELECTED", "REJECTED"],
 
   SELECTED: ["OFFER_ACCEPTED", "OFFER_REJECTED"],
 
