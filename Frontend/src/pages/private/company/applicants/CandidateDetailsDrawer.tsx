@@ -277,7 +277,7 @@ export const CandidateDetailsDrawer: React.FC<CandidateDetailsDrawerProps> = ({
                 openUpdateModal(app, 'SHORTLISTED');
               }}
               disabled={['SHORTLISTED', 'SELECTED', 'REJECTED', 'OFFER_ACCEPTED', 'OFFER_REJECTED', 'WITHDRAWN'].includes(app.status)}
-              className="flex-1 h-11 bg-violet-605 hover:bg-violet-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-violet-500/10 hover:shadow-violet-500/20 transition-all flex items-center justify-center gap-1.5 disabled:opacity-40 cursor-pointer"
+              className="flex-1 h-11 bg-violet-600 hover:bg-violet-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-violet-500/10 hover:shadow-violet-500/20 transition-all flex items-center justify-center gap-1.5 disabled:opacity-40 cursor-pointer"
             >
               <Sparkles size={14} /> Shortlist
             </button>
@@ -287,7 +287,7 @@ export const CandidateDetailsDrawer: React.FC<CandidateDetailsDrawerProps> = ({
                 openUpdateModal(app, 'SELECTED');
               }}
               disabled={['SELECTED', 'REJECTED', 'OFFER_ACCEPTED', 'OFFER_REJECTED', 'WITHDRAWN'].includes(app.status)}
-              className="flex-1 h-11 bg-emerald-650 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5 disabled:opacity-40 cursor-pointer"
+              className="flex-1 h-11 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase tracking-wider rounded-xl shadow-lg shadow-emerald-500/10 hover:shadow-emerald-500/20 transition-all flex items-center justify-center gap-1.5 disabled:opacity-40 cursor-pointer"
             >
               <CheckCircle2 size={14} /> Select
             </button>

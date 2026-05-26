@@ -312,7 +312,7 @@ const Applicants: React.FC = () => {
     return null;
   }, [selectedApp, targetStatus, targetRound]);
 
-  const openUpdateModal = React.useCallback((app: any, newStatus: string) => {
+  const openUpdateModal = React.useCallback((app: any, newStatus: string, initialRound?: string) => {
     setSubmissionError(null);
     if (newStatus === app.status && newStatus !== 'SHORTLISTED') return;
 
@@ -328,9 +328,11 @@ const Applicants: React.FC = () => {
     
     // Set intelligent defaults for rounds and reasons based on the new status
     if (newStatus === 'SHORTLISTED') {
-      let nextRound = 'APTITUDE';
-      if (app.currentRound === 'APTITUDE') nextRound = 'TECHNICAL';
-      else if (app.currentRound === 'TECHNICAL') nextRound = 'HR';
+      let nextRound = initialRound || 'APTITUDE';
+      if (!initialRound) {
+        if (app.currentRound === 'APTITUDE') nextRound = 'TECHNICAL';
+        else if (app.currentRound === 'TECHNICAL') nextRound = 'HR';
+      }
       
       setTargetRound(nextRound);
       setReasonText(getPresetReason('SHORTLISTED', nextRound));

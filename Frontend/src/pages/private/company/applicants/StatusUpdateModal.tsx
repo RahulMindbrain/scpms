@@ -287,105 +287,100 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
               </span>
             </div>
 
-            <div className="w-full overflow-x-auto pb-4 scrollbar-none -mx-2 px-2">
-              <div className="flex items-center justify-between w-full min-w-[320px] relative py-2.5 px-4 bg-muted/5 rounded-3xl border border-border/40">
-                {[
-                  { id: 'APTITUDE', label: 'Aptitude', icon: <Brain size={12} /> },
-                  { id: 'TECHNICAL', label: 'Technical', icon: <Code2 size={12} /> },
-                  { id: 'HR', label: 'HR', icon: <UserCheck size={12} /> }
-                ].map((round, idx) => {
-                  const progressState = getRoundProgressState(round.id, selectedApp);
-                  const isCompleted = progressState === 'completed';
-                  const isActive = progressState === 'active';
-                  const isFailed = progressState === 'failed';
+            <div className="w-full pb-1">
+              <div className="flex flex-col items-center w-full bg-muted/5 rounded-3xl border border-border/40 p-5 gap-4">
+                
+                {/* Circles Row with solid connecting track line */}
+                <div className="flex items-center justify-between w-full px-8 relative">
+                  <div className="absolute left-[44px] right-[44px] top-1/2 -translate-y-1/2 h-[2px] bg-zinc-200 dark:bg-zinc-800/60 pointer-events-none" />
                   
-                  const isUISelected = targetRound === round.id;
-                  const isRoundDisabled = isRoundBackward(selectedApp.currentRound, round.id);
+                  {[
+                    { id: 'APTITUDE', label: 'Aptitude', icon: <Brain size={14} /> },
+                    { id: 'TECHNICAL', label: 'Technical', icon: <Code2 size={14} /> },
+                    { id: 'HR', label: 'HR', icon: <UserCheck size={14} /> }
+                  ].map((round, idx) => {
+                    const progressState = getRoundProgressState(round.id, selectedApp);
+                    const isCompleted = progressState === 'completed';
+                    const isActive = progressState === 'active';
+                    const isFailed = progressState === 'failed';
+                    
+                    const isUISelected = targetRound === round.id;
+                    const isRoundDisabled = isRoundBackward(selectedApp.currentRound, round.id);
+
+                    return (
+                      <div key={round.id} className="relative z-10">
+                        {isUISelected && (
+                          <span className="absolute -inset-1.5 rounded-full animate-pulse bg-violet-500/25 dark:bg-violet-500/35 blur-xs pointer-events-none" />
+                        )}
+                        {isActive && !isUISelected && (
+                          <span className="absolute -inset-1 rounded-full animate-ping bg-blue-400/20 dark:bg-blue-500/30 opacity-75 pointer-events-none" />
+                        )}
+                        
+                        <button
+                          type="button"
+                          id={`pipeline-round-${round.id.toLowerCase()}`}
+                          disabled={isRoundDisabled}
+                          onClick={() => handleRoundChange(round.id)}
+                          className={`size-10 rounded-full border-2 flex items-center justify-center transition-all duration-300 relative z-10 cursor-pointer shadow-xs hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed
+                            ${isUISelected
+                              ? 'border-violet-500 bg-violet-600 text-white dark:bg-violet-600 shadow-md shadow-violet-500/20'
+                              : isCompleted 
+                                ? 'border-emerald-500 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-400 animate-in fade-in' 
+                                : isActive 
+                                  ? 'border-blue-500 bg-blue-50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-400 animate-in fade-in' 
+                                  : isFailed 
+                                    ? 'border-rose-500 bg-rose-50 text-rose-700 dark:bg-rose-950/20 dark:text-rose-405' 
+                                    : 'border-zinc-250 bg-white text-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 hover:border-zinc-350 hover:text-zinc-600'}`}
+                          title={isRoundDisabled ? 'Cannot select a completed or previous round' : `Click to select ${round.label} round`}
+                        >
+                          {isCompleted ? (
+                            <Check size={14} className="stroke-[3px]" />
+                          ) : isFailed ? (
+                            <X size={14} className="stroke-[3px] text-rose-600" />
+                          ) : (
+                            round.icon
+                          )}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Selected Round Status Context Card */}
+                {(() => {
+                  const selectedRoundData = [
+                    { id: 'APTITUDE', label: 'Aptitude Assessment', icon: <Brain size={15} /> },
+                    { id: 'TECHNICAL', label: 'Technical Interview', icon: <Code2 size={15} /> },
+                    { id: 'HR', label: 'HR Interview', icon: <UserCheck size={15} /> }
+                  ].find(r => r.id === targetRound) || { id: 'APTITUDE', label: 'Aptitude Assessment', icon: <Brain size={15} /> };
 
                   return (
-                    <React.Fragment key={round.id}>
-                      {/* Connector Line between stages */}
-                      {idx > 0 && (
-                        <div className="flex-1 h-[2px] relative mx-1 bg-zinc-150 dark:bg-zinc-800/40 rounded-full overflow-hidden">
-                          <div 
-                            className={`absolute left-0 top-0 h-full w-full rounded-full transition-colors duration-500
-                              ${isCompleted 
-                                ? 'bg-emerald-500/80 dark:bg-emerald-600/80' 
-                                : isFailed
-                                  ? 'bg-rose-500/50 dark:bg-rose-950/40' 
-                                  : isActive
-                                    ? 'bg-gradient-to-r from-emerald-500 to-blue-500 animate-pulse'
-                                    : 'bg-zinc-250 dark:bg-zinc-850'}`} 
-                          />
+                    <div className="w-full bg-background border border-border/60 rounded-2xl p-3 flex items-center justify-between text-xs shadow-xs animate-in fade-in duration-300">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2.5 bg-violet-500/10 text-violet-600 dark:text-violet-400 rounded-xl shrink-0">
+                          {selectedRoundData.icon}
                         </div>
-                      )}
-
-                      {/* Stage Interactive Node */}
-                      <div className="flex flex-col items-center relative z-10 shrink-0">
-                        <div className="relative">
-                          {/* Selected UI State Glow Effect */}
-                          {isUISelected && (
-                            <span className="absolute -inset-1.5 rounded-full animate-pulse bg-violet-500/20 dark:bg-violet-500/35 blur-xs pointer-events-none" />
-                          )}
-                          {/* Backend Current Active Stage Ping Glow */}
-                          {isActive && !isUISelected && (
-                            <span className="absolute -inset-1 rounded-full animate-ping bg-blue-400/20 dark:bg-blue-500/30 opacity-75 pointer-events-none" />
-                          )}
-
-                          <button
-                            type="button"
-                            id={`pipeline-round-${round.id.toLowerCase()}`}
-                            disabled={isRoundDisabled}
-                            onClick={() => handleRoundChange(round.id)}
-                            className={`size-9 rounded-full border-2 flex items-center justify-center transition-all duration-300 relative z-10 cursor-pointer shadow-xs hover:scale-105 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed
-                              ${isUISelected
-                                ? 'border-violet-500 bg-violet-600 text-white dark:bg-violet-600 shadow-md shadow-violet-500/20'
-                                : isCompleted 
-                                  ? 'border-emerald-500 bg-emerald-50 text-emerald-700 hover:border-emerald-600 dark:bg-emerald-950/20 dark:text-emerald-400' 
-                                  : isActive 
-                                    ? 'border-blue-500 bg-blue-50 text-blue-700 hover:border-blue-600 dark:bg-blue-950/20 dark:text-blue-400' 
-                                    : isFailed 
-                                      ? 'border-rose-500 bg-rose-50 text-rose-700 hover:border-rose-600 dark:bg-rose-950/20 dark:text-rose-400' 
-                                      : 'border-zinc-200 bg-white text-zinc-400 dark:border-zinc-800 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:text-zinc-600 dark:hover:text-zinc-300'}`}
-                            title={isRoundDisabled ? 'Cannot select a completed or previous round' : `Click to select ${round.label} round`}
-                          >
-                            {isCompleted ? (
-                              <Check size={12} className="stroke-[3.5px]" />
-                            ) : isFailed ? (
-                              <X size={12} className="stroke-[3.5px] text-rose-600 dark:text-rose-400" />
-                            ) : (
-                              round.icon
-                            )}
-                          </button>
+                        <div>
+                          <span className="font-bold text-foreground block text-sm">{selectedRoundData.label}</span>
+                          <span className="text-muted-foreground font-semibold uppercase text-[10px] tracking-wider block mt-0.5">
+                            {targetRound === selectedApp.currentRound ? 'Current Active stage' : 'Selected Target Stage'}
+                          </span>
                         </div>
-                        {/* Stage Label and Status */}
-                        <span className={`text-xs font-bold uppercase tracking-wider mt-2.5 transition-colors duration-300
-                          ${isUISelected 
-                            ? 'text-violet-650 dark:text-violet-400 font-extrabold scale-105' 
-                            : isCompleted 
-                              ? 'text-emerald-600 dark:text-emerald-400 font-semibold' :
-                              isActive 
-                                ? 'text-blue-600 dark:text-blue-400 font-bold' :
-                                isFailed 
-                                  ? 'text-rose-600 dark:text-rose-400 font-semibold' :
-                                  'text-zinc-400 dark:text-zinc-500 font-medium'}`}>
-                          {round.label}
-                        </span>
-                        <span className="text-[10px] font-bold uppercase tracking-wider opacity-70">
-                          {isUISelected 
-                            ? 'Target' 
-                            : isCompleted 
-                              ? 'Passed' 
-                              : isActive 
-                                ? 'Current' 
-                                : isFailed 
-                                  ? 'Failed' 
-                                  : 'Upcoming'}
-                        </span>
                       </div>
-                    </React.Fragment>
+                      <span className={`inline-flex items-center justify-center px-2.5 py-1 text-xs font-bold uppercase tracking-wider rounded-lg border
+                        ${targetRound === selectedApp.currentRound
+                          ? 'bg-blue-500/5 text-blue-600 border-blue-500/10'
+                          : isRoundBackward(selectedApp.currentRound, targetRound)
+                            ? 'bg-emerald-500/5 text-emerald-600 border-emerald-500/10'
+                            : 'bg-violet-500/5 text-violet-600 border-violet-500/10'
+                        }`}
+                      >
+                        {targetRound === selectedApp.currentRound ? 'Active' : 'Target'}
+                      </span>
+                    </div>
                   );
-                })}
+                })()}
+
               </div>
             </div>
           </div>
