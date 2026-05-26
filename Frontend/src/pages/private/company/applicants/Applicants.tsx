@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+
 import type { AppDispatch } from '@/redux/store/store';
 import type { RootState } from '@/redux/reducers/rootReducer';
 import Loader from '@/components/Loader';
@@ -934,7 +934,6 @@ const Applicants: React.FC = () => {
         validationError={validationError}
         submissionError={submissionError}
         formatStage={formatStage}
-        formatRound={formatRound}
         getPresetReason={getPresetReason}
       />
     </div>
