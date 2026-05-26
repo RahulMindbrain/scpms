@@ -70,47 +70,32 @@ const getRelativeTime = (dateString: string) => {
   }
 };
 
-// Map current applicant state to the 5 pipeline rounds
+// Map current applicant state to the 8 pipeline stages
 const getPipelineStages = (status: string, currentRound: string | null) => {
-  const roundsOrder = ['APPLIED', 'APTITUDE', 'TECHNICAL', 'HR', 'SELECTED'];
+  const roundsOrder = ['APPLIED', 'APTITUDE', 'GROUP_DISCUSSION', 'TECHNICAL', 'HR', 'MANAGERIAL', 'FINAL', 'SELECTED'];
   
   // Map internal sub-rounds to standard steps
   let mappedRound = 'APPLIED';
   if (status === 'SHORTLISTED') {
-    if (!currentRound || currentRound === 'APTITUDE' || currentRound === 'GROUP_DISCUSSION') {
-      mappedRound = 'APTITUDE';
-    } else if (currentRound === 'TECHNICAL' || currentRound === 'MANAGERIAL') {
-      mappedRound = 'TECHNICAL';
-    } else if (currentRound === 'HR' || currentRound === 'FINAL') {
-      mappedRound = 'HR';
-    } else {
-      mappedRound = 'APTITUDE';
-    }
+    mappedRound = currentRound || 'APTITUDE';
   } else if (status === 'SELECTED' || status === 'OFFER_ACCEPTED') {
     mappedRound = 'SELECTED';
   } else if (status === 'REJECTED') {
-    if (!currentRound) {
-      mappedRound = 'APPLIED';
-    } else if (currentRound === 'APTITUDE' || currentRound === 'GROUP_DISCUSSION') {
-      mappedRound = 'APTITUDE';
-    } else if (currentRound === 'TECHNICAL' || currentRound === 'MANAGERIAL') {
-      mappedRound = 'TECHNICAL';
-    } else if (currentRound === 'HR' || currentRound === 'FINAL') {
-      mappedRound = 'HR';
-    } else {
-      mappedRound = 'APPLIED';
-    }
+    mappedRound = currentRound || 'APPLIED';
   }
 
   const failedIndex = status === 'REJECTED' ? roundsOrder.indexOf(mappedRound) : -1;
   const activeIndex = status !== 'REJECTED' ? roundsOrder.indexOf(mappedRound) : -1;
 
   return [
-    { id: 'APPLIED', label: 'Application Received' },
-    { id: 'APTITUDE', label: 'Assessment' },
-    { id: 'TECHNICAL', label: 'Technical Interview' },
-    { id: 'HR', label: 'HR Discussion' },
-    { id: 'SELECTED', label: 'Final Decision' }
+    { id: 'APPLIED', label: 'Applied' },
+    { id: 'APTITUDE', label: 'Aptitude' },
+    { id: 'GROUP_DISCUSSION', label: 'GD' },
+    { id: 'TECHNICAL', label: 'Technical' },
+    { id: 'HR', label: 'HR' },
+    { id: 'MANAGERIAL', label: 'Managerial' },
+    { id: 'FINAL', label: 'Final' },
+    { id: 'SELECTED', label: 'Selected' }
   ].map((stage, idx) => {
     let state: 'completed' | 'active' | 'upcoming' | 'failed' | 'disabled' = 'upcoming';
 
@@ -320,7 +305,7 @@ const Applicants: React.FC = () => {
 
   const openUpdateModal = React.useCallback((app: any, newStatus: string) => {
     setSubmissionError(null);
-    if (newStatus === app.status) return;
+    if (newStatus === app.status && newStatus !== 'SHORTLISTED') return;
 
     if (isBackward(app.status, newStatus)) {
       toast.error("Invalid Workflow Transition", {
@@ -342,7 +327,8 @@ const Applicants: React.FC = () => {
     // Set intelligent defaults for rounds and reasons based on the new status
     if (newStatus === 'SHORTLISTED') {
       let nextRound = 'APTITUDE';
-      if (app.currentRound === 'APTITUDE') nextRound = 'TECHNICAL';
+      if (app.currentRound === 'APTITUDE') nextRound = 'GROUP_DISCUSSION';
+      else if (app.currentRound === 'GROUP_DISCUSSION') nextRound = 'TECHNICAL';
       else if (app.currentRound === 'TECHNICAL') nextRound = 'HR';
       else if (app.currentRound === 'HR') nextRound = 'MANAGERIAL';
       else if (app.currentRound === 'MANAGERIAL') nextRound = 'FINAL';
@@ -760,6 +746,7 @@ const Applicants: React.FC = () => {
                   const isEligible = candCgpa >= reqCgpa && candBacklogs <= reqBacklogs;
 
                   const stages = getPipelineStages(app.status, app.currentRound);
+                  const dropdownValue = app.status === 'SHORTLISTED' ? (app.currentRound || 'APTITUDE') : app.status;
 
                   return (
                     <motion.div
@@ -831,42 +818,86 @@ const Applicants: React.FC = () => {
                         {/* RIGHT SECTION: Application lifecycle actions (No duplicate status badges, selector dropdown acts as badge) */}
                         <div className="flex flex-col gap-1 items-start lg:items-end justify-center text-left lg:text-right shrink-0 w-full lg:w-auto">
                           <div className="flex items-center gap-2 w-full lg:justify-end">
-                            {/* Less Saturated Dropdown Trigger acting as Status indicator */}
                             <Select
-                              value={app.status}
-                              onValueChange={(value) => openUpdateModal(app, value)}
+                              value={dropdownValue}
+                              onValueChange={(value) => {
+                                if (value === 'APPLIED') {
+                                  openUpdateModal(app, 'APPLIED');
+                                } else if (value === 'SELECTED') {
+                                  openUpdateModal(app, 'SELECTED');
+                                } else if (value === 'REJECTED') {
+                                  openUpdateModal(app, 'REJECTED');
+                                } else {
+                                  openUpdateModal(app, 'SHORTLISTED', value);
+                                }
+                              }}
                             >
                               <SelectTrigger className={`h-9 w-[130px] rounded-xl border text-[10px] font-black uppercase tracking-wider px-3 transition-all flex items-center justify-between focus:ring-0 focus:ring-offset-0 cursor-pointer shadow-xs
                                 ${app.status === 'SELECTED' || app.status === 'OFFER_ACCEPTED' ? 'bg-emerald-50/50 hover:bg-emerald-50/80 border-emerald-200/60 dark:bg-emerald-950/20 dark:border-emerald-900/30 text-emerald-700 dark:text-emerald-400' :
                                   app.status === 'REJECTED' ? 'bg-red-50/40 hover:bg-red-50/60 border-red-100 text-red-600 dark:bg-red-950/10 dark:border-red-950/20 dark:text-red-400' :
                                   app.status === 'SHORTLISTED' ? 'bg-blue-50/50 hover:bg-blue-50/80 border-blue-200/60 dark:bg-blue-950/20 dark:border-blue-900/30 text-blue-700 dark:text-blue-400' :
                                   'bg-zinc-50/50 hover:bg-zinc-50/80 border-zinc-200/60 dark:bg-zinc-800/40 dark:border-zinc-800/80 text-zinc-700 dark:text-zinc-300'}`}
-                            >
-                                <SelectValue />
+                              >
+                                <SelectValue>
+                                  {formatStage(app.status, app.currentRound)}
+                                </SelectValue>
                               </SelectTrigger>
-                              <SelectContent className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 shadow-xl p-1 bg-white dark:bg-zinc-950 min-w-[140px]">
+                              <SelectContent className="rounded-xl border border-zinc-200/80 dark:border-zinc-800 shadow-xl p-1 bg-white dark:bg-zinc-950 min-w-[160px]">
                                 <SelectItem value="APPLIED" disabled={isBackward(app.status, 'APPLIED')} className="rounded-lg py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer focus:bg-zinc-50 dark:focus:bg-zinc-900">
                                   <div className="flex items-center gap-2">
                                     <Clock size={13} className="text-zinc-400 shrink-0" />
                                     <span>Applied</span>
                                   </div>
                                 </SelectItem>
-                                <SelectItem value="SHORTLISTED" disabled={isBackward(app.status, 'SHORTLISTED')} className="rounded-lg py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer focus:bg-blue-50/50 dark:focus:bg-blue-950/30">
+                                
+                                {/* 6 Interview rounds inside dropdown options */}
+                                <SelectItem value="APTITUDE" disabled={app.status === 'SHORTLISTED' && isRoundBackward(app.currentRound, 'APTITUDE')} className="rounded-lg py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer focus:bg-blue-50/50 dark:focus:bg-blue-950/30">
                                   <div className="flex items-center gap-2">
-                                    <Check size={13} className="text-blue-500 shrink-0" />
-                                    <span>Shortlist</span>
+                                    <FileText size={13} className="text-violet-500 shrink-0" />
+                                    <span>Aptitude Round</span>
                                   </div>
                                 </SelectItem>
+                                <SelectItem value="GROUP_DISCUSSION" disabled={app.status === 'SHORTLISTED' && isRoundBackward(app.currentRound, 'GROUP_DISCUSSION')} className="rounded-lg py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer focus:bg-blue-50/50 dark:focus:bg-blue-950/30">
+                                  <div className="flex items-center gap-2">
+                                    <Users size={13} className="text-violet-500 shrink-0" />
+                                    <span>GD Round</span>
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="TECHNICAL" disabled={app.status === 'SHORTLISTED' && isRoundBackward(app.currentRound, 'TECHNICAL')} className="rounded-lg py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer focus:bg-blue-50/50 dark:focus:bg-blue-950/30">
+                                  <div className="flex items-center gap-2">
+                                    <Code2 size={13} className="text-violet-500 shrink-0" />
+                                    <span>Technical Round</span>
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="HR" disabled={app.status === 'SHORTLISTED' && isRoundBackward(app.currentRound, 'HR')} className="rounded-lg py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer focus:bg-blue-50/50 dark:focus:bg-blue-950/30">
+                                  <div className="flex items-center gap-2">
+                                    <User size={13} className="text-violet-500 shrink-0" />
+                                    <span>HR Round</span>
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="MANAGERIAL" disabled={app.status === 'SHORTLISTED' && isRoundBackward(app.currentRound, 'MANAGERIAL')} className="rounded-lg py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer focus:bg-blue-50/50 dark:focus:bg-blue-950/30">
+                                  <div className="flex items-center gap-2">
+                                    <Briefcase size={13} className="text-violet-500 shrink-0" />
+                                    <span>Managerial Round</span>
+                                  </div>
+                                </SelectItem>
+                                <SelectItem value="FINAL" disabled={app.status === 'SHORTLISTED' && isRoundBackward(app.currentRound, 'FINAL')} className="rounded-lg py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer focus:bg-blue-50/50 dark:focus:bg-blue-950/30">
+                                  <div className="flex items-center gap-2">
+                                    <Target size={13} className="text-violet-500 shrink-0" />
+                                    <span>Final Round</span>
+                                  </div>
+                                </SelectItem>
+
                                 <SelectItem value="SELECTED" disabled={isBackward(app.status, 'SELECTED')} className="rounded-lg py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer focus:bg-emerald-50/50 dark:focus:bg-emerald-950/30">
                                   <div className="flex items-center gap-2">
                                     <Award size={13} className="text-emerald-500 shrink-0" />
-                                    <span>Select</span>
+                                    <span>Select Candidate</span>
                                   </div>
                                 </SelectItem>
                                 <SelectItem value="REJECTED" disabled={isBackward(app.status, 'REJECTED')} className="rounded-lg py-2 text-xs text-zinc-700 dark:text-zinc-300 cursor-pointer focus:bg-rose-50/50 dark:focus:bg-rose-950/30">
                                   <div className="flex items-center gap-2">
                                     <XCircle size={13} className="text-rose-500 shrink-0" />
-                                    <span>Reject</span>
+                                    <span>Reject Candidate</span>
                                   </div>
                                 </SelectItem>
                               </SelectContent>
@@ -956,8 +987,12 @@ const Applicants: React.FC = () => {
                                         ) : (
                                           stage.id === 'APPLIED' ? <Check size={13} /> :
                                           stage.id === 'APTITUDE' ? <FileText size={13} /> :
+                                          stage.id === 'GROUP_DISCUSSION' ? <Users size={13} /> :
                                           stage.id === 'TECHNICAL' ? <Code2 size={13} /> :
-                                          stage.id === 'HR' ? <Users size={13} /> :
+                                          stage.id === 'HR' ? <User size={13} /> :
+                                          stage.id === 'MANAGERIAL' ? <Briefcase size={13} /> :
+                                          stage.id === 'FINAL' ? <Target size={13} /> :
+                                          stage.id === 'SELECTED' ? <Trophy size={13} /> :
                                           <Trophy size={13} />
                                         )}
                                       </motion.div>
