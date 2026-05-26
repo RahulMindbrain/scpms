@@ -26,10 +26,11 @@ export const allowedRoundTransitions: Record<InterviewRound, InterviewRound[]> =
     APTITUDE: ["GROUP_DISCUSSION", "HR", "TECHNICAL", "MANAGERIAL"],
 
     GROUP_DISCUSSION: ["HR", "TECHNICAL", "MANAGERIAL"],
+    
+    TECHNICAL: ["HR","MANAGERIAL"],
 
     HR: ["TECHNICAL", "MANAGERIAL"],
 
-    TECHNICAL: ["MANAGERIAL"],
 
     MANAGERIAL: [],
 
