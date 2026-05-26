@@ -18,7 +18,28 @@ import {
   User,
   Clock
 } from 'lucide-react';
-import { isBackward, isRoundBackward } from './Applicants';
+const STATUS_FLOW = ['APPLIED', 'SHORTLISTED', 'SELECTED', 'OFFER_ACCEPTED'];
+
+const isBackward = (current: string, next: string) => {
+  if (next === 'REJECTED') return false; // Can always reject unless already rejected or finalized
+  const currentIndex = STATUS_FLOW.indexOf(current);
+  const nextIndex = STATUS_FLOW.indexOf(next);
+  
+  if (nextIndex === -1) return false; 
+  if (currentIndex === -1) return false;
+
+  return nextIndex < currentIndex;
+};
+
+const isRoundBackward = (currentRound: string | null | undefined, nextRound: string) => {
+  if (!currentRound) return false;
+  const ROUNDS_ORDER = ['APTITUDE', 'TECHNICAL', 'HR'];
+  const currentIndex = ROUNDS_ORDER.indexOf(currentRound);
+  const nextIndex = ROUNDS_ORDER.indexOf(nextRound);
+  
+  if (currentIndex === -1 || nextIndex === -1) return false;
+  return nextIndex < currentIndex;
+};
 
 interface StatusUpdateModalProps {
   isOpen: boolean;
@@ -64,7 +85,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
       return 'inactive';
     }
     
-    const roundsList = ['APTITUDE', 'GROUP_DISCUSSION', 'TECHNICAL', 'HR', 'MANAGERIAL', 'FINAL'];
+    const roundsList = ['APTITUDE', 'TECHNICAL', 'HR'];
     const activeRound = currentRound || 'APTITUDE';
     const activeIdx = roundsList.indexOf(activeRound);
     const roundIdx = roundsList.indexOf(roundId);
@@ -97,11 +118,8 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
     setTargetStatus(statusId);
     if (statusId === 'SHORTLISTED') {
       let defaultRound = 'APTITUDE';
-      if (selectedApp.currentRound === 'APTITUDE') defaultRound = 'GROUP_DISCUSSION';
-      else if (selectedApp.currentRound === 'GROUP_DISCUSSION') defaultRound = 'TECHNICAL';
+      if (selectedApp.currentRound === 'APTITUDE') defaultRound = 'TECHNICAL';
       else if (selectedApp.currentRound === 'TECHNICAL') defaultRound = 'HR';
-      else if (selectedApp.currentRound === 'HR') defaultRound = 'MANAGERIAL';
-      else if (selectedApp.currentRound === 'MANAGERIAL') defaultRound = 'FINAL';
       
       setTargetRound(defaultRound);
       setReasonText(getPresetReason('SHORTLISTED', defaultRound));
@@ -127,13 +145,13 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
         {/* Header */}
         <div className="flex items-start justify-between relative z-10 text-left">
           <div className="space-y-1">
-            <span className="text-[10px] font-black text-primary uppercase tracking-widest">Recruitment Stage Update</span>
-            <h3 className="text-lg font-black text-foreground">
+            <span className="text-xs font-bold text-primary uppercase tracking-wider">Recruitment Stage Update</span>
+            <h3 className="text-lg font-extrabold text-foreground">
               {selectedApp.student?.user?.firstname} {selectedApp.student?.user?.lastname}
             </h3>
             <div className="flex flex-wrap items-center gap-1.5 text-xs font-bold text-muted-foreground uppercase tracking-wider">
               <span>Current: {formatStage(selectedApp.status, selectedApp.currentRound)}</span>
-              <span className="text-primary font-black">➔</span>
+              <span className="text-primary font-bold">➔</span>
               <span className="text-violet-650 dark:text-violet-400 font-extrabold bg-violet-500/5 px-2 py-0.5 rounded-lg border border-violet-500/10">
                 Target: {formatStage(targetStatus, targetRound)}
               </span>
@@ -192,7 +210,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
                 {renderIcon()}
               </div>
               <div className="space-y-1">
-                <h4 className="text-xs font-black uppercase tracking-wider">{err.title}</h4>
+                <h4 className="text-xs font-bold uppercase tracking-wider">{err.title}</h4>
                 <p className="text-xs font-medium opacity-90 leading-relaxed">{err.message}</p>
                 {submissionError && (
                   <button 
@@ -200,7 +218,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
                       e.preventDefault();
                       submitStatusUpdate();
                     }}
-                    className="mt-2 text-[10px] font-black uppercase tracking-widest text-primary hover:underline flex items-center gap-1 cursor-pointer"
+                    className="mt-2 text-xs font-bold uppercase tracking-wider text-primary hover:underline flex items-center gap-1 cursor-pointer"
                   >
                     Retry Action
                   </button>
@@ -212,7 +230,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
 
         {/* Target Status Controller */}
         <div className="space-y-2 relative z-10 text-left">
-          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block">
+          <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
             Target Status
           </label>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
@@ -247,7 +265,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
                   id={`target-status-${statusItem.id.toLowerCase()}`}
                   disabled={isDisabled}
                   onClick={() => handleStatusChange(statusItem.id)}
-                  className={`p-3 rounded-2xl border-2 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-xs font-black uppercase tracking-wider ${themeClasses}`}
+                  className={`p-3 rounded-2xl border-2 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold uppercase tracking-wider ${themeClasses}`}
                 >
                   {statusItem.icon}
                   <span>{statusItem.label}</span>
@@ -261,23 +279,20 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
         {targetStatus === 'SHORTLISTED' && (
           <div className="space-y-3 relative z-10 text-left animate-in fade-in duration-300">
             <div className="flex items-center justify-between">
-              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block">
+              <label className="text-xs font-semibold text-muted-foreground uppercase tracking-wider block">
                 Interview Round Selection
               </label>
-              <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider bg-violet-500/5 px-2.5 py-0.5 rounded-full border border-violet-500/10">
+              <span className="text-xs font-bold text-violet-600 dark:text-violet-400 uppercase tracking-wider bg-violet-500/5 px-2.5 py-0.5 rounded-full border border-violet-500/10">
                 Select Target Round
               </span>
             </div>
 
             <div className="w-full overflow-x-auto pb-4 scrollbar-none -mx-2 px-2">
-              <div className="flex items-center justify-between w-full min-w-[550px] relative py-2.5 px-4 bg-muted/5 rounded-3xl border border-border/40">
+              <div className="flex items-center justify-between w-full min-w-[320px] relative py-2.5 px-4 bg-muted/5 rounded-3xl border border-border/40">
                 {[
                   { id: 'APTITUDE', label: 'Aptitude', icon: <Brain size={12} /> },
-                  { id: 'GROUP_DISCUSSION', label: 'GD', icon: <MessagesSquare size={12} /> },
                   { id: 'TECHNICAL', label: 'Technical', icon: <Code2 size={12} /> },
-                  { id: 'HR', label: 'HR', icon: <UserCheck size={12} /> },
-                  { id: 'MANAGERIAL', label: 'Managerial', icon: <Briefcase size={12} /> },
-                  { id: 'FINAL', label: 'Final', icon: <Trophy size={12} /> }
+                  { id: 'HR', label: 'HR', icon: <UserCheck size={12} /> }
                 ].map((round, idx) => {
                   const progressState = getRoundProgressState(round.id, selectedApp);
                   const isCompleted = progressState === 'completed';
@@ -343,21 +358,20 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
                             )}
                           </button>
                         </div>
-
                         {/* Stage Label and Status */}
-                        <span className={`text-[9px] font-black uppercase tracking-wider mt-2.5 transition-colors duration-300
+                        <span className={`text-xs font-bold uppercase tracking-wider mt-2.5 transition-colors duration-300
                           ${isUISelected 
-                            ? 'text-violet-600 dark:text-violet-400 font-extrabold scale-105' 
+                            ? 'text-violet-650 dark:text-violet-400 font-extrabold scale-105' 
                             : isCompleted 
-                              ? 'text-emerald-600 dark:text-emerald-400 font-bold' :
+                              ? 'text-emerald-600 dark:text-emerald-400 font-semibold' :
                               isActive 
-                                ? 'text-blue-600 dark:text-blue-400 font-black' :
+                                ? 'text-blue-600 dark:text-blue-400 font-bold' :
                                 isFailed 
-                                  ? 'text-rose-600 dark:text-rose-400 font-bold' :
+                                  ? 'text-rose-600 dark:text-rose-400 font-semibold' :
                                   'text-zinc-400 dark:text-zinc-500 font-medium'}`}>
                           {round.label}
                         </span>
-                        <span className="text-[7px] font-bold uppercase tracking-widest opacity-60">
+                        <span className="text-[10px] font-bold uppercase tracking-wider opacity-70">
                           {isUISelected 
                             ? 'Target' 
                             : isCompleted 
@@ -379,23 +393,23 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
 
         {/* Smart Presets Suggestions for Recruiter */}
         <div className="space-y-2 relative z-10 text-left shrink-0">
-          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block">
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
             Quick Remarks Presets
           </label>
           <div className="flex flex-wrap gap-1.5">
             {(() => {
               const presets = targetStatus === 'SHORTLISTED'
-                ? ['Cleared technical round', 'Strong technical credentials', 'Eligible for managerial interview', 'Excellent analytical skills']
+                ? ['Cleared technical round', 'Strong technical credentials', 'Eligible for HR interview', 'Excellent analytical skills']
                 : targetStatus === 'SELECTED'
                   ? ['Offered extended post interview', 'Outstanding technical & HR performance', 'Immediate release of offer letter']
-                  : ['Lacks sufficient core skills', 'Interview feedback not cleared', 'Unsatisfactory response metrics'];
+                  : ['Lacks sufficient core skills', 'Interview feedback not cleared', 'Did not clear technical interview'];
               
               return presets.map((preset) => (
                 <button
                   key={preset}
                   type="button"
                   onClick={() => setReasonText(preset)}
-                  className="px-2.5 py-1 text-[9px] font-bold text-muted-foreground hover:text-foreground bg-muted/10 hover:bg-muted/20 border border-border/50 hover:border-border rounded-lg transition-all cursor-pointer"
+                  className="px-2.5 py-1 text-xs font-semibold text-muted-foreground hover:text-foreground bg-muted/10 hover:bg-muted/20 border border-border/50 hover:border-border rounded-lg transition-all cursor-pointer"
                 >
                   + {preset}
                 </button>
@@ -406,7 +420,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
 
         {/* Reason/Remarks Input */}
         <div className="space-y-2 relative z-10 text-left">
-          <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest block">
+          <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider block">
             Decision Notes / Feedback
           </label>
           <textarea
@@ -424,7 +438,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
             type="button"
             onClick={onClose}
             disabled={isSubmitting}
-            className="px-5 py-3 border border-border/80 text-muted-foreground hover:text-foreground font-black text-[10px] uppercase tracking-widest rounded-2xl hover:bg-muted/5 transition-all disabled:opacity-50 cursor-pointer"
+            className="px-5 py-3 border border-border/80 text-muted-foreground hover:text-foreground font-bold text-xs uppercase tracking-wider rounded-2xl hover:bg-muted/5 transition-all disabled:opacity-50 cursor-pointer"
           >
             Cancel
           </button>
@@ -432,7 +446,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
             type="button"
             onClick={submitStatusUpdate}
             disabled={isSubmitting || validationError?.type === 'error'}
-            className="px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/95 font-black text-[10px] uppercase tracking-widest rounded-2xl shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            className="px-6 py-3 bg-primary text-primary-foreground hover:bg-primary/95 font-bold text-xs uppercase tracking-wider rounded-2xl shadow-lg shadow-primary/10 hover:shadow-primary/20 transition-all flex items-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
           >
             {isSubmitting ? (
               <div className="flex items-center gap-2">
