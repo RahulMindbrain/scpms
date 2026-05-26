@@ -138,7 +138,19 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="w-full max-w-lg bg-card border border-border/80 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 animate-in zoom-in-95 duration-300 relative overflow-hidden">
+      <div className=" w-full 
+  max-w-2xl
+  max-h-[90vh]
+  overflow-y-auto
+  bg-card 
+  border 
+  border-border/80 
+  rounded-3xl 
+  p-6 md:p-8 
+  shadow-2xl 
+  space-y-6 
+  animate-in zoom-in-95 duration-300 
+  relative animate-in zoom-in-95 duration-300 relative overflow-hidden">
         {/* Modal Ambient Mesh */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
         
