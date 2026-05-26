@@ -13,8 +13,6 @@ import {
   ExternalLink, 
   FilterX, 
   Award, 
-  Check, 
-  Trophy,
   Code2,
   Users
 } from 'lucide-react';
@@ -69,71 +67,6 @@ const getRelativeTime = (dateString: string) => {
   } catch (e) {
     return 'recently';
   }
-};
-
-// Map current applicant state to the 5 pipeline stages
-const getPipelineStages = (status: string, currentRound: string | null) => {
-  const roundsOrder = ['APPLIED', 'APTITUDE', 'TECHNICAL', 'HR', 'SELECTED'];
-  
-  // Map internal sub-rounds to standard steps
-  let mappedRound = 'APPLIED';
-  if (status === 'SHORTLISTED') {
-    mappedRound = currentRound || 'APTITUDE';
-    if (currentRound === 'GROUP_DISCUSSION') {
-      mappedRound = 'APTITUDE';
-    } else if (currentRound === 'MANAGERIAL') {
-      mappedRound = 'TECHNICAL';
-    } else if (currentRound === 'FINAL') {
-      mappedRound = 'HR';
-    }
-  } else if (status === 'SELECTED' || status === 'OFFER_ACCEPTED') {
-    mappedRound = 'SELECTED';
-  } else if (status === 'REJECTED') {
-    mappedRound = currentRound || 'APPLIED';
-    if (currentRound === 'GROUP_DISCUSSION') {
-      mappedRound = 'APTITUDE';
-    } else if (currentRound === 'MANAGERIAL') {
-      mappedRound = 'TECHNICAL';
-    } else if (currentRound === 'FINAL') {
-      mappedRound = 'HR';
-    }
-  }
-
-  const failedIndex = status === 'REJECTED' ? roundsOrder.indexOf(mappedRound) : -1;
-  const activeIndex = status !== 'REJECTED' ? roundsOrder.indexOf(mappedRound) : -1;
-
-  return [
-    { id: 'APPLIED', label: 'Applied' },
-    { id: 'APTITUDE', label: 'Aptitude' },
-    { id: 'TECHNICAL', label: 'Technical' },
-    { id: 'HR', label: 'HR' },
-    { id: 'SELECTED', label: 'Selected' }
-  ].map((stage, idx) => {
-    let state: 'completed' | 'active' | 'upcoming' | 'failed' | 'disabled' = 'upcoming';
-
-    if (status === 'SELECTED' || status === 'OFFER_ACCEPTED') {
-      state = 'completed';
-    } else if (status === 'REJECTED') {
-      if (idx < failedIndex) {
-        state = 'completed';
-      } else if (idx === failedIndex) {
-        state = 'failed';
-      } else {
-        state = 'disabled';
-      }
-    } else {
-      // Shortlisted or Applied
-      if (idx < activeIndex) {
-        state = 'completed';
-      } else if (idx === activeIndex) {
-        state = 'active';
-      } else {
-        state = 'upcoming';
-      }
-    }
-
-    return { ...stage, state };
-  });
 };
 
 export const STATUS_FLOW = ['APPLIED', 'SHORTLISTED', 'SELECTED', 'OFFER_ACCEPTED'];
@@ -503,43 +436,6 @@ const Applicants: React.FC = () => {
     window.open(absoluteUrl, '_blank');
   }, []);
 
-  // Renders premium Initials-based avatar with custom gradient index mapping
-  const renderCandidateAvatar = (app: any, size: "sm" | "lg" = "sm") => {
-    const name = `${app.student?.user?.firstname || 'Candidate'} ${app.student?.user?.lastname || ''}`;
-    const initials = `${app.student?.user?.firstname?.charAt(0) || 'C'}${app.student?.user?.lastname?.charAt(0) || ''}`.toUpperCase();
-    
-    // Custom gradient palettes to ensure absolute visual stunningness
-    const gradients = [
-      "from-orange-400 to-amber-500 ring-orange-100/80 dark:ring-orange-950/20",
-      "from-blue-400 to-indigo-500 ring-blue-100/80 dark:ring-blue-950/20",
-      "from-emerald-400 to-teal-500 ring-emerald-100/80 dark:ring-emerald-950/20",
-      "from-violet-400 to-purple-500 ring-violet-100/80 dark:ring-violet-950/20",
-      "from-rose-400 to-pink-500 ring-rose-100/80 dark:ring-rose-950/20"
-    ];
-    
-    let sum = 0;
-    for (let i = 0; i < name.length; i++) sum += name.charCodeAt(i);
-    const grad = gradients[sum % gradients.length];
-    const [gradientClasses, ringClasses] = grad.split(" ring-");
-
-    if (size === "lg") {
-      return (
-        <Avatar size="lg" className={`size-14 border border-white/20 ring-4 ring-${ringClasses} shadow-md transition-all duration-300 group-hover/avatar:scale-105 shrink-0`}>
-          <AvatarFallback className={`bg-gradient-to-br ${gradientClasses} font-bold text-sm text-white tracking-tight`}>
-            {initials}
-          </AvatarFallback>
-        </Avatar>
-      );
-    }
-
-    return (
-      <Avatar size="sm" className="shadow-xs border border-border/10 ring-2 ring-background transition-transform duration-300 group-hover:scale-105 shrink-0">
-        <AvatarFallback className={`bg-gradient-to-tr ${gradientClasses} font-bold text-xs tracking-wider text-white`}>
-          {initials}
-        </AvatarFallback>
-      </Avatar>
-    );
-  };
 
   return (
     <div className="min-h-screen pb-20 animate-in fade-in duration-700">

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Search, GraduationCap, ArrowUpRight } from 'lucide-react';
+import { Search, GraduationCap } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchJobApplications } from '@/redux/thunks/companyThunk';
 import type { RootState, AppDispatch } from '@/redux/store/store';

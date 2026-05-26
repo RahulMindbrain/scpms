@@ -7,15 +7,10 @@ import {
   ShieldAlert, 
   Info, 
   AlertCircle,
-  Send,
   Brain,
-  MessagesSquare,
   Code2,
   UserCheck,
-  Briefcase,
-  Trophy,
   Check,
-  User,
   Clock
 } from 'lucide-react';
 const STATUS_FLOW = ['APPLIED', 'SHORTLISTED', 'SELECTED', 'OFFER_ACCEPTED'];
@@ -56,7 +51,6 @@ interface StatusUpdateModalProps {
   validationError: any;
   submissionError: any;
   formatStage: (status: string, round?: string | null) => string;
-  formatRound: (round: string) => string;
   getPresetReason: (status: string, round: string) => string;
 }
 
@@ -75,7 +69,6 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
   validationError,
   submissionError,
   formatStage,
-  formatRound,
   getPresetReason
 }) => {
   const getRoundProgressState = (roundId: string, app: any) => {
@@ -310,7 +303,7 @@ export const StatusUpdateModal: React.FC<StatusUpdateModalProps> = ({
                     { id: 'APTITUDE', label: 'Aptitude', icon: <Brain size={14} /> },
                     { id: 'TECHNICAL', label: 'Technical', icon: <Code2 size={14} /> },
                     { id: 'HR', label: 'HR', icon: <UserCheck size={14} /> }
-                  ].map((round, idx) => {
+                  ].map((round) => {
                     const progressState = getRoundProgressState(round.id, selectedApp);
                     const isCompleted = progressState === 'completed';
                     const isActive = progressState === 'active';
